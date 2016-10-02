@@ -1,0 +1,2 @@
+# fogofwar
+Tabletop kriegspiel calculator

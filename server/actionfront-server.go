@@ -30,30 +30,7 @@ func main() {
 
 	Config = config.LoadConfig()
 	cpus := smt.Init()
-	fmt.Printf("Go-CMMS running on %d CPU cores\nSMS-On = %v\n", cpus, Config.SMSOn)
-
-	if Config.SMSOn {
-		println(".. Will Send SMS Messages as needed")
-	} else {
-		println(".. Will NOT send any SMS messages with current settings")
-	}
-
-	// Make sure the SMS stuff is all working before we go too far
-	go func() {
-		smsbal, smserr := GetSMSBalance()
-		if smserr != nil {
-			log.Fatal("Cannot retrieve SMS account info\n", smserr.Error())
-		}
-		log.Println("... Remaining SMS Balance =", smsbal)
-	}()
-
-	go func() {
-		smsbal, smserr := GetIntlBalance()
-		if smserr != nil {
-			log.Fatal("Cannot retrieve International SMS account info", smserr.Error())
-		}
-		log.Println("... Remaining International SMS Balance =", smsbal)
-	}()
+	fmt.Printf("ActionFront Server running on %d CPU cores\n", cpus)
 
 	// Start up the basic web server
 	e = echo.New()
@@ -103,9 +80,6 @@ func main() {
 	Connections = new(ConnectionsList)
 	registerRPC()
 
-	// On startup, generate a batch of tasks, and continue scanning on the hour
-	autoGenerate()
-
 	e.Get("/ws", standard.WrapHandler(websocket.Handler(webSocket)))
 	// e.Get("/ws", fasthttp.WrapHandler(websocket.Handler(webSocket)))
 
@@ -119,7 +93,8 @@ func main() {
 
 	cachePDFImage()
 	std := standard.New(fmt.Sprintf(":%d", Config.WebPort))
-	e.Run(std)
+	errRun := e.Run(std)
+	println("done", errRun.Error())
 
 	// std.SetHandler(e)
 	// gracehttp.Serve(std.Server)

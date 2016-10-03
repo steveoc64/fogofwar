@@ -1,11 +1,11 @@
 package main
 
-import "itrak-cmms/shared"
+import "../shared"
 
-func getRoutes(uid int, role string) []shared.UserRoute {
+func getRoutes(uid int, rank int) []shared.UserRoute {
 
-	switch role {
-	case "Admin":
+	switch rank {
+	default:
 		return []shared.UserRoute{
 			{Route: "/", Func: "sitemap"},
 			{Route: "/sitemachines/{site}", Func: "sitemachines"},

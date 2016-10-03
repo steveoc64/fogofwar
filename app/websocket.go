@@ -266,7 +266,7 @@ func processAsync(method string, msg shared.AsyncMessage) {
 	switch method {
 	case "Ping":
 		Session.Channel = msg.ID
-		print("Set channel to", Session.Channel)
+		// print("Set channel to", Session.Channel)
 	case "PingRPC.Ping":
 		// print("Keepalive")
 	default:

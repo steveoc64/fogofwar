@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"itrak-cmms/shared"
+	"../shared"
 
 	"golang.org/x/net/websocket"
 )
@@ -24,7 +24,7 @@ type Connection struct {
 	Mutex    *sync.Mutex
 	Username string
 	UserID   int
-	UserRole string
+	Rank     int
 	Time     time.Time
 	ticker   *time.Ticker
 	enc      *gob.Encoder
@@ -51,6 +51,25 @@ func (c *Connection) Send(name string, payload interface{}) error {
 	}
 	// log.Println("got here with", payload)
 	return nil
+}
+
+func (c *Connection) GetRank() string {
+	switch c.Rank {
+	case 1:
+		return "Lt"
+	case 2:
+		return "Capt"
+	case 3:
+		return "Maj"
+	case 4:
+		return "Col"
+	case 5:
+		return "General"
+	case 6:
+		return "Marshal"
+	default:
+		return fmt.Sprintf("Unknown %d", c.Rank)
+	}
 }
 
 // Upgrade the session data for this connection

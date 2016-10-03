@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"time"
 
-	"itrak-cmms/shared"
+	"../shared"
 )
 
 type UtilRPC struct{}

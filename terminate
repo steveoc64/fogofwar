@@ -1,3 +1,2 @@
-killall -q cmms-server
-#taskkill /IM cmms-server.exe /F
+killall -q actionfront-server
 exit 0

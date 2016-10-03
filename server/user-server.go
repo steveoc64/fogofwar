@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"itrak-cmms/shared"
+	"../shared"
 )
 
 type UserRPC struct{}

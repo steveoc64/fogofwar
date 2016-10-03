@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"itrak-cmms/shared"
+	"../shared"
 
 	"github.com/nfnt/resize"
 )

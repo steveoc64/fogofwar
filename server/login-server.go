@@ -1,24 +1,20 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"time"
 
-	"itrak-cmms/shared"
+	"../shared"
 )
 
 type LoginRPC struct{}
 
 type dbLoginResponse struct {
-	ID          int            `db:"id"`
-	Username    string         `db:"username"`
-	Name        string         `db:"name"`
-	Role        string         `db:"role"`
-	SiteID      int            `db:"site_id"`
-	SiteName    sql.NullString `db:"sitename"`
-	CanAllocate bool           `db:"can_allocate"`
+	ID       int    `db:"id"`
+	Username string `db:"username"`
+	Name     string `db:"name"`
+	Rank     int    `db:"rank"`
 }
 
 func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
@@ -27,7 +23,7 @@ func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
 	conn.Route = data.Route
 	*r = conn.Route
 	println("\n----------------------------------")
-	log.Printf("%s:%s -> %s\n", conn.Username, conn.UserRole, conn.Route)
+	log.Printf("%s:%s -> %s\n", conn.Username, conn.Rank, conn.Route)
 	conn.BroadcastAdmin("nav", data.Route, data.Channel)
 	return nil
 }
@@ -52,14 +48,20 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		// 	left join site s on (s.id = u.site_id)
 		// 	where lower(u.username) = lower('`, lc.Username, `') and lower(passwd) = lower('`, lc.Password, `')`)
 
-		err := DB.
-			Select("u.id,u.username,u.name,u.role,u.site_id,s.name as sitename,u.can_allocate as can_allocate").
-			From(`users u
-			left join site s on (s.id = u.site_id)`).
-			Where("lower(u.username) = lower($1) and lower(passwd) = lower($2)",
-				lc.Username, lc.Password).
+		// err := DB.
+		// 	Select("u.id,u.username,u.name,u.role,u.site_id,s.name as sitename,u.can_allocate as can_allocate").
+		// 	From(`users u
+		// 	left join site s on (s.id = u.site_id)`).
+		// 	Where("lower(u.username) = lower($1) and lower(passwd) = lower($2)",
+		// 		lc.Username, lc.Password).
+		// 	QueryStruct(res)
+		// // log.Println(res)
+
+		err := DB.SQL(`select
+			id,username,name,rank
+			from users
+			where lower(username) = lower($1) and lower(passwd) = lower($2)`, lc.Username, lc.Password).
 			QueryStruct(res)
-		// log.Println(res)
 
 		if err != nil {
 			log.Println("Login Failed:", err.Error())
@@ -67,8 +69,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Token = ""
 			// lr.Menu = []shared.UserMenu{}
 			lr.Routes = []shared.UserRoute{}
-			lr.Role = ""
-			lr.Site = ""
+			lr.Rank = 0
 		} else {
 			// log.Println("Login OK")
 			lr.Result = "OK"
@@ -76,14 +77,10 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 
 			//lr.Menu = []string{"RPC Dashboard", "Events", "Sites", "Machines", "Tools", "Parts", "Vendors", "Users", "Skills", "Reports"}
 			// lr.Menu = getMenu(res.Role)
-			lr.Routes = getRoutes(res.ID, res.Role)
-			lr.Role = res.Role
+			lr.Routes = getRoutes(res.ID, res.Rank)
+			lr.Rank = res.Rank
 			lr.ID = res.ID
-			lr.CanAllocate = res.CanAllocate
-			if res.SiteName.Valid {
-				lr.Site = res.SiteName.String
-			}
-			conn.Login(lc.Username, res.ID, res.Role)
+			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
 			conn.Broadcast("login", "insert", lr.ID)
 		}
@@ -91,7 +88,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 
 	logger(start, "Login.Login",
 		fmt.Sprintf("%s,%s,%t,%d", lc.Username, lc.Password, lc.RememberMe, lc.Channel),
-		fmt.Sprintf("%s,%s,%s", lr.Result, lr.Role, lr.Site),
+		fmt.Sprintf("%s,%s,%s", lr.Result, lr.Rank, lr.Site),
 		lc.Channel, lr.ID, "users", lr.ID, false)
 
 	return nil
@@ -100,7 +97,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 func (l *LoginRPC) UsersOnline(channel int, u *[]shared.UserOnline) error {
 	start := time.Now()
 	conn := Connections.Get(channel)
-	if conn.UserRole == "Admin" {
+	if conn.Rank > 9 {
 
 		for _, k := range Connections.Keys() {
 			v := Connections.Get(k)

@@ -9,16 +9,15 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-func Login(username string, passwd string, rem bool) {
+func Login(username string, passwd string) {
 
 	Session.Username = ""
 	Session.UserRole = ""
 
 	lc := &shared.LoginCredentials{
-		Username:   username,
-		Password:   passwd,
-		RememberMe: rem,
-		Channel:    Session.Channel,
+		Username: username,
+		Password: passwd,
+		Channel:  Session.Channel,
 	}
 	// print("login params", lc)
 
@@ -129,8 +128,7 @@ func initLoginForm() {
 		evt.PreventDefault()
 		username := doc.GetElementByID("l-username").(*dom.HTMLInputElement).Value
 		passwd := doc.GetElementByID("l-passwd").(*dom.HTMLInputElement).Value
-		rem := doc.GetElementByID("l-remember").(*dom.HTMLInputElement).Checked
-		go Login(username, passwd, rem)
+		go Login(username, passwd)
 	})
 
 	logoutBtn := doc.GetElementByID("logoutbtn").(*dom.HTMLButtonElement)

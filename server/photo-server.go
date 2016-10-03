@@ -112,7 +112,7 @@ func (u *UtilRPC) AddPhoto(data shared.PhotoRPCData, newID *int) error {
 
 	logger(start, "Util.AddPhoto",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("%d", *newID),
 		data.Channel, conn.UserID, "photo", 0, true)
 
@@ -134,7 +134,7 @@ func (u *UtilRPC) GetPhoto(data shared.PhotoRPCData, photo *shared.Photo) error 
 
 	logger(start, "Util.GetPhoto",
 		fmt.Sprintf("Channel %d, ID %d, User %d %s %s",
-			data.Channel, data.ID, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, data.ID, conn.UserID, conn.Username, conn.GetRank()),
 		photo.Notes,
 		data.Channel, conn.UserID, "photo", data.ID, false)
 
@@ -155,7 +155,7 @@ func (u *UtilRPC) GetFullPhoto(data shared.PhotoRPCData, photo *shared.Photo) er
 
 	logger(start, "Util.GetFullPhoto",
 		fmt.Sprintf("Channel %d, ID %d, User %d %s %s",
-			data.Channel, data.ID, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, data.ID, conn.UserID, conn.Username, conn.GetRank()),
 		photo.Data[:22],
 		data.Channel, conn.UserID, "photo", data.ID, false)
 
@@ -171,7 +171,7 @@ func (u *UtilRPC) PhotoList(data shared.PhotoTestRPCData, photos *[]shared.Photo
 
 	logger(start, "Util.PhotoList",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("%d Photos", len(*photos)),
 		data.Channel, conn.UserID, "photo", 0, false)
 
@@ -191,7 +191,7 @@ func (u *UtilRPC) UpdatePhoto(data shared.PhotoRPCData, done *bool) error {
 
 	logger(start, "Util.UpdatePhoto",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("%d", data.ID),
 		data.Channel, conn.UserID, "photo", 0, true)
 
@@ -210,7 +210,7 @@ func (u *UtilRPC) DeletePhoto(data shared.PhotoRPCData, done *bool) error {
 
 	logger(start, "Util.DeletePhoto",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.UserRole),
+			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("%d", data.ID),
 		data.Channel, conn.UserID, "photo", 0, true)
 
@@ -264,7 +264,7 @@ func (u *UtilRPC) GetPDFImage(channel int, pdf *string) error {
 
 	logger(start, "Util.GetPDFImage",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.UserRole),
+			channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]),
 		channel, conn.UserID, "stdimg", id, false)
 
@@ -288,7 +288,7 @@ func (u *UtilRPC) GetRawDataImage(channel int, pdf *string) error {
 
 	logger(start, "Util.GetRawDataImage",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.UserRole),
+			channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]),
 		channel, conn.UserID, "stdimg", id, false)
 

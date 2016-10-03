@@ -23,7 +23,7 @@ func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
 	conn.Route = data.Route
 	*r = conn.Route
 	println("\n----------------------------------")
-	log.Printf("%s:%s -> %s\n", conn.Username, conn.Rank, conn.Route)
+	log.Printf("%s:%s -> %s\n", conn.Username, conn.GetRank(), conn.Route)
 	conn.BroadcastAdmin("nav", data.Route, data.Channel)
 	return nil
 }
@@ -88,7 +88,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 
 	logger(start, "Login.Login",
 		fmt.Sprintf("%s,%s,%t,%d", lc.Username, lc.Password, lc.RememberMe, lc.Channel),
-		fmt.Sprintf("%s,%s,%s", lr.Result, lr.Rank, lr.Site),
+		fmt.Sprintf("%s,%d", lr.Result, lr.Rank),
 		lc.Channel, lr.ID, "users", lr.ID, false)
 
 	return nil
@@ -108,20 +108,17 @@ func (l *LoginRPC) UsersOnline(channel int, u *[]shared.UserOnline) error {
 				theIP = req.RemoteAddr
 			}
 			user := shared.UserOnline{
-				ID:          v.UserID,
-				Username:    v.Username,
-				Browser:     fmt.Sprintf("%s", req.Header["User-Agent"]),
-				IP:          theIP,
-				Name:        "lookup",
-				Email:       "lookup",
-				Role:        v.UserRole,
-				SMS:         "lookup",
-				IsTech:      false,
-				CanAllocate: false,
-				Route:       v.Route,
-				Routes:      v.Routes,
-				Duration:    time.Since(v.Time).String(),
-				Channel:     v.ID,
+				ID:       v.UserID,
+				Username: v.Username,
+				Browser:  fmt.Sprintf("%s", req.Header["User-Agent"]),
+				IP:       theIP,
+				Name:     "lookup",
+				Email:    "lookup",
+				Rank:     v.Rank,
+				Route:    v.Route,
+				Routes:   v.Routes,
+				Duration: time.Since(v.Time).String(),
+				Channel:  v.ID,
 			}
 
 			if user.ID == 0 {
@@ -135,7 +132,7 @@ func (l *LoginRPC) UsersOnline(channel int, u *[]shared.UserOnline) error {
 
 	logger(start, "Login.UsersOnline",
 		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.UserRole),
+			channel, conn.UserID, conn.Username, conn.GetRank()),
 		fmt.Sprintf("%d Users Online", len(*u)),
 		channel, conn.UserID, "users", 0, false)
 

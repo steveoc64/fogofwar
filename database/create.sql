@@ -7,6 +7,8 @@ create table users (
 	email text not null,
 	rank int not null default 1
 );
+insert into users (username, passwd, name, email, rank) 
+	values 'steve','steve','Steve','steveoc64@gmail.com',10;
 
 drop table if exists stdimg;
 create table stdimg (

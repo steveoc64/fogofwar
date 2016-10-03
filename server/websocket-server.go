@@ -73,10 +73,10 @@ func (c *Connection) GetRank() string {
 }
 
 // Upgrade the session data for this connection
-func (c *Connection) Login(username string, id int, role string) {
+func (c *Connection) Login(username string, id int, rank int) {
 	c.Username = username
 	c.UserID = id
-	c.UserRole = role
+	c.Rank = rank
 	c.Route = ""
 	c.Time = time.Now()
 }
@@ -125,7 +125,7 @@ func (c *Connection) BroadcastAdmin(name string, action string, id int) {
 	}
 
 	for _, v := range Connections.cmap {
-		if v != c && v.UserID != 0 && v.UserRole == "Admin" {
+		if v != c && v.UserID != 0 && v.Rank > 9 {
 			log.Println("broadcastAdmin", name, action, id, "»", v.ID)
 			go v.Send(name, data)
 		}
@@ -174,7 +174,7 @@ func (c *ConnectionsList) BroadcastAllAdmin(name string, action string, id int) 
 	}
 
 	for _, v := range c.cmap {
-		if v.UserID != 0 && v.UserRole == "Admin" {
+		if v.UserID != 0 && v.Rank > 9 {
 			log.Println("BroadcastAllAdmin", name, action, id, "»", v.ID)
 			go v.Send(name, data)
 		}

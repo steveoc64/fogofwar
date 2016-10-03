@@ -50,21 +50,21 @@ func Lights() {
 	if rxOn {
 		if txOn {
 			// RxTxLights.SetAttribute("src", "/img/RoundRxTxB.png")
-			RxTxLights.SetAttribute("src", "/img/sbs-logo-tr.png")
+			RxTxLights.SetAttribute("src", "/img/af-logo-tr.png")
 
 		} else {
 			// RxTxLights.SetAttribute("src", "/img/RoundRx__B.png")
-			RxTxLights.SetAttribute("src", "/img/sbs-logo-nr.png")
+			RxTxLights.SetAttribute("src", "/img/af-logo-nr.png")
 
 		}
 	} else {
 		if txOn {
 			// RxTxLights.SetAttribute("src", "/img/Round__TxB.png")
-			RxTxLights.SetAttribute("src", "/img/sbs-logo-tn.png")
+			RxTxLights.SetAttribute("src", "/img/af-logo-tn.png")
 
 		} else {
 			// RxTxLights.SetAttribute("src", "/img/RoundRxTx-none.png")
-			RxTxLights.SetAttribute("src", "/img/sbs-logo-nn.png")
+			RxTxLights.SetAttribute("src", "/img/af-logo-nn.png")
 
 		}
 	}

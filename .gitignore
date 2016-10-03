@@ -1,12 +1,9 @@
 dist
 config.json
-cmms
 app.js
 *.map
 bower_components
-cmms-server
-cmms-server.exe
-makefile
+actionfront-server
 template.go
 .sass-cache
 app.css

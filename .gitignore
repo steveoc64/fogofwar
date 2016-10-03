@@ -13,6 +13,5 @@ template.go
 assets/scss/.sass-cache
 test
 backup
-makefile
 templates/old
 *~

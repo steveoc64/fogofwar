@@ -1,0 +1,118 @@
+/* http://tympanus.net/Development/PricingTablesInspiration/  */
+
+.action-grid {
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-justify-content: center;
+	justify-content: center;
+	width: 100%;
+	margin: 0em;
+	padding: 0em;
+	cursor: default;
+	border: 1px;
+	background: #fff;
+	border-top: 1px solid $sbs-dksand;
+}
+
+.action-hidden {
+	display: none !important
+}
+
+.action__item {
+	-webkit-transition: 0.6s;
+	transition: 0.6s;
+	position: relative;
+	display: -webkit-flex;
+	display: flex;
+	margin: 1rem;
+	padding: 0rem;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-align-items: stretch;
+	align-items: stretch;
+	text-align: center;
+	-webkit-flex: 0 1 22rem;
+	flex: 0 1 22rem;
+	background-color: $sbs-box;
+	box-shadow: 0 5px 20px rgba(0,0,0,0.05), 0 15px 30px -10px rgba(0,0,0,0.3);
+	-webkit-transition: 0.6s;
+	transition: 0.6s;
+	border-radius: .4rem;	
+	border: 4px solid(#344);
+	font-size: 1.6rem;
+	height: 20rem;
+
+	// if they insist on using an iphone
+	@media (max-height: 740px) {
+		height: 16rem;
+	}
+
+	.action__title {
+		transition: 0.6s;
+		font-size: 2.0rem;
+		width: 100%;
+		margin: 0 0 0.25em;
+		padding: 0 0 0.5em;
+		color: $sbs-blue;
+		border-top: 3px solid $sbs-box;
+
+		// if they insist on using an iphone
+		@media (max-height: 740px) {
+			font-size: 1.4rem;
+		}
+
+	}
+
+	.action__icon {
+		transition: 0.6s;
+		color: $sbs-blue;
+		width: 100%;
+		font-size: 4.0rem;
+
+		// if they insist on using an iphone
+		@media (max-height: 740px) {
+			font-size: 3.0rem;
+		}
+
+	}
+
+	.action__text {
+		transition: 0.6s;
+		color: black;
+		font-size: 1rem;
+		font-style: italic;
+		text-align: justify;
+		padding: 1.2rem 3rem 0.3rem 3rem;
+		text-justify: inter-word;
+		border-top: 1px solid $sbs-dksand;
+		height: 100%;
+
+		// if they insist on using an iphone
+		@media (max-height: 740px) {
+			padding: 1.4rem 2rem 0.3rem 2rem;
+			font-size: 1rem;
+			border: none;
+		}
+	}
+
+	&:hover {
+		transition: 0.3s;
+		background-color: $sbs-ltbox;
+		// outline: 1px solid $sbs-ltblue;
+		.action__title {
+			transition: 0.8s;
+			border-top: 3px solid $sbs-ltblue;	
+		}
+		.action__icon {
+			transition: 0.8s;
+			color: $sbs-ltblue;
+			width: 100%;
+		}
+		.action__text {
+			border-bottom: 3px solid $sbs-ltblue;	
+		}
+	}
+
+}

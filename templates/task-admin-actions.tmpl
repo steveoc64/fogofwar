@@ -1,0 +1,66 @@
+<div class="action-grid">
+	{{if .EventID}}
+	<div class="action__item" url="/stoppage/{{.ID}}">
+		<div class="action__title">Stoppage</div>
+		<div class="action__icon"><i class="fa fa-pause-circle-o fa-lg"></i></div>
+		<div class="action__text">
+			View the Stoppage Event related to this task.
+		</div>
+	</div>
+	{{end}}
+	{{if .SchedID}}
+	<div class="action__item" url="/sched/{{.ID}}">
+		<div class="action__title">Schedule</div>
+		<div class="action__icon"><i class="fa fa-wrench fa-lg"></i></div>
+		<div class="action__text">
+			View the Scheduled Task that created this task.
+		</div>
+	</div>
+	{{end}}
+	{{if and .AssignedTo (not .IsRead)}}
+	<div class="action__item" url="/retransmit/{{.ID}}">
+		<div class="action__title">Re-Transmit SMS</div>
+		<div class="action__icon"><i class="fa fa-phone-square fa-lg"></i></div>
+		<div class="action__text">
+			Records indicate that this user hasn't read the Task yet.
+			Click to Re-Transmit the SMS message.
+		</div>
+	</div>
+	{{end}}
+	{{if .AllDone}}
+	<div class="action__item" url="/task/complete/{{.ID}}">
+		<div class="action__title">Complete Task</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Mark this task as complete.
+		</div>
+	</div>
+	{{else}}
+	{{if not .CompletedDate}}
+	<div class="action__item" url="">
+		<div class="action__title">More Info Needed</div>
+		<div class="action__icon"><i class="fa fa-minus-square fa-lg"></i></div>
+		<div class="action__text">
+		Before you can complete this task, please enter the number of hours spent, and complete any checkbox items.
+		</div>
+	</div>
+	{{end}}
+	{{end}}
+<!-- 
+	<div class="action__item" url="/task/parts/{{.ID}}">
+		<div class="action__title">Parts</div>
+		<div class="action__icon"><i class="fa fa-puzzle-piece fa-lg"></i></div>
+		<div class="action__text">
+			<b>TODO</b><br>
+			Select Spare Parts used in this job.
+		</div>
+	</div>
+	 -->
+	<div class="action__item" url="/task/invoices/{{.ID}}">
+		<div class="action__title">Invoices</div>
+		<div class="action__icon"><i class="fa fa-money fa-lg"></i></div>
+		<div class="action__text">
+		  Record external invoices attached to this task.
+		</div>
+	</div> 
+</div>

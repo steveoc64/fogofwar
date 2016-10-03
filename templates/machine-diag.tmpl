@@ -1,0 +1,202 @@
+<svg class="svg-panel-nohover" xmlns="http://www.w3.org/2000/svg" 
+    	 width="95%"
+    	 viewBox="0 0 {{.Machine.SVGWidth1}} 180">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#eee;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#869ab1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9ac;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="bgradh" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#abd;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2 2" result="shadow"/>
+      <feOffset dx="3" dy="3"/>
+    </filter>      
+    <filter id="shadow1" x="0" y="0" width="200%" height="200%">
+      <feOffset result="offOut" in="SourceAlpha" dx="1" dy="1" />
+      <feGaussianBlur result="blurOut" in="offOut" stdDeviation="10" />
+      <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+    </filter>
+    <radialGradient id="GreenBtn">
+        <stop offset="10%" stop-color="#4f2"/>
+        <stop offset="95%" stop-color="#2a1"/>
+    </radialGradient>
+    <radialGradient id="DullGreenBtn">
+        <stop offset="10%" stop-color="#898"/>
+        <stop offset="95%" stop-color="#888"/>
+    </radialGradient>
+    <radialGradient id="BlueBtn">
+        <stop offset="10%" stop-color="#ff0">
+          <animate attributeName="stop-color"
+          values="#26a;#08e;#0af;#0af;#08e;#26a"
+          dur="0.8s"
+          repeatCount="indefinite" />
+        </stop>
+        <stop offset="95%" stop-color="#26a"/>
+    </radialGradient>
+    <radialGradient id="YellowBtn">
+        <stop offset="10%" stop-color="#ff0">
+          <animate attributeName="stop-color"
+          values="#da2;#ee0;#ff0;#ff0;#ee0;#da2"
+          dur="0.8s"
+          repeatCount="indefinite" />
+        </stop>
+        <stop offset="95%" stop-color="#da2"/>
+    </radialGradient>
+    <radialGradient id="DullYellowBtn">
+        <stop offset="10%" stop-color="#998"/>
+        <stop offset="95%" stop-color="#888"/>
+    </radialGradient>
+    <radialGradient id="RedBtn">   <!--  fx="60%" fy="30%"> -->
+        <stop offset="10%" stop-color="#fa0">
+          <animate attributeName="stop-color"
+          values="#f00;#f80;#fa0;#f80;#f00"
+          dur="0.8s"
+          repeatCount="indefinite" />
+        </stop>
+        <stop offset="95%" stop-color="#e00">
+          <animate attributeName="stop-color"
+          values="#800;#a00;#f00;#a00;#800"
+          dur="0.8s"
+          repeatCount="indefinite" />
+        </stop>
+    </radialGradient>
+  </defs>
+
+  <!-- Add picture for uncoiler -->
+  {{if .Machine.MachineTypeData.Uncoiler}}
+  <g stroke="#114" stroke-width="2" class="fillhover">    
+    <title>Raise Event on Uncoiler</title>
+    <polygon points="30,90 0,148 60,148" fill="url(#grad1)"/>
+    <circle cx="30" cy="90" r="30" fill="{{.Machine.NonToolBg .Machine.Uncoiler}}"/>
+  </g>
+  {{end}}
+
+  <!-- Add buttons for elec, etc -->
+  {{if .Machine.MachineTypeData.Electrical}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Electrical</title>
+    <rect x="0" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Electrical}}"/>
+    <image xlink:href="/img/elec.png" x="1" y="2" height="38px" width="38px"/>
+  </g>  
+  {{end}}
+  {{if .Machine.MachineTypeData.Hydraulic}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Hydraulic</title>
+    <rect x="50" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Hydraulic}}"/>
+    <image xlink:href="/img/hydraulic.png" x="51" y="2" height="38px" width="38px"/>
+  </g>
+  {{end}}
+  {{if .Machine.MachineTypeData.Pnuematic}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Pnuematic</title>
+    <rect x="100" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Pnuematic}}"/>
+    <image xlink:href="/img/pnue.png" x="101" y="2" height="38px" width="38px"/>
+  </g>
+  {{end}}
+  {{if .Machine.MachineTypeData.Lube}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Lube</title>
+    <rect x="150" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Lube}}"/>
+    <image xlink:href="/img/lube.png" x="151" y="2" height="38px" width="38px"/>
+  </g>
+  {{end}}
+  {{if .Machine.MachineTypeData.Printer}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Printer</title>
+    <rect x="200" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Printer}}"/>
+    <image xlink:href="/img/printer.png" x="201" y="2" height="38px" width="38px"/>
+  </g>
+  {{end}}
+  {{if .Machine.MachineTypeData.Console}}
+  <g stroke="#114" stroke-width="1" class="fillhover">
+    <title>Console</title>
+    <rect x="250" y="0" width="40" rx="3" ry="3" height="40" class="bhover"
+          fill="{{.Machine.NonToolBg .Machine.Console}}"/>
+    <image xlink:href="/img/console.png" x="251" y="2" height="38px" width="38px"/>
+  </g>
+  {{end}}
+
+  <!-- Add main rectangle -->
+  <rect x="80" y="100" width="{{.Machine.SVGWidth2}}" 
+    height="48" stroke="black" stroke-width="2" fill="url(#grad1)"/>
+  <text transform="translate(100 135)" style="font-size: 22;">{{.Machine.Name}}</text>
+
+  <!-- Add the status indicators -->
+  <g stroke="black" fill="{{.Machine.SVGStatus}}">
+    <circle cx="{{.Machine.SVGX}}" cy="125" r="18"/>
+  </g>
+
+  {{if .Machine.MachineTypeData.Encoder}}
+  <g stroke="#114" stroke-width="2" class="fillhover">
+    <title>Encoder</title>
+    <rect x="80" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.Encoder}}"/>
+    <image xlink:href="/img/encoder.png" x="81" y="62" height="38px" width="28px"/>
+  </g>
+  {{end}}
+  {{if .Machine.MachineTypeData.StripGuide}}
+  <g stroke="#114" stroke-width="2" class="fillhover">
+    <title>Strip Guide</title>
+    <rect x="115" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.StripGuide}}"/>
+    <image xlink:href="/img/stripguide.png" x="116" y="62" height="38px" width="28px"/>
+  </g>
+  {{end}}
+
+  {{if .Machine.MachineTypeData.Rollbed}}
+  <g stroke="#114" stroke-width="2" class="fillhover">
+    <title>Roll Bed</title>
+
+  <rect x="150" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.Rollbed}}"/>
+    <circle cx="165" cy="73" r="6" fill="#ccc"/>
+    <circle cx="165" cy="87" r="6" fill="#ccc"/>
+  <rect x="185" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.Rollbed}}"/>
+    <circle cx="200" cy="73" r="6" fill="#ccc"/>
+    <circle cx="200" cy="87" r="6" fill="#ccc"/>
+  <rect x="220" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.Rollbed}}"/>
+    <circle cx="235" cy="73" r="6" fill="#ccc"/>
+    <circle cx="235" cy="87" r="6" fill="#ccc"/>
+  <rect x="255" y="60" width="30" height="40" fill="{{.Machine.NonToolBg .Machine.Rollbed}}"/>
+    <circle cx="270" cy="73" r="6" fill="#ccc"/>
+    <circle cx="270" cy="87" r="6" fill="#ccc"/>
+
+  </g>
+  {{end}}
+
+  <!-- Now draw all the tools     -->
+  {{$compID := .CompID}}
+  {{range $index,$comp := .Machine.Components}}
+  <svg x="{{$comp.SVGX $index}}" 
+       class="tooltip tooltip--ne"
+       ng-click="Machines.raiseIssue(row,comp,comp.ID,'tool')">
+       <title>{{$comp.Name}}</title>
+    <a>
+    <rect x="16" y="0" width="15" height="20" stroke="black" stroke-width="1" fill="#ddd"/>
+    <rect y="20" width="45" rx="10" ry="10" height="80" stroke="black" stroke-width="2" 
+          fill="{{$comp.SVGFill2 $compID}}"
+          class="hoverme"/>
+    <text x="5" y="50">{{$comp.SVGName $index}}</text>
+    </a>
+  </svg>
+  {{end}}
+
+  <!-- Now draw the conveyor -->
+  {{if .Machine.MachineTypeData.Conveyor}}
+  <rect x="80" y="150" rx="10" ry="10" width="{{.Machine.SVGWidth2}}" 
+    height="22" stroke="black" stroke-width="2" fill="url(#grad1)"
+    class="hoverme"/>
+  <text transform="translate(100 164)" style="font-size: 14;">Conveyor</text>
+  {{end}}
+
+
+</svg>

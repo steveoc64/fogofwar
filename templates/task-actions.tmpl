@@ -1,0 +1,30 @@
+<div class="action-grid">
+	{{if .AllDone}}
+	<div class="action__item" url="/task/complete/{{.ID}}">
+		<div class="action__title">Complete Task</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Mark this task as complete.
+		</div>
+	</div>
+	{{if not .CompletedDate}}
+	<div class="action__item" url="">
+		<div class="action__title">More Info Needed</div>
+		<div class="action__icon"><i class="fa fa-minus-square fa-lg"></i></div>
+		<div class="action__text">
+		Before you can complete this task, please enter the number of hours spent, and complete any checkbox items.
+		</div>
+	</div>
+	{{end}}
+	{{end}}
+<!-- 
+	<div class="action__item" url="/task/parts/{{.ID}}">
+		<div class="action__title">Parts</div>
+		<div class="action__icon"><i class="fa fa-puzzle-piece fa-lg"></i></div>
+		<div class="action__text">
+			<b>TODO</b><br>
+			Select Spare Parts used in this job.
+		</div>
+	</div>
+	 -->
+</div>

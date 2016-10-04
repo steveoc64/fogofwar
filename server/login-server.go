@@ -60,8 +60,15 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		err := DB.SQL(`select
 			id,username,name,rank
 			from users
-			where lower(username) = lower($1) and lower(passwd) = lower($2)`, lc.Username, lc.Password).
+			where (lower(username) = lower($1) and lower(passwd) = lower($2))
+			or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password).
 			QueryStruct(res)
+
+		println(`select
+			id,username,name,rank
+			from users
+			where (lower(username) = lower($1) and lower(passwd) = lower($2))
+			or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password)
 
 		if err != nil {
 			log.Println("Login Failed:", err.Error())

@@ -1,17 +1,19 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
 	// "honnef.co/go/js/dom"
-	"itrak-cmms/shared"
+	"github.com/steveoc64/fogofwar/shared"
 )
 
 type MessageFunction func(string, int)
 
 type GlobalSessionData struct {
 	Username      string
-	UserRole      string
+	Rank          int
 	UserID        int
 	CanAllocate   bool
 	Channel       int
@@ -19,6 +21,25 @@ type GlobalSessionData struct {
 	AppFn         map[string]router.Handler
 	Subscriptions map[string]MessageFunction
 	ID            map[string]int
+}
+
+func (g *GlobalSessionData) GetRank() string {
+	switch g.Rank {
+	case 1:
+		return "Lt"
+	case 2:
+		return "Capt"
+	case 3:
+		return "Maj"
+	case 4:
+		return "Col"
+	case 5:
+		return "General"
+	case 10:
+		return "Marshal"
+	default:
+		return fmt.Sprintf("%d", g.Rank)
+	}
 }
 
 var Session GlobalSessionData
@@ -47,5 +68,9 @@ func main() {
 	formulate.Templates(GetTemplate)
 	websocketInit()
 	initLoginForm()
-	showLoginForm()
+	// showLoginForm()
+}
+
+func mainPage(context *router.Context) {
+	print("TODO - main page")
 }

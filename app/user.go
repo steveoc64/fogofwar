@@ -1,10 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 
-	"itrak-cmms/shared"
+	"github.com/steveoc64/fogofwar/shared"
 
 	"github.com/go-humble/form"
 	"github.com/go-humble/router"
@@ -70,10 +69,6 @@ func userProfile() {
 				if err != nil {
 					print("email", err.Error())
 				}
-				data.SMS, err = f.GetString("SMS")
-				if err != nil {
-					print("sms", err.Error())
-				}
 				p1, _ := f.GetString("p1")
 				p2, _ := f.GetString("p2")
 
@@ -91,7 +86,6 @@ func userProfile() {
 						Name:    data.Name,
 						Passwd:  data.Passwd,
 						Email:   data.Email,
-						SMS:     data.SMS,
 					}
 					// print("passing update req", req)
 					go func() {
@@ -103,93 +97,6 @@ func userProfile() {
 			})
 		}
 	}()
-}
-
-func siteUserList(context *router.Context) {
-	id, err := strconv.Atoi(context.Params["id"])
-	if err != nil {
-		print(err.Error())
-		return
-	}
-
-	go func() {
-
-		site := shared.Site{}
-		rpcClient.Call("SiteRPC.Get", shared.SiteRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &site)
-		print("site after get =", site)
-
-		BackURL := fmt.Sprintf("/site/%d", id)
-		form := formulate.EditForm{}
-		form.New("fa-user", "User Access for Site - "+site.Name)
-		print("site =", site)
-		// Layout the fields
-
-		form.Row(1).
-			Add(1, "Users", "div", "Users", "")
-
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate(BackURL)
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
-		// All done, so render the form
-		form.Render("edit-form", "main", &site)
-
-		// And load in a the sites array
-		// Need a data set that is a slice of :
-		// - Site ID
-		// - Site Name
-		// - Bool, whether the user has access to this site
-		// On toggling a site, send an RPC to the backend to toggle the state
-		siteUsers := []shared.SiteUser{}
-		req := shared.UserSiteRequest{
-			Channel: Session.Channel,
-			ID:      id,
-			User:    nil,
-			Site:    &site,
-		}
-		rpcClient.Call("UserRPC.GetSiteUsers", req, &siteUsers)
-		loadTemplate("site-users-array", "[name=Users]", siteUsers)
-
-		// add a click handler for the sites array
-		w := dom.GetWindow()
-		doc := w.Document()
-
-		if el := doc.QuerySelector("[name=Users]"); el != nil {
-
-			el.AddEventListener("click", false, func(evt dom.Event) {
-				clickedOn := evt.Target()
-				switch clickedOn.TagName() {
-				case "INPUT":
-					ie := clickedOn.(*dom.HTMLInputElement)
-					key, _ := strconv.Atoi(ie.GetAttribute("key"))
-					data := shared.UserSiteSetRequest{
-						Channel: Session.Channel,
-						SiteID:  site.ID,
-						UserID:  key,
-						Role:    "",
-						IsSet:   ie.Checked,
-					}
-
-					go func() {
-						done := false
-						rpcClient.Call("UserRPC.SetSite", data, &done)
-					}()
-				}
-
-			})
-		}
-
-	}()
-
 }
 
 // Display a list of users
@@ -206,16 +113,8 @@ func userList(context *router.Context) {
 		form.Column("Username", "Username")
 		form.Column("Name", "Name")
 		form.Column("Email", "Email")
-		form.Column("Mobile", "SMS")
-		form.BoolColumn("Use", "UseMobile")
 		form.BoolColumn("Local", "Local")
-		form.Column("Role", "Role")
-		form.BoolColumn("Tech ?", "IsTech")
-		form.BoolColumn("Alloc ?", "CanAllocate")
-
-		if Session.UserRole == "Admin" {
-			form.Column("Hourly Rate", "HourlyRate")
-		}
+		form.Column("Rank", "Rank")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -242,7 +141,7 @@ func userList(context *router.Context) {
 
 }
 
-type Roles struct {
+type Ranks struct {
 	ID   int
 	Name string
 }
@@ -256,13 +155,14 @@ func userEdit(context *router.Context) {
 		return
 	}
 
-	roles := []Roles{
-		{1, "Admin"},
-		{2, "Site Manager"},
-		{3, "Technician"},
-		{4, "Service Contractor"},
-		{5, "Floor"},
-		{6, "Public"},
+	ranks := []Ranks{
+		{1, "Lieutenant"},
+		{2, "Captain"},
+		{3, "Major"},
+		{4, "Colonel"},
+		{5, "General"},
+		{10, "Marshal"},
+		{12, "Emporer"},
 	}
 
 	go func() {
@@ -276,13 +176,6 @@ func userEdit(context *router.Context) {
 		form := formulate.EditForm{}
 		form.New("fa-user", "User Details - "+user.Name)
 
-		currentRole := 0
-		for _, r := range roles {
-			if r.Name == user.Role {
-				currentRole = r.ID
-				break
-			}
-		}
 		// Layout the fields
 
 		form.Row(2).
@@ -296,22 +189,16 @@ func userEdit(context *router.Context) {
 			AddCheck(1, "Local Carrier", "Local").
 			AddCheck(1, "Send Msgs", "UseMobile")
 
-		if Session.UserRole == "Admin" {
+		if Session.Rank > 9 {
 			form.Row(5).
-				AddSelect(2, "Role", "Role", roles, "ID", "Name", 1, currentRole).
+				AddSelect(2, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank).
 				AddCheck(1, "Technician", "IsTech").
 				AddCheck(1, "Allocate Tasks ?", "CanAllocate").
 				AddDecimal(1, "Hourly Rate", "HourlyRate", 2, "1")
 		} else {
 			form.Row(3).
-				AddSelect(1, "Role", "Role", roles, "ID", "Name", 1, currentRole)
+				AddSelect(2, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank)
 		}
-
-		form.Row(1).
-			Add(1, "Sites to Access", "div", "Sites", "")
-
-		form.Row(1).
-			Add(1, "Sites to Highlight", "div", "Highlights", "")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -336,15 +223,6 @@ func userEdit(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(&user)
 
-			// now convert the selected role ID into a string
-			roleID, _ := strconv.Atoi(user.Role)
-			for _, r := range roles {
-				if r.ID == roleID {
-					user.Role = r.Name
-					break
-				}
-			}
-
 			data := shared.UserRPCData{
 				Channel: Session.Channel,
 				User:    &user,
@@ -363,80 +241,6 @@ func userEdit(context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
 
-		// And load in a the sites array
-		// Need a data set that is a slice of :
-		// - Site ID
-		// - Site Name
-		// - Bool, whether the user has access to this site
-		// On toggling a site, send an RPC to the backend to toggle the state
-		userSites := []shared.UserSite{}
-		req := shared.UserSiteRequest{
-			Channel: Session.Channel,
-			User:    &user,
-		}
-		rpcClient.Call("UserRPC.GetSites", req, &userSites)
-		loadTemplate("user-sites-array", "[name=Sites]", userSites)
-		loadTemplate("user-highlight-array", "[name=Highlights]", userSites)
-
-		// add a click handler for the sites array
-		w := dom.GetWindow()
-		doc := w.Document()
-
-		if el := doc.QuerySelector("[name=Sites]"); el != nil {
-
-			el.AddEventListener("click", false, func(evt dom.Event) {
-				clickedOn := evt.Target()
-				switch clickedOn.TagName() {
-				case "INPUT":
-					ie := clickedOn.(*dom.HTMLInputElement)
-					key, _ := strconv.Atoi(ie.GetAttribute("key"))
-					data := shared.UserSiteSetRequest{
-						Channel: Session.Channel,
-						UserID:  user.ID,
-						SiteID:  key,
-						Role:    user.Role,
-						IsSet:   ie.Checked,
-					}
-
-					go func() {
-						done := false
-						rpcClient.Call("UserRPC.SetSite", data, &done)
-					}()
-				}
-
-			})
-
-		}
-
-		if el := doc.QuerySelector("[name=Highlights]"); el != nil {
-
-			el.AddEventListener("click", false, func(evt dom.Event) {
-				clickedOn := evt.Target()
-				switch clickedOn.TagName() {
-				case "INPUT":
-					ie := clickedOn.(*dom.HTMLInputElement)
-					key, _ := strconv.Atoi(ie.GetAttribute("key"))
-					data := shared.UserSiteSetRequest{
-						Channel: Session.Channel,
-						UserID:  user.ID,
-						SiteID:  key,
-						Role:    user.Role,
-						IsSet:   ie.Checked,
-					}
-
-					go func() {
-						done := false
-						rpcClient.Call("UserRPC.SetHighlight", data, &done)
-					}()
-
-					// Set the corresponding site checkbox to checked
-					doc.QuerySelector(fmt.Sprintf("#user-site-%d", key)).(*dom.HTMLInputElement).Checked = true
-				}
-
-			})
-
-		}
-
 	}()
 
 }
@@ -444,13 +248,14 @@ func userEdit(context *router.Context) {
 // Add form for a new user
 func userAdd(context *router.Context) {
 
-	roles := []Roles{
-		{1, "Admin"},
-		{2, "Site Manager"},
-		{3, "Technician"},
-		{4, "Service Contractor"},
-		{5, "Floor"},
-		{6, "Public"},
+	ranks := []Ranks{
+		{1, "Lieutenant"},
+		{2, "Captain"},
+		{3, "Major"},
+		{4, "Colonel"},
+		{5, "General"},
+		{10, "Marshal"},
+		{12, "Emporer"},
 	}
 
 	go func() {
@@ -472,8 +277,8 @@ func userAdd(context *router.Context) {
 			Add(1, "Mobile", "text", "SMS", "")
 
 		form.Row(3).
-			Add(1, "Role", "select", "Role", "")
-		form.SetSelectOptions("Role", roles, "ID", "Name", 1, 0)
+			Add(1, "Rank", "select", "Rank", "")
+		form.SetSelectOptions("Rank", ranks, "ID", "Name", 1, 0)
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

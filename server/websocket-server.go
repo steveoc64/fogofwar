@@ -65,7 +65,7 @@ func (c *Connection) GetRank() string {
 		return "Col"
 	case 5:
 		return "General"
-	case 6:
+	case 10:
 		return "Marshal"
 	default:
 		return fmt.Sprintf("Unknown %d", c.Rank)

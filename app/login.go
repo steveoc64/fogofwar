@@ -3,16 +3,16 @@ package main
 import (
 	"fmt"
 
-	"itrak-cmms/shared"
+	"github.com/steveoc64/fogofwar/shared"
 
-	"github.com/gopherjs/gopherjs/js"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func Login(username string, passwd string) {
 
 	Session.Username = ""
-	Session.UserRole = ""
+	Session.Rank = 0
 
 	lc := &shared.LoginCredentials{
 		Username: username,
@@ -29,13 +29,20 @@ func Login(username string, passwd string) {
 	if lr.Result == "OK" {
 		// createMenu(lr.Menu)
 		Session.Username = lc.Username
-		Session.UserRole = lr.Role
+		Session.Rank = lr.Rank
 		Session.UserID = lr.ID
-		Session.CanAllocate = lr.CanAllocate
 		// print("login =", Session)
-		loadRoutes(lr.Role, lr.Routes)
+		print("loading routes", lr.Routes)
+		loadRoutes(lr.Rank, lr.Routes)
 		hideLoginForm()
-		GetPDFImage() // cache the PDF thumbnail
+		// GetPDFImage() // cache the PDF thumbnail
+
+		// Get the users name and set the menu option to that
+		myName := fmt.Sprintf(`%s %s`, Session.GetRank(), Session.Username)
+		w := dom.GetWindow()
+		doc := w.Document()
+		doc.QuerySelector("#myname").SetTextContent(myName)
+
 	} else {
 		print("login failed")
 		dom.GetWindow().Alert("Login Failed")
@@ -44,40 +51,28 @@ func Login(username string, passwd string) {
 
 func Logout() {
 	print("log out")
-	showLoginForm()
+	// showLoginForm()
 	initRouter() // reset all the routes to nothing
 	// js.Global.Get("location").Set("hash", "")
 
 	w := dom.GetWindow()
+	doc := w.Document()
 	loc := w.Location()
 	print("loc=", loc)
 
 	// loc.pathname =
-	js.Global.Get("location").Call("replace", "/")
+	// js.Global.Get("location").Call("replace", "/")
+	doc.GetElementByID("slidemenu").Class().Remove("cbp-spmenu-open")
+	doc.GetElementByID("hamburger").Class().Add("hidden")
+	doc.GetElementByID("gotologin").Class().Remove("hidden")
+	doc.GetElementByID("grid1").Class().Remove("hidden")
 }
 
 func hideLoginForm() {
 	w := dom.GetWindow()
 	doc := w.Document()
-
-	logoutBtn := doc.GetElementByID("logoutbtn").(*dom.HTMLButtonElement)
-	logoutBtn.Style().Set("display", "inline")
-	// logoutBtn.AddEventListener("click", false, func(evt dom.Event) {
-	// 	evt.PreventDefault()
-	// 	Logout()
-	// })
-
-	username := fmt.Sprintf("%s - %s", Session.Username, Session.UserRole)
-	userBtn := doc.GetElementByID("userbtn").(*dom.HTMLButtonElement)
-	userBtn.SetTextContent(username)
-	userBtn.Style().Set("display", "inline")
-	// userBtn.AddEventListener("click", false, func(evt dom.Event) {
-	// 	evt.PreventDefault()
-	// 	userProfile()
-	// })
-
-	ldiv := doc.GetElementByID("loginform").(*dom.HTMLDivElement)
-	ldiv.Style().Set("display", "none")
+	doc.GetElementByID("loginform").Class().Add("hidden")
+	doc.GetElementByID("hamburger").Class().Remove("hidden")
 }
 
 func showLoginForm() {
@@ -91,31 +86,15 @@ func showLoginForm() {
 	loginBtn := doc.GetElementByID("l-loginbtn").(*dom.HTMLInputElement)
 	loginBtn.Class().Remove("button-outline")
 
-	ldiv := doc.GetElementByID("loginform").(*dom.HTMLDivElement)
-	ldiv.Style().Set("display", "block")
+	doc.GetElementByID("loginform").Class().Remove("hidden")
+	doc.GetElementByID("hamburger").Class().Add("hidden")
+	doc.GetElementByID("grid1").Class().Add("hidden")
 	uname := doc.GetElementByID("l-username").(*dom.HTMLInputElement)
-	// print("uname value =", uname.Value)
 	if uname.Value == "" {
 		uname.Focus()
 	}
 
-	// loginBtn.AddEventListener("click", false, func(evt dom.Event) {
-	// 	// print("clicked login btn")
-	// 	evt.PreventDefault()
-
-	// 	username := doc.GetElementByID("l-username").(*dom.HTMLInputElement).Value
-	// 	passwd := doc.GetElementByID("l-passwd").(*dom.HTMLInputElement).Value
-	// 	rem := doc.GetElementByID("l-remember").(*dom.HTMLInputElement).Checked
-
-	// 	go Login(username, passwd, rem)
-	// })
-
-	logoutBtn := doc.GetElementByID("logoutbtn").(*dom.HTMLButtonElement)
-	logoutBtn.Style().Set("display", "none")
-	userBtn := doc.GetElementByID("userbtn").(*dom.HTMLButtonElement)
-	userBtn.Style().Set("display", "none")
-
-	// removeMenu()
+	doc.GetElementByID("gotologin").Class().Add("hidden")
 }
 
 func initLoginForm() {
@@ -123,28 +102,80 @@ func initLoginForm() {
 	doc := w.Document()
 
 	// Attach events once
-	loginBtn := doc.GetElementByID("l-loginbtn").(*dom.HTMLInputElement)
-	loginBtn.AddEventListener("click", false, func(evt dom.Event) {
+	doc.QuerySelector("#l-loginbtn").AddEventListener("click", false, func(evt dom.Event) {
 		evt.PreventDefault()
 		username := doc.GetElementByID("l-username").(*dom.HTMLInputElement).Value
 		passwd := doc.GetElementByID("l-passwd").(*dom.HTMLInputElement).Value
 		go Login(username, passwd)
 	})
 
-	logoutBtn := doc.GetElementByID("logoutbtn").(*dom.HTMLButtonElement)
-	logoutBtn.AddEventListener("click", false, func(evt dom.Event) {
+	doc.QuerySelector("#l-cancelbtn").AddEventListener("click", false, func(evt dom.Event) {
 		evt.PreventDefault()
-		Logout()
+		doc.GetElementByID("hamburger").Class().Add("hidden")
+		doc.GetElementByID("gotologin").Class().Remove("hidden")
+		doc.GetElementByID("grid1").Class().Remove("hidden")
+		doc.GetElementByID("loginform").Class().Add("hidden")
 	})
 
-	userBtn := doc.GetElementByID("userbtn").(*dom.HTMLButtonElement)
-	userBtn.AddEventListener("click", false, func(evt dom.Event) {
-		evt.PreventDefault()
-		userProfile()
-	})
+	// logoutBtn := doc.GetElementByID("logoutbtn").(*dom.HTMLButtonElement)
+	// logoutBtn.AddEventListener("click", false, func(evt dom.Event) {
+	// 	evt.PreventDefault()
+	// 	Logout()
+	// })
+
+	// userBtn := doc.GetElementByID("userbtn").(*dom.HTMLButtonElement)
+	// userBtn.AddEventListener("click", false, func(evt dom.Event) {
+	// 	evt.PreventDefault()
+	// 	userProfile()
+	// })
 
 	doc.QuerySelector("#homepage").AddEventListener("click", false, func(evt dom.Event) {
-		print("clicked on homepage thing")
 		Session.Navigate("/")
 	})
+
+	doc.QuerySelector("#hamburger").AddEventListener("click", false, func(evt dom.Event) {
+		print("click on burger")
+		el := doc.QuerySelector("#slidemenu")
+		print("el", el)
+		el.Class().Add("cbp-spmenu-open")
+	})
+
+	doc.QuerySelector("#myname").AddEventListener("click", false, func(evt dom.Event) {
+		doc.QuerySelector("#slidemenu").Class().Remove("cbp-spmenu-open")
+	})
+
+	doc.QuerySelector("#gotologin").AddEventListener("click", false, func(evt dom.Event) {
+		showLoginForm()
+	})
+
+	doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
+		print("logout")
+		if w.Confirm("Really Sign Out ?") {
+			Logout()
+		}
+	})
+
+	doc.QuerySelector("#main-tute").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/tute")
+	})
+
+	doc.QuerySelector("#main-faq").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/faq")
+	})
+
+	doc.QuerySelector("#main-signup").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signup")
+	})
+
+	// clear the loader, setup the signin button
+	doc.GetElementByID("loader").Class().Add("hidden")
+	doc.GetElementByID("grid1").Class().Remove("hidden")
+	doc.GetElementByID("gotologin").Class().Remove("hidden")
+}
+
+func signUp(context *router.Context) {
+	print("in signup form")
 }

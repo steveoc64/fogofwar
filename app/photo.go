@@ -7,7 +7,7 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 
-	"itrak-cmms/shared"
+	"github.com/steveoc64/fogofwar/shared"
 
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"

@@ -11,7 +11,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"itrak-cmms/shared"
+	"github.com/steveoc64/fogofwar/shared"
 
 	"github.com/gopherjs/websocket"
 	"honnef.co/go/js/dom"
@@ -207,12 +207,12 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 func autoReload() {
 
 	print("Connection has expired !!")
-	print("Logging out in ... 3")
+	print("Logging out in ... 2")
 
 	go func() {
-		time.Sleep(time.Second)
-		print("................ 2")
-		time.Sleep(time.Second)
+		// time.Sleep(time.Second)
+		// print("................ 2")
+		// time.Sleep(time.Second)
 		print("........... 1")
 		time.Sleep(time.Second)
 		print(" !! BYE !!")

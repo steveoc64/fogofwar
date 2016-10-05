@@ -34,7 +34,7 @@ func loadTemplate(template string, selector string, data interface{}) error {
 		print("Could not find selector", selector)
 		return errors.New("Invalid selector")
 	}
-	print("looks ok adding template", t, "to", el, "with", data)
+	// print("looks ok adding template", t, "to", el, "with", data)
 	if err := t.ExecuteEl(el, data); err != nil {
 		print(err.Error())
 		return err

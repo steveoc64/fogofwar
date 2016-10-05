@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"../shared"
@@ -66,11 +67,11 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password).
 			QueryStruct(res)
 
-		println(`select
-			id,username,name,rank
-			from users
-			where (lower(username) = lower($1) and lower(passwd) = lower($2))
-			or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password)
+		// println(`select
+		// 	id,username,name,rank
+		// 	from users
+		// 	where (lower(username) = lower($1) and lower(passwd) = lower($2))
+		// 	or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password)
 
 		if err != nil {
 			log.Println("Login Failed:", err.Error())
@@ -211,7 +212,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 
 	m := mail.NewMail()
 	m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
-	m.SetHeader("To", "steveoc64@gmail.com")
+	m.SetHeader("To", u.Email)
 	m.SetHeader("Subject", "Welcome to ActionFront")
 	m.SetBody("text/html", fmt.Sprintf(`Your activation code is:
 <br>
@@ -223,5 +224,36 @@ The Team at wargaming.io`, vcode))
 	MailChannel <- m
 
 	*newUser = u
+	return nil
+}
+
+func (l *LoginRPC) ValidateNewUser(u *shared.UserSignup, ok *bool) error {
+
+	*ok = false
+	println("Validating New User", u.Username, u.Secret)
+
+	uid := 0
+	DB.SQL(`select id from users where rank=0 and username=$1`, u.Username).QueryScalar(&uid)
+	if uid == 0 {
+		return errors.New("Invalid New Username")
+	}
+
+	vcode := ""
+	DB.SQL(`select code from vcode where uid=$1 and expires > now()`, uid).QueryScalar(&vcode)
+	println("Required vcode =", vcode)
+
+	if vcode == "" {
+		return errors.New("No Validation Code on file")
+	}
+
+	if vcode != strings.Trim(u.Secret, " ") {
+		return errors.New("Codes dont match")
+	}
+
+	// They are validated, so upgrade the user account, and remove the validation code
+	DB.SQL(`delete from vcode where uid=$1`, uid).Exec()
+	DB.SQL(`update users set rank=1 where id=$1 and rank=0`, uid).Exec()
+
+	*ok = true
 	return nil
 }

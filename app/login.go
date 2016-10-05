@@ -36,7 +36,7 @@ func Login(username string, passwd string) {
 		Session.UserID = lr.ID
 		loadRoutes(lr.Rank, lr.Routes)
 
-		print("got a list of valid routes", lr.Routes)
+		// print("got a list of valid routes", lr.Routes)
 
 		// Create the slideout menu once and for all
 		// Get the users name and set the menu option to that
@@ -46,6 +46,7 @@ func Login(username string, passwd string) {
 		doc := w.Document()
 		doc.QuerySelector("#myname").SetTextContent(myName)
 		doc.QuerySelector("#hamburger").Class().Remove("hidden")
+		doc.QuerySelector("#signin-btn").Class().Add("hidden")
 
 		doc.QuerySelector("#myname").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
@@ -121,11 +122,10 @@ func loginForm() {
 	loadTemplate("loginform", "main", nil)
 
 	doc.QuerySelector("#l-loginbtn").AddEventListener("click", false, func(evt dom.Event) {
-		print("clickd on loginbtn")
+		// print("clickd on loginbtn")
 		evt.PreventDefault()
 		username := doc.GetElementByID("l-username").(*dom.HTMLInputElement).Value
 		passwd := doc.GetElementByID("l-passwd").(*dom.HTMLInputElement).Value
-		print("doin the login thing")
 		go Login(username, passwd)
 	})
 
@@ -406,6 +406,21 @@ func signUp(context *router.Context) {
 		doc.QuerySelector("[name=Secret]").AddEventListener("change", false, func(evt dom.Event) {
 			secret := evt.Target().(*dom.HTMLInputElement)
 			print("SecretCode has changed", secret.Value)
+			go func() {
+				form.Bind(&user)
+				print("binded", user)
+				ok := false
+				err := rpcClient.Call("LoginRPC.ValidateNewUser", user, &ok)
+				if err != nil {
+					print(err.Error())
+					errRow.Class().Remove("hidden")
+					errors.SetTextContent(err.Error())
+				} else {
+					// We are now validated .. autologin
+					go Login(user.Username, user.Passwd1)
+				}
+
+			}()
 
 		})
 	}()

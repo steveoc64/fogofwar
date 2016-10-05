@@ -71,5 +71,5 @@ func main() {
 }
 
 func mainPage(context *router.Context) {
-	print("in the main page now")
+	loadTemplate("main-page", "main", nil)
 }

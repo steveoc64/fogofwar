@@ -113,6 +113,18 @@ div.centerme
 		margin-top: 2rem
 		margin-bottom: 4rem
 
+.no-mobile
+	visibility: hidden
+
+.mobile-only
+	visibility: visible
+
+@media (min-width: 24.0rem)
+	.mobile-only
+		visibility: hidden
+	.no-mobile
+		visibility: visible
+
 .heading-font-size 
 	font-size: 1.2rem
 	color: #999

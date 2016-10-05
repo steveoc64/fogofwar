@@ -33,7 +33,7 @@
   <div class="wrapper">
 
     <nav class="navigation">
-      <section class="container">
+      <!-- <section class="container"> -->
         <!-- <img class="rxtx-lights" src="img/RxTx-none.png" id="rxtx"> -->
         <a class="navigation-title" href="#" id="homepage">
           <img class="img" src="img/af-logo-nn.png" id="rxtx" alt="ActionFront" title="ActionFront">
@@ -44,8 +44,11 @@
           <h1 class="title">Logout</h1>
         </a>
  -->
-        <button class="button float-right no-print hidden" id="gotologin">
-          <i class="fa fa-sign-in fa-lg"></i> Sign In
+        <button class="button button-header float-right hidden mobile-only" id="signin-mobile">
+          <i class="fa fa-sign-in fa-lg" style="font-size: 3rem"></i>
+        </button>
+        <button class="button button-header float-right no-print hidden no-mobile" id="signin-btn">
+          <i class="fa fa-sign-in fa-lg" style="font-size: 3rem"></i> Sign In
         </button>
         <button class="button button-header float-right no-print hidden" id="hamburger">
           <i class="fa fa-bars fa-lg" style="font-size: 3rem"></i>
@@ -57,73 +60,14 @@
           User
         </button>
  -->     
-     </section>
+     <!-- </section> -->
     </nav>
   </div>
 
-  <!-- Slide in menu once logged in  -->
- <nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="slidemenu">
-  <h3 id="myname">Options</h3>
-  <a href="#" id="menu-settings"><i class="fa fa-cog"></i> Settings</a>
-  <a href="#" id="menu-tute"><i class="fa fa-graduation-cap"></i> Tutorial</a>
-  <a href="#" id="menu-army"><i class="fa fa-sitemap"></i> Armies</a>
-  <a href="#" id="menu-game"><i class="fa fa-bomb"></i> Games</a>
-  <a href="#" id="menu-invite"><i class="fa fa-gift"></i> Invite Friends</a>
-  <a href="#" id="menu-purchase"><i class="fa fa-envelope"></i> Contact</a>
-  <a href="#" id="menu-signout"><i class="fa fa-sign-out"></i> SignOut</a>
-</nav> 
-
-  <!-- Login Screen -->
-  <div class="container hidden" id="loginform">
-    <form>
-      <fieldset>
-        <label for="l-username">Name</label>
-        <input type="text" placeholder="User Name" id="l-username">
-        <label for="l-passwd">Password</label>
-        <!-- <input type="password" placeholder="Password" id="l-passwd"> -->
-        <input type="password" placeholder="Password" id="l-passwd">
-  <!--       <div class="remember-me">
-          <input type="checkbox" id="l-remember">
-          <label class="label-inline" for="l-remember">Remember Me</label>
-        </div>
- -->        
-        <input class="button button-outline" type="button" value="Cancel" id="l-cancelbtn">
-        <input class="button button-outline" type="submit" value="Sign In" id="l-loginbtn">
-      </fieldset>
-    </form>
-  </div>
-
-  <div class="action-grid hidden" id="grid1">
-   <div class="action__item" id="main-signup" url="/signup">
-    <div class="action__title">Sign Up</div>
-    <div class="action__icon"><i class="fa fa-thumbs-o-up fa-lg"></i></div>
-    <div class="action__text">
-      Sign Up today - its <b>FREE</b> !!<p> 
-      Join a growing community of tabletop gamers in the cloud. 
-    </div>
-   </div>
-
-   <div class="action__item" id="main-tute" url="/tutorial">
-    <div class="action__title">Tutorial</div>
-    <div class="action__icon"><i class="fa fa-graduation-cap fa-lg"></i></div>
-    <div class="action__text">
-      Tutorial on how to play, whats in the rules, etc.
-    </div>
-   </div>
-
-   <div class="action__item" id="main-faq" url="/faq">
-    <div class="action__title">FAQ</div>
-    <div class="action__icon"><i class="fa fa-question fa-lg"></i></div>
-    <div class="action__text">
-      Frequently Asked Questions.<p>
-      <i>.. and even some answers to go with them.</i>
-    </div>
-   </div>
-  
-  </div>
-  
   <main>
     <div class="centerme" id="loader">
+    <h3>Loading App ...  </h3>
+    <p><br>
     <img src="img/ajax-loader.gif">
     </div>
   </main>
@@ -134,15 +78,13 @@
     <img src="img/spinner.gif">
   </div>
 
+  <div id="slidemenu-div"></div>
+
 <div class="md-overlay"></div>
 
 </body>
 
 <!-- Our Apps -->
-<script type="text/javascript">
-  document.getElementById("l-username").focus()
-</script>
-
 <script src="app.js"></script>
 
 </html>

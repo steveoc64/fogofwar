@@ -63,14 +63,13 @@ func (s *GlobalSessionData) Reload(context *router.Context) {
 }
 
 func main() {
-
 	initRouter()
 	formulate.Templates(GetTemplate)
 	websocketInit()
-	initLoginForm()
-	// showLoginForm()
+	initForms()
+	grid1()
 }
 
 func mainPage(context *router.Context) {
-	print("TODO - main page")
+	print("in the main page now")
 }

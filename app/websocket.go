@@ -74,7 +74,7 @@ func websocketInit() net.Conn {
 	Session.Channel = 0
 
 	wsBaseURL := getWSBaseURL()
-	print("init websocket", wsBaseURL)
+	// print("init websocket", wsBaseURL)
 	wss, err := websocket.Dial(wsBaseURL)
 	if err != nil {
 		print("failed to open websocket", wsBaseURL, err.Error())

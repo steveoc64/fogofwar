@@ -29,6 +29,7 @@ func loadTemplate(template string, selector string, data interface{}) error {
 	}
 
 	el := doc.QuerySelector(selector)
+	// print("loadtemplate", template, "into", selector, "=", el)
 	if el == nil {
 		print("Could not find selector", selector)
 		return errors.New("Invalid selector")
@@ -43,7 +44,7 @@ func loadTemplate(template string, selector string, data interface{}) error {
 
 func enableRoutes(Rank int) {
 
-	print("enabling routes for rank", Rank, "session", Session, Session.GetRank())
+	// print("enabling routes for rank", Rank, "session", Session, Session.GetRank())
 
 	switch Rank {
 	default:
@@ -83,7 +84,7 @@ func initRouter() {
 }
 
 func defaultRoute(context *router.Context) {
-	print("Nav to Default Route")
+	// print("Nav to Default Route")
 }
 
 func loadRoutes(Rank int, Routes []shared.UserRoute) {

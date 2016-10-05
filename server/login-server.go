@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"../shared"
+	"github.com/steveoc64/godev/mail"
 )
 
 type LoginRPC struct{}
@@ -143,5 +145,83 @@ func (l *LoginRPC) UsersOnline(channel int, u *[]shared.UserOnline) error {
 		fmt.Sprintf("%d Users Online", len(*u)),
 		channel, conn.UserID, "users", 0, false)
 
+	return nil
+}
+
+func (l *LoginRPC) CheckUsername(u string, ok *bool) error {
+	id := 0
+	*ok = false
+	DB.SQL(`select id from users where lower(username) = lower($1)`, u).QueryScalar(&id)
+	// println("got id of", id, "for", u)
+	if id == 0 {
+		*ok = true // could find no user with the same name
+	}
+	return nil
+}
+
+func (l *LoginRPC) CheckEmail(e string, ok *bool) error {
+	id := 0
+	*ok = false
+	DB.SQL(`select id from users where lower(email) = lower($1)`, e).QueryScalar(&id)
+	// println("got id of", id, "for", e)
+	if id == 0 {
+		*ok = true // could find no user with the same email
+	}
+	return nil
+}
+
+func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) error {
+	// attempt to create the new user
+	u.Rank = 0
+	if u.Passwd1 != u.Passwd2 {
+		println("Passwd mismatch")
+		return errors.New("Password Mismatch")
+	}
+
+	cnt := 0
+	// Zap any un-authenticated user with the same name
+	DB.SQL(`delete from users where username=$1 and rank=0`, u.Username).Exec()
+
+	// Reject the request if someone else has the name
+	DB.SQL(`select count(*) from users where username=$1`, u.Username).QueryScalar(&cnt)
+	if cnt > 0 {
+		return errors.New("Username in use")
+	}
+
+	// Reject the request if someone else has the email
+	DB.SQL(`select count(*) from users where email=$1`, u.Email).QueryScalar(&cnt)
+	if cnt > 0 {
+		return errors.New("Email is in use")
+	}
+
+	// Looks valid, so add the new user
+	DB.InsertInto("users").
+		Whitelist("username", "name", "passwd", "email", "rank", "notes", "country", "bloglink", "channel").
+		Record(u).
+		Returning("id").
+		QueryScalar(&u.ID)
+
+	fmt.Printf("Looks ok new user =%v\n", u)
+
+	// and create a new VCODE record for them
+	vcode := "224556"
+	DB.SQL(`delete from vcode where expires > now()`).Exec()
+	DB.SQL(`delete from vcode where uid=$1`, u.ID).Exec()
+	DB.SQL(`insert into vcode (uid,code) values ($1,$2)`, u.ID, vcode).Exec()
+
+	m := mail.NewMail()
+	m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
+	m.SetHeader("To", "steveoc64@gmail.com")
+	m.SetHeader("Subject", "Welcome to ActionFront")
+	m.SetBody("text/html", fmt.Sprintf(`Your activation code is:
+<br>
+%s
+<br>
+<br>
+Many Thanks,<br>
+The Team at wargaming.io`, vcode))
+	MailChannel <- m
+
+	*newUser = u
 	return nil
 }

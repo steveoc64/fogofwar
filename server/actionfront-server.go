@@ -14,8 +14,11 @@ import (
 	"github.com/steveoc64/godev/db"
 	"github.com/steveoc64/godev/echocors"
 	// _ "github.com/steveoc64/godev/sms"
+	"github.com/steveoc64/godev/mail"
 	"github.com/steveoc64/godev/smt"
 	runner "gopkg.in/mgutz/dat.v1/sqlx-runner"
+
+	gomail "gopkg.in/gomail.v2"
 
 	// "github.com/facebookgo/grace/gracehttp"
 	"golang.org/x/net/websocket"
@@ -25,6 +28,7 @@ var e *echo.Echo
 var DB *runner.DB
 
 var Config config.ConfigType
+var MailChannel chan *gomail.Message
 
 func main() {
 
@@ -37,8 +41,15 @@ func main() {
 	e.SetDebug(true)
 	e.Static("/", "public")
 
-	// e.Index("public/index.html")
-	// e.ServeDir("/", "public/")
+	// Start up the mail server
+	MailChannel = mail.InitMailer()
+	// m := mail.NewMail()
+	// m.SetHeader("From", "ActionFront System <system@wargaming.io>")
+	// m.SetHeader("To", "steveoc64@gmail.com")
+	// m.SetHeader("Subject", "ActionFront Startup - Dev")
+	// m.SetBody("text/html", "ActionFront Dev Server Restart")
+	// MailChannel <- m
+
 	e.SetHTTPErrorHandler(func(err error, context echo.Context) {
 		httpError, ok := err.(*echo.HTTPError)
 		if ok {
@@ -57,7 +68,6 @@ func main() {
 		}
 	})
 
-	// e.Use(mw.Logger())
 	e.Use(mw.Recover())
 	e.Use(mw.Gzip())
 	if Config.Debug {

@@ -1,15 +1,23 @@
 drop table if exists users;
 create table users (
 	id serial not null primary key,
-	username text not null,
+	username text not null unique,
 	passwd text not null,
 	name text not null,
-	email text not null,
+	email text not null unique,
 	rank int not null default 1,
-	channel int not null default 0
+	channel int not null default 0,
+	country text not null default '',
+	bloglink text not null default '',
+	notes text not null default ''
 );
-insert into users (username, passwd, name, email, rank) 
-	values ('steve','steve','Steve','steveoc64@gmail.com',10);
+
+drop table if exists vcode;
+create table vcode (
+	uid int not null primary key,
+	code text not null default '',
+	expires timestamp default now() + interval '2 hour'
+);
 
 drop table if exists stdimg;
 create table stdimg (

@@ -19,9 +19,9 @@
         {{end}}        
       </div>
 
-      {{range .Rows}}
-      <div data-row-span="{{.Span}}">
-        {{range .Fields}}
+      {{range $rowindex,$row := .Rows}}
+      <div data-row-span="{{.Span}}" name="row-{{$rowindex}}">
+        {{range $row.Fields}}
         {{$fieldModel := .Model}}
         <div data-field-span="{{.Span}}">
           {{if ne .Type "checkbox"}}

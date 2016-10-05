@@ -8,6 +8,24 @@ type User struct {
 	Email    string `db:"email"`
 	Rank     int    `db:"rank"`
 	Notes    string `db:"notes"`
+	Country  string `db:"country"`
+	Bloglink string `db:"bloglink"`
+	Channel  int    `db:"channel"`
+}
+
+type UserSignup struct {
+	ID       int    `db:"id"`
+	Channel  int    `db:"channel"`
+	Username string `db:"username"`
+	Name     string `db:"name"`
+	Passwd1  string `db:"passwd"`
+	Passwd2  string `db:"passwd2"`
+	Email    string `db:"email"`
+	Notes    string `db:"notes"`
+	Country  string `db:"country"`
+	Bloglink string `db:"bloglink"`
+	Secret   string `db:"secret"`
+	Rank     int    `db:"rank"`
 }
 
 type UserRPCData struct {

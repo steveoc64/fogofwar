@@ -29,6 +29,24 @@ create table stdimg (
 	thumb	text not null default ''
 );
 
+drop table if exists troop_type;
+create table troop_type (
+	id serial not null primary key,
+	code text not null default '',
+	name text not null default '',
+	arm char(1) not null default 'I',
+	
+
+);
+
+drop table if exists oob;
+create table oob (
+);
+
+drop table if exists oob_unit;
+create table oob_unit (
+);
+
 
 
 

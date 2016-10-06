@@ -23,6 +23,7 @@ get:
 	go get -u github.com/lib/pq
 	go get -u gopkg.in/mgutz/dat.v1/sqlx-runner
 	go get -u github.com/nfnt/resize
+	go get -u gopkg.in/gomail.v2
 	mkdir -p scripts
 	mkdir -p backup
 

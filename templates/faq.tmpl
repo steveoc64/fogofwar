@@ -4,6 +4,7 @@ Frequently Asked Questions
 </h2>
 
 <hr>
+<center><img src="/img/kriegsspiel3.png"></center>
 <h3>Game Questions</h3>
 <h4>Q: So what historical period is this system aimed at?</h4>
 <p>
@@ -32,23 +33,314 @@ Horse and Musket period gaming.
 <hr>
 <h4>Q: So its up to the players to negotiate with each other over each combat situation?</h4>
 <p>Correct.</p>
-<p>The basic "straight forward questions" are simple factors that both players should be able to agree on, but tabletop games by their nature are analog affairs, where much is open to interpretation, imagination, experience, and negotiation. </p>
+<p>The basic "straight forward questions" are simple factors that both players should be able to agree on, but tabletop games are by their nature analog affairs, where much is open to interpretation, imagination, experience, and negotiation. </p>
 <p>These factors are indeed what makes tabletop gaming unique and appealing compared to computer games, so this system attempts to embrace that rather than replace it.</p>
-<p>The sort of situational factors that affect each combat situation include questions such as :</p>
+<p>It also means that player involvement is kept high throughout the game, and that all players are given every opportunity to understand the mechanics involved, and argue their case to influence those odds. 
+<p>The sort of situational factors that affect each combat situation include obvious questions such as :</p>
+<ul>
+	<li>Range between opposing units?</li>
+	<li>Is the terrain in question Open / Rough / Wooded?</li>
+	<li>Is the target under cover?</li>
+	<li>Hit in the Flank ?</li>
+</ul>
+<p>.. which are all straight forward, through to other questions which may be more open to negotiation, and may require the players to state a strong case for applying them or not :</p>
+<ul>
+	<li>Has a supporting line to the rear within reach should they need to retreat ?</li>
+	<li>Is this artillery firing to good effect, or is it obscured ?</li>
+	<li>Should the defending unit be considered suprised and ambushed by this attack ?</li>
+	<li>.. etc</li>
+</ul>
+<p>All up, there are over 1,000 possible combinations of Unit vs Unit combat situations included in the game model, each with a variety of modifying factors that can influence the result.</p>
 
 <hr>
-<h4>Q: Distance and time scales?</h4>
+<h4>Q: What's the detail of the Combat Results ?</h4>
+<p>Combat results are computed and presented on 3 separate levels, so lets look at that in more detail.</p>
+<ol>
+	<li>General Outcome.
+	<p>Whenever 2 opposing units clash, there are 6 general outcomes, all things considered:</p>
+	<ol>
+		<li>Attacker Wins, Defender Totally Defeated</li>
+		<li>Attacker Wins, Defender Defeated</li>
+		<li>Attacker Wins, Defender Repulsed</li>
+		<li>Attacker Repulsed</li>
+		<li>Attacker Defeated</li>
+		<li>Attacker Totally Defeated</li>
+	</ol>
+	<p>So when opposing units engage, they fight, and then all players are informed of the General Outcome of each encounter. The calculation of the odds of each outcome though is somewhat complicated, and needs a whole book to explain. The Computer backend manages to look after the details of these calculations for you.</p>
+	<p>Each unit that is involved in a contact - whether it wins or loses, will have actual casualties calulated and applied based on the situation and the general result.</p>
+	</li>
+	<li>Logistical Data.
+	<p>Each individual unit on the table is tracked in detail, including :</p>
+	<ul>
+		<li>Exact number of actual men in the unit.</li>
+		<li>Exact number of wounded / killed / sick / panicked.</li>
+		<li>Ammunition and supply state.</li>
+		<li>Fatigue state.</li>
+		<li>Command & Control state.</li>
+	</ul>
+	<p>All of these factors are both linear and deterministic, so that over the course of a battle they degrade at a predictable rate as they take fire and get involved in combats.</p>
+	<p>Attrition due to casualties is tracked by the computer umpire, and does not require any figure or base removal.</p>
+	<p>Each time a unit receives fire (from musket / skirmisher / artillery), individual casualties are computed and applied for each unit.</p>
+	<p>Each time a unit fires, ammunition and supply state is computed and applied.</p>
+	<p>Each time a unit moves, changes formation, or performs some other physical action, fatigue and control costs are computed and applied to the unit.</p>
+	<p>Each time a unit spends a period recovering, fatigue / control state and supply state recovery is computed and applied to the unit.</p>
+	<p>During the course of a game, a player can move (the command base representing themselves) to a unit, and "Perform an Inspection", to gain access to the detailed logistical state of the unit they are inspecting.</p>
+	<p>Unless the unit is being personally inspected by the player, these logistical details are not available during the game.</p>
+	<p>At the end of the game, all logistical details for all units of all sides are available.</p>
+	</li>
+	<li>Morale State
+	<p>Morale is modelled using the following general principles :</p>
+	<ul>
+		<li>It is assumed that all units and sub-commands will have a very limited understanding of the overall situation on the tabletop, and can only act based on what is happening in their immediate local area.</li>
+		<li>As a general rule, units and sub-commands will act in strict accordance with their orders, and continue to do so until the unit completely breaks.</li>
+		<li>That negative changes in the morale state can occur suddenly, are hard to predict, and sometimes hard to explain or justify - but they do happen, and they can happen to any unit on any side involved.</li>
+		<li>That casualty levels due to attrition do not have a serious impact on morale state. Loss of morale is more related to unexpected "shock" from exceptional events - either real or imagined.</li>
+		<li>That morale state recovery during the course of a game is much slower and more predictable than morale loss.</li>
+	</ul>
+		
+	</li>
+
+</ol>
+
 
 <hr>
-<h4>Q: What historical periods is this system aimed at ?</h4>
+<h4>Q: Distance and Time Scales?</h4>
+
 <hr>
-<h4>Q: What historical periods is this system aimed at ?</h4>
+<h4>Q: Command and Control?</h4>
+
 <hr>
-<h4>Q: What historical periods is this system aimed at ?</h4>
+<h4>Q: Unit Activation System?</h4>
+
 <hr>
-<h4>Q: What historical periods is this system aimed at ?</h4>
+<h4>Q: IGO UGO ?</h4>
+
 <hr>
-<h4>Q: What historical periods is this system aimed at ?</h4>
+<h4>Q: Visibility and Hidden Movement?</h4>
+
+<hr>
+<h4>Q: Battlefield Friction?</h4>
+
+<hr>
+<center><img src="/img/kriegsspiel3.png"></center>
+<h3>Show Me The Money</h3>
+
+<hr>
+<h4>Q: Do I have to pay to play?</h4>
+<p>NO.</p>
+<p>You can sign up and register for FREE, which allows you to start gaming immediately on a small scale, and spend as much time as you like playing with the system, and see if it works for you .. or not.</p>
+<p>If you register and play on the Free account, then you are part of the community .. there is no catch.</p>
+
+<hr>
+<h4>Q: So does that mean that all my gaming friends have to register too?</h4>
+<p>NO.</p>
+<p>As a Registered Player, you can create a Game, and then invite 1 or more friends to play (the number of players depends on your Rank). The "invite" consists of a QR code / PIN number that your friends can scan / enter to connect to your game anonymously.</p>
+
+<hr>
+<h4>Q: So what's all this going to actually cost me?</h4>
+<p>If you like what you see, and want to get more serious with the system, then you can <b>Purchase A Commission</b> .. just like a real Officer in the Napoleonic Period, and extend what you can do with it.</p>
+<p>There are several levels of Commissioned Ranks available for purchase, to suit both your gaming needs, and your budget.</p>
+
+<p>Here is the basic Commission Purchase structure, the benefits of each Rank, and the cost to purchase :</p>
+
+<table class="data-table">
+	<tr class="data-row">
+		<th>Rank</th>
+		<th>Avail</th>
+		<th>Cost</th>
+		<th>Limits</th>
+		<th>Orders</th>
+		<th>Extras</th>
+	</tr>
+	<tr class="data-row">
+		<td>Lieutenant</td>
+		<td>Now</td>
+		<td>FREE</td>
+		<td>
+			<ul>
+				<li>1 Game</li>
+				<li>2 Players</li>
+				<li>8 OOBs</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Attack</li>
+				<li>Defend</li>
+				<li>Support</li>
+				<li>Reserve</li>
+			</ul>
+		</td>
+		<td>
+			<li>Copy OOB</li>
+		</td>
+	</tr>
+	<tr class="data-row">
+		<td>Captain</td>
+		<td>Now</td>
+		<td>$5 per month</td>
+		<td>
+			<ul>
+				<li>4 Games</li>
+				<li>4 Players</li>
+				<li>16 OOBs</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Probe</li>
+				<li>Attack</li>
+				<li>Defend</li>
+				<li>Support</li>
+				<li>Reserve</li>
+			</ul>
+		</td>
+		<td>
+			<li>Copy OOB</li>
+			<li>Import / Export OOB</li>
+		</td>	
+	</tr>
+	<tr class="data-row">
+		<td>Major</td>
+		<td>XMas 2016</td>
+		<td>$8 per month</td>
+		<td>
+			<ul>
+				<li>8 Game</li>
+				<li>6 Players</li>
+				<li>24 OOBs</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Advance Guard</li>
+				<li>Probe</li>
+				<li>Attack</li>
+				<li>Defend</li>
+				<li>Support</li>
+				<li>Reserve</li>
+			</ul>
+		</td>
+		<td>
+			<li>Copy OOB</li>
+			<li>Import / Export OOB</li>
+			<li>Audio</li>
+		</td>	
+	</tr>
+	<tr class="data-row">
+		<td>Colonel</td>
+		<td>XMas 2016</td>
+		<td>$15 per month</td>
+		<td>
+			<ul>
+				<li>16 Games</li>
+				<li>8 Players</li>
+				<li>48 OOBs</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Advance Guard</li>
+				<li>Probe</li>
+				<li>Attack</li>
+				<li>Defend</li>
+				<li>Support</li>
+				<li>Flank March</li>
+				<li>Reserve</li>
+			</ul>
+		</td>
+		<td>
+			<li>Copy OOB</li>
+			<li>Import / Export OOB</li>
+			<li>Audio</li>
+			<li>Linked Games</li>
+		</td>	
+	</tr>
+	<tr class="data-row">
+		<td>Brigadier</td>
+		<td>Apr 2017</td>
+		<td>$20 per month</td>
+		<td>
+			<ul>
+				<li>32 Games</li>
+				<li>16 Players per game</li>
+				<li>100 OOBs</li>
+			</ul>
+		</td>
+		<td>
+			<ul>
+				<li>Advance Guard</li>
+				<li>Probe</li>
+				<li>Attack</li>
+				<li>Defend</li>
+				<li>Support</li>
+				<li>Flank March</li>
+				<li>Engineering</li>
+				<li>Reserve</li>
+			</ul>
+		</td>
+		<td>
+			<li>Copy OOB</li>
+			<li>Import / Export OOB</li>
+			<li>Audio</li>
+			<li>Linked Games</li>
+		</td>	
+	</tr>
+
+</table>
+
+
+<table>
+	<tr>
+		<th>Item</th>
+		<th>Description</th>
+	</tr>
+	<tr>
+		<td>Currency</td>
+		<td>All $Dollar figures quoted are in $USD, and paid manually at the player's convenience via PayPal or supported Credit Card methods.</td>
+	</tr>
+	<tr>
+		<td>Games</td>
+		<td>Number of Games (or scenarios) that this Player is able to create, edit and store on their account at the same time. Each Game can be played as many times as you want.</td>
+	</tr>
+	<tr>
+		<td>Players</td>
+		<td>Number of Simultaneous Players allowed for each Game that this Player is hosting.</td>
+	</tr>
+	<tr>
+		<td>OOBs</td>
+		<td>Number of Orders of Battle that you can store in your account. Each Game requires </td>
+	</tr>
+	<tr>
+		<td>Orders</td>
+		<td>The types of Orders that Players may give to units during the course of a Game. The Free account offers a simple but effective set of command options, and the higher ranks allow access to more complicated combinations of orders.</td>
+	</tr>
+	<tr>
+		<td>Audio</td>
+		<td>Includes streaming audio sound effects during the game as units execute orders.</td>
+	</tr>
+	<tr>
+		<td>Linked Games</td>
+		<td>Allows the Player to create a map-less Mini-Campaign by stringing together a limited set of Linked Games where the losses to each unit are carried across to the next game .. until the Grand Finale battle where all remaining units meet.</td>
+	</tr>
+	<tr>
+		<td>Full Campaign Mode</td>
+		<td>Allows the Player to create a full Campaign Mode </td>
+	</tr>
+	<tr>
+		<td>Copy OOB</td>
+		<td>You can search and browse through all OOBs stored on the site. If you see one that you like, then you can create a copy of it into your account, and edit it and use it from there.</td>
+	</tr>
+	<tr>
+		<td>Import / Export OOB</td>
+		<td>Allows you to export OOBs to your computer as a spreadsheet, and work on them offline. You can also Import OOBs from a spreadsheet into this system.</td>
+	</tr>
+</table>
+
+
+<hr>
+
+<center><img src="/img/kriegsspiel3.png"></center>
 <h3>Tech Questions</h3>
 <hr>
 <h4>Q: What is this ? Is it another computer game or something?</h4>
@@ -76,6 +368,13 @@ Horse and Musket period gaming.
 <p></p>
 
 <hr>
+<h4>Q: What are the Multi-User Aspects and Limitations?</h4>
+<p>Each Game played on the system can have a number of Players connect to that game at the same time .. but this number is limited based on the Rank of the Player who is hosting the Game.</p>
+<p>The Free Account allows you to setup and run games with 2 players connected at the same time.</p>
+<p>The Higher Ranking Commissions allows you setup and run games with more players - up to a maximum of 16 players at the same time.</p>
+
+ 
+<hr>
 <h4>Q: Tell me about the Network Requirements for game play?</h4>
 <p>If you are on a wired or dedicated WiFi connection in your game room, then you are fine .. so lets look at 3G or 4G mobile connections in more detail, as being the extreme worst case scenario.</p>
 <p>For each player that connects to the system, it will use between 4-10 MB Total bandwidth to connect and load all the game assets.</p>
@@ -85,5 +384,22 @@ Horse and Musket period gaming.
 <p>Thats all the tech stuff anyway, for those that are counting beans and worried about burning through your bandwidth on your mobile account.</p>
 <p>Bottom line - as a good Game Host, you should provide not only a healthy supply of Beer and Pretzels for your fellow Gentlemen and Officers ... but also a reasonable Wifi connection as a bare minimum, if you are going to use this system :)</p>
 
+<hr>
+<h4>Q: What development stack are you using?</h4>
+<p>Good Question, thanks for asking :)</p>
+<ul>
+	<li><i class="fa fa-cloud fa-lg"></i> Hosting via <a href="digtialocean.com" target="do">Digital Ocean</a> cloud hosting, in multiple locations - USA / EU / Singapore</li>
+	<li><i class="fa fa-linux fa-lg"></i> Develop on Linux / Host on FreeBSD + ZFS</li>
+	<li><i class="fa fa-database fa-lg"></i> <a href="postgresql.org" target="pg">PostgreSQL Database</a> with Redis for caching.</li>
+	<li><i class="fa fa-code fa-lg"></i> Backend written in the <a href="golang.org" target="golang">GO Programming Language</a></li>
+	<li><i class="fa fa-code fa-lg"></i> Frontend also written in Go, using <a href="gopherjs.org" target="gjs"> GopherJS</a> compiler, and all comms with the backend executed using RPC over websockets.</li>
+	<li><i class="fa fa-github fa-lg"></i> Code management via <a href="github.com" target="gh"> GitHub</a> ... with the possibility of opening up the repo once the application matures.</li>
+</ul>
+
+<hr>
+<h4>Q: I have an idea for a Game/App/Web Application .. would you be interested?</h4>
+<p>.. you Bet !</p>
+<p>If it involves coding, and its a sound & well thought out idea,  then Im likely to be very interested.</p>
+<p>Please use the "Contact" link provided in the main menu to expand the idea.</p>
 
 <center><img src="/img/kriegsspiel3.png"></center>

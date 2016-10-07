@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/steveoc64/fogofwar/shared"
+	// "github.com/steveoc64/fogofwar/shared"
+	"./shared"
 	"github.com/steveoc64/formulate"
 
 	"regexp"
@@ -225,6 +226,7 @@ func signUp(context *router.Context) {
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&user)
+			user.Channel = Session.Channel
 			print("binded", user)
 
 			// before we go much further, work out how far into this form we are

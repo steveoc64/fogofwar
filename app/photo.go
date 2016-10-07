@@ -7,7 +7,8 @@ import (
 
 	"github.com/gopherjs/gopherjs/js"
 
-	"github.com/steveoc64/fogofwar/shared"
+	// "github.com/steveoc64/fogofwar/shared"
+	"./shared"
 
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"

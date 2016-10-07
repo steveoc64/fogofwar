@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 
-	"github.com/steveoc64/fogofwar/shared"
+	"./shared"
 
 	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"

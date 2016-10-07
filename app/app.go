@@ -6,7 +6,8 @@ import (
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
 	// "honnef.co/go/js/dom"
-	"github.com/steveoc64/fogofwar/shared"
+	// "github.com/steveoc64/fogofwar/shared"
+	"./shared"
 )
 
 type MessageFunction func(string, int)

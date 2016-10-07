@@ -11,7 +11,7 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/steveoc64/fogofwar/shared"
+	"./shared"
 
 	"github.com/gopherjs/websocket"
 	"honnef.co/go/js/dom"

@@ -3,7 +3,7 @@ package main
 import (
 	"strconv"
 
-	"github.com/steveoc64/fogofwar/shared"
+	"./shared"
 
 	"github.com/go-humble/form"
 	"github.com/go-humble/router"

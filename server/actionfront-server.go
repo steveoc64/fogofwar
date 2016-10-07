@@ -42,13 +42,19 @@ func main() {
 	e.Static("/", "public")
 
 	// Start up the mail server
+	if Config.MailServer == "" {
+		println("Mail is turned OFF")
+	} else {
+		println("Mail server =", Config.MailServer)
+		
 	MailChannel = mail.InitMailer()
 	m := mail.NewMail()
 	m.SetHeader("From", "ActionFront System <system@wargaming.io>")
 	m.SetHeader("To", "steveoc64@gmail.com")
 	m.SetHeader("Subject", "ActionFront Startup - Cloud9")
 	m.SetBody("text/html", "ActionFront Dev Server Restart")
-	// MailChannel <- m
+	MailChannel <- m
+	}
 
 	e.SetHTTPErrorHandler(func(err error, context echo.Context) {
 		httpError, ok := err.(*echo.HTTPError)

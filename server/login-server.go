@@ -210,18 +210,21 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 	DB.SQL(`delete from vcode where uid=$1`, u.ID).Exec()
 	DB.SQL(`insert into vcode (uid,code) values ($1,$2)`, u.ID, vcode).Exec()
 
-	m := mail.NewMail()
-	m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
-	m.SetHeader("To", u.Email)
-	m.SetHeader("Subject", "Welcome to ActionFront")
-	m.SetBody("text/html", fmt.Sprintf(`Your activation code is:
+	if Config.MailServer != "" {
+
+		m := mail.NewMail()
+		m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
+		m.SetHeader("To", u.Email)
+		m.SetHeader("Subject", "Welcome to ActionFront")
+		m.SetBody("text/html", fmt.Sprintf(`Your activation code is:
 <br>
 %s
 <br>
 <br>
 Many Thanks,<br>
 The Team at wargaming.io`, vcode))
-	MailChannel <- m
+		MailChannel <- m
+	}
 
 	*newUser = u
 	return nil

@@ -43,11 +43,11 @@ func main() {
 
 	// Start up the mail server
 	MailChannel = mail.InitMailer()
-	// m := mail.NewMail()
-	// m.SetHeader("From", "ActionFront System <system@wargaming.io>")
-	// m.SetHeader("To", "steveoc64@gmail.com")
-	// m.SetHeader("Subject", "ActionFront Startup - Dev")
-	// m.SetBody("text/html", "ActionFront Dev Server Restart")
+	m := mail.NewMail()
+	m.SetHeader("From", "ActionFront System <system@wargaming.io>")
+	m.SetHeader("To", "steveoc64@gmail.com")
+	m.SetHeader("Subject", "ActionFront Startup - Cloud9")
+	m.SetBody("text/html", "ActionFront Dev Server Restart")
 	// MailChannel <- m
 
 	e.SetHTTPErrorHandler(func(err error, context echo.Context) {

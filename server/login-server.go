@@ -221,7 +221,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 <br>
 Many Thanks,<br>
 The Team at wargaming.io`, vcode))
-	MailChannel <- m
+	// MailChannel <- m
 
 	*newUser = u
 	return nil

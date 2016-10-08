@@ -142,7 +142,7 @@ create table rating (
 -- 5 British System
 drop table if exists drill;
 create table drill (
-	int serial not null primary key,
+	id serial not null primary key,
 	name text not null default '',
 	ranks int not null default 3,
 	flankers bool,
@@ -159,6 +159,7 @@ create table drill (
 	control int not null default 1,
 	speed int not null default 1
 );
+\i drill.sql
 
 -- conditions
 -- 1 Superior
@@ -172,21 +173,23 @@ create table small_arms (
 	id serial not null primary key,
 	name text not null default '',
 	ranges int[4],
-	effects int[4][6]
+	effects int[4][6],
+	covered int[4][6]
 );
+\i small_arms
 
 drop table if exists gunnery;
 create table gunnery (
 	id serial not null primary key,
 	name text not null default '',
-	cannister_ranges int[2],
-	cannister_effects int[2][6],
+	cannister int[3][6],
+	cannister_bad int[3][6],
 	ranges int[4],
-	effects int[4][6],
-	hw bool,
-	hw_fire int,
-	roll int 
+	good_effect int[4][6],
+	bad_effect int[4][6],
+	hw bool
 );
+\i gunnery.sql
 
 drop table if exists cav_type;
 create table cav_type (
@@ -199,6 +202,7 @@ create table cav_type (
 	cossack bool,
 	dubious bool
 );
+\i can_type.sql
 
 drop table if exists unit;
 create table unit (
@@ -425,7 +429,7 @@ create table game_unit (
 	small_arms int not null default 0,
 	elite_arms int not null default 0,
 	lt_coy int not null default 0,
-	jg_coy int not null default 0,
+	rifles bool,
 	lt_lost int not null default 0,
 	lt_mstate int not null default 0,  -- 0 Good 1,2 Repulsed 3,4,5,6 Defeated 12 TotalDefeat
 	rating int not null default 5,

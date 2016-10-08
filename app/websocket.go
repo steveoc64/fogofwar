@@ -1,15 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"time"
-	// "github.com/gopherjs/gopherjs/js"
 	"bufio"
 	"encoding/gob"
-	//	"errors"
+	"fmt"
+	"time"
+
 	"io"
 	"net"
 	"net/rpc"
+
+	"github.com/gopherjs/gopherjs/js"
 
 	"./shared"
 
@@ -217,6 +218,9 @@ func autoReload() {
 		time.Sleep(time.Second)
 		print(" !! BYE !!")
 		Logout()
+
+		// Force a reload
+		js.Global.Get("location").Call("replace", "/")
 	}()
 }
 

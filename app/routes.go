@@ -50,8 +50,10 @@ func enableRoutes(Rank int) {
 	switch Rank {
 	default:
 		Session.AppFn = map[string]router.Handler{
-			"main":        mainPage,
+			"mainpage":    mainPage,
+			"settings":    userSettings,
 			"usersonline": usersOnline,
+			"manual":      manual,
 		}
 	}
 
@@ -90,7 +92,6 @@ func defaultRoute(context *router.Context) {
 
 func loadRoutes(Rank int, Routes []shared.UserRoute) {
 
-	// print("Loading new routing table")
 	if Session.Router != nil {
 		Session.Router.Stop()
 	}

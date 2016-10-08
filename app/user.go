@@ -355,3 +355,11 @@ func _usersOnline(action string, id int) {
 	form.Render("useronline", "main", users)
 
 }
+
+func userSettings(context *router.Context) {
+	print("TODO - userSettings")
+}
+
+func name() {
+
+}

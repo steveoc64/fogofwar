@@ -48,11 +48,40 @@ func Login(username string, passwd string) {
 		doc.QuerySelector("#myname").SetTextContent(myName)
 		doc.QuerySelector("#hamburger").Class().Remove("hidden")
 		doc.QuerySelector("#signin-btn").Class().Add("hidden")
+		doc.QuerySelector("#faq").Class().Add("hidden")
 
-		doc.QuerySelector("#myname").AddEventListener("click", false, func(evt dom.Event) {
+		menu := doc.QuerySelector("#slidemenu")
+		menu.AddEventListener("click", false, func(evt dom.Event) {
+			menu.Class().Remove("cbp-spmenu-open")
+		})
+
+		doc.QuerySelector("#menu-settings").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			el := doc.QuerySelector("#slidemenu")
-			el.Class().Remove("cbp-spmenu-open")
+			Session.Navigate("/settings")
+		})
+		doc.QuerySelector("#menu-campaign").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("TODO - Campaigns")
+		})
+		doc.QuerySelector("#menu-scenario").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("TODO - Scenarios")
+		})
+		doc.QuerySelector("#menu-game").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("TODO - Games")
+		})
+		doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("TODO - Invite")
+		})
+		doc.QuerySelector("#menu-tutorial").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/manual")
+		})
+		doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("TODO - Contact")
 		})
 		doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
@@ -78,17 +107,15 @@ func Logout() {
 
 	w := dom.GetWindow()
 	doc := w.Document()
-	loc := w.Location()
-	print("loc=", loc)
 
-	// loc.pathname =
-	// js.Global.Get("location").Call("replace", "/")
 	doc.GetElementByID("slidemenu-div").SetInnerHTML("")
 	doc.GetElementByID("hamburger").Class().Add("hidden")
 	doc.GetElementByID("signin-btn").Class().Remove("hidden")
 	doc.GetElementByID("signin-mobile").Class().Remove("hidden")
+	doc.GetElementByID("faq").Class().Add("hidden")
 
 	grid1()
+
 }
 
 func initForms() {
@@ -106,9 +133,7 @@ func initForms() {
 	})
 
 	doc.QuerySelector("#hamburger").AddEventListener("click", false, func(evt dom.Event) {
-		print("clicked on hamburger")
 		el := doc.QuerySelector("#slidemenu")
-		print("el", el)
 		el.Class().Add("cbp-spmenu-open")
 	})
 }
@@ -120,6 +145,7 @@ func loginForm() {
 	doc.QuerySelector("#signin-btn").Class().Add("hidden")
 	doc.QuerySelector("#signin-mobile").Class().Add("hidden")
 	doc.QuerySelector("#hamburger").Class().Add("hidden")
+	doc.QuerySelector("#faq").Class().Add("hidden")
 	loadTemplate("loginform", "main", nil)
 
 	doc.QuerySelector("#l-loginbtn").AddEventListener("click", false, func(evt dom.Event) {
@@ -156,10 +182,10 @@ func grid1() {
 		loginForm()
 	})
 
-	doc.QuerySelector("#main-tute").AddEventListener("click", false, func(evt dom.Event) {
-		evt.PreventDefault()
-		Session.Navigate("/tute")
-	})
+	// doc.QuerySelector("#main-tute").AddEventListener("click", false, func(evt dom.Event) {
+	// 	evt.PreventDefault()
+	// 	Session.Navigate("/tute")
+	// })
 
 	doc.QuerySelector("#main-faq").AddEventListener("click", false, func(evt dom.Event) {
 		evt.PreventDefault()

@@ -26,7 +26,7 @@ create table user_rego (
 	created timestamptz not null default localtimestamp,
 	expires timestamptz not null default localtimestamp,
 	charge numeric(8,2),
-	receipt text not null default '',
+	receipt text not null default ''
 );
 create index user_rego_idx on user_rego (user_id, created);
 
@@ -67,7 +67,8 @@ create table army (
 	nation text not null default '',
 	descr text not null default ''
 );
-create index army_campaign_idx on army(campaign_id)
+drop index if exists army_campaign_idx;
+create index army_campaign_idx on army(campaign_id);
 
 -- cmd levels
 -- 1 Wing
@@ -87,7 +88,8 @@ create table cmd (
 	rating int not null default 0,
 	inspiration int not null default 0
 );
-create index cmd_army_idx on cmd(army);
+drop index if exists cmd_army_idx;
+create index cmd_army_idx on cmd(army_id);
 
 -- unit type
 -- 1 Command
@@ -123,8 +125,8 @@ create table rating (
 	attack_superior bool,
 	attack_guns bool,
 	fire_bonus int not null default 0,
-	melee_bonus int not null default 0
-	ammo int not null default 10,
+	melee_bonus int not null default 0,
+	ammo int not null default 10
 );
 
 -- Drill
@@ -245,7 +247,7 @@ create table orders (
 );
 
 drop table if exists scenario;
-create table screnario (
+create table scenario (
 	id serial not null primary key,
 	campaign_id int not null default 0,
 	author int not null default 0,
@@ -260,8 +262,10 @@ create table screnario (
 	blue_team text not null default '',
 	blue_brief text not null default ''
 );
-create index scenario_campaign_idx on screnario (campaign_id);
-create index scenario_author_idx on screnario (author);
+drop index if exists scenario_campaign_idx;
+create index scenario_campaign_idx on scenario (campaign_id);
+drop index if exists scenario_author_idx;
+create index scenario_author_idx on scenario (author);
 
 drop table if exists scenario_cmd;
 create table scenario_cmd (
@@ -277,7 +281,8 @@ create table scenario_cmd (
 	inspiration int not null default 0,
 	condition int not null default 2
 );
-create index scenario_cmd_scenario_idx on scenario_cmd (screnario_id);
+drop index if exists scenario_cmd_scenario_idx;
+create index scenario_cmd_scenario_idx on scenario_cmd (scenario_id);
 
 
 drop table if exists scenario_unit;
@@ -304,7 +309,8 @@ create table scenario_unit (
 	gunnery_type int not null default 0,
 	gun_condition int not null default 2
 );
-create index screnario_unit_cmd_idx on screnario_cmd (cmd_id);
+drop index if exists scenario_unit_cmd_idx;
+create index scenario_unit_cmd_idx on scenario_unit (cmd_id);
 
 drop table if exists game;
 create table game (
@@ -318,7 +324,7 @@ create table game (
 );
 create index game_scenario_idx on game (scenario_id);
 
-drop table if exsits game_objective;
+drop table if exists game_objective;
 -- TODO create table
 
 drop table if exists game_condition;
@@ -355,12 +361,15 @@ create table game_cmd_order (
 	game_id int not null,
 	cmd_id int not null,
 	turns int not null default 2,  -- Once hits 0, stick. If counts down to 0, replaces existing
-	order int not null,
+	new_order int not null,
 	objective int not null default 0,
-	enemy int not null default 0
+	enemy int not null default 0,
+	friend int not null default 0
 );
+drop index if exists game_cmd_order_game_idx;
+drop index if exists game_cmd_order_cmd_idx;
 create index game_cmd_order_game_idx on game_cmd_order (game_id);
-create index game_cmd_order_cmd_idx on game_cmd_order (game_id);
+create index game_cmd_order_cmd_idx on game_cmd_order (cmd_id);
 
 drop table if exists game_cmd_player;
 create table game_cmd_player (
@@ -428,7 +437,7 @@ create table game_unit (
 	guns_limbered bool,
 	guns_mstate int not null default 0,
 	gunnery_type int not null default 0,
-	gun_max_condition int not null default 2
+	gun_max_condition int not null default 2,
 	gun_condition int not null default 2
 );
 create index game_unit_cmd_idx on game_unit (cmd_id);

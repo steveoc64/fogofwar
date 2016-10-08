@@ -193,7 +193,7 @@ create table gunnery (
 
 drop table if exists cav_type;
 create table cav_type (
-	int serial not null primary key,
+	id serial not null primary key,
 	name text not null default '',
 	weight int not null default 1, -- Light Medium Heavy
 	battle bool,
@@ -202,7 +202,7 @@ create table cav_type (
 	cossack bool,
 	dubious bool
 );
-\i can_type.sql
+\i cav_type.sql
 
 drop table if exists unit;
 create table unit (
@@ -233,17 +233,20 @@ drop table if exists cmd_action;
 create table cmd_action (
 	id serial not null primary key,
 	descr text not null default '',
-	min_rank int not null default 0,
-	min_level int not null default 0,
+	chance int not null default 1, -- -1 each attempt, -1 repulsed, -2 defeated, -1 engaged  
+	rank int not null default 0,
+	level int not null default 0,
 	attach bool,
 	cav bool,
 	gun bool,
 	sk bool,
 	bayonet bool,
+	not_engaged bool,
 	engaged bool,
 	repulsed bool,
 	defeated bool
 );
+\i cmd_action.sql;
 
 drop table if exists orders;
 create table orders (
@@ -254,6 +257,7 @@ create table orders (
 	enemy_unit bool,
 	friendly_unit bool
 );
+\i orders;
 
 drop table if exists scenario;
 create table scenario (
@@ -404,11 +408,10 @@ create table game_unit (
 	cmd_id int not null,
 	path ltree,
 	name text not null default '',
-	commander_condition int not null default 10, -- 10 = in command, 1 = lost control 0 = injured, -1 = dead
+	commander_control int not null default 10, -- 0-10 = remaining control points to spend  -1 = injured, -2 = dead
 	nation text not null default '',
 	utype int not null default 1,
 	condition int not null default 2,
-	control int not null default 0,   -- 0 Ready, >0 = turns to restore order before fmt change
 	cmd_level int not null default 1,
 	drill int not null default 1,
 	table_sector int not null default 0, -- 0 left, 1 Centre, 2 Right

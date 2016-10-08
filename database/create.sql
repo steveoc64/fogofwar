@@ -12,6 +12,7 @@ create table users (
 	bloglink text not null default '',
 	notes text not null default ''
 );
+\i users.sql
 
 drop table if exists vcode;
 create table vcode (
@@ -39,6 +40,7 @@ create table stdimg (
 	preview text not null default '',
 	thumb	text not null default ''
 );
+\i stdimg.sql
 
 create extension ltree;
 -- create extension postgis;
@@ -56,6 +58,7 @@ create table campaign (
 	-- latlon geography(point,4326)
 	latlon point
 );
+\i campaign.sql
 create index campaign_author_idx on campaign(author);
 create index campaign_fork_idx on campaign(forked_from);
 
@@ -99,9 +102,10 @@ create index cmd_army_idx on cmd(army_id);
 -- 5 Other / Asset
 drop table if exists utype;
 create table utype (
-	int serial not null primary key,
+	id serial not null primary key,
 	name text not null default ''
 );
+\. utype.sql
 
 -- ratings
 -- 1 Guard
@@ -128,6 +132,7 @@ create table rating (
 	melee_bonus int not null default 0,
 	ammo int not null default 10
 );
+\i rating.sql
 
 -- Drill
 -- 1 Old School Linear

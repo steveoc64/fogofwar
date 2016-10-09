@@ -64,11 +64,9 @@ func (u *UserRPC) List(channel int, profs *[]shared.User) error {
 
 	DB.SQL(UserListQuery, conn.UserID).QueryStructs(profs)
 
-	logger(start, "User.List",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%d Users", len(*profs)),
-		channel, conn.UserID, "users", 0, false)
+	logger(start, "User.List", channel, conn.UserID, conn.Username,
+		"",
+		fmt.Sprintf("%d Users", len(*profs)))
 
 	return nil
 }
@@ -81,11 +79,9 @@ func (u *UserRPC) Me(channel int, prof *shared.User) error {
 
 	DB.SQL(UserGetQuery, conn.UserID).QueryStruct(prof)
 
-	logger(start, "User.Me",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%s %s", prof.Email, prof.Name),
-		channel, conn.UserID, "users", 0, false)
+	logger(start, "User.Me", channel, conn.UserID, conn.Username,
+		"",
+		fmt.Sprintf("%s %s", prof.Email, prof.Name))
 
 	return nil
 }
@@ -98,10 +94,9 @@ func (u *UserRPC) Get(data shared.UserRPCData, prof *shared.User) error {
 
 	DB.SQL(UserGetQuery, data.ID).QueryStruct(prof)
 
-	logger(start, "User.Get",
+	logger(start, "User.Get", data.Channel, conn.UserID, conn.Username,
 		fmt.Sprintf("%d", data.ID),
-		fmt.Sprintf("%s %s", prof.Email, prof.Name),
-		data.Channel, conn.UserID, "users", data.ID, false)
+		fmt.Sprintf("%s %s", prof.Email, prof.Name))
 
 	return nil
 }
@@ -117,11 +112,9 @@ func (u *UserRPC) Set(req shared.UserUpdate, done *bool) error {
 		Where("id = $1", req.ID).
 		Exec()
 
-	logger(start, "User.Set",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			req.Channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%s %s %s", req.Email, req.Name, req.Passwd),
-		req.Channel, conn.UserID, "users", req.ID, true)
+	logger(start, "User.Set", req.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%v", req),
+		"")
 
 	// *done = true
 
@@ -140,11 +133,9 @@ func (u *UserRPC) Update(data shared.UserRPCData, done *bool) error {
 		Where("id = $1", data.User.ID).
 		Exec()
 
-	logger(start, "User.Update",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
+	logger(start, "User.Update", data.Channel, conn.UserID, conn.Username,
 		fmt.Sprintf("%v", data.User),
-		data.Channel, conn.UserID, "users", data.User.ID, true)
+		"")
 
 	*done = true
 
@@ -163,11 +154,9 @@ func (u *UserRPC) Insert(data shared.UserRPCData, id *int) error {
 		Returning("id").
 		QueryScalar(id)
 
-	logger(start, "User.Insert",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
+	logger(start, "User.Insert", data.Channel, conn.UserID, conn.Username,
 		fmt.Sprintf("%v", data.User),
-		data.Channel, conn.UserID, "users", *id, true)
+		"")
 
 	return nil
 }
@@ -184,12 +173,8 @@ func (u *UserRPC) Delete(data shared.UserRPCData, ok *bool) error {
 		Where("id=$1", id).
 		Exec()
 
-	logger(start, "User.Delete",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%d %s %s %s %s",
-			id, data.User.Username, data.User.Email, data.User.Name, data.User.Passwd),
-		data.Channel, conn.UserID, "users", id, true)
+	logger(start, "User.Delete", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", id), "")
 
 	return nil
 }

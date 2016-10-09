@@ -50,16 +50,18 @@ create extension ltree;
 drop table if exists campaign;
 create table campaign (
 	id serial not null primary key,
-	author int not null default 0,
+	author_id int not null default 0,
 	forked_from int not null default 0,
 	name text not null default '',
 	year int not null default 1800,
 	descr text not null default '',
+	notes text not null default '',
 	-- latlon geography(point,4326)
-	latlon point
+	latlon point,
+	public bool default true
 );
 \i campaign.sql
-create index campaign_author_idx on campaign(author);
+create index campaign_author_idx on campaign(author_id);
 create index campaign_fork_idx on campaign(forked_from);
 
 drop table if exists army;

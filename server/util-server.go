@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	_ "image/png"
 	"log"
 	"os/exec"
@@ -27,11 +26,8 @@ func (u *UtilRPC) Backup(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Backup",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		*result,
-		channel, conn.UserID, "", 0, false)
+	logger(start, "Util.Backup", channel, conn.UserID, conn.Username,
+		"", *result)
 
 	return nil
 }
@@ -53,11 +49,8 @@ func (u *UtilRPC) Top(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Top",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		"top",
-		channel, conn.UserID, "", 0, false)
+	logger(start, "Util.Top", channel, conn.UserID, conn.Username,
+		"", *result)
 
 	return nil
 }
@@ -79,11 +72,8 @@ func (u *UtilRPC) Logs(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Logs",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		"logs",
-		channel, conn.UserID, "", 0, false)
+	logger(start, "Util.Logs", channel, conn.UserID, conn.Username,
+		"", *result)
 
 	return nil
 }

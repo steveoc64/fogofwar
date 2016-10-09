@@ -110,11 +110,9 @@ func (u *UtilRPC) AddPhoto(data shared.PhotoRPCData, newID *int) error {
 
 	DB.SQL(`update photo set entity='test', entity_id=$1 where id=$1`, newID).Exec()
 
-	logger(start, "Util.AddPhoto",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%d", *newID),
-		data.Channel, conn.UserID, "photo", 0, true)
+	logger(start, "Util.AddPhoto", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("Data of len %d", len(data.Photo.Data)),
+		fmt.Sprintf("%d", *newID))
 
 	return nil
 }
@@ -132,11 +130,9 @@ func (u *UtilRPC) GetPhoto(data shared.PhotoRPCData, photo *shared.Photo) error 
 			from photo
 			where id=$1`, data.ID).QueryStruct(photo)
 
-	logger(start, "Util.GetPhoto",
-		fmt.Sprintf("Channel %d, ID %d, User %d %s %s",
-			data.Channel, data.ID, conn.UserID, conn.Username, conn.GetRank()),
-		photo.Notes,
-		data.Channel, conn.UserID, "photo", data.ID, false)
+	logger(start, "Util.GetPhoto", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", data.ID),
+		photo.Notes)
 
 	return nil
 }
@@ -153,11 +149,9 @@ func (u *UtilRPC) GetFullPhoto(data shared.PhotoRPCData, photo *shared.Photo) er
 		length(thumb) as length_t
 		from photo where id=$1`, data.ID).QueryStruct(photo)
 
-	logger(start, "Util.GetFullPhoto",
-		fmt.Sprintf("Channel %d, ID %d, User %d %s %s",
-			data.Channel, data.ID, conn.UserID, conn.Username, conn.GetRank()),
-		photo.Data[:22],
-		data.Channel, conn.UserID, "photo", data.ID, false)
+	logger(start, "Util.GetFullPhoto", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", data.ID),
+		photo.Data[:22])
 
 	return nil
 }
@@ -169,11 +163,9 @@ func (u *UtilRPC) PhotoList(data shared.PhotoTestRPCData, photos *[]shared.Photo
 
 	DB.SQL(`select id,entity,entity_id,notes,thumb,filename from photo order by id desc`).QueryStructs(photos)
 
-	logger(start, "Util.PhotoList",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%d Photos", len(*photos)),
-		data.Channel, conn.UserID, "photo", 0, false)
+	logger(start, "Util.PhotoList", data.Channel, conn.UserID, conn.Username,
+		"",
+		fmt.Sprintf("%d Photos", len(*photos)))
 
 	return nil
 }
@@ -189,11 +181,9 @@ func (u *UtilRPC) UpdatePhoto(data shared.PhotoRPCData, done *bool) error {
 		Where("id = $1", data.ID).
 		Exec()
 
-	logger(start, "Util.UpdatePhoto",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
+	logger(start, "Util.UpdatePhoto", data.Channel, conn.UserID, conn.Username,
 		fmt.Sprintf("%d", data.ID),
-		data.Channel, conn.UserID, "photo", 0, true)
+		"")
 
 	*done = true
 
@@ -208,11 +198,9 @@ func (u *UtilRPC) DeletePhoto(data shared.PhotoRPCData, done *bool) error {
 	// Save the data
 	DB.SQL(`delete from photo where id=$1`, data.ID).Exec()
 
-	logger(start, "Util.DeletePhoto",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			data.Channel, conn.UserID, conn.Username, conn.GetRank()),
+	logger(start, "Util.DeletePhoto", data.Channel, conn.UserID, conn.Username,
 		fmt.Sprintf("%d", data.ID),
-		data.Channel, conn.UserID, "photo", 0, true)
+		"")
 
 	*done = true
 
@@ -262,11 +250,9 @@ func (u *UtilRPC) GetPDFImage(channel int, pdf *string) error {
 		return nil
 	}
 
-	logger(start, "Util.GetPDFImage",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]),
-		channel, conn.UserID, "stdimg", id, false)
+	logger(start, "Util.GetPDFImage", channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", id),
+		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]))
 
 	return nil
 }
@@ -286,11 +272,9 @@ func (u *UtilRPC) GetRawDataImage(channel int, pdf *string) error {
 		return nil
 	}
 
-	logger(start, "Util.GetRawDataImage",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]),
-		channel, conn.UserID, "stdimg", id, false)
+	logger(start, "Util.GetRawDataImage", channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", id),
+		fmt.Sprintf("Img ID %d size %d header %s", id, len(*pdf), (*pdf)[:44]))
 
 	return nil
 }

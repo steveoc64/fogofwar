@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 
+	"./shared"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
-	// "honnef.co/go/js/dom"
-	// "github.com/steveoc64/fogofwar/shared"
-	"./shared"
+	"honnef.co/go/js/dom"
 )
 
 type MessageFunction func(string, int)
@@ -72,5 +71,45 @@ func main() {
 }
 
 func mainPage(context *router.Context) {
-	loadTemplate("main-page", "main", nil)
+
+	go func() {
+		// users := []shared.User{}
+		// rpcClient.Call("UserRPC.List", Session.Channel, &users)
+
+		form := formulate.ListForm{}
+		form.New("fa-bomb", "Games")
+
+		// Define the layout
+		form.Column("Game", "Game")
+		form.Column("Players", "Players")
+		form.Column("Turn", "Turn")
+		form.Column("Hosted By", "HostedBy")
+		form.DateColumn("Created", "Created")
+		form.DateColumn("Expires", "Expires")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/")
+		})
+
+		form.NewRowEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/game/add")
+		})
+
+		form.RowEvent(func(key string) {
+			Session.Navigate("/game/" + key)
+		})
+
+		form.Render("game-list", "main", nil)
+
+		// print("add action grid")
+		form.ActionGrid("main-actions", "#action-grid", nil, func(url string) {
+			print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+	}()
+
 }

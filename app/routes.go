@@ -50,10 +50,21 @@ func enableRoutes(Rank int) {
 	switch Rank {
 	default:
 		Session.AppFn = map[string]router.Handler{
-			"mainpage":    mainPage,
-			"settings":    userSettings,
-			"usersonline": usersOnline,
-			"manual":      manual,
+			"mainpage":      mainPage,
+			"settings":      userSettings,
+			"usersonline":   usersOnline,
+			"manual":        manual,
+			"campaign":      campaignList,
+			"campaign-add":  campaignAdd,
+			"campaign-edit": campaignEdit,
+			"army-add":      armyAdd,
+			"army-edit":     armyEdit,
+			"command-add":   commandAdd,
+			"command-edit":  commandEdit,
+			"scenario-add":  scenarioAdd,
+			"scenario-edit": scenarioEdit,
+			"scommand-add":  scommandAdd,
+			"scommand-edit": scommandEdit,
 		}
 	}
 

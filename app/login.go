@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 
-	// "github.com/steveoc64/fogofwar/shared"
 	"./shared"
 	"github.com/steveoc64/formulate"
 

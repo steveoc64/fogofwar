@@ -96,10 +96,9 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		}
 	}
 
-	logger(start, "Login.Login",
+	logger(start, "Login.Login", lc.Channel, 0, "",
 		fmt.Sprintf("%s,%s,%t,%d", lc.Username, lc.Password, lc.RememberMe, lc.Channel),
-		fmt.Sprintf("%s,%d", lr.Result, lr.Rank),
-		lc.Channel, lr.ID, "users", lr.ID, false)
+		fmt.Sprintf("%s,%d", lr.Result, lr.Rank))
 
 	return nil
 }
@@ -140,11 +139,9 @@ func (l *LoginRPC) UsersOnline(channel int, u *[]shared.UserOnline) error {
 
 	}
 
-	logger(start, "Login.UsersOnline",
-		fmt.Sprintf("Channel %d, User %d %s %s",
-			channel, conn.UserID, conn.Username, conn.GetRank()),
-		fmt.Sprintf("%d Users Online", len(*u)),
-		channel, conn.UserID, "users", 0, false)
+	logger(start, "Login.UsersOnline", channel, conn.UserID, conn.Username,
+		conn.GetRank(),
+		fmt.Sprintf("%d Users Online", len(*u)))
 
 	return nil
 }

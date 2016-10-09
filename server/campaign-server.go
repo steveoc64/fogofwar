@@ -48,3 +48,17 @@ func (c *CampaignRPC) ListPublic(channel int, campaigns *[]shared.Campaign) erro
 
 	return nil
 }
+
+func (c *CampaignRPC) Get(data shared.CampaignRPCData, retval *shared.Campaign) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	DB.SQL(`select * from campaign where id=$1`, data.ID).QueryStruct(retval)
+
+	logger(start, "Campaign.Get", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return nil
+}

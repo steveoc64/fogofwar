@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"./shared"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
@@ -54,5 +56,69 @@ func campaignAdd(context *router.Context) {
 }
 
 func campaignEdit(context *router.Context) {
-	print("TODO - Campaign Edit")
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		c := shared.Campaign{}
+		rpcClient.Call("CampaignRPC.Get", shared.CampaignRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &c)
+		print("got c", c)
+
+		form := formulate.EditForm{}
+		form.New("fa-map", "Campaign Details - "+c.Name)
+
+		// Layout the fields
+
+		form.Row(4).
+			AddInput(3, "Name", "Name").
+			AddNumber(1, "Year", "Year", "0")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/campaign")
+		})
+
+		form.DeleteEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			go func() {
+				data := shared.CampaignRPCData{
+					Channel:  Session.Channel,
+					Campaign: &c,
+				}
+				done := false
+				rpcClient.Call("CampaignRPC.Delete", data, &done)
+				Session.Navigate("/campaign")
+			}()
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&c)
+
+			data := shared.CampaignRPCData{
+				Channel:  Session.Channel,
+				Campaign: &c,
+			}
+			go func() {
+				rpcClient.Call("CampaignRPC.Update", data, &c)
+				Session.Navigate("/campaign")
+			}()
+		})
+
+		form.PrintEvent(func(evt dom.Event) {
+			dom.GetWindow().Print()
+		})
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &c)
+
+	}()
+
 }

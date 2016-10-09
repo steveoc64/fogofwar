@@ -71,50 +71,87 @@ func campaignEdit(context *router.Context) {
 		print("got c", c)
 
 		form := formulate.EditForm{}
-		form.New("fa-map", "Campaign Details - "+c.Name)
 
 		// Layout the fields
 
-		form.Row(4).
-			AddInput(3, "Name", "Name").
-			AddNumber(1, "Year", "Year", "0")
+		if c.Author == Session.UserID {
 
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/campaign")
-		})
+			form.New("fa-map", "Edit Campaign Details - "+c.Name)
 
-		form.DeleteEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			go func() {
+			form.Row(5).
+				AddInput(3, "Name", "Name").
+				AddNumber(1, "Year", "Year", "0").
+				AddCheck(1, "Public", "Public")
+
+			form.Row(1).
+				AddInput(1, "Description", "Descr")
+
+			form.Row(1).
+				AddBigTextarea(1, "Notes", "Notes")
+
+			// Add event handlers
+			form.CancelEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				Session.Navigate("/campaign")
+			})
+
+			form.DeleteEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				go func() {
+					data := shared.CampaignRPCData{
+						Channel:  Session.Channel,
+						Campaign: &c,
+					}
+					done := false
+					rpcClient.Call("CampaignRPC.Delete", data, &done)
+					Session.Navigate("/campaign")
+				}()
+			})
+
+			form.SaveEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				form.Bind(&c)
+
 				data := shared.CampaignRPCData{
 					Channel:  Session.Channel,
+					ID:       id,
 					Campaign: &c,
 				}
-				done := false
-				rpcClient.Call("CampaignRPC.Delete", data, &done)
+				go func() {
+					rpcClient.Call("CampaignRPC.Update", data, &c)
+					Session.Navigate("/campaign")
+				}()
+			})
+
+			form.PrintEvent(func(evt dom.Event) {
+				dom.GetWindow().Print()
+			})
+
+		} else {
+
+			form.New("fa-map", "View Details of Campaign - "+c.Name)
+
+			form.Row(5).
+				AddDisplay(3, "Name", "Name").
+				AddDisplay(1, "Year", "Year").
+				AddDisplayCheck(1, "Public", "Public")
+
+			form.Row(1).
+				AddDisplay(1, "Description", "Descr")
+
+			form.Row(1).
+				AddDisplayArea(1, "Notes", "Notes")
+
+			// Add event handlers
+			form.CancelEvent(func(evt dom.Event) {
+				evt.PreventDefault()
 				Session.Navigate("/campaign")
-			}()
-		})
+			})
 
-		form.SaveEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			form.Bind(&c)
-
-			data := shared.CampaignRPCData{
-				Channel:  Session.Channel,
-				Campaign: &c,
-			}
-			go func() {
-				rpcClient.Call("CampaignRPC.Update", data, &c)
-				Session.Navigate("/campaign")
-			}()
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
+			form.PrintEvent(func(evt dom.Event) {
+				dom.GetWindow().Print()
+			})
+		}
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &c)

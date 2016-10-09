@@ -63,14 +63,14 @@
                     </select>
                   {{end}}
                   {{if eq .Type "checkbox"}}
-                    <input type="checkbox" name="{{.Model}}" {{if .Checked}}checked{{end}}>
+                    <input type="checkbox" name="{{.Model}}" {{if .Checked}}checked{{end}} {{if .Readonly}}disabled{{end}}>
                   {{end}}
                   {{if eq .Type "radio"}}
                     {{$model := .Model}}
                     <div name="radio-{{$model}}">
                     <label></label>
                     {{range .Options}}
-                    <label><input type="radio" name="{{$model}}" value="{{.Key}}" {{if .Selected}}checked="checked"{{end}}> {{.Display}}</label>
+                    <label><input type="radio" name="{{$model}}" value="{{.Key}}" {{if .Selected}}checked="checked"{{end}} {{if .Readonly}}disabled{{end}}> {{.Display}}</label>
                     {{end}}
                     </div>
                   {{end}}                  
@@ -147,13 +147,13 @@
             </select>
           {{end}}
           {{if eq .Type "checkbox"}}
-            <input type="checkbox" name="{{.Model}}" {{if or .Value .Checked}}checked{{end}}> {{.Label}}
+            <input type="checkbox" name="{{.Model}}" {{if or .Value .Checked}}checked{{end}} {{if .Readonly}}disabled{{end}}> {{.Label}}
           {{end}}
           {{if eq .Type "radio"}}
             <div name="radio-{{$fieldModel}}">
             <label></label>
             {{range .Options}}
-            <label><input type="radio" name="{{$fieldModel}}" value="{{.Key}}" {{if .Selected}}checked="checked"{{end}}> {{.Display}}</label>
+            <label><input type="radio" name="{{$fieldModel}}" value="{{.Key}}" {{if .Selected}}checked="checked"{{end}} {{if .Readonly}}disabled{{end}}> {{.Display}}</label>
             {{end}}
             </div>
           {{end}}

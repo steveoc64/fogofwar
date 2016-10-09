@@ -62,3 +62,26 @@ func (c *CampaignRPC) Get(data shared.CampaignRPCData, retval *shared.Campaign) 
 
 	return nil
 }
+
+func (c *CampaignRPC) Update(data shared.CampaignRPCData, retval *shared.Campaign) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.Update("campaign").
+		SetWhitelist(data.Campaign, "name", "year", "public", "descr", "notes").
+		Where("id = $1 and author_id=$2", data.ID, conn.UserID).
+		Exec()
+
+	DB.Select("name", "year", "public", "descr", "notes").
+		From("campaign").
+		Where("id=$1", data.ID).
+		Limit(1).
+		QueryStruct(retval)
+
+	logger(start, "Campaign.Update", data.Channel, conn.UserID, conn.Username,
+		fmt.Sprintf("%d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}

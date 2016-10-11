@@ -21,6 +21,7 @@ type GlobalSessionData struct {
 	AppFn         map[string]router.Handler
 	Subscriptions map[string]MessageFunction
 	ID            map[string]int
+	URL           string
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -45,9 +46,11 @@ func (g *GlobalSessionData) GetRank() string {
 var Session GlobalSessionData
 
 func (s *GlobalSessionData) Navigate(url string) {
+	// print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
 	s.Subscriptions = make(map[string]MessageFunction)
 	s.Router.Navigate(url)
+	s.URL = url
 	go rpcClient.Call("LoginRPC.Nav", shared.Nav{
 		Channel: s.Channel,
 		Route:   url,
@@ -107,7 +110,7 @@ func mainPage(context *router.Context) {
 
 		// print("add action grid")
 		form.ActionGrid("main-actions", "#action-grid", nil, func(url string) {
-			print("clicked on", url)
+			// print("clicked on", url)
 			Session.Navigate(url)
 		})
 

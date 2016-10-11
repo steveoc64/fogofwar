@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"./shared"
 	"github.com/steveoc64/formulate"
@@ -458,34 +457,35 @@ func signUp(context *router.Context) {
 
 }
 
-func showDisqus(id string) {
+func showDisqus(id string, title string) {
 	if Session.Rank > 1 {
 		w := dom.GetWindow()
 		doc := w.Document()
 		el := doc.QuerySelector("#disqus_thread")
-		print("el")
 		el.Class().Remove("hidden")
 
-		js.Global.Set("disqus_page_id", id)
-		dc := js.Global.Get("disqus_page_id")
-		print("dc = ", dc)
+		// DISQUS.reset({
+		//   reload: true,
+		//   config: function () {
+		//     this.page.identifier = "newidentifier";
+		//     this.page.url = "http://example.com/#!newthread";
+		//   }
+		// });
 
-		// var disqus_config = function () {
-		// 	this.page.url = "http://wargaming.io/disqus";
-		//   this.page.identifier = disqus_page_id;
-		// };
+		configFn := func(this *js.Object, args []*js.Object) interface{} {
+			// print("inside the config function")
+			page := this.Get("page")
+			page.Set("identifier", id)
+			page.Set("url", "wargaming.io"+Session.URL)
+			page.Set("title", title)
+			print("page now set to", page)
+			return nil
+		}
 
-		// (function() { // DON'T EDIT BELOW THIS LINE
-		//   var d = document, s = d.createElement('script');
-		//   s.src = '//actionfront.disqus.com/embed.js';
-		//   s.setAttribute('data-timestamp', +new Date());
-		//   ddiv.appendChild(s);
-		// })();
-
-		script := doc.CreateElement("script").(*dom.HTMLScriptElement)
-		script.Src = "//actionfront.disqus.com/embed.js"
-		script.SetAttribute("data-timestamp", time.Now().String())
-		el.AppendChild(script)
+		js.Global.Get("DISQUS").Call("reset", js.M{
+			"reload": true,
+			"config": js.MakeFunc(configFn),
+		})
 	}
 
 }

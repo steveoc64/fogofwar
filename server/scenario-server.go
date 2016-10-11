@@ -96,9 +96,11 @@ func (s *ScenarioRPC) Insert(data shared.ScenarioRPCData, retval *shared.Scenari
 
 	id := 0
 	data.Scenario.AuthorID = conn.UserID
+	data.Scenario.Public = false
 
 	err := DB.InsertInto("scenario").
-		Whitelist("name", "author_id", "year", "public", "descr", "notes", "red_team", "red_brief", "blue_team", "blue_brief").
+		// Whitelist("name", "author_id", "year", "public", "descr", "notes", "red_team", "red_brief", "blue_team", "blue_brief").
+		Whitelist("name", "author_id", "year", "descr").
 		Record(data.Scenario).
 		Returning("id").
 		QueryScalar(&id)

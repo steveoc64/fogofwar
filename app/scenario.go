@@ -61,22 +61,10 @@ func scenarioAdd(context *router.Context) {
 
 		form.Row(5).
 			AddInput(3, "Name", "Name").
-			AddNumber(1, "Year", "Year", "0").
-			AddCheck(1, "Public", "Public")
+			AddNumber(1, "Year", "Year", "0")
 
 		form.Row(1).
 			AddInput(1, "Description", "Descr")
-
-		form.Row(1).
-			AddBigTextarea(1, "Notes", "Notes")
-
-		form.Row(2).
-			AddInput(1, "Red Team", "RedTeam").
-			AddInput(1, "Blue Team", "BlueTeam")
-
-		form.Row(2).
-			AddBigTextarea(1, "Red Briefing", "RedBrief").
-			AddBigTextarea(1, "Blue Briefing", "BlueBrief")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -94,7 +82,7 @@ func scenarioAdd(context *router.Context) {
 			}
 			go func() {
 				rpcClient.Call("ScenarioRPC.Insert", data, &data)
-				Session.Navigate("/scenario")
+				Session.Navigate(fmt.Sprintf("/scenario/%d", data.ID))
 			}()
 		})
 
@@ -130,10 +118,15 @@ func scenarioEdit(context *router.Context) {
 
 			form.New("fa-sitemap", "Edit Scenario Details - "+data.Name)
 
-			form.Row(5).
+			rowElem := form.Row(5).
 				AddInput(3, "Name", "Name").
-				AddNumber(1, "Year", "Year", "0").
-				AddCheck(1, "Public", "Public")
+				AddNumber(1, "Year", "Year", "0")
+
+			if Session.Rank > 9 {
+				rowElem.AddCheck(1, "Public", "Public")
+			} else {
+				rowElem.AddDisplayCheck(1, "Public", "Public")
+			}
 
 			form.Row(1).
 				AddInput(1, "Description", "Descr")
@@ -217,7 +210,7 @@ func scenarioEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
-		showDisqus(fmt.Sprintf("scenario-%d", id))
+		showDisqus(fmt.Sprintf("scenario-%d", id), data.Name)
 
 	}()
 

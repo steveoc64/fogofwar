@@ -84,16 +84,24 @@
 
 <div class="md-overlay"></div>
 
+<div id="disqus_thread" class="disqus-container hidden">Here is the disqus thread</div>
+<script>
+var disqus_config = function () {
+  // this.page.url = "http://wargaming.io/disqus";
+  this.page.url = "wargaming.io"
+  this.page.identifier = "lobby"
+  this.page.title = "Members Lobby"
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = '//actionfront.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
 </body>
 
 <!-- Our Apps -->
 <script src="app.js"></script>
-
-<script>
-var disqus_page_id = "actionfront"
-var disqus_config = function () {
-  this.page.url = "http://wargaming.io/disqus";
-  this.page.identifier = disqus_page_id;
-};
-</script>
 </html>

@@ -478,6 +478,7 @@ func showDisqus(id string, title string) {
 			page.Set("identifier", id)
 			page.Set("url", "wargaming.io"+Session.URL)
 			page.Set("title", title)
+			page.Set("category_id", id)
 			print("page now set to", page)
 			return nil
 		}

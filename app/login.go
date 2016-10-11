@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"./shared"
 	"github.com/steveoc64/formulate"
@@ -9,6 +10,7 @@ import (
 	"regexp"
 
 	"github.com/go-humble/router"
+	"github.com/gopherjs/gopherjs/js"
 	"honnef.co/go/js/dom"
 )
 
@@ -58,10 +60,10 @@ func Login(username string, passwd string) {
 			evt.PreventDefault()
 			Session.Navigate("/settings")
 		})
-		doc.QuerySelector("#menu-campaign").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			print("TODO - Campaigns")
-		})
+		// doc.QuerySelector("#menu-campaign").AddEventListener("click", false, func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	print("TODO - Campaigns")
+		// })
 		doc.QuerySelector("#menu-scenario").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
 			print("TODO - Scenarios")
@@ -112,6 +114,8 @@ func Logout() {
 	doc.GetElementByID("signin-btn").Class().Remove("hidden")
 	doc.GetElementByID("signin-mobile").Class().Remove("hidden")
 	doc.GetElementByID("faq").Class().Add("hidden")
+
+	Session.Navigate("/")
 
 	grid1()
 
@@ -452,4 +456,45 @@ func signUp(context *router.Context) {
 		})
 	}()
 
+}
+
+func showDisqus(id string) {
+	if Session.Rank > 1 {
+		w := dom.GetWindow()
+		doc := w.Document()
+		el := doc.QuerySelector("#disqus_thread")
+		print("el")
+		el.Class().Remove("hidden")
+
+		js.Global.Set("disqus_page_id", id)
+		dc := js.Global.Get("disqus_page_id")
+		print("dc = ", dc)
+
+		// var disqus_config = function () {
+		// 	this.page.url = "http://wargaming.io/disqus";
+		//   this.page.identifier = disqus_page_id;
+		// };
+
+		// (function() { // DON'T EDIT BELOW THIS LINE
+		//   var d = document, s = d.createElement('script');
+		//   s.src = '//actionfront.disqus.com/embed.js';
+		//   s.setAttribute('data-timestamp', +new Date());
+		//   ddiv.appendChild(s);
+		// })();
+
+		script := doc.CreateElement("script").(*dom.HTMLScriptElement)
+		script.Src = "//actionfront.disqus.com/embed.js"
+		script.SetAttribute("data-timestamp", time.Now().String())
+		el.AppendChild(script)
+	}
+
+}
+
+func hideDisqus() {
+	w := dom.GetWindow()
+	doc := w.Document()
+	el := doc.QuerySelector("#disqus_thread")
+	if el != nil {
+		el.Class().Add("hidden")
+	}
 }

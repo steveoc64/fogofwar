@@ -26,7 +26,7 @@ func (u *UtilRPC) Backup(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Backup", channel, conn.UserID, conn.Username,
+	logger(start, "Util.Backup", conn,
 		"", *result)
 
 	return nil
@@ -49,7 +49,7 @@ func (u *UtilRPC) Top(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Top", channel, conn.UserID, conn.Username,
+	logger(start, "Util.Top", conn,
 		"", *result)
 
 	return nil
@@ -72,7 +72,7 @@ func (u *UtilRPC) Logs(channel int, result *string) error {
 		*result = string(out)
 	}
 
-	logger(start, "Util.Logs", channel, conn.UserID, conn.Username,
+	logger(start, "Util.Logs", conn,
 		"", *result)
 
 	return nil

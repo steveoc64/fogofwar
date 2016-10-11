@@ -52,6 +52,7 @@ func (s *GlobalSessionData) Navigate(url string) {
 		Channel: s.Channel,
 		Route:   url,
 	}, &url)
+	hideDisqus()
 }
 
 func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction) {
@@ -77,7 +78,7 @@ func mainPage(context *router.Context) {
 		// rpcClient.Call("UserRPC.List", Session.Channel, &users)
 
 		form := formulate.ListForm{}
-		form.New("fa-bomb", "Games")
+		form.New("fa-bookmark", "Games")
 
 		// Define the layout
 		form.Column("Game", "Game")

@@ -54,17 +54,9 @@ func enableRoutes(Rank int) {
 			"settings":      userSettings,
 			"usersonline":   usersOnline,
 			"manual":        manual,
-			"campaign":      campaignList,
-			"campaign-add":  campaignAdd,
-			"campaign-edit": campaignEdit,
-			"army-add":      armyAdd,
-			"army-edit":     armyEdit,
-			"command-add":   commandAdd,
-			"command-edit":  commandEdit,
+			"scenario":      scenarioList,
 			"scenario-add":  scenarioAdd,
 			"scenario-edit": scenarioEdit,
-			"scommand-add":  scommandAdd,
-			"scommand-edit": scommandEdit,
 		}
 	}
 
@@ -78,7 +70,6 @@ func enableRoutes(Rank int) {
 			// doc.QuerySelector("#show-image").Class().Remove("md-show")
 		})
 	}
-
 }
 
 func initRouter() {

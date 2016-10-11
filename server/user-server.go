@@ -64,7 +64,7 @@ func (u *UserRPC) List(channel int, profs *[]shared.User) error {
 
 	DB.SQL(UserListQuery, conn.UserID).QueryStructs(profs)
 
-	logger(start, "User.List", channel, conn.UserID, conn.Username,
+	logger(start, "User.List", conn,
 		"",
 		fmt.Sprintf("%d Users", len(*profs)))
 
@@ -79,7 +79,7 @@ func (u *UserRPC) Me(channel int, prof *shared.User) error {
 
 	DB.SQL(UserGetQuery, conn.UserID).QueryStruct(prof)
 
-	logger(start, "User.Me", channel, conn.UserID, conn.Username,
+	logger(start, "User.Me", conn,
 		"",
 		fmt.Sprintf("%s %s", prof.Email, prof.Name))
 
@@ -94,7 +94,7 @@ func (u *UserRPC) Get(data shared.UserRPCData, prof *shared.User) error {
 
 	DB.SQL(UserGetQuery, data.ID).QueryStruct(prof)
 
-	logger(start, "User.Get", data.Channel, conn.UserID, conn.Username,
+	logger(start, "User.Get", conn,
 		fmt.Sprintf("%d", data.ID),
 		fmt.Sprintf("%s %s", prof.Email, prof.Name))
 
@@ -112,7 +112,7 @@ func (u *UserRPC) Set(req shared.UserUpdate, done *bool) error {
 		Where("id = $1", req.ID).
 		Exec()
 
-	logger(start, "User.Set", req.Channel, conn.UserID, conn.Username,
+	logger(start, "User.Set", conn,
 		fmt.Sprintf("%v", req),
 		"")
 
@@ -133,7 +133,7 @@ func (u *UserRPC) Update(data shared.UserRPCData, done *bool) error {
 		Where("id = $1", data.User.ID).
 		Exec()
 
-	logger(start, "User.Update", data.Channel, conn.UserID, conn.Username,
+	logger(start, "User.Update", conn,
 		fmt.Sprintf("%v", data.User),
 		"")
 
@@ -154,7 +154,7 @@ func (u *UserRPC) Insert(data shared.UserRPCData, id *int) error {
 		Returning("id").
 		QueryScalar(id)
 
-	logger(start, "User.Insert", data.Channel, conn.UserID, conn.Username,
+	logger(start, "User.Insert", conn,
 		fmt.Sprintf("%v", data.User),
 		"")
 
@@ -173,7 +173,7 @@ func (u *UserRPC) Delete(data shared.UserRPCData, ok *bool) error {
 		Where("id=$1", id).
 		Exec()
 
-	logger(start, "User.Delete", data.Channel, conn.UserID, conn.Username,
+	logger(start, "User.Delete", conn,
 		fmt.Sprintf("%d", id), "")
 
 	return nil

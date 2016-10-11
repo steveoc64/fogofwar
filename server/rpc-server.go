@@ -24,4 +24,9 @@ func registerRPC() {
 	}
 	log.Println("» Campaign")
 
+	if err := rpc.Register(new(ScenarioRPC)); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("» Scenario")
+
 }

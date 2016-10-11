@@ -22,7 +22,7 @@ func (c *CampaignRPC) List(channel int, campaigns *[]shared.Campaign) error {
 		order by year`, conn.UserID).
 		QueryStructs(campaigns)
 
-	logger(start, "Campaign.List", channel, conn.UserID, conn.Username,
+	logger(start, "Campaign.List", conn,
 		"",
 		fmt.Sprintf("%d Campaigns", len(*campaigns)))
 
@@ -42,7 +42,7 @@ func (c *CampaignRPC) ListPublic(channel int, campaigns *[]shared.Campaign) erro
 		order by year`, conn.UserID).
 		QueryStructs(campaigns)
 
-	logger(start, "Campaign.ListPublic", channel, conn.UserID, conn.Username,
+	logger(start, "Campaign.ListPublic", conn,
 		"",
 		fmt.Sprintf("%d Campaigns", len(*campaigns)))
 
@@ -56,7 +56,7 @@ func (c *CampaignRPC) Get(data shared.CampaignRPCData, retval *shared.Campaign) 
 
 	DB.SQL(`select * from campaign where id=$1`, data.ID).QueryStruct(retval)
 
-	logger(start, "Campaign.Get", data.Channel, conn.UserID, conn.Username,
+	logger(start, "Campaign.Get", conn,
 		fmt.Sprintf("%d", data.ID),
 		fmt.Sprintf("%v", *retval))
 
@@ -79,7 +79,7 @@ func (c *CampaignRPC) Update(data shared.CampaignRPCData, retval *shared.Campaig
 		Limit(1).
 		QueryStruct(retval)
 
-	logger(start, "Campaign.Update", data.Channel, conn.UserID, conn.Username,
+	logger(start, "Campaign.Update", conn,
 		fmt.Sprintf("%d", data.ID),
 		fmt.Sprintf("%v", *retval))
 

@@ -16,11 +16,7 @@ func campaignList(context *router.Context) {
 		c2 := []shared.Campaign{}
 		rpcClient.Call("CampaignRPC.List", Session.Channel, &c)
 		rpcClient.Call("CampaignRPC.ListPublic", Session.Channel, &c2)
-		print("got c", c)
-		print("got c2", c2)
-
 		c3 := append(c, c2...)
-		print("got c3")
 
 		form := formulate.ListForm{}
 		form.New("fa-map", "Campaigns")
@@ -68,13 +64,12 @@ func campaignEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      id,
 		}, &c)
-		print("got c", c)
 
 		form := formulate.EditForm{}
 
 		// Layout the fields
 
-		if c.Author == Session.UserID {
+		if c.AuthorID == Session.UserID {
 
 			form.New("fa-map", "Edit Campaign Details - "+c.Name)
 
@@ -131,10 +126,9 @@ func campaignEdit(context *router.Context) {
 
 			form.New("fa-map", "View Details of Campaign - "+c.Name)
 
-			form.Row(5).
+			form.Row(4).
 				AddDisplay(3, "Name", "Name").
-				AddDisplay(1, "Year", "Year").
-				AddDisplayCheck(1, "Public", "Public")
+				AddDisplay(1, "Year", "Year")
 
 			form.Row(1).
 				AddDisplay(1, "Description", "Descr")

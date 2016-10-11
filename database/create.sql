@@ -259,28 +259,31 @@ create table orders (
 	enemy_unit bool,
 	friendly_unit bool
 );
-\i orders;
+\i orders.sql
 
 drop table if exists scenario;
 create table scenario (
 	id serial not null primary key,
 	campaign_id int not null default 0,
-	author int not null default 0,
+	author_id int not null default 0,
 	created timestamptz not null default localtimestamp,
 	forked_from int not null default 0,
 	name text not null default '',
 	descr text not null default '',
+	notes text not null default '',
 	year int not null default 1800,
+	public bool default true,
 	latlon point,
 	red_team text not null default '',
 	red_brief text not null default '',
 	blue_team text not null default '',
 	blue_brief text not null default ''
 );
-drop index if exists scenario_campaign_idx;
-create index scenario_campaign_idx on scenario (campaign_id);
+\i scenario.sql
+-- drop index if exists scenario_campaign_idx;
+-- create index scenario_campaign_idx on scenario (campaign_id);
 drop index if exists scenario_author_idx;
-create index scenario_author_idx on scenario (author);
+create index scenario_author_idx on scenario (author_id);
 
 drop table if exists scenario_cmd;
 create table scenario_cmd (
@@ -296,6 +299,7 @@ create table scenario_cmd (
 	inspiration int not null default 0,
 	condition int not null default 2
 );
+\i scenario_cmd.sql
 drop index if exists scenario_cmd_scenario_idx;
 create index scenario_cmd_scenario_idx on scenario_cmd (scenario_id);
 

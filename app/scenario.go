@@ -210,7 +210,7 @@ func scenarioEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
-		showDisqus(fmt.Sprintf("scenario-%d", id), data.Name)
+		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
 
 	}()
 

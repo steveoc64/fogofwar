@@ -472,20 +472,17 @@ func showDisqus(id string, title string) {
 		//   }
 		// });
 
-		configFn := func(this *js.Object, args []*js.Object) interface{} {
-			// print("inside the config function")
-			page := this.Get("page")
-			page.Set("identifier", id)
-			page.Set("url", "wargaming.io"+Session.URL)
-			page.Set("title", title)
-			page.Set("category_id", id)
-			print("page now set to", page)
-			return nil
-		}
-
 		js.Global.Get("DISQUS").Call("reset", js.M{
 			"reload": true,
-			"config": js.MakeFunc(configFn),
+			"config": js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
+				// print("inside the config function")
+				page := this.Get("page")
+				page.Set("identifier", id)
+				page.Set("url", "http://wargaming.io/#!"+Session.URL[1:])
+				page.Set("title", title)
+				page.Set("category_id", id)
+				return nil
+			}),
 		})
 	}
 

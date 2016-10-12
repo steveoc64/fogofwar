@@ -12,7 +12,7 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 		{Route: "/", Func: "mainpage"},
 		{Route: "/settings", Func: "settings"},
 		{Route: "/manual", Func: "manual"},
-		{Route: "/scenario", Func: "scenario"},
+		{Route: "/scenarios", Func: "scenarios"},
 		{Route: "/scenario/add", Func: "scenario-add"},
 		{Route: "/scenario/{id}", Func: "scenario-edit"},
 	}
@@ -27,6 +27,7 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 	case 10: // Emporer gets more options
 		more = []shared.UserRoute{
 			{Route: "/usersonline", Func: "usersonline"},
+			{Route: "/users", Func: "users"},
 		}
 	}
 	if len(more) > 0 {

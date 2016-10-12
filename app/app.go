@@ -110,7 +110,7 @@ func mainPage(context *router.Context) {
 		form.Render("game-list", "main", nil)
 
 		// print("add action grid")
-		form.ActionGrid("main-actions", "#action-grid", nil, func(url string) {
+		form.ActionGrid("main-actions", "#action-grid", Session, func(url string) {
 			// print("clicked on", url)
 			Session.Navigate(url)
 		})

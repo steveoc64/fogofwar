@@ -47,19 +47,26 @@ func enableRoutes(Rank int) {
 
 	// print("enabling routes for rank", Rank, "session", Session, Session.GetRank())
 
+	Session.AppFn = map[string]router.Handler{
+		"mainpage":      mainPage,
+		"settings":      userSettings,
+		"usersonline":   usersOnline,
+		"manual":        manual,
+		"scenarios":     scenarioList,
+		"scenario-add":  scenarioAdd,
+		"scenario-edit": scenarioEdit,
+	}
 	switch Rank {
-	default:
-		Session.AppFn = map[string]router.Handler{
-			"mainpage":      mainPage,
-			"settings":      userSettings,
-			"usersonline":   usersOnline,
-			"manual":        manual,
-			"scenario":      scenarioList,
-			"scenario-add":  scenarioAdd,
-			"scenario-edit": scenarioEdit,
+	case 10:
+		more := map[string]router.Handler{
+			"users":        userList,
+			"user-edit":    userEdit,
+			"users-online": usersOnline,
+		}
+		for k, v := range more {
+			Session.AppFn[k] = v
 		}
 	}
-
 	w := dom.GetWindow()
 	doc := w.Document()
 

@@ -1,16 +1,60 @@
 package shared
 
+import "time"
+
 type User struct {
-	ID       int    `db:"id"`
-	Username string `db:"username"`
-	Name     string `db:"name"`
-	Passwd   string `db:"passwd"`
-	Email    string `db:"email"`
-	Rank     int    `db:"rank"`
-	Notes    string `db:"notes"`
-	Country  string `db:"country"`
-	Bloglink string `db:"bloglink"`
-	Channel  int    `db:"channel"`
+	ID       int        `db:"id"`
+	Username string     `db:"username"`
+	Name     string     `db:"name"`
+	Passwd   string     `db:"passwd"`
+	Email    string     `db:"email"`
+	Rank     int        `db:"rank"`
+	Notes    string     `db:"notes"`
+	Country  string     `db:"country"`
+	Bloglink string     `db:"bloglink"`
+	Channel  int        `db:"channel"`
+	Created  *time.Time `db:"created"`
+}
+
+func (u *User) GetRank() string {
+
+	switch u.Rank {
+	case 1:
+		return "Lieutenant"
+	case 2:
+		return "Captain"
+	case 3:
+		return "Major"
+	case 4:
+		return "Colonel"
+	case 5:
+		return "Brigadier"
+	case 6:
+		return "General"
+	case 7:
+		return "Marshal"
+	case 10:
+		return "Emporer"
+	}
+	return "Private"
+}
+
+type Rank struct {
+	ID   int
+	Name string
+}
+
+func GetRanks() []Rank {
+	ranks := []Rank{
+		{1, "Lieutenant"},
+		{2, "Captain"},
+		{3, "Major"},
+		{4, "Colonel"},
+		{5, "General"},
+		{7, "Marshal"},
+		{10, "Emporer"},
+	}
+	return ranks
 }
 
 type UserSignup struct {

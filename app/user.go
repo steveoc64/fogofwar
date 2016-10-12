@@ -5,116 +5,32 @@ import (
 
 	"./shared"
 
-	"github.com/go-humble/form"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
 	"honnef.co/go/js/dom"
 )
-
-// Display modal dialog of user profile, with the ability to update info
-func userProfile() {
-
-	go func() {
-		w := dom.GetWindow()
-		doc := w.Document()
-		// print("edit user profile")
-
-		// TODO - get the user profile data from the backend
-		data := shared.User{}
-		err := rpcClient.Call("UserRPC.Me", Session.Channel, &data)
-		if err != nil {
-			print("RPC error", err.Error())
-			return
-		}
-
-		loadTemplate("user-profile", "#user-profile", data)
-		el := doc.QuerySelector("#user-profile")
-		el.Class().Add("md-show")
-		doc.QuerySelector("#nameField").(*dom.HTMLInputElement).Focus()
-
-		// Setup the close button
-		closeBtn := doc.QuerySelector(".md-up-close")
-		if closeBtn != nil {
-			closeBtn.AddEventListener("click", false, func(evt dom.Event) {
-				evt.PreventDefault()
-				el.Class().Remove("md-show")
-			})
-		}
-
-		// Allow ESC to close dialog
-		doc.QuerySelector("#user-profile-form").AddEventListener("keyup", false, func(evt dom.Event) {
-			if evt.(*dom.KeyboardEvent).KeyCode == 27 {
-				evt.PreventDefault()
-				el.Class().Remove("md-show")
-			}
-		})
-
-		// Setup the save button
-		saveBtn := doc.QuerySelector(".md-up-save")
-		if saveBtn != nil {
-			saveBtn.AddEventListener("click", false, func(evt dom.Event) {
-
-				evt.PreventDefault()
-
-				formEl := doc.QuerySelector("#user-profile-form")
-				f, err := form.Parse(formEl)
-				if err != nil {
-					print("Form Parse Error", err.Error())
-				}
-				data.Name, err = f.GetString("Name")
-				if err != nil {
-					print("Name", err.Error())
-				}
-				data.Email, err = f.GetString("Email")
-				if err != nil {
-					print("email", err.Error())
-				}
-				p1, _ := f.GetString("p1")
-				p2, _ := f.GetString("p2")
-
-				// print("updated data =", data, p1, p2)
-				if p1 != p2 {
-					w.Alert("Passwords do not match")
-				} else {
-					if p1 != "" {
-						data.Passwd = p1
-					}
-					d := false
-					req := shared.UserUpdate{
-						Channel: Session.Channel,
-						ID:      data.ID,
-						Name:    data.Name,
-						Passwd:  data.Passwd,
-						Email:   data.Email,
-					}
-					// print("passing update req", req)
-					go func() {
-						rpcClient.Call("UserRPC.Set", &req, &d)
-						el.Class().Remove("md-show")
-					}()
-				}
-
-			})
-		}
-	}()
-}
 
 // Display a list of users
 func userList(context *router.Context) {
 
 	go func() {
 		users := []shared.User{}
-		rpcClient.Call("UserRPC.List", Session.Channel, &users)
+		rpcClient.Call("UserRPC.List", shared.UserRPCData{
+			Channel: Session.Channel,
+		}, &users)
+		print("got users", users)
 
 		form := formulate.ListForm{}
-		form.New("fa-user", "Users List - All Users")
+		form.New("fa-user", "Users List")
 
 		// Define the layout
+		form.Column("Rank", "Rank")
 		form.Column("Username", "Username")
+		form.Column("Country", "Country")
 		form.Column("Name", "Name")
 		form.Column("Email", "Email")
-		form.BoolColumn("Local", "Local")
-		form.Column("Rank", "Rank")
+		// form.Column("Bloglink", "Bloglink")
+		form.DateColumn("Created", "Created")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -141,11 +57,6 @@ func userList(context *router.Context) {
 
 }
 
-type Ranks struct {
-	ID   int
-	Name string
-}
-
 // Edit an existing user
 func userEdit(context *router.Context) {
 
@@ -155,15 +66,7 @@ func userEdit(context *router.Context) {
 		return
 	}
 
-	ranks := []Ranks{
-		{1, "Lieutenant"},
-		{2, "Captain"},
-		{3, "Major"},
-		{4, "Colonel"},
-		{5, "General"},
-		{10, "Marshal"},
-		{12, "Emporer"},
-	}
+	ranks := shared.GetRanks()
 
 	go func() {
 		user := shared.User{}
@@ -248,15 +151,7 @@ func userEdit(context *router.Context) {
 // Add form for a new user
 func userAdd(context *router.Context) {
 
-	ranks := []Ranks{
-		{1, "Lieutenant"},
-		{2, "Captain"},
-		{3, "Major"},
-		{4, "Colonel"},
-		{5, "General"},
-		{10, "Marshal"},
-		{12, "Emporer"},
-	}
+	ranks := shared.GetRanks()
 
 	go func() {
 		user := shared.User{}

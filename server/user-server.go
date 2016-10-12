@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -56,19 +57,24 @@ u.id,u.username,u.passwd,u.email,u.role,u.sms,u.name,u.hourly_rate,u.use_mobile,
 ///////////////////////////////////////////////////////////
 // Code
 
-// Get all users
-func (u *UserRPC) List(channel int, profs *[]shared.User) error {
+func (u *UserRPC) List(data shared.UserRPCData, retval *[]shared.User) error {
 	start := time.Now()
+	print("here")
 
-	conn := Connections.Get(channel)
+	conn := Connections.Get(data.Channel)
+	print("got con", conn)
+	if conn.Rank < 10 {
+		return errors.New("Insufficient Privileges")
+	}
 
-	DB.SQL(UserListQuery, conn.UserID).QueryStructs(profs)
+	err := DB.SQL(`select * from users order by username`, data.ID).QueryStructs(retval)
+	print("retval", retval)
 
 	logger(start, "User.List", conn,
 		"",
-		fmt.Sprintf("%d Users", len(*profs)))
+		fmt.Sprintf("%d Users", len(*retval)))
 
-	return nil
+	return err
 }
 
 // Get the user for the given channel

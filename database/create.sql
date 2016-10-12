@@ -9,6 +9,7 @@ create table users (
 	created timestamptz not null default localtimestamp,
 	expires timestamptz not null default localtimestamp,
 	channel int not null default 0,
+	ip_address text not null default '',
 	country text not null default '',
 	bloglink text not null default '',
 	notes text not null default '',
@@ -17,6 +18,16 @@ create table users (
 	newsletter bool not null default true
 );
 \i users.sql
+
+drop table if exists login;
+create table login (
+	user_id int not null,
+	date timestamptz not null default localtimestamp,
+	ip_address text not null default '',
+	channel int not null default 0
+);
+create index login_date_idx on login(date);
+create index login_user_idx on login(user_id);
 
 drop table if exists vcode;
 create table vcode (

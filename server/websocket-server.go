@@ -240,7 +240,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()
 
-	// Unlogin all users on that channel
+	// Unlogin all users on that channel, but leave their last IP Address open
 	DB.SQL(`update users set channel=0 where channel=$1`, conn.ID).Exec()
 	return c
 }

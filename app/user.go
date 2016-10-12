@@ -28,11 +28,15 @@ func userList(context *router.Context) {
 		form.Column("Rank", "GetRank")
 		form.Column("Username", "Username")
 		form.Column("Country", "Country")
-		form.Column("Name", "Name")
+		form.Column("IP", "IPAddress")
+		form.Column("Ch", "Channel")
+		// form.Column("Name", "Name")
 		form.Column("Email", "Email")
+		form.Column("Scenarios", "NumScenarios")
+		form.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
-		form.DateColumn("Created", "Created")
-		form.DateColumn("Created", "Expires")
+		// form.DateColumn("Created", "Created")
+		form.DateColumn("Expires", "Expires")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -63,10 +67,14 @@ func userList(context *router.Context) {
 		formOffline.Column("Rank", "GetRank")
 		formOffline.Column("Username", "Username")
 		formOffline.Column("Country", "Country")
+		formOffline.Column("LastIP", "IPAddress")
 		formOffline.Column("Name", "Name")
 		formOffline.Column("Email", "Email")
+		formOffline.Column("Scenarios", "NumScenarios")
+		formOffline.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
-		formOffline.DateColumn("Created", "Created")
+		// formOffline.DateColumn("Created", "Created")
+		formOffline.DateColumn("Expires", "Expires")
 
 		// Add event handlers
 		formOffline.CancelEvent(func(evt dom.Event) {
@@ -127,11 +135,12 @@ func userEdit(context *router.Context) {
 			AddDate(1, "Account Created", "Created").
 			AddDate(1, "Commission Expires", "Expires")
 
-		form.Row(8).
+		form.Row(9).
 			AddInput(5, "Blog Link", "Bloglink").
 			AddCheck(1, "Disqus", "Disqus").
 			AddCheck(1, "Banned", "Banned").
-			AddDisplay(1, "Channel", "Channel")
+			AddDisplay(1, "Channel", "Channel").
+			AddDisplay(1, "IP", "IPAddress")
 
 		if user.Channel != 0 {
 			form.Row(1).
@@ -181,7 +190,29 @@ func userEdit(context *router.Context) {
 		w := dom.GetWindow()
 		doc := w.Document()
 
-		doc.QuerySelector("[name=Activity]").SetInnerHTML("")
+		if user.Channel != 0 {
+			doc.QuerySelector("[name=Activity]").SetInnerHTML("")
+		}
+
+		// Add a list of logins for this user
+		l := []shared.Login{}
+		rpcClient.Call("LoginRPC.ListByUser", shared.LoginRPCData{
+			Channel: Session.Channel,
+			ID:      user.ID,
+		}, &l)
+		print("got logins ?", l)
+
+		lList := formulate.ListForm{}
+		lList.New("fa-signin", "Last Dozen Sign-Ins")
+
+		// Define the layout
+		lList.DateColumn("Date", "Date")
+		lList.Column("IP Address", "IPAddress")
+
+		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div.SetID("userlogin-list")
+		doc.QuerySelector("main").AppendChild(div)
+		lList.Render("userlogin-list", "#userlogin-list", l)
 
 		// Add a list of scenarios for this user
 		s := []shared.Scenario{}
@@ -189,6 +220,7 @@ func userEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &s)
+		print("got scenarios ?", s)
 
 		sList := formulate.ListForm{}
 		sList.New("fa-sitemap", "Scenarios")
@@ -203,10 +235,10 @@ func userEdit(context *router.Context) {
 			Session.Navigate("/scenario/" + key)
 		})
 
-		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div = doc.CreateElement("div").(*dom.HTMLDivElement)
 		div.SetID("userscen-list")
 		doc.QuerySelector("main").AppendChild(div)
-		sList.RenderAgain("userscen-list", "#userscen-list", s)
+		sList.Render("userscen-list", "#userscen-list", s)
 
 		// Add a list of games for this user
 		g := []shared.Game{}
@@ -233,7 +265,7 @@ func userEdit(context *router.Context) {
 		div = doc.CreateElement("div").(*dom.HTMLDivElement)
 		div.SetID("usergame-list")
 		doc.QuerySelector("main").AppendChild(div)
-		gList.RenderAgain("usergame-list", "#usergame-list", g)
+		gList.Render("usergame-list", "#usergame-list", g)
 	}()
 
 }

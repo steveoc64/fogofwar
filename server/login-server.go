@@ -97,7 +97,20 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
 			conn.Broadcast("login", "insert", lr.ID)
-			DB.SQL(`update users set channel=$2 where id=$1`, res.ID, conn.ID).Exec()
+
+			// Create a login record
+			req := conn.Socket.Request()
+			theIP := ""
+			if theIP = req.Header.Get("X-Real-Ip"); theIP == "" {
+				theIP = req.RemoteAddr
+			}
+
+			// Update the user
+			DB.SQL(`update users set channel=$2,ip_address=$3 where id=$1`, res.ID, conn.ID, theIP).Exec()
+
+			// Create a login record
+			DB.SQL(`insert into login (user_id,ip_address,channel) values ($1,$2,$3)`,
+				res.ID, theIP, conn.ID).Exec()
 		}
 	}
 
@@ -261,4 +274,18 @@ func (l *LoginRPC) ValidateNewUser(u *shared.UserSignup, ok *bool) error {
 
 	*ok = true
 	return nil
+}
+
+func (l *LoginRPC) ListByUser(data shared.LoginRPCData, retval *[]shared.Login) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select * from login where user_id=$1 order by date desc limit 12`, data.ID).QueryStructs(retval)
+
+	logger(start, "Login.ListByUser", conn,
+		fmt.Sprintf("User %d", data.ID),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
 }

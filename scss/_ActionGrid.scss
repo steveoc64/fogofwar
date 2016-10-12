@@ -43,11 +43,13 @@
 	border-radius: .4rem;	
 	border: 4px solid(#344);
 	font-size: 1.6rem;
-	height: 20rem;
+	height: 16rem;
 
 	// if they insist on using an iphone
 	@media (max-height: 740px) {
-		height: 16rem;
+		flex: 0 1 14rem;
+		-webkit-flex: 0 1 14rem;
+		height: 12rem;
 	}
 
 	.action__title {
@@ -62,6 +64,8 @@
 		// phones
 		@media (max-height: 740px) {
 			font-size: 1.4rem;
+			padding: 0 0 0 0;
+			margin: 0 0 0 0;
 		}
 
 	}
@@ -74,7 +78,7 @@
 
 		// if they insist on using an iphone
 		@media (max-height: 740px) {
-			font-size: 3.0rem;
+			font-size: 2.2rem;
 		}
 
 	}
@@ -92,7 +96,7 @@
 
 		// if they insist on using an iphone
 		@media (max-height: 740px) {
-			padding: 1.4rem 2rem 0.3rem 2rem;
+			padding: 0.4rem 1rem 0.3rem 1rem;
 			font-size: 1rem;
 			border: none;
 		}

@@ -1,5 +1,7 @@
 package shared
 
+import "time"
+
 type LoginCredentials struct {
 	Username   string
 	Password   string
@@ -30,4 +32,17 @@ type UserRoute struct {
 type Nav struct {
 	Channel int
 	Route   string
+}
+
+type Login struct {
+	ID        int        `db:"user_id"`
+	Date      *time.Time `db:"date"`
+	IPAddress string     `db:"ip_address"`
+	Channel   int        `db:"channel"`
+}
+
+type LoginRPCData struct {
+	Channel int
+	ID      int
+	Login   *Login
 }

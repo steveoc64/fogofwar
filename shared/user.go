@@ -3,21 +3,24 @@ package shared
 import "time"
 
 type User struct {
-	ID         int        `db:"id"`
-	Username   string     `db:"username"`
-	Name       string     `db:"name"`
-	Passwd     string     `db:"passwd"`
-	Email      string     `db:"email"`
-	Rank       int        `db:"rank"`
-	Notes      string     `db:"notes"`
-	Country    string     `db:"country"`
-	Bloglink   string     `db:"bloglink"`
-	Channel    int        `db:"channel"`
-	Created    *time.Time `db:"created"`
-	Expires    *time.Time `db:"expires"`
-	Banned     bool       `db:"banned"`
-	Disqus     bool       `db:"disqus"`
-	Newsletter bool       `db:"newsletter"`
+	ID           int        `db:"id"`
+	Username     string     `db:"username"`
+	Name         string     `db:"name"`
+	Passwd       string     `db:"passwd"`
+	Email        string     `db:"email"`
+	Rank         int        `db:"rank"`
+	Notes        string     `db:"notes"`
+	Country      string     `db:"country"`
+	Bloglink     string     `db:"bloglink"`
+	Channel      int        `db:"channel"`
+	IPAddress    string     `db:"ip_address"`
+	Created      *time.Time `db:"created"`
+	Expires      *time.Time `db:"expires"`
+	Banned       bool       `db:"banned"`
+	Disqus       bool       `db:"disqus"`
+	Newsletter   bool       `db:"newsletter"`
+	NumScenarios int        `db:"num_scenarios"`
+	NumGames     int        `db:"num_games"`
 }
 
 func (u *User) GetRank() string {

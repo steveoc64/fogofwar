@@ -232,7 +232,8 @@ func (s *ScenarioRPC) InsertForce(data shared.ForceRPCData, retval *shared.Force
 
 	id := 0
 	err := DB.InsertInto("force").
-		Whitelist("nation", "name", "level", "scenario_id", "red_team", "blue_team").
+		Whitelist("nation", "name", "level", "scenario_id", "red_team", "blue_team",
+			"cmdr_name", "inspiration", "rating", "condition").
 		Record(data.Force).
 		Returning("id").
 		QueryScalar(&id)

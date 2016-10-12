@@ -300,7 +300,7 @@ create table force (
 	inspiration int not null default 0,
 	condition int not null default 2
 );
-\i scenario_force.sql
+\i force.sql
 drop index if exists force_scenario_idx;
 create index force_scenario_idx on force (scenario_id);
 

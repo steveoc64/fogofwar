@@ -89,13 +89,13 @@ func enableRoutes(Rank int) {
 	}
 
 	rpcClient.Call("UtilRPC.GetCmdLevels", Session.Channel, &CmdLevels)
-	print("cmd_levels", CmdLevels)
+	// print("cmd_levels", CmdLevels)
 	rpcClient.Call("UtilRPC.GetCmdRatings", Session.Channel, &CmdRatings)
-	print("cmd_ratings", CmdRatings)
+	// print("cmd_ratings", CmdRatings)
 	rpcClient.Call("UtilRPC.GetInspirations", Session.Channel, &Inspirations)
-	print("insp", Inspirations)
+	// print("insp", Inspirations)
 	rpcClient.Call("UtilRPC.GetConditions", Session.Channel, &Conditions)
-	print("conditions", Conditions)
+	// print("conditions", Conditions)
 }
 
 func initRouter() {

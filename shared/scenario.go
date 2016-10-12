@@ -28,20 +28,20 @@ type ScenarioRPCData struct {
 }
 
 type Force struct {
-	ID           int    `db:"id"`
-	ScenarioID   int    `db:"scenario_id"`
-	ScenarioName string `db:"scenario_name"`
-	RedTeam      bool   `db:"red_team"`
-	BlueTeam     bool   `db:"blue_team"`
-	Nation       string `db:"nation"`
-	Name         string `db:"name"`
-	CmdrName     string `db:"cmdr_name"`
-	Level        int    `db:"level"`
-	LevelName    string `db:"level_name"`
-	Descr        string `db:"descr"`
-	Rating       int    `db:"rating"`
-	Insipration  int    `db:"inspiration"`
-	Condition    int    `db:"condition"`
+	ID            int    `db:"id"`
+	ScenarioID    int    `db:"scenario_id"`
+	ScenarioName  string `db:"scenario_name"`
+	RedTeam       bool   `db:"red_team"`
+	BlueTeam      bool   `db:"blue_team"`
+	Nation        string `db:"nation"`
+	Name          string `db:"name"`
+	CommanderName string `db:"cmdr_name"`
+	Level         int    `db:"level"`
+	LevelName     string `db:"level_name"`
+	Descr         string `db:"descr"`
+	Rating        int    `db:"rating"`
+	Inspiration   int    `db:"inspiration"`
+	Condition     int    `db:"condition"`
 }
 
 type ForceRPCData struct {

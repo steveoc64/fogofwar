@@ -410,7 +410,7 @@ func scenarioRedAdd(context *router.Context) {
 			AddSelect(1, "Condition", "Condition", Conditions, "ID", "Name", 1, 3)
 
 		form.Row(5).
-			AddInput(3, "Commander", "CmdrName").
+			AddInput(3, "Commander", "CommanderName").
 			AddSelect(1, "Command Rating", "Rating", CmdRatings, "ID", "Name", 1, 3).
 			AddSelect(1, "Inspiration", "Inspiration", Inspirations, "ID", "Name", 1, 3)
 
@@ -432,6 +432,7 @@ func scenarioRedAdd(context *router.Context) {
 				Force:   &data,
 			}
 			go func() {
+				print("data", data)
 				rpcClient.Call("ScenarioRPC.InsertForce", RPCdata, &data)
 				// Session.Navigate(fmt.Sprintf("/scenario/%d/red", id))
 				Session.Reload(context)
@@ -503,7 +504,7 @@ func scenarioBlueAdd(context *router.Context) {
 			AddSelect(1, "Condition", "Condition", Conditions, "ID", "Name", 1, 3)
 
 		form.Row(5).
-			AddInput(3, "Commander", "CmdrName").
+			AddInput(3, "Commander", "CommanderName").
 			AddSelect(1, "Command Rating", "Rating", CmdRatings, "ID", "Name", 1, 3).
 			AddSelect(1, "Inspiration", "Inspiration", Inspirations, "ID", "Name", 1, 3)
 

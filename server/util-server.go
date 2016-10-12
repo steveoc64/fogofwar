@@ -1,10 +1,13 @@
 package main
 
 import (
+	"fmt"
 	_ "image/png"
 	"log"
 	"os/exec"
 	"time"
+
+	"../shared"
 )
 
 type UtilRPC struct{}
@@ -76,4 +79,60 @@ func (u *UtilRPC) Logs(channel int, result *string) error {
 		"", *result)
 
 	return nil
+}
+
+func (u *UtilRPC) GetCmdLevels(Channel int, retval *[]shared.CmdLevel) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from cmd_level order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetCmdLevels", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}
+
+func (u *UtilRPC) GetCmdRatings(Channel int, retval *[]shared.CmdRating) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from cmd_rating order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetCmdRatings", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}
+
+func (u *UtilRPC) GetInspirations(Channel int, retval *[]shared.Inspiration) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from inspiration order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetInspirations", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}
+
+func (u *UtilRPC) GetConditions(Channel int, retval *[]shared.Condition) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from condition order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetConditions", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
 }

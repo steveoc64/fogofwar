@@ -1,7 +1,3 @@
-drop table if exists campaign;
-drop table if exists scenario_cmd;
-drop table if exists cmd;
-
 drop table if exists users;
 create table users (
 	id serial not null primary key,
@@ -66,42 +62,54 @@ create extension ltree;
 -- create extension cube;
 -- create extension earthdistance;
 
+drop table if exists campaign;
+create table campaign (
+	id serial not null primary key,
+	author_id int not null default 0,
+	forked_from int not null default 0,
+	name text not null default '',
+	year int not null default 1800,
+	descr text not null default '',
+	notes text not null default '',
+	-- latlon geography(point,4326)
+	latlon point,
+	public bool default true
+);
+\i campaign.sql
+create index campaign_author_idx on campaign(author_id);
+create index campaign_fork_idx on campaign(forked_from);
+
+drop table if exists army;
+create table army (
+	id serial not null primary key,
+	campaign_id int not null,
+	name text not null default '',
+	nation text not null default '',
+	descr text not null default ''
+);
+drop index if exists army_campaign_idx;
+create index army_campaign_idx on army(campaign_id);
+
 -- cmd levels
--- 1 Army
+-- 1 Wing
 -- 2 Corps
 -- 3 Division
 -- 4 Brigade
 -- 5 Battalion
-drop table if exists cmd_level;
-create table cmd_level (
-	id serial not null primary key,
-	name text not null default ''
-);
-\i cmd_level.sql 
 
-drop table if exists cmd_rating;
-create table cmd_rating (
+drop table if exists cmd;
+create table cmd (
 	id serial not null primary key,
+	army_id int not null,
+	nation text not null default '',
 	name text not null default '',
-	effect int not null default 0
+	level int not null default 1,
+	descr text not null default '',
+	rating int not null default 0,
+	inspiration int not null default 0
 );
-\i cmd_rating.sql
-
-drop table if exists inspiration;
-create table inspiration (
-	id serial not null primary key,
-	name text not null default '',
-	effect int not null default 0
-);
-\i inspiration.sql
-
-drop table if exists condition;
-create table condition (
-	id serial not null primary key,
-	name text not null default '',
-	effect int not null default 0
-);
-\i condition.sql
+drop index if exists cmd_army_idx;
+create index cmd_army_idx on cmd(army_id);
 
 -- unit type
 -- 1 Command
@@ -114,7 +122,7 @@ create table utype (
 	id serial not null primary key,
 	name text not null default ''
 );
-\i utype.sql
+\. utype.sql
 
 -- ratings
 -- 1 Guard
@@ -169,6 +177,13 @@ create table drill (
 	speed int not null default 1
 );
 \i drill.sql
+
+-- conditions
+-- 1 Superior
+-- 2 Good
+-- 3 Adequate
+-- 4 Shoddy
+-- 5 Spent 
 
 drop table if exists small_arms;
 create table small_arms (
@@ -285,30 +300,29 @@ create table scenario (
 drop index if exists scenario_author_idx;
 create index scenario_author_idx on scenario (author_id);
 
-drop table if exists force;
-create table force (
+drop table if exists scenario_cmd;
+create table scenario_cmd (
 	id serial not null primary key,
 	scenario_id int not null default 0,
 	red_team bool,
 	blue_team bool,
 	nation text not null default '',
 	name text not null default '',
-	cmdr_name text not null default '',
 	level int not null default 1,
 	descr text not null default '',
 	rating int not null default 0,
 	inspiration int not null default 0,
 	condition int not null default 2
 );
-\i scenario_force.sql
-drop index if exists force_scenario_idx;
-create index force_scenario_idx on force (scenario_id);
+\i scenario_cmd.sql
+drop index if exists scenario_cmd_scenario_idx;
+create index scenario_cmd_scenario_idx on scenario_cmd (scenario_id);
 
 
-drop table if exists force_unit;
-create table force_unit (
+drop table if exists scenario_unit;
+create table scenario_unit (
 	id serial not null primary key,
-	force_id int not null,
+	cmd_id int not null,
 	path ltree,
 	name text not null default '',
 	nation text not null default '',
@@ -329,8 +343,8 @@ create table force_unit (
 	gunnery_type int not null default 0,
 	gun_condition int not null default 2
 );
-drop index if exists force_unit_force_idx;
-create index force_unit_force_idx on force_unit (force_id);
+drop index if exists scenario_unit_cmd_idx;
+create index scenario_unit_cmd_idx on scenario_unit (cmd_id);
 
 drop table if exists game;
 create table game (
@@ -368,7 +382,6 @@ create table game_cmd (
 	blue_team bool,
 	nation text not null default '',
 	name text not null default '',
-	cmdr_name text not null default '',
 	level int not null default 1,
 	descr text not null default '',
 	rating int not null default 0,

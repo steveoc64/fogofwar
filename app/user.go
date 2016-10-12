@@ -18,7 +18,6 @@ func userList(context *router.Context) {
 		rpcClient.Call("UserRPC.ListOnline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
-		print("got users", users)
 
 		form := formulate.ListForm{}
 		form.New("fa-user", "Users Online")
@@ -58,7 +57,6 @@ func userList(context *router.Context) {
 		rpcClient.Call("UserRPC.ListOffline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
-		print("got users", users)
 
 		formOffline := formulate.ListForm{}
 		formOffline.New("fa-user", "Users Offline")
@@ -106,7 +104,6 @@ func userEdit(context *router.Context) {
 	}
 
 	ranks := shared.GetRanks()
-	print("ranks", ranks)
 
 	go func() {
 		user := shared.User{}
@@ -114,7 +111,6 @@ func userEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      id,
 		}, &user)
-		print("got user", user)
 
 		form := formulate.EditForm{}
 		form.New("fa-user", "User Details - "+user.Name)
@@ -200,7 +196,6 @@ func userEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &l)
-		print("got logins ?", l)
 
 		lList := formulate.ListForm{}
 		lList.New("fa-signin", "Last Dozen Sign-Ins")
@@ -220,7 +215,6 @@ func userEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &s)
-		print("got scenarios ?", s)
 
 		sList := formulate.ListForm{}
 		sList.New("fa-sitemap", "Scenarios")

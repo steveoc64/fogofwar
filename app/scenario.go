@@ -132,16 +132,16 @@ func scenarioEdit(context *router.Context) {
 			form.Row(1).
 				AddInput(1, "Description", "Descr")
 
+			// form.Row(2).
+			// 	AddInput(1, "Red Team", "RedTeam").
+			// 	AddInput(1, "Blue Team", "BlueTeam")
+
 			form.Row(1).
 				AddBigTextarea(1, "Notes", "Notes")
 
-			form.Row(2).
-				AddInput(1, "Red Team", "RedTeam").
-				AddInput(1, "Blue Team", "BlueTeam")
-
-			form.Row(2).
-				AddTextarea(1, "Red Briefing", "RedBrief").
-				AddTextarea(1, "Blue Briefing", "BlueBrief")
+			// form.Row(2).
+			// 	AddTextarea(1, "Red Briefing", "RedBrief").
+			// 	AddTextarea(1, "Blue Briefing", "BlueBrief")
 
 			// form.DeleteEvent(func(evt dom.Event) {
 			// 	evt.PreventDefault()
@@ -189,13 +189,13 @@ func scenarioEdit(context *router.Context) {
 			form.Row(1).
 				AddDisplayArea(1, "Notes", "Notes")
 
-			form.Row(2).
-				AddDisplay(1, "Red Team", "RedTeam").
-				AddDisplay(1, "Blue Team", "BlueTeam")
+			// form.Row(2).
+			// 	AddDisplay(1, "Red Team", "RedTeam").
+			// 	AddDisplay(1, "Blue Team", "BlueTeam")
 
-			form.Row(2).
-				AddDisplayArea(1, "Red Briefing", "RedBrief").
-				AddDisplayArea(1, "Blue Briefing", "BlueBrief")
+			// form.Row(2).
+			// 	AddDisplayArea(1, "Red Briefing", "RedBrief").
+			// 	AddDisplayArea(1, "Blue Briefing", "BlueBrief")
 
 		}
 
@@ -211,8 +211,363 @@ func scenarioEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
+		form.ActionGrid("scenario-actions", "#action-grid", data, func(url string) {
+			Session.Navigate(url)
+		})
+
 		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
 
 	}()
 
+}
+
+type ForceArray struct {
+	ScenarioID int
+	CanEdit    bool
+	Color      string
+	LColor     string
+	Forces     *[]shared.Force
+}
+
+func scenarioRed(context *router.Context) {
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		data := shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &data)
+		canEdit := false
+		if data.AuthorID == Session.UserID {
+			canEdit = true
+		}
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-flag-o", "Red Force Details - "+data.Name)
+
+		form.Row(1).
+			AddInput(1, "Commander", "RedTeam")
+
+		form.Row(1).
+			AddTextarea(1, "Briefing", "RedBrief")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&data)
+
+			go func() {
+				rpcClient.Call("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
+					Channel:  Session.Channel,
+					ID:       id,
+					Scenario: &data,
+				}, &data)
+				Session.Reload(context)
+			}()
+		})
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &data)
+
+		// print("add action grid")
+		forces := []shared.Force{}
+		rpcClient.Call("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &forces)
+		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+			ScenarioID: id,
+			CanEdit:    canEdit,
+			Color:      "Red",
+			LColor:     "red",
+			Forces:     &forces,
+		}, func(url string) {
+			// print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
+
+	}()
+}
+
+func scenarioBlue(context *router.Context) {
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		data := shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &data)
+
+		canEdit := false
+		if data.AuthorID == Session.UserID {
+			canEdit = true
+		}
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-flag", "Blue Force Details - "+data.Name)
+
+		form.Row(1).
+			AddInput(1, "Commander", "BlueTeam")
+
+		form.Row(1).
+			AddTextarea(1, "Briefing", "BlueBrief")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&data)
+
+			go func() {
+				rpcClient.Call("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
+					Channel:  Session.Channel,
+					ID:       id,
+					Scenario: &data,
+				}, &data)
+				Session.Reload(context)
+			}()
+		})
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &data)
+
+		// print("add action grid")
+		forces := []shared.Force{}
+		rpcClient.Call("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &forces)
+		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+			ScenarioID: id,
+			Color:      "Blue",
+			CanEdit:    canEdit,
+			LColor:     "blue",
+			Forces:     &forces,
+		}, func(url string) {
+			// print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
+
+	}()
+}
+
+var NationLastUsed string
+
+func scenarioRedAdd(context *router.Context) {
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		data := shared.Force{}
+		scenario := shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &scenario)
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-flag-o", fmt.Sprintf("Add Red Force - %s", scenario.Name))
+
+		form.Row(6).
+			AddInput(2, "Nation", "Nation").
+			AddInput(2, "Unit Name", "Name").
+			AddSelect(1, "Level", "Level", CmdLevels, "ID", "Name", 1, 2).
+			AddSelect(1, "Condition", "Condition", Conditions, "ID", "Name", 1, 3)
+
+		form.Row(5).
+			AddInput(3, "Commander", "CmdrName").
+			AddSelect(1, "Command Rating", "Rating", CmdRatings, "ID", "Name", 1, 3).
+			AddSelect(1, "Inspiration", "Inspiration", Inspirations, "ID", "Name", 1, 3)
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/scenario/%d/red", id))
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&data)
+			data.RedTeam = true
+			data.ScenarioID = id
+			NationLastUsed = data.Nation
+
+			RPCdata := shared.ForceRPCData{
+				Channel: Session.Channel,
+				Force:   &data,
+			}
+			go func() {
+				rpcClient.Call("ScenarioRPC.InsertForce", RPCdata, &data)
+				// Session.Navigate(fmt.Sprintf("/scenario/%d/red", id))
+				Session.Reload(context)
+			}()
+		})
+
+		form.PrintEvent(func(evt dom.Event) {
+			dom.GetWindow().Print()
+		})
+
+		// All done, so render the form
+		data.Nation = NationLastUsed
+		form.Render("edit-form", "main", &data)
+
+		w := dom.GetWindow()
+		doc := w.Document()
+
+		if NationLastUsed == "" {
+			doc.QuerySelector("[name=Nation]").(*dom.HTMLInputElement).Focus()
+		} else {
+			doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+		}
+
+		// Action Grid
+		forces := []shared.Force{}
+		rpcClient.Call("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &forces)
+		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+			ScenarioID: id,
+			Color:      "Red",
+			CanEdit:    false,
+			LColor:     "red",
+			Forces:     &forces,
+		}, func(url string) {
+			// print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+	}()
+}
+
+func scenarioBlueAdd(context *router.Context) {
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		data := shared.Force{}
+		scenario := shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &scenario)
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-flag", fmt.Sprintf("Add Blue Force - %s", scenario.Name))
+
+		form.Row(6).
+			AddInput(2, "Nation", "Nation").
+			AddInput(2, "Unit Name", "Name").
+			AddSelect(1, "Level", "Level", CmdLevels, "ID", "Name", 1, 2).
+			AddSelect(1, "Condition", "Condition", Conditions, "ID", "Name", 1, 3)
+
+		form.Row(5).
+			AddInput(3, "Commander", "CmdrName").
+			AddSelect(1, "Command Rating", "Rating", CmdRatings, "ID", "Name", 1, 3).
+			AddSelect(1, "Inspiration", "Inspiration", Inspirations, "ID", "Name", 1, 3)
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/scenario/%d/blue", id))
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&data)
+			data.BlueTeam = true
+			data.ScenarioID = id
+			NationLastUsed = data.Nation
+
+			RPCdata := shared.ForceRPCData{
+				Channel: Session.Channel,
+				Force:   &data,
+			}
+			go func() {
+				rpcClient.Call("ScenarioRPC.InsertForce", RPCdata, &data)
+				// Session.Navigate(fmt.Sprintf("/scenario/%d/blue/add", id))
+				Session.Reload(context)
+			}()
+		})
+
+		form.PrintEvent(func(evt dom.Event) {
+			dom.GetWindow().Print()
+		})
+
+		// All done, so render the form
+		data.Nation = NationLastUsed
+		form.Render("edit-form", "main", &data)
+
+		w := dom.GetWindow()
+		doc := w.Document()
+
+		if NationLastUsed == "" {
+			doc.QuerySelector("[name=Nation]").(*dom.HTMLInputElement).Focus()
+		} else {
+			doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+		}
+
+		// Action Grid
+		forces := []shared.Force{}
+		rpcClient.Call("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &forces)
+		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+			ScenarioID: id,
+			Color:      "Blue",
+			CanEdit:    false,
+			LColor:     "ble",
+			Forces:     &forces,
+		}, func(url string) {
+			// print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+	}()
+}
+
+func forceEdit(context *router.Context) {
+	print("TODO - forceEdit")
 }

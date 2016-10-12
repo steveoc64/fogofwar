@@ -1,0 +1,20 @@
+<div class="action-grid">
+	{{if .CanEdit}}
+	<div class="action__item" url="/scenario/{{.ScenarioID}}/{{.LColor}}/add">
+		<div class="action__title">Add</div>
+		<div class="action__icon"><i class="fa fa-plus-circle fa-lg"></i></div>
+		<div class="action__text">
+			Add {{.Color}} Command
+		</div>
+	</div>
+	{{end}}
+	{{range .Forces}}
+	<div class="action__item" url="/force/{{.ID}}">
+		<div class="action__title">{{.LevelName}}</div>
+		<div class="action__icon"><i class="fa {{if lt .Level 3}}fa-angle-double-up{{end}} {{if gt .Level 2}}fa-angle-up{{end}} fa-lg"></i></div>
+		<div class="action__text">
+			{{.Name}}	
+		</div>
+	</div>
+	{{end}}
+</div>

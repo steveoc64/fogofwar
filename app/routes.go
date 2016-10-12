@@ -13,6 +13,11 @@ func fixLinks() {
 	Session.Router.InterceptLinks()
 }
 
+var CmdLevels []shared.CmdLevel
+var CmdRatings []shared.CmdRating
+var Inspirations []shared.Inspiration
+var Conditions []shared.Condition
+
 // Load a template and attach it to the specified element in the doc
 func loadTemplate(template string, selector string, data interface{}) error {
 	w := dom.GetWindow()
@@ -48,13 +53,18 @@ func enableRoutes(Rank int) {
 	// print("enabling routes for rank", Rank, "session", Session, Session.GetRank())
 
 	Session.AppFn = map[string]router.Handler{
-		"mainpage":      mainPage,
-		"settings":      userSettings,
-		"usersonline":   usersOnline,
-		"manual":        manual,
-		"scenarios":     scenarioList,
-		"scenario-add":  scenarioAdd,
-		"scenario-edit": scenarioEdit,
+		"mainpage":          mainPage,
+		"settings":          userSettings,
+		"usersonline":       usersOnline,
+		"manual":            manual,
+		"scenarios":         scenarioList,
+		"scenario-add":      scenarioAdd,
+		"scenario-edit":     scenarioEdit,
+		"scenario-red":      scenarioRed,
+		"scenario-red-add":  scenarioRedAdd,
+		"scenario-blue":     scenarioBlue,
+		"scenario-blue-add": scenarioBlueAdd,
+		"force-edit":        forceEdit,
 	}
 	switch Rank {
 	case 10:
@@ -77,6 +87,15 @@ func enableRoutes(Rank int) {
 			// doc.QuerySelector("#show-image").Class().Remove("md-show")
 		})
 	}
+
+	rpcClient.Call("UtilRPC.GetCmdLevels", Session.Channel, &CmdLevels)
+	print("cmd_levels", CmdLevels)
+	rpcClient.Call("UtilRPC.GetCmdRatings", Session.Channel, &CmdRatings)
+	print("cmd_ratings", CmdRatings)
+	rpcClient.Call("UtilRPC.GetInspirations", Session.Channel, &Inspirations)
+	print("insp", Inspirations)
+	rpcClient.Call("UtilRPC.GetConditions", Session.Channel, &Conditions)
+	print("conditions", Conditions)
 }
 
 func initRouter() {

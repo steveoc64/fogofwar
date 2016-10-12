@@ -108,6 +108,52 @@ func (c *ScenarioRPC) Update(data shared.ScenarioRPCData, retval *shared.Scenari
 	return err
 }
 
+func (c *ScenarioRPC) UpdateRed(data shared.ScenarioRPCData, retval *shared.Scenario) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.Update("scenario").
+		SetWhitelist(data.Scenario, "red_team", "red_brief").
+		Where("id = $1 and author_id=$2", data.ID, conn.UserID).
+		Exec()
+
+	DB.Select("red_team", "red_brief").
+		From("scenario").
+		Where("id=$1", data.ID).
+		Limit(1).
+		QueryStruct(retval)
+
+	logger(start, "Scenario.UpdateRed", conn,
+		fmt.Sprintf("%d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (c *ScenarioRPC) UpdateBlue(data shared.ScenarioRPCData, retval *shared.Scenario) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.Update("scenario").
+		SetWhitelist(data.Scenario, "blue_team", "blue_brief").
+		Where("id = $1 and author_id=$2", data.ID, conn.UserID).
+		Exec()
+
+	DB.Select("blue_team", "blue_brief").
+		From("scenario").
+		Where("id=$1", data.ID).
+		Limit(1).
+		QueryStruct(retval)
+
+	logger(start, "Scenario.UpdateBlue", conn,
+		fmt.Sprintf("%d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
 func (s *ScenarioRPC) Insert(data shared.ScenarioRPCData, retval *shared.Scenario) error {
 	start := time.Now()
 
@@ -139,6 +185,65 @@ func (s *ScenarioRPC) Insert(data shared.ScenarioRPCData, retval *shared.Scenari
 	logger(start, "Scenario.Insert", conn,
 		fmt.Sprintf("%v", data.Scenario),
 		fmt.Sprintf("%d", id))
+
+	return err
+}
+
+func (s *ScenarioRPC) GetRedForces(data shared.ScenarioRPCData, retval *[]shared.Force) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name 
+		from force f 
+			left join cmd_level l on l.id=f.level
+			left join scenario s on s.id=f.scenario_id
+		where f.red_team and f.scenario_id=$1`, data.ID).QueryStructs(retval)
+
+	logger(start, "Scenario.GetRedForces", conn,
+		fmt.Sprintf("Scenario %d", data.ID),
+		fmt.Sprintf("%d Red Forces", len(*retval)))
+
+	return err
+}
+
+func (s *ScenarioRPC) GetBlueForces(data shared.ScenarioRPCData, retval *[]shared.Force) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name 
+		from force f 
+			left join cmd_level l on l.id=f.level
+			left join scenario s on s.id=f.scenario_id
+		where f.blue_team and f.scenario_id=$1`, data.ID).QueryStructs(retval)
+
+	logger(start, "Scenario.GetBlueForces", conn,
+		fmt.Sprintf("Scenario %d", data.ID),
+		fmt.Sprintf("%d Blue Forces", len(*retval)))
+
+	return err
+}
+
+func (s *ScenarioRPC) InsertForce(data shared.ForceRPCData, retval *shared.Force) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	id := 0
+	err := DB.InsertInto("force").
+		Whitelist("nation", "name", "level", "scenario_id", "red_team", "blue_team").
+		Record(data.Force).
+		Returning("id").
+		QueryScalar(&id)
+
+	if err == nil {
+		DB.SQL(`select * from force where id=$1`, id).QueryStruct(retval)
+	}
+
+	logger(start, "Scenario.InsertForce", conn,
+		fmt.Sprintf("ID %d", id),
+		fmt.Sprintf("%v", *retval))
 
 	return err
 }

@@ -14,6 +14,9 @@ type User struct {
 	Bloglink string     `db:"bloglink"`
 	Channel  int        `db:"channel"`
 	Created  *time.Time `db:"created"`
+	Expires  *time.Time `db:"expires"`
+	Banned   bool       `db:"banned"`
+	Disqus   bool       `db:"disqus"`
 }
 
 func (u *User) GetRank() string {
@@ -37,6 +40,16 @@ func (u *User) GetRank() string {
 		return "Emporer"
 	}
 	return "Private"
+}
+
+func (u *User) GetCreated() string {
+	print("formatting created", u.Created, u.Created.Format("Mon, Jan 2 2006"))
+	return u.Created.Format("Mon, Jan 2 2006")
+}
+
+func (u *User) GetExpires() string {
+	print("formatting expires", u.Expires, u.Expires.Format("Mon, Jan 2 2006"))
+	return u.Expires.Format("Mon, Jan 2 2006")
 }
 
 type Rank struct {

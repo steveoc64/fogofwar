@@ -140,8 +140,8 @@ func scenarioEdit(context *router.Context) {
 				AddInput(1, "Blue Team", "BlueTeam")
 
 			form.Row(2).
-				AddBigTextarea(1, "Red Briefing", "RedBrief").
-				AddBigTextarea(1, "Blue Briefing", "BlueBrief")
+				AddTextarea(1, "Red Briefing", "RedBrief").
+				AddTextarea(1, "Blue Briefing", "BlueBrief")
 
 			// form.DeleteEvent(func(evt dom.Event) {
 			// 	evt.PreventDefault()
@@ -167,7 +167,7 @@ func scenarioEdit(context *router.Context) {
 				}
 				go func() {
 					rpcClient.Call("ScenarioRPC.Update", RPCdata, &data)
-					Session.Navigate("/scenario")
+					Session.Navigate("/scenarios")
 				}()
 			})
 
@@ -202,7 +202,7 @@ func scenarioEdit(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/scenario")
+			Session.Navigate("/scenarios")
 		})
 
 		// form.PrintEvent(func(evt dom.Event) {

@@ -28,6 +28,7 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 		more = []shared.UserRoute{
 			{Route: "/usersonline", Func: "usersonline"},
 			{Route: "/users", Func: "users"},
+			{Route: "/user/{id}", Func: "user-edit"},
 		}
 	}
 	if len(more) > 0 {

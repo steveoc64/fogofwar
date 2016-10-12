@@ -7,10 +7,13 @@ create table users (
 	email text not null unique,
 	rank int not null default 1,
 	created timestamptz not null default localtimestamp,
+	expires timestamptz not null default localtimestamp,
 	channel int not null default 0,
 	country text not null default '',
 	bloglink text not null default '',
-	notes text not null default ''
+	notes text not null default '',
+	banned bool not null default false,
+	disqus bool not null default true
 );
 \i users.sql
 

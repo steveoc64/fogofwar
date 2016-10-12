@@ -89,10 +89,6 @@ func Login(username string, passwd string) {
 				Logout()
 			}
 		})
-
-		// and go to the main route
-		Session.Navigate("/")
-
 	} else {
 		print("login failed")
 		dom.GetWindow().Alert("Login Failed")
@@ -137,6 +133,11 @@ func initForms() {
 	doc.QuerySelector("#hamburger").AddEventListener("click", false, func(evt dom.Event) {
 		el := doc.QuerySelector("#slidemenu")
 		el.Class().Add("cbp-spmenu-open")
+	})
+
+	doc.QuerySelector("#homepage").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/")
 	})
 }
 

@@ -77,6 +77,20 @@ func (u *UserRPC) List(data shared.UserRPCData, retval *[]shared.User) error {
 	return err
 }
 
+func (u *UserRPC) Get(data shared.UserRPCData, retval *shared.User) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select * from users where id=$1`, data.ID).QueryStruct(retval)
+
+	logger(start, "User.Get", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
 // Get the user for the given channel
 func (u *UserRPC) Me(channel int, prof *shared.User) error {
 	start := time.Now()
@@ -87,21 +101,6 @@ func (u *UserRPC) Me(channel int, prof *shared.User) error {
 
 	logger(start, "User.Me", conn,
 		"",
-		fmt.Sprintf("%s %s", prof.Email, prof.Name))
-
-	return nil
-}
-
-// Get the user for the given id
-func (u *UserRPC) Get(data shared.UserRPCData, prof *shared.User) error {
-	start := time.Now()
-
-	conn := Connections.Get(data.Channel)
-
-	DB.SQL(UserGetQuery, data.ID).QueryStruct(prof)
-
-	logger(start, "User.Get", conn,
-		fmt.Sprintf("%d", data.ID),
 		fmt.Sprintf("%s %s", prof.Email, prof.Name))
 
 	return nil

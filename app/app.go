@@ -98,10 +98,10 @@ func mainPage(context *router.Context) {
 			Session.Navigate("/")
 		})
 
-		form.NewRowEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/game/add")
-		})
+		// form.NewRowEvent(func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	Session.Navigate("/game/add")
+		// })
 
 		form.RowEvent(func(key string) {
 			Session.Navigate("/game/" + key)

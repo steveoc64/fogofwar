@@ -59,7 +59,6 @@ func userList(context *router.Context) {
 
 // Edit an existing user
 func userEdit(context *router.Context) {
-
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -67,6 +66,7 @@ func userEdit(context *router.Context) {
 	}
 
 	ranks := shared.GetRanks()
+	print("ranks", ranks)
 
 	go func() {
 		user := shared.User{}
@@ -74,39 +74,39 @@ func userEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      id,
 		}, &user)
+		print("got user", user)
 
-		BackURL := "/users"
 		form := formulate.EditForm{}
 		form.New("fa-user", "User Details - "+user.Name)
 
 		// Layout the fields
 
+		form.Row(3).
+			AddSelect(1, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank).
+			AddInput(1, "Username", "Username").
+			AddInput(1, "Password", "Passwd")
+
+		form.Row(5).
+			AddInput(2, "Name", "Name").
+			AddInput(2, "Email", "Email").
+			AddInput(1, "Country", "Country")
+
 		form.Row(2).
-			Add(1, "Username", "text", "Username", `id="focusme"`).
-			Add(1, "Password", "text", "Passwd", "")
+			AddDisplay(1, "Account Created", "GetCreated").
+			AddDisplay(1, "Commission Expires", "GetExpires")
 
-		form.Row(11).
-			Add(3, "Name", "text", "Name", "").
-			Add(3, "Email", "text", "Email", "").
-			Add(3, "Mobile", "text", "SMS", "").
-			AddCheck(1, "Local Carrier", "Local").
-			AddCheck(1, "Send Msgs", "UseMobile")
+		form.Row(7).
+			AddInput(5, "Blog Link", "Bloglink").
+			AddCheck(1, "Disqus", "Disqus").
+			AddCheck(1, "Banned", "Banned")
 
-		if Session.Rank > 9 {
-			form.Row(5).
-				AddSelect(2, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank).
-				AddCheck(1, "Technician", "IsTech").
-				AddCheck(1, "Allocate Tasks ?", "CanAllocate").
-				AddDecimal(1, "Hourly Rate", "HourlyRate", 2, "1")
-		} else {
-			form.Row(3).
-				AddSelect(2, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank)
-		}
+		form.Row(1).
+			AddBigTextarea(1, "Notes", "Notes")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate(BackURL)
+			Session.Navigate("/users")
 		})
 
 		form.DeleteEvent(func(evt dom.Event) {
@@ -118,7 +118,7 @@ func userEdit(context *router.Context) {
 				}
 				done := false
 				rpcClient.Call("UserRPC.Delete", data, &done)
-				Session.Navigate(BackURL)
+				Session.Navigate("/users")
 			}()
 		})
 
@@ -133,17 +133,12 @@ func userEdit(context *router.Context) {
 			go func() {
 				done := false
 				rpcClient.Call("UserRPC.Update", data, &done)
-				Session.Navigate(BackURL)
+				Session.Navigate("/users")
 			}()
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
 		})
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
-
 	}()
 
 }
@@ -156,7 +151,6 @@ func userAdd(context *router.Context) {
 	go func() {
 		user := shared.User{}
 
-		BackURL := "/users"
 		form := formulate.EditForm{}
 		form.New("fa-user", "Add New User")
 
@@ -168,17 +162,17 @@ func userAdd(context *router.Context) {
 
 		form.Row(3).
 			Add(1, "Name", "text", "Name", "").
-			Add(1, "Email", "text", "Email", "").
-			Add(1, "Mobile", "text", "SMS", "")
+			Add(1, "Email", "text", "Email", "")
 
 		form.Row(3).
 			Add(1, "Rank", "select", "Rank", "")
+
 		form.SetSelectOptions("Rank", ranks, "ID", "Name", 1, 0)
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate(BackURL)
+			Session.Navigate("/users")
 		})
 
 		form.SaveEvent(func(evt dom.Event) {
@@ -192,7 +186,7 @@ func userAdd(context *router.Context) {
 				newID := 0
 				rpcClient.Call("UserRPC.Insert", data, &newID)
 				print("added user", newID)
-				Session.Navigate(BackURL)
+				Session.Navigate("/users")
 			}()
 		})
 

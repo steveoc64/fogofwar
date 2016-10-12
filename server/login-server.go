@@ -18,6 +18,7 @@ type dbLoginResponse struct {
 	Username string `db:"username"`
 	Name     string `db:"name"`
 	Rank     int    `db:"rank"`
+	Disqus   bool   `db:"disqus"`
 }
 
 func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
@@ -61,10 +62,11 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		// // log.Println(res)
 
 		err := DB.SQL(`select
-			id,username,name,rank
+			id,username,name,rank,disqus
 			from users
-			where (lower(username) = lower($1) and lower(passwd) = lower($2))
-			or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password).
+			where banned = false 
+			and ((lower(username) = lower($1) and lower(passwd) = lower($2))
+			or (lower(email) = lower($1) and lower(passwd) = lower($2)))`, lc.Username, lc.Password).
 			QueryStruct(res)
 
 		// println(`select
@@ -91,7 +93,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Routes = getRoutes(res.ID, res.Rank)
 			lr.Rank = res.Rank
 			lr.ID = res.ID
-			lr.Disqus = Config.Disqus
+			lr.Disqus = Config.Disqus && res.Disqus
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
 			conn.Broadcast("login", "insert", lr.ID)

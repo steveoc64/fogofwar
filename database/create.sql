@@ -13,7 +13,8 @@ create table users (
 	bloglink text not null default '',
 	notes text not null default '',
 	banned bool not null default false,
-	disqus bool not null default true
+	disqus bool not null default true,
+	newsletter bool not null default true
 );
 \i users.sql
 

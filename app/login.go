@@ -240,7 +240,7 @@ func signUp(context *router.Context) {
 			AddInput(1, "Link Address for Your Website / Blog / Club", "Bloglink")
 
 		form.Row(1).
-			AddBigTextarea(1, "Tell us a bit about yourself, the games you play, figs, rules preferences, etc.", "Notes")
+			AddTextarea(1, "Tell us a bit about yourself, the games you play, figs, rules preferences, etc.", "Notes")
 
 		form.Row(1).
 			AddCustom(1, "", "Graphic", "")

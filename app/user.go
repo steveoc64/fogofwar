@@ -92,16 +92,17 @@ func userEdit(context *router.Context) {
 			AddInput(1, "Country", "Country")
 
 		form.Row(2).
-			AddDisplay(1, "Account Created", "GetCreated").
-			AddDisplay(1, "Commission Expires", "GetExpires")
+			AddDate(1, "Account Created", "Created").
+			AddDate(1, "Commission Expires", "Expires")
 
-		form.Row(7).
+		form.Row(8).
 			AddInput(5, "Blog Link", "Bloglink").
 			AddCheck(1, "Disqus", "Disqus").
-			AddCheck(1, "Banned", "Banned")
+			AddCheck(1, "Banned", "Banned").
+			AddDisplay(1, "Channel", "Channel")
 
 		form.Row(1).
-			AddBigTextarea(1, "Notes", "Notes")
+			AddTextarea(1, "Notes", "Notes")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -125,14 +126,15 @@ func userEdit(context *router.Context) {
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&user)
+			print("bind", user)
 
 			data := shared.UserRPCData{
 				Channel: Session.Channel,
+				ID:      user.ID,
 				User:    &user,
 			}
 			go func() {
-				done := false
-				rpcClient.Call("UserRPC.Update", data, &done)
+				rpcClient.Call("UserRPC.Update", data, &user)
 				Session.Navigate("/users")
 			}()
 		})

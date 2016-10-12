@@ -97,6 +97,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
 			conn.Broadcast("login", "insert", lr.ID)
+			DB.SQL(`update users set channel=$2 where id=$1`, res.ID, conn.ID).Exec()
 		}
 	}
 

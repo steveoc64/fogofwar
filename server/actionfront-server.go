@@ -91,6 +91,9 @@ func main() {
 	// Connect to the database
 	DB = db.Init(Config.DataSourceName)
 
+	// Clear all channel data in the database
+	DB.SQL(`update users set channel=0`).Exec()
+
 	// Add the all important Websocket handler
 	Connections = new(ConnectionsList)
 	registerRPC()

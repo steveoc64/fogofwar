@@ -55,6 +55,12 @@ func main() {
 		// MailChannel <- m
 	}
 
+	if Config.Disqus {
+		println("Disqus is ON")
+	} else {
+		println("Disqus is OFF")
+	}
+
 	e.SetHTTPErrorHandler(func(err error, context echo.Context) {
 		httpError, ok := err.(*echo.HTTPError)
 		if ok {

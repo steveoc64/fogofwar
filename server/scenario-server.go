@@ -49,6 +49,28 @@ func (c *ScenarioRPC) ListPublic(channel int, scenarios *[]shared.Scenario) erro
 	return nil
 }
 
+func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]shared.Scenario) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	if conn.Rank < 9 {
+		return errors.New("Insufficient Privilege")
+	}
+
+	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+		from scenario s
+			left join users a on a.id=s.author_id
+		where author_id = $1
+		order by year`, data.ID).
+		QueryStructs(scenarios)
+
+	logger(start, "Scenario.ListByUser", conn,
+		"",
+		fmt.Sprintf("%d Scenarios", len(*scenarios)))
+
+	return nil
+}
+
 func (c *ScenarioRPC) Get(data shared.ScenarioRPCData, retval *shared.Scenario) error {
 	start := time.Now()
 

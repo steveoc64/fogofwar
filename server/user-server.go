@@ -12,10 +12,9 @@ type UserRPC struct{}
 
 func (u *UserRPC) List(data shared.UserRPCData, retval *[]shared.User) error {
 	start := time.Now()
-	print("here")
 
 	conn := Connections.Get(data.Channel)
-	print("got con", conn)
+
 	if conn.Rank < 10 {
 		return errors.New("Insufficient Privileges")
 	}
@@ -24,6 +23,44 @@ func (u *UserRPC) List(data shared.UserRPCData, retval *[]shared.User) error {
 	print("retval", retval)
 
 	logger(start, "User.List", conn,
+		"",
+		fmt.Sprintf("%d Users", len(*retval)))
+
+	return err
+}
+
+func (u *UserRPC) ListOnline(data shared.UserRPCData, retval *[]shared.User) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	if conn.Rank < 10 {
+		return errors.New("Insufficient Privileges")
+	}
+
+	err := DB.SQL(`select * from users where channel != 0 order by username`, data.ID).QueryStructs(retval)
+	print("retval", retval)
+
+	logger(start, "User.ListOnline", conn,
+		"",
+		fmt.Sprintf("%d Users", len(*retval)))
+
+	return err
+}
+
+func (u *UserRPC) ListOffline(data shared.UserRPCData, retval *[]shared.User) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	if conn.Rank < 10 {
+		return errors.New("Insufficient Privileges")
+	}
+
+	err := DB.SQL(`select * from users where channel = 0 order by username`, data.ID).QueryStructs(retval)
+	print("retval", retval)
+
+	logger(start, "User.ListOffline", conn,
 		"",
 		fmt.Sprintf("%d Users", len(*retval)))
 

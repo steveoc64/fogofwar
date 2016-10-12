@@ -15,15 +15,16 @@ func userList(context *router.Context) {
 
 	go func() {
 		users := []shared.User{}
-		rpcClient.Call("UserRPC.List", shared.UserRPCData{
+		rpcClient.Call("UserRPC.ListOnline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
 		print("got users", users)
 
 		form := formulate.ListForm{}
-		form.New("fa-user", "Users List")
+		form.New("fa-user", "Users Online")
 
 		// Define the layout
+		form.Column("Channel", "Channel")
 		form.Column("Rank", "GetRank")
 		form.Column("Username", "Username")
 		form.Column("Country", "Country")
@@ -31,6 +32,7 @@ func userList(context *router.Context) {
 		form.Column("Email", "Email")
 		// form.Column("Bloglink", "Bloglink")
 		form.DateColumn("Created", "Created")
+		form.DateColumn("Created", "Expires")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -43,15 +45,45 @@ func userList(context *router.Context) {
 			Session.Navigate("/user/add")
 		})
 
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
 		form.RowEvent(func(key string) {
 			Session.Navigate("/user/" + key)
 		})
 
-		form.Render("user-list", "main", users)
+		form.Render("onlineuser-list", "main", users)
+
+		rpcClient.Call("UserRPC.ListOffline", shared.UserRPCData{
+			Channel: Session.Channel,
+		}, &users)
+		print("got users", users)
+
+		formOffline := formulate.ListForm{}
+		formOffline.New("fa-user", "Users Offline")
+
+		// Define the layout
+		formOffline.Column("Rank", "GetRank")
+		formOffline.Column("Username", "Username")
+		formOffline.Column("Country", "Country")
+		formOffline.Column("Name", "Name")
+		formOffline.Column("Email", "Email")
+		// form.Column("Bloglink", "Bloglink")
+		formOffline.DateColumn("Created", "Created")
+
+		// Add event handlers
+		formOffline.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/")
+		})
+
+		formOffline.RowEvent(func(key string) {
+			Session.Navigate("/user/" + key)
+		})
+
+		w := dom.GetWindow()
+		doc := w.Document()
+		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div.SetID("offlineusers")
+		doc.QuerySelector("main").AppendChild(div)
+		formOffline.Render("offlineuser-list", "#offlineusers", users)
 
 	}()
 
@@ -101,6 +133,11 @@ func userEdit(context *router.Context) {
 			AddCheck(1, "Banned", "Banned").
 			AddDisplay(1, "Channel", "Channel")
 
+		if user.Channel != 0 {
+			form.Row(1).
+				AddCustom(1, "Activity", "Activity", "")
+		}
+
 		form.Row(1).
 			AddTextarea(1, "Notes", "Notes")
 
@@ -126,7 +163,6 @@ func userEdit(context *router.Context) {
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&user)
-			print("bind", user)
 
 			data := shared.UserRPCData{
 				Channel: Session.Channel,
@@ -141,6 +177,63 @@ func userEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
+
+		w := dom.GetWindow()
+		doc := w.Document()
+
+		doc.QuerySelector("[name=Activity]").SetInnerHTML("")
+
+		// Add a list of scenarios for this user
+		s := []shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.ListByUser", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      user.ID,
+		}, &s)
+
+		sList := formulate.ListForm{}
+		sList.New("fa-sitemap", "Scenarios")
+
+		// Define the layout
+		sList.Column("ID", "ID")
+		sList.Column("Name", "Name")
+		sList.Column("Year", "Year")
+		sList.Column("Description", "Descr")
+
+		sList.RowEvent(func(key string) {
+			Session.Navigate("/scenario/" + key)
+		})
+
+		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div.SetID("userscen-list")
+		doc.QuerySelector("main").AppendChild(div)
+		sList.RenderAgain("userscen-list", "#userscen-list", s)
+
+		// Add a list of games for this user
+		g := []shared.Game{}
+		rpcClient.Call("GameRPC.ListByUser", shared.GameRPCData{
+			Channel: Session.Channel,
+			ID:      user.ID,
+		}, &g)
+
+		gList := formulate.ListForm{}
+		gList.New("fa-bookmark", "Games")
+
+		// Define the layout
+		gList.Column("ID", "ID")
+		gList.Column("Based on Scenario", "ScenName")
+		gList.Column("Turn", "GetTurn")
+		gList.Column("Year", "Year")
+		gList.Column("Description", "Descr")
+		gList.DateColumn("Created", "Created")
+		gList.DateColumn("Expires", "Expires")
+		gList.RowEvent(func(key string) {
+			Session.Navigate("/game/" + key)
+		})
+
+		div = doc.CreateElement("div").(*dom.HTMLDivElement)
+		div.SetID("usergame-list")
+		doc.QuerySelector("main").AppendChild(div)
+		gList.RenderAgain("usergame-list", "#usergame-list", g)
 	}()
 
 }

@@ -24,7 +24,7 @@ func userList(context *router.Context) {
 		form.New("fa-user", "Users List")
 
 		// Define the layout
-		form.Column("Rank", "Rank")
+		form.Column("Rank", "GetRank")
 		form.Column("Username", "Username")
 		form.Column("Country", "Country")
 		form.Column("Name", "Name")

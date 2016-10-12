@@ -44,7 +44,7 @@ func scenarioList(context *router.Context) {
 		})
 
 		form.Render("scenario-list", "main", data)
-		showDisqus("scenarios", "Scenarios")
+		showDisqus("scenarios", "Scenarios General Discussion")
 	}()
 
 }

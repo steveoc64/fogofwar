@@ -13,6 +13,7 @@ type LoginReply struct {
 	Rank   int
 	ID     int
 	Routes []UserRoute
+	Disqus bool
 }
 
 // type UserMenu struct {

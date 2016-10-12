@@ -80,6 +80,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			// lr.Menu = []shared.UserMenu{}
 			lr.Routes = []shared.UserRoute{}
 			lr.Rank = 0
+			lr.Disqus = false
 		} else {
 			// log.Println("Login OK")
 			lr.Result = "OK"
@@ -90,6 +91,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Routes = getRoutes(res.ID, res.Rank)
 			lr.Rank = res.Rank
 			lr.ID = res.ID
+			lr.Disqus = Config.Disqus
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
 			conn.Broadcast("login", "insert", lr.ID)

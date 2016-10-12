@@ -22,6 +22,7 @@ type GlobalSessionData struct {
 	Subscriptions map[string]MessageFunction
 	ID            map[string]int
 	URL           string
+	Disqus        bool
 }
 
 func (g *GlobalSessionData) GetRank() string {

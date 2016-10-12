@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/engine/standard"
 	mw "github.com/labstack/echo/middleware"
 	_ "github.com/lib/pq"
-	"github.com/steveoc64/godev/config"
+	// "github.com/steveoc64/godev/config"
 	"github.com/steveoc64/godev/db"
 	"github.com/steveoc64/godev/echocors"
 	// _ "github.com/steveoc64/godev/sms"
@@ -27,12 +27,11 @@ import (
 var e *echo.Echo
 var DB *runner.DB
 
-var Config config.ConfigType
 var MailChannel chan *gomail.Message
 
 func main() {
 
-	Config = config.LoadConfig()
+	Config = LoadConfig()
 	cpus := smt.Init()
 	fmt.Printf("ActionFront Server running on %d CPU cores\n", cpus)
 

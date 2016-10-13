@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"../shared"
@@ -260,7 +261,7 @@ func (s *ScenarioRPC) GetForce(data shared.ScenarioRPCData, retval *shared.Force
 
 	// now get the units attached
 	if err == nil {
-		DB.SQL(`select * from force_unit where force_id=$1`, data.ID).QueryStructs(retval.Units)
+		DB.SQL(`select * from force_unit where force_id=$1`, data.ID).QueryStructs(&retval.Units)
 	}
 
 	logger(start, "Session.GetForce", conn,
@@ -285,6 +286,69 @@ func (s *ScenarioRPC) UpdateForce(data shared.ForceRPCData, retval *shared.Force
 	}
 
 	logger(start, "Scenario.UpdateForce", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (s *ScenarioRPC) AddCommand(data shared.ScenarioRPCData, retval *shared.ForceUnit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	unit := shared.ForceUnit{
+		ForceID:  data.ID,
+		Path:     "New_Division",
+		UType:    1,
+		CmdLevel: 3,
+	}
+	err := DB.InsertInto("force_unit").
+		Whitelist("force_id", "path", "utype", "cmd_level").
+		Record(unit).
+		Returning("id").
+		QueryScalar(&unit.ID)
+
+	if err == nil {
+		DB.SQL(`select * from force_unit where id=$1`, unit.ID).QueryStruct(retval)
+	}
+
+	logger(start, "Scenario.AddCommand", conn,
+		fmt.Sprintf("Force %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.ForceUnit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	// Calculate the Part of the Path
+	paths := strings.Split(data.ForceUnit.Path, ".")
+	println("paths", paths, len(paths))
+	if len(paths) > 0 {
+		hackPath := paths[len(paths)-1]
+		println("hackpath", hackPath)
+		hackPath = strings.NewReplacer(" ", "_", ".", "-", ",", "_").Replace(data.ForceUnit.Name)
+		println("hackedpath", hackPath)
+		paths[len(paths)-1] = hackPath
+		data.ForceUnit.Path = strings.Join(paths, ".")
+		println("new path", data.ForceUnit.Path)
+	}
+
+	_, err := DB.Update("force_unit").
+		SetWhitelist(data.ForceUnit, "path", "name", "commander_name", "nation", "cmd_level", "drill", "bayonets", "small_arms",
+			"elite_arms", "lt_coy", "jg_coy", "rating", "sabres", "cav_type", "cav_rating", "guns", "gunnery_type", "gun_condition").
+		Where("id = $1", data.ID).
+		Exec()
+
+	if err == nil {
+		DB.SQL(`select * from force_unit where id=$1`, data.ID).QueryStruct(retval)
+	}
+
+	logger(start, "Scenario.UpdateUnit", conn,
 		fmt.Sprintf("ID %d", data.ID),
 		fmt.Sprintf("%v", *retval))
 

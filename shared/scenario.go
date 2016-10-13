@@ -88,3 +88,9 @@ type ForceUnit struct {
 	GunneryType   int    `db:"gunnery_type"`
 	GunCondition  int    `db:"gun_condition"`
 }
+
+type ForceUnitRPCData struct {
+	Channel   int
+	ID        int
+	ForceUnit *ForceUnit
+}

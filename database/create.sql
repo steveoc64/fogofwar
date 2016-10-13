@@ -206,10 +206,10 @@ create table cav_type (
 );
 \i cav_type.sql
 
-drop table if exists unit;
-create table unit (
+drop table if exists force_unit;
+create table force_unit (
 	id serial not null primary key,
-	cmd_id int not null default 0,
+	force_id int not null default 0,
 	path ltree,
 	name text not null default '',
 	nation text not null default '',
@@ -229,7 +229,8 @@ create table unit (
 	gunnery_type int not null default 0,
 	gun_condition int not null default 2
 );
-create index unit_cmd_idx on unit (cmd_id);
+\i force_unit.sql
+create index force_unit_force_idx on force_unit (force_id);
 
 drop table if exists cmd_action;
 create table cmd_action (

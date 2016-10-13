@@ -1,9 +1,9 @@
 truncate condition restart identity;
 copy condition (id,name,effect) from stdin;
-1	Excellent	2
-2	Good	1
+1	Parade Order	2
+2	Battle Ready	1
 3	Adequate	0
-4	Poor	-1
+4	Tattered	-1
 5	Spent	-3
 \.
 select * from condition;

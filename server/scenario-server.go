@@ -248,3 +248,38 @@ func (s *ScenarioRPC) InsertForce(data shared.ForceRPCData, retval *shared.Force
 
 	return err
 }
+
+func (s *ScenarioRPC) GetForce(data shared.ScenarioRPCData, retval *shared.Force) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select * from force where id=$1`, data.ID).QueryStruct(retval)
+
+	logger(start, "Session.GetForce", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (s *ScenarioRPC) UpdateForce(data shared.ForceRPCData, retval *shared.Force) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.Update("force").
+		SetWhitelist(data.Force, "nation", "name", "cmdr_name", "level", "rating", "inspiration", "condition").
+		Where("id = $1", data.ID).
+		Exec()
+
+	if err == nil {
+		err = DB.SQL(`select * from force where id=$1`, data.ID).QueryStruct(retval)
+	}
+
+	logger(start, "Scenario.UpdateForce", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}

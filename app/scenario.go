@@ -439,10 +439,6 @@ func scenarioRedAdd(context *router.Context) {
 			}()
 		})
 
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
 		// All done, so render the form
 		data.Nation = NationLastUsed
 		form.Render("edit-form", "main", &data)
@@ -532,10 +528,6 @@ func scenarioBlueAdd(context *router.Context) {
 			}()
 		})
 
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
 		// All done, so render the form
 		data.Nation = NationLastUsed
 		form.Render("edit-form", "main", &data)
@@ -559,7 +551,7 @@ func scenarioBlueAdd(context *router.Context) {
 			ScenarioID: id,
 			Color:      "Blue",
 			CanEdit:    false,
-			LColor:     "ble",
+			LColor:     "blue",
 			Forces:     &forces,
 		}, func(url string) {
 			// print("clicked on", url)
@@ -570,5 +562,156 @@ func scenarioBlueAdd(context *router.Context) {
 }
 
 func forceEdit(context *router.Context) {
-	print("TODO - forceEdit")
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+		data := shared.Force{}
+		rpcClient.Call("ScenarioRPC.GetForce", shared.ForceRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &data)
+		print("got force")
+		scenario := shared.Scenario{}
+		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      data.ScenarioID,
+		}, &scenario)
+		print("got scenario")
+
+		canEdit := false
+		if scenario.AuthorID == Session.UserID {
+			canEdit = true
+		}
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		Color := "Red"
+		LColor := "red"
+		if data.BlueTeam {
+			Color = "Blue"
+			LColor = "blue"
+		}
+		form.New("fa-flag", fmt.Sprintf("%s Force - %s", Color, scenario.Name))
+
+		form.Row(6).
+			AddInput(2, "Nation", "Nation").
+			AddInput(2, "Unit Name", "Name").
+			AddSelect(1, "Level", "Level", CmdLevels, "ID", "Name", 1, data.Level).
+			AddSelect(1, "Condition", "Condition", Conditions, "ID", "Name", 1, data.Condition)
+
+		form.Row(6).
+			AddInput(4, "Commander", "CommanderName").
+			AddSelect(1, "Command Rating", "Rating", CmdRatings, "ID", "Name", 1, data.Rating).
+			AddSelect(1, "Inspiration", "Inspiration", Inspirations, "ID", "Name", 1, data.Inspiration)
+
+		swapper := formulate.Swapper{
+			Name:     "UnitDetails",
+			Selected: 0,
+		}
+
+		form.Row(3).
+			AddCustom(1, "Units", "Units", "Units").
+			AddSwapper(2, "Unit Details", &swapper)
+
+		// Create the swapper panels, one for each unit type :
+		// -- unit type
+		// -- 1 Command
+		// -- 2 Infantry Brigade
+		// -- 3 Cavalry Brigade
+		// -- 4 Artillery Reserve
+		// -- 5 Other / Asset
+		cmdPanel := swapper.AddPanel("Command")
+		cmdPanel.AddRow(1).AddInput(1, "Path", "Path")
+		cmdPanel.AddRow(1).AddInput(1, "Name", "Name")
+
+		// catPanel := swapper.AddPanel("Category")
+		// 	catPanel.AddRow(1).AddInput(1, "Category Name", "CatName")
+		// 	catPanel.AddRow(1).AddInput(1, "Stock Code", "CatStockCode")
+		// 	catPanel.AddRow(1).AddInput(1, "Description", "CatDescr")
+		// 	catPanel.AddRow(2).
+		// 		AddSelect(1, "Machine Type", "MachineType",
+		// 			machineTypes, "ID", "Name", 0, 0).
+		// 		AddSelect(1, "Tool", "MachineTool",
+		// 			machineTools, "ID", "Name", 0, 0)
+
+		// 	catPanel.Row(4).
+		// 		AddButton(1, "Save", "SaveCat").
+		// 		AddButton(1, "+ Category", "AddCat").
+		// 		AddButton(1, "+ Part", "AddPart").
+		// 		AddButton(1, "- Delete", "DelCat")
+
+		// 	// Layout the fields for Parts
+		// 	partPanel := swapper.AddPanel("Part")
+
+		// 	partPanel.Row(2).
+		// 		AddInput(1, "Name", "Name").
+		// 		AddInput(1, "Stock Code", "StockCode")
+
+		// 	partPanel.Row(1).
+		// 		AddInput(1, "Description", "Descr")
+
+		// 	partPanel.Row(4).
+		// 		AddDecimal(1, "ReOrder Level", "ReorderStocklevel", 2, "1").
+		// 		AddDecimal(1, "ReOrder Qty", "ReorderQty", 2, "1").
+		// 		AddDecimal(1, "Current Stock", "CurrentStock", 2, "1").
+		// 		AddInput(1, "Qty Type", "QtyType")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
+		})
+
+		if canEdit {
+			form.SaveEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				form.Bind(&data)
+				NationLastUsed = data.Nation
+
+				RPCdata := shared.ForceRPCData{
+					Channel: Session.Channel,
+					ID:      data.ID,
+					Force:   &data,
+				}
+				go func() {
+					rpcClient.Call("ScenarioRPC.UpdateForce", RPCdata, &data)
+					Session.Reload(context)
+				}()
+			})
+		}
+
+		w := dom.GetWindow()
+		doc := w.Document()
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &data)
+		swapper.Select(0)
+		doc.QuerySelector(`[name="Units"]`).SetInnerHTML("") // Init the tree panel
+		doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+
+		// Action Grid
+		forces := []shared.Force{}
+		rpcClient.Call(fmt.Sprintf("ScenarioRPC.Get%sForces", Color), shared.ScenarioRPCData{
+			Channel: Session.Channel,
+			ID:      data.ScenarioID,
+		}, &forces)
+		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+			ScenarioID: data.ScenarioID,
+			Color:      Color,
+			CanEdit:    canEdit,
+			LColor:     LColor,
+			Forces:     &forces,
+		}, func(url string) {
+			// print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+	}()
+
 }

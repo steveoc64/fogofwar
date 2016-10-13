@@ -212,6 +212,7 @@ create table force_unit (
 	force_id int not null default 0,
 	path ltree,
 	name text not null default '',
+	commander_name text not null default '',
 	nation text not null default '',
 	utype int not null default 1,
 	cmd_level int not null default 1,

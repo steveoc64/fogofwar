@@ -136,3 +136,45 @@ func (u *UtilRPC) GetConditions(Channel int, retval *[]shared.Condition) error {
 
 	return err
 }
+
+func (u *UtilRPC) GetRatings(Channel int, retval *[]shared.UnitRating) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from rating order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetRatings", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}
+
+func (u *UtilRPC) GetCavTypes(Channel int, retval *[]shared.CavType) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from cav_type order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetCavType", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}
+
+func (u *UtilRPC) GetGunnery(Channel int, retval *[]shared.Gunnery) error {
+	start := time.Now()
+
+	conn := Connections.Get(Channel)
+
+	err := DB.SQL(`select * from gunnery order by id`).QueryStructs(retval)
+
+	logger(start, "Util.GetGunnery", conn,
+		fmt.Sprintf(""),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}

@@ -574,13 +574,13 @@ func forceEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      id,
 		}, &data)
-		print("got force")
+		// print("got force")
 		scenario := shared.Scenario{}
 		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      data.ScenarioID,
 		}, &scenario)
-		print("got scenario")
+		// print("got scenario")
 
 		canEdit := false
 		if scenario.AuthorID == Session.UserID {
@@ -612,8 +612,15 @@ func forceEdit(context *router.Context) {
 
 		swapper := formulate.Swapper{
 			Name:     "UnitDetails",
-			Selected: 0,
+			Selected: 1,
 		}
+
+		form.Row(6).
+			AddButton(2, "+ Division", "AddCommand").
+			AddButton(1, "+ Brigade", "AddBde").
+			AddButton(1, "+ Cavalry Bde", "AddCav").
+			AddButton(1, "+ Artillery", "AddGun").
+			AddButton(1, "+ Other", "AddOther")
 
 		form.Row(3).
 			AddCustom(1, "Units", "Units", "Units").
@@ -626,41 +633,44 @@ func forceEdit(context *router.Context) {
 		// -- 3 Cavalry Brigade
 		// -- 4 Artillery Reserve
 		// -- 5 Other / Asset
-		cmdPanel := swapper.AddPanel("Command")
-		cmdPanel.AddRow(1).AddInput(1, "Path", "Path")
-		cmdPanel.AddRow(1).AddInput(1, "Name", "Name")
 
-		// catPanel := swapper.AddPanel("Category")
-		// 	catPanel.AddRow(1).AddInput(1, "Category Name", "CatName")
-		// 	catPanel.AddRow(1).AddInput(1, "Stock Code", "CatStockCode")
-		// 	catPanel.AddRow(1).AddInput(1, "Description", "CatDescr")
-		// 	catPanel.AddRow(2).
-		// 		AddSelect(1, "Machine Type", "MachineType",
-		// 			machineTypes, "ID", "Name", 0, 0).
-		// 		AddSelect(1, "Tool", "MachineTool",
-		// 			machineTools, "ID", "Name", 0, 0)
+		cmdPanel := swapper.AddPanel("Cmd")
+		cmdPanel.AddRow(3).
+			AddInput(1, "Division Name", "Name").
+			AddInput(1, "Commander", "CommanderName").
+			AddInput(1, "Nationality", "Nation")
 
-		// 	catPanel.Row(4).
-		// 		AddButton(1, "Save", "SaveCat").
-		// 		AddButton(1, "+ Category", "AddCat").
-		// 		AddButton(1, "+ Part", "AddPart").
-		// 		AddButton(1, "- Delete", "DelCat")
+		bdePanel := swapper.AddPanel("Bde")
+		bdePanel.AddRow(3).
+			AddInput(2, "Brigade Name", "Name").
+			AddInput(1, "Nationality", "Nation")
+		bdePanel.AddRow(3).
+			AddNumber(1, "Bayonets", "Bayonets", "0").
+			AddNumber(1, "Light Coys", "LtCoys", "0").
+			AddNumber(1, "Jager Coys", "JgCoys", "0")
+		bdePanel.AddRow(2).
+			AddSelect(1, "Infantry Rating for whole Bde", "Rating", UnitRatings, "ID", "Name", 1, 5).
+			AddSelect(1, "Drill Standard", "Drill", Drills, "ID", "Name", 1, 1)
+		bdePanel.AddRow(3).
+			AddNumber(1, "Sabres", "Sabres", "0").
+			AddSelect(1, "Type", "CavType", CavTypes, "ID", "Name", 0, 0).
+			AddSelect(1, "Rating", "CavRating", UnitRatings, "ID", "Name", 0, 0)
+		bdePanel.AddRow(3).
+			AddNumber(1, "Guns", "Guns", "0").
+			AddSelect(1, "Type", "GunneryType", GunTypes, "ID", "Name", 0, 0).
+			AddSelect(1, "Condition", "GunCondition", Conditions, "ID", "Name", 0, 0)
 
-		// 	// Layout the fields for Parts
-		// 	partPanel := swapper.AddPanel("Part")
+		cavPanel := swapper.AddPanel("Cav")
+		cavPanel.AddRow(1).AddInput(1, "Nation", "Nation")
+		cavPanel.AddRow(1).AddInput(1, "Name", "Name")
 
-		// 	partPanel.Row(2).
-		// 		AddInput(1, "Name", "Name").
-		// 		AddInput(1, "Stock Code", "StockCode")
+		gunPanel := swapper.AddPanel("Gun")
+		gunPanel.AddRow(1).AddInput(1, "Nation", "Nation")
+		gunPanel.AddRow(1).AddInput(1, "Name", "Name")
 
-		// 	partPanel.Row(1).
-		// 		AddInput(1, "Description", "Descr")
-
-		// 	partPanel.Row(4).
-		// 		AddDecimal(1, "ReOrder Level", "ReorderStocklevel", 2, "1").
-		// 		AddDecimal(1, "ReOrder Qty", "ReorderQty", 2, "1").
-		// 		AddDecimal(1, "Current Stock", "CurrentStock", 2, "1").
-		// 		AddInput(1, "Qty Type", "QtyType")
+		otherPanel := swapper.AddPanel("Other")
+		otherPanel.AddRow(1).AddInput(1, "Nation", "Nation")
+		otherPanel.AddRow(1).AddInput(1, "Name", "Name")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -691,6 +701,7 @@ func forceEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
+		swapper.Panels[0].Paint(&shared.Force{}) // clear it out
 		swapper.Select(0)
 		doc.QuerySelector(`[name="Units"]`).SetInnerHTML("") // Init the tree panel
 		doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
@@ -710,6 +721,52 @@ func forceEdit(context *router.Context) {
 		}, func(url string) {
 			// print("clicked on", url)
 			Session.Navigate(url)
+		})
+
+		// Add Buttons
+		doc.QuerySelector("[name=AddCommand]").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("Add Command")
+			theUnit := shared.ForceUnit{}
+			swapper.Panels[0].Paint(&theUnit)
+			swapper.Select(0)
+			doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement).Focus()
+		})
+
+		doc.QuerySelector("[name=AddBde]").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("Add Brigade")
+			theUnit := shared.ForceUnit{}
+			swapper.Panels[1].Paint(&theUnit)
+			swapper.Select(1)
+			doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
+		})
+
+		doc.QuerySelector("[name=AddCav]").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("Add Cavalry")
+			theUnit := shared.ForceUnit{}
+			swapper.Panels[2].Paint(&theUnit)
+			swapper.Select(2)
+			doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
+		})
+
+		doc.QuerySelector("[name=AddGun]").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("Add Gun")
+			theUnit := shared.ForceUnit{}
+			swapper.Panels[3].Paint(&theUnit)
+			swapper.Select(3)
+			doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
+		})
+
+		doc.QuerySelector("[name=AddOther]").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			print("Add Other")
+			theUnit := shared.ForceUnit{}
+			swapper.Panels[4].Paint(&theUnit)
+			swapper.Select(4)
+			doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
 		})
 
 	}()

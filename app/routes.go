@@ -17,6 +17,10 @@ var CmdLevels []shared.CmdLevel
 var CmdRatings []shared.CmdRating
 var Inspirations []shared.Inspiration
 var Conditions []shared.Condition
+var UnitRatings []shared.UnitRating
+var CavTypes []shared.CavType
+var GunTypes []shared.Gunnery
+var Drills []shared.DrillType
 
 // Load a template and attach it to the specified element in the doc
 func loadTemplate(template string, selector string, data interface{}) error {
@@ -96,6 +100,12 @@ func enableRoutes(Rank int) {
 	// print("insp", Inspirations)
 	rpcClient.Call("UtilRPC.GetConditions", Session.Channel, &Conditions)
 	// print("conditions", Conditions)
+	rpcClient.Call("UtilRPC.GetRatings", Session.Channel, &UnitRatings)
+	print("ratings", UnitRatings)
+	rpcClient.Call("UtilRPC.GetCavTypes", Session.Channel, &CavTypes)
+	print("cavtypes", CavTypes)
+	rpcClient.Call("UtilRPC.GetGunnery", Session.Channel, &GunTypes)
+	print("gunnery", GunTypes)
 }
 
 func initRouter() {

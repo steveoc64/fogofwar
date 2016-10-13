@@ -198,7 +198,8 @@ func (s *ScenarioRPC) GetRedForces(data shared.ScenarioRPCData, retval *[]shared
 		from force f 
 			left join cmd_level l on l.id=f.level
 			left join scenario s on s.id=f.scenario_id
-		where f.red_team and f.scenario_id=$1`, data.ID).QueryStructs(retval)
+		where f.red_team and f.scenario_id=$1
+		order by id`, data.ID).QueryStructs(retval)
 
 	logger(start, "Scenario.GetRedForces", conn,
 		fmt.Sprintf("Scenario %d", data.ID),
@@ -216,7 +217,8 @@ func (s *ScenarioRPC) GetBlueForces(data shared.ScenarioRPCData, retval *[]share
 		from force f 
 			left join cmd_level l on l.id=f.level
 			left join scenario s on s.id=f.scenario_id
-		where f.blue_team and f.scenario_id=$1`, data.ID).QueryStructs(retval)
+		where f.blue_team and f.scenario_id=$1
+		order by id`, data.ID).QueryStructs(retval)
 
 	logger(start, "Scenario.GetBlueForces", conn,
 		fmt.Sprintf("Scenario %d", data.ID),
@@ -255,6 +257,11 @@ func (s *ScenarioRPC) GetForce(data shared.ScenarioRPCData, retval *shared.Force
 	conn := Connections.Get(data.Channel)
 
 	err := DB.SQL(`select * from force where id=$1`, data.ID).QueryStruct(retval)
+
+	// now get the units attached
+	if err == nil {
+		DB.SQL(`select * from force_unit where force_id=$1`, data.ID).QueryStructs(retval.Units)
+	}
 
 	logger(start, "Session.GetForce", conn,
 		fmt.Sprintf("ID %d", data.ID),

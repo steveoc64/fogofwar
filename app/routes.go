@@ -13,15 +13,6 @@ func fixLinks() {
 	Session.Router.InterceptLinks()
 }
 
-var CmdLevels []shared.CmdLevel
-var CmdRatings []shared.CmdRating
-var Inspirations []shared.Inspiration
-var Conditions []shared.Condition
-var UnitRatings []shared.UnitRating
-var CavTypes []shared.CavType
-var GunTypes []shared.Gunnery
-var Drills []shared.DrillType
-
 // Load a template and attach it to the specified element in the doc
 func loadTemplate(template string, selector string, data interface{}) error {
 	w := dom.GetWindow()
@@ -92,20 +83,24 @@ func enableRoutes(Rank int) {
 		})
 	}
 
-	rpcClient.Call("UtilRPC.GetCmdLevels", Session.Channel, &CmdLevels)
-	// print("cmd_levels", CmdLevels)
-	rpcClient.Call("UtilRPC.GetCmdRatings", Session.Channel, &CmdRatings)
-	// print("cmd_ratings", CmdRatings)
-	rpcClient.Call("UtilRPC.GetInspirations", Session.Channel, &Inspirations)
-	// print("insp", Inspirations)
-	rpcClient.Call("UtilRPC.GetConditions", Session.Channel, &Conditions)
-	// print("conditions", Conditions)
-	rpcClient.Call("UtilRPC.GetRatings", Session.Channel, &UnitRatings)
-	print("ratings", UnitRatings)
-	rpcClient.Call("UtilRPC.GetCavTypes", Session.Channel, &CavTypes)
-	print("cavtypes", CavTypes)
-	rpcClient.Call("UtilRPC.GetGunnery", Session.Channel, &GunTypes)
-	print("gunnery", GunTypes)
+	// rpcClient.Call("UtilRPC.GetCmdLevels", Session.Channel, &CmdLevels)
+	// // print("cmd_levels", CmdLevels)
+	// rpcClient.Call("UtilRPC.GetCmdRatings", Session.Channel, &CmdRatings)
+	// // print("cmd_ratings", CmdRatings)
+	// rpcClient.Call("UtilRPC.GetInspirations", Session.Channel, &Inspirations)
+	// // print("insp", Inspirations)
+	// rpcClient.Call("UtilRPC.GetConditions", Session.Channel, &Conditions)
+	// // print("conditions", Conditions)
+	// rpcClient.Call("UtilRPC.GetRatings", Session.Channel, &UnitRatings)
+	// print("ratings", UnitRatings)
+	// rpcClient.Call("UtilRPC.GetCavTypes", Session.Channel, &CavTypes)
+	// print("cavtypes", CavTypes)
+	// rpcClient.Call("UtilRPC.GetGunnery", Session.Channel, &GunTypes)
+	// print("gunnery", GunTypes)
+	// rpcClient.Call("UtilRPC.GetDrills", Session.Channel, &Drills)
+	// print("drills", Drills)
+	// rpcClient.Call("UtilRPC.GetSmallArms", Session.Channel, &SmallArms)
+	// print("arms", SmallArms)
 }
 
 func initRouter() {
@@ -118,6 +113,7 @@ func initRouter() {
 	Session.Router.ShouldInterceptLinks = true
 	Session.Router.HandleFunc("/", defaultRoute)
 	Session.Router.HandleFunc("/signup", signUp)
+	Session.Router.HandleFunc("/signin", signIn)
 	Session.Router.HandleFunc("/tute", tutorial)
 	Session.Router.HandleFunc("/faq", faq)
 	Session.Router.Start()

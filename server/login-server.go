@@ -91,6 +91,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			//lr.Menu = []string{"RPC Dashboard", "Events", "Sites", "Machines", "Tools", "Parts", "Vendors", "Users", "Skills", "Reports"}
 			// lr.Menu = getMenu(res.Role)
 			lr.Routes = getRoutes(res.ID, res.Rank)
+			lr.LookupTable = getLookupTable()
 			lr.Rank = res.Rank
 			lr.ID = res.ID
 			lr.Disqus = Config.Disqus && res.Disqus
@@ -116,7 +117,8 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 
 	logger(start, "Login.Login", conn,
 		fmt.Sprintf("%v", lc),
-		fmt.Sprintf("%v", lr))
+		lr.Result)
+	// fmt.Sprintf("%v", lr.))
 
 	return nil
 }

@@ -61,36 +61,40 @@ type Gunnery struct {
 }
 
 type DrillType struct {
-	ID int `db:"id"`
-	Name string `db:"name"`
-	Ranks int ``
-	Flankers bool ``
-	EliteCoy bool ``
-	ThirdRank bool ``
-	OpenOrder bool ``
-	Line bool ``
-	Mixed bool ``
-	AttCol bool ``
-	CloseCol bool ``
-	Oblique bool ``
-	Square bool ``
-	Mob bool ``
-	Control int ``
-	Speed int ``
-		id serial not null primary key,
-	name text not null default '',
-	ranks int not null default 3,
-	flankers bool,
-	elite_coy bool,
-	third_rank bool,
-	open_order bool,
-	line bool,
-	mixed bool,
-	att_col bool,
-	close_col bool,
-	oblique bool,
-	square bool,
-	mob bool,
-	control int not null default 1,
-	speed int not null default 1
+	ID        int    `db:"id"`
+	Name      string `db:"name"`
+	Ranks     int    `db:"ranks"`
+	Flankers  bool   `db:"flankers"`
+	EliteCoy  bool   `db:"elite_coy"`
+	ThirdRank bool   `db:"third_rank"`
+	OpenOrder bool   `db:"open_order"`
+	Line      bool   `db:"line"`
+	Mixed     bool   `db:"mixed"`
+	AttCol    bool   `db:"att_col"`
+	CloseCol  bool   `db:"close_col"`
+	Oblique   bool   `db:"oblique"`
+	Square    bool   `db:"square"`
+	Mob       bool   `db:"mob"`
+	Control   int    `db:"control"`
+	Speed     int    `db:"speed"`
+}
+
+type SmallArms struct {
+	ID      int    `db:"id"`
+	Name    string `db:"name"`
+	Ranges  []byte `db:"ranges"`
+	Effects []byte `db:"effects"`
+	Covered []byte `db:"covered"`
+}
+
+type LookupTable struct {
+	CmdLevel    []CmdLevel
+	Condition   []Condition
+	Inspiration []Inspiration
+	CmdRating   []CmdRating
+	UnitRating  []UnitRating
+	CavType     []CavType
+	Gunnery     []Gunnery
+	DrillType   []DrillType
+	SmallArms   []SmallArms
 }

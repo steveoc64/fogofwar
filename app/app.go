@@ -23,6 +23,7 @@ type GlobalSessionData struct {
 	ID            map[string]int
 	URL           string
 	Disqus        bool
+	Lookup        shared.LookupTable
 }
 
 func (g *GlobalSessionData) GetRank() string {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	_ "image/png"
 	"log"
 	"os/exec"
@@ -81,100 +80,144 @@ func (u *UtilRPC) Logs(channel int, result *string) error {
 	return nil
 }
 
-func (u *UtilRPC) GetCmdLevels(Channel int, retval *[]shared.CmdLevel) error {
-	start := time.Now()
+// func (u *UtilRPC) GetCmdLevels(Channel int, retval *[]shared.CmdLevel) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from cmd_level order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from cmd_level order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetCmdLevels", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetCmdLevels", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetCmdRatings(Channel int, retval *[]shared.CmdRating) error {
-	start := time.Now()
+// func (u *UtilRPC) GetCmdRatings(Channel int, retval *[]shared.CmdRating) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from cmd_rating order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from cmd_rating order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetCmdRatings", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetCmdRatings", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetInspirations(Channel int, retval *[]shared.Inspiration) error {
-	start := time.Now()
+// func (u *UtilRPC) GetInspirations(Channel int, retval *[]shared.Inspiration) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from inspiration order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from inspiration order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetInspirations", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetInspirations", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetConditions(Channel int, retval *[]shared.Condition) error {
-	start := time.Now()
+// func (u *UtilRPC) GetConditions(Channel int, retval *[]shared.Condition) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from condition order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from condition order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetConditions", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetConditions", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetRatings(Channel int, retval *[]shared.UnitRating) error {
-	start := time.Now()
+// func (u *UtilRPC) GetRatings(Channel int, retval *[]shared.UnitRating) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from rating order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from rating order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetRatings", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetRatings", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetCavTypes(Channel int, retval *[]shared.CavType) error {
-	start := time.Now()
+// func (u *UtilRPC) GetCavTypes(Channel int, retval *[]shared.CavType) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from cav_type order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from cav_type order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetCavType", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetCavType", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
-}
+// 	return err
+// }
 
-func (u *UtilRPC) GetGunnery(Channel int, retval *[]shared.Gunnery) error {
-	start := time.Now()
+// func (u *UtilRPC) GetGunnery(Channel int, retval *[]shared.Gunnery) error {
+// 	start := time.Now()
 
-	conn := Connections.Get(Channel)
+// 	conn := Connections.Get(Channel)
 
-	err := DB.SQL(`select * from gunnery order by id`).QueryStructs(retval)
+// 	err := DB.SQL(`select * from gunnery order by id`).QueryStructs(retval)
 
-	logger(start, "Util.GetGunnery", conn,
-		fmt.Sprintf(""),
-		fmt.Sprintf("%d Records", len(*retval)))
+// 	logger(start, "Util.GetGunnery", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
 
-	return err
+// 	return err
+// }
+
+// func (u *UtilRPC) GetDrills(Channel int, retval *[]shared.DrillType) error {
+// 	start := time.Now()
+
+// 	conn := Connections.Get(Channel)
+
+// 	err := DB.SQL(`select * from drill order by id`).QueryStructs(retval)
+
+// 	logger(start, "Util.GetDrills", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
+
+// 	return err
+// }
+
+// func (u *UtilRPC) GetSmallArms(Channel int, retval *[]shared.SmallArms) error {
+// 	start := time.Now()
+
+// 	conn := Connections.Get(Channel)
+
+// 	err := DB.SQL(`select * from small_arms order by id`).QueryStructs(retval)
+
+// 	logger(start, "Util.GetSmallArms", conn,
+// 		fmt.Sprintf(""),
+// 		fmt.Sprintf("%d Records", len(*retval)))
+
+// 	return err
+// }
+
+func getLookupTable() shared.LookupTable {
+
+	l := shared.LookupTable{}
+	DB.SQL(`select * from cmd_level order by id`).QueryStructs(&l.CmdLevel)
+	DB.SQL(`select * from cmd_rating order by id`).QueryStructs(&l.CmdRating)
+	DB.SQL(`select * from inspiration order by id`).QueryStructs(&l.Inspiration)
+	DB.SQL(`select * from condition order by id`).QueryStructs(&l.Condition)
+	DB.SQL(`select * from rating order by id`).QueryStructs(&l.UnitRating)
+	DB.SQL(`select * from cav_type order by id`).QueryStructs(&l.CavType)
+	DB.SQL(`select * from gunnery order by id`).QueryStructs(&l.Gunnery)
+	DB.SQL(`select * from drill order by id`).QueryStructs(&l.DrillType)
+	DB.SQL(`select * from small_arms order by id`).QueryStructs(&l.SmallArms)
+
+	return l
 }

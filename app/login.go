@@ -35,7 +35,10 @@ func Login(username string, passwd string) {
 		Session.Rank = lr.Rank
 		Session.UserID = lr.ID
 		Session.Disqus = lr.Disqus
+		Session.Lookup = lr.LookupTable
 		loadRoutes(lr.Rank, lr.Routes)
+
+		print("Got Lookups", Session.Lookup)
 
 		// print("got a list of valid routes", lr.Routes)
 
@@ -89,6 +92,7 @@ func Login(username string, passwd string) {
 				Logout()
 			}
 		})
+		Session.Navigate("/")
 	} else {
 		print("login failed")
 		dom.GetWindow().Alert("Login Failed")
@@ -139,6 +143,10 @@ func initForms() {
 		evt.PreventDefault()
 		Session.Navigate("/")
 	})
+}
+
+func signIn(context *router.Context) {
+	loginForm()
 }
 
 func loginForm() {
@@ -199,6 +207,12 @@ func grid1() {
 		evt.PreventDefault()
 		Session.Navigate("/signup")
 	})
+
+	doc.QuerySelector("#main-signin").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signin")
+	})
+
 }
 
 func signUp(context *router.Context) {

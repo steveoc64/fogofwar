@@ -178,7 +178,7 @@ create table small_arms (
 	effects int[4][6],
 	covered int[4][6]
 );
-\i small_arms
+\i small_arms.sql
 
 drop table if exists gunnery;
 create table gunnery (

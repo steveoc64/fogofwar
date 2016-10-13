@@ -127,16 +127,16 @@ func userEdit(context *router.Context) {
 			AddInput(2, "Email", "Email").
 			AddInput(1, "Country", "Country")
 
-		form.Row(2).
-			AddDate(1, "Account Created", "Created").
-			AddDate(1, "Commission Expires", "Expires")
-
 		form.Row(9).
-			AddInput(5, "Blog Link", "Bloglink").
+			AddInput(3, "Blog Link", "Bloglink").
 			AddCheck(1, "Disqus", "Disqus").
 			AddCheck(1, "Banned", "Banned").
 			AddDisplay(1, "Channel", "Channel").
 			AddDisplay(1, "IP", "IPAddress")
+
+		form.Row(2).
+			AddDate(1, "Account Created", "Created").
+			AddDate(1, "Commission Expires", "Expires")
 
 		if user.Channel != 0 {
 			form.Row(1).

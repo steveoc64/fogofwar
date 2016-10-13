@@ -10,12 +10,13 @@ type LoginCredentials struct {
 }
 
 type LoginReply struct {
-	Result string
-	Token  string
-	Rank   int
-	ID     int
-	Routes []UserRoute
-	Disqus bool
+	Result      string
+	Token       string
+	Rank        int
+	ID          int
+	Routes      []UserRoute
+	Disqus      bool
+	LookupTable LookupTable
 }
 
 // type UserMenu struct {

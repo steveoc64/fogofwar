@@ -576,7 +576,7 @@ func forceEdit(context *router.Context) {
 			Channel: Session.Channel,
 			ID:      id,
 		}, &force)
-		print("got force", force)
+		// print("got force", force)
 
 		scenario := shared.Scenario{}
 		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
@@ -628,6 +628,9 @@ func forceEdit(context *router.Context) {
 				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
 		}
 
+		form.Row(1).
+			AddCustom(1, "Summary", "Summary", "")
+
 		swapper := formulate.Swapper{
 			Name:     "UnitDetails",
 			Selected: 1,
@@ -659,11 +662,12 @@ func forceEdit(context *router.Context) {
 			AddDisplay(1, "", "Name")
 
 		cmdPanel := swapper.AddPanel("Cmd")
-		cmdPanel.AddRow(2).
-			AddInput(1, "Command Name", "Name").
+		cmdPanel.AddRow(3).
+			AddInput(2, "Command Name", "Name").
 			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
-		cmdPanel.AddRow(2).
+		cmdPanel.AddRow(3).
 			AddInput(1, "Commander", "CommanderName").
+			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
 			AddInput(1, "Nationality", "Nation")
 
 		bdePanel := swapper.AddPanel("Bde")
@@ -676,8 +680,8 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Drill", "Drill", Session.Lookup.DrillType, "ID", "Name", 1, 1).
 			AddSelect(1, "Arms", "SmallArms", Session.Lookup.SmallArms, "ID", "Name", 1, 1)
 		bdePanel.AddRow(3).
-			AddNumber(1, "Extra - Light Coys", "LtCoys", "0").
-			AddNumber(1, "Jager Coys", "JgCoys", "0").
+			AddNumber(1, "Extra - Light Coys", "LtCoy", "0").
+			AddNumber(1, "Jager Coys", "JgCoy", "0").
 			AddSelect(1, "Lt Coy Arms", "EliteArms", Session.Lookup.SmallArms, "ID", "Name", 0, 0)
 		bdePanel.AddRow(3).
 			AddNumber(1, "Attached Sabres", "Sabres", "0").
@@ -702,6 +706,9 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 
 		gunPanel := swapper.AddPanel("Gun")
+		gunPanel.AddRow(3).
+			AddInput(2, "Battery Name", "Name").
+			AddCheck(1, "Horse Artillery", "HorseGuns")
 		gunPanel.AddRow(3).
 			AddNumber(1, "Guns", "Guns", "0").
 			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
@@ -782,11 +789,22 @@ func forceEdit(context *router.Context) {
 
 		setActionGrid()
 		drawUnitList := func() {
-			print("draw unit list, and theUnit is", TheUnit)
+			// print("draw unit list, and theUnit is", TheUnit)
 			tbody := doc.QuerySelector("#unitlist").(*dom.HTMLTableSectionElement)
 			tbody.SetInnerHTML("")
 
+			totalBayonets := 0
+			totalSabres := 0
+			totalGuns := 0
+			totalCmdrs := 0
+
 			for _, v := range force.Units {
+				totalBayonets += v.Bayonets
+				totalSabres += v.Sabres
+				totalGuns += v.Guns
+				if v.UType == 1 {
+					totalCmdrs += 1
+				}
 				row := tbody.InsertRow(-1)
 				row.SetClass("data-row")
 				row.SetAttribute("key", fmt.Sprintf("%d", v.ID))
@@ -796,7 +814,25 @@ func forceEdit(context *router.Context) {
 				if v.ID == TheUnit.ID {
 					cell.Class().Add("highlight")
 				}
+
+				descr := ""
+				switch v.UType {
+				case 1:
+					descr = v.CommanderName
+				case 2, 3, 4, 5:
+					descr = v.GetBases()
+				}
+				cell = row.InsertCell(-1)
+				cell.SetClass("compressed")
+				cell.SetInnerHTML(descr)
 			}
+
+			doc.QuerySelector("[name=Summary]").
+				SetInnerHTML(fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres, %d Guns",
+					totalCmdrs,
+					totalBayonets,
+					totalSabres,
+					totalGuns))
 		}
 
 		initUnitList := func() {
@@ -826,7 +862,7 @@ func forceEdit(context *router.Context) {
 		if canEdit {
 
 			doc.QuerySelector("form").AddEventListener("change", false, func(evt dom.Event) {
-				print("form change event", evt)
+				// print("form change event", evt)
 
 				// detect if the top part has changed
 				tempForce := force
@@ -841,32 +877,16 @@ func forceEdit(context *router.Context) {
 					}
 					go func() {
 						rpcClient.Call("ScenarioRPC.UpdateForce", RPCdata, &force)
-						print("and got back data with id", force.ID, force)
+						// print("and got back data with id", force.ID, force)
 						setActionGrid()
 					}()
 				} else {
 					// Looks like one of the bottom parts has changed
-					print("bottom section has changed", swapper.Selected)
+					// print("bottom section has changed", swapper.Selected)
 					swapper.Panels[swapper.Selected].Bind(&TheUnit)
 					TheUnit.UType = swapper.Selected
-					print("panel bind", TheUnit)
-					switch swapper.Selected {
-					case 0:
-						print("do nothing on this one")
-					case 1:
-						print("is command")
-					case 2:
-						print("is brigade")
-					case 3:
-						print("is cavalry")
-					case 4:
-						print("is artillery")
-					case 5:
-						print("is detachment")
-					}
-
 					if TheUnit.UType > 0 {
-						print("save unit with ID", TheUnit.ID)
+						// print("save unit with ID", TheUnit.ID)
 						go func() {
 							rpcClient.Call("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
 								Channel:   Session.Channel,
@@ -892,10 +912,10 @@ func forceEdit(context *router.Context) {
 				tr = tr.ParentElement()
 			}
 			key, _ := strconv.Atoi(tr.GetAttribute("key"))
-			print("clik on unit with key", key)
+			// print("clik on unit with key", key)
 			for _, v := range force.Units {
 				if v.ID == key {
-					print("Got matching unit", v)
+					// print("Got matching unit", v)
 					TheUnit = v
 					drawUnitList()
 
@@ -904,6 +924,26 @@ func forceEdit(context *router.Context) {
 						swapper.Panels[1].Paint(&TheUnit)
 						swapper.Select(1)
 						doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement).Focus()
+					case 2: // Bde
+						// print("paint panel 2")
+						swapper.Panels[2].Paint(&TheUnit)
+						swapper.Select(2)
+						doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
+					case 3: // Cav
+						// print("paint panel 2")
+						swapper.Panels[3].Paint(&TheUnit)
+						swapper.Select(3)
+						doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
+					case 4: // Bty
+						// print("paint panel 2")
+						swapper.Panels[4].Paint(&TheUnit)
+						swapper.Select(4)
+						doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
+					case 5: // Other
+						// print("paint panel 2")
+						swapper.Panels[5].Paint(&TheUnit)
+						swapper.Select(5)
+						doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
 					}
 					break
 				}
@@ -913,15 +953,17 @@ func forceEdit(context *router.Context) {
 		// Add Buttons
 		doc.QuerySelector("[name=AddCommand]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("Add Command")
+			// print("Add Command")
 			go func() {
 				// add a blank Division to the end of the units array
+				newUnit := shared.ForceUnit{}
 				rpcClient.Call("ScenarioRPC.AddCommand", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
-				}, &TheUnit)
+				}, &newUnit)
+				TheUnit = newUnit
 				force.Units = append(force.Units, TheUnit)
-				print("theUnit now set to", TheUnit)
+				// print("theUnit now set to", TheUnit)
 				drawUnitList()
 				swapper.Panels[1].Paint(&TheUnit)
 				swapper.Select(1)
@@ -931,43 +973,108 @@ func forceEdit(context *router.Context) {
 
 		doc.QuerySelector("[name=AddBde]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("Add Brigade")
-
-			theUnit := shared.ForceUnit{}
-			swapper.Panels[2].Paint(&theUnit)
-			swapper.Select(2)
-			doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
-			drawUnitList()
+			// print("Add Brigade")
+			go func() {
+				// add a blank brigade to the units array
+				newUnit := shared.ForceUnit{}
+				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+					Channel:    Session.Channel,
+					ID:         force.ID,
+					UType:      2,
+					ParentPath: TheUnit.Path,
+				}, &newUnit)
+				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      force.ID,
+				}, &force.Units)
+				// print("theUnit now set to", TheUnit)
+				TheUnit = newUnit
+				drawUnitList()
+				swapper.Panels[2].Paint(&TheUnit)
+				swapper.Select(2)
+				doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
+			}()
 		})
 
 		doc.QuerySelector("[name=AddCav]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("Add Cavalry")
-			theUnit := shared.ForceUnit{}
-			swapper.Panels[3].Paint(&theUnit)
-			swapper.Select(3)
-			doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
-			drawUnitList()
+			// print("Add Cavalry")
+			go func() {
+				// add a blank brigade to the units array
+				newUnit := shared.ForceUnit{}
+				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+					Channel:    Session.Channel,
+					ID:         force.ID,
+					UType:      3,
+					ParentPath: TheUnit.Path,
+				}, &newUnit)
+				print("add unit returns ", newUnit)
+				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      force.ID,
+				}, &force.Units)
+				TheUnit = newUnit
+				// print("theUnit now set to", TheUnit)
+				drawUnitList()
+				swapper.Panels[3].Paint(&TheUnit)
+				swapper.Select(3)
+				doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
+			}()
+
 		})
 
 		doc.QuerySelector("[name=AddGun]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("Add Gun")
-			theUnit := shared.ForceUnit{}
-			swapper.Panels[4].Paint(&theUnit)
-			swapper.Select(4)
-			doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
-			drawUnitList()
+			// print("Add Battery")
+			go func() {
+				// add a blank brigade to the units array
+				newUnit := shared.ForceUnit{}
+				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+					Channel:    Session.Channel,
+					ID:         force.ID,
+					UType:      4,
+					ParentPath: TheUnit.Path,
+				}, &newUnit)
+				print("add unit returns ", newUnit)
+				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      force.ID,
+				}, &force.Units)
+				TheUnit = newUnit
+				// print("theUnit now set to", TheUnit)
+				drawUnitList()
+				swapper.Panels[4].Paint(&TheUnit)
+				swapper.Select(4)
+				doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
+			}()
+
 		})
 
 		doc.QuerySelector("[name=AddOther]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("Add Other")
-			theUnit := shared.ForceUnit{}
-			swapper.Panels[5].Paint(&theUnit)
-			swapper.Select(5)
-			doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
-			drawUnitList()
+			// print("Add Detachment")
+			go func() {
+				// add a blank brigade to the units array
+				newUnit := shared.ForceUnit{}
+				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+					Channel:    Session.Channel,
+					ID:         force.ID,
+					UType:      5,
+					ParentPath: TheUnit.Path,
+				}, &newUnit)
+				print("add unit returns ", newUnit)
+				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      force.ID,
+				}, &force.Units)
+				TheUnit = newUnit
+				// print("theUnit now set to", TheUnit)
+				drawUnitList()
+				swapper.Panels[5].Paint(&TheUnit)
+				swapper.Select(5)
+				doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
+			}()
+
 		})
 
 	}()

@@ -1,6 +1,9 @@
 package shared
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Scenario struct {
 	ID         int        `db:"id"`
@@ -85,12 +88,35 @@ type ForceUnit struct {
 	CavType       int    `db:"cav_type"`
 	CavRating     int    `db:"cav_rating"`
 	Guns          int    `db:"guns"`
+	HorseGuns     bool   `db:"horse_guns"`
 	GunneryType   int    `db:"gunnery_type"`
 	GunCondition  int    `db:"gun_condition"`
 }
 
+func (u *ForceUnit) GetBases() string {
+
+	retval := ""
+	if u.Bayonets > 75 {
+		retval = fmt.Sprintf("%d Bases", (u.Bayonets+225)/450)
+	}
+
+	x := u.LtCoy + u.JgCoy
+	if x > 0 {
+		retval += fmt.Sprintf(" %d Sk", x)
+	}
+	if u.Sabres > 0 {
+		retval += fmt.Sprintf(" %d Cav", (u.Sabres+37)/75)
+	}
+	if u.Guns > 0 {
+		retval += fmt.Sprintf(" %d Guns", (u.Guns+3)/4)
+	}
+	return retval
+}
+
 type ForceUnitRPCData struct {
-	Channel   int
-	ID        int
-	ForceUnit *ForceUnit
+	Channel    int
+	ID         int
+	UType      int
+	ParentPath string
+	ForceUnit  *ForceUnit
 }

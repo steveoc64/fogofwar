@@ -122,46 +122,6 @@ ALTER SEQUENCE army_id_seq OWNED BY army.id;
 
 
 --
--- Name: campaign; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE TABLE campaign (
-    id integer NOT NULL,
-    author_id integer DEFAULT 0 NOT NULL,
-    forked_from integer DEFAULT 0 NOT NULL,
-    name text DEFAULT ''::text NOT NULL,
-    year integer DEFAULT 1800 NOT NULL,
-    descr text DEFAULT ''::text NOT NULL,
-    notes text DEFAULT ''::text NOT NULL,
-    latlon point,
-    public boolean DEFAULT true
-);
-
-
-ALTER TABLE public.campaign OWNER TO steve;
-
---
--- Name: campaign_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
---
-
-CREATE SEQUENCE campaign_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.campaign_id_seq OWNER TO steve;
-
---
--- Name: campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
---
-
-ALTER SEQUENCE campaign_id_seq OWNED BY campaign.id;
-
-
---
 -- Name: cav_type; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
 --
 
@@ -199,24 +159,6 @@ ALTER TABLE public.cav_type_id_seq OWNER TO steve;
 
 ALTER SEQUENCE cav_type_id_seq OWNED BY cav_type.id;
 
-
---
--- Name: cmd; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE TABLE cmd (
-    id integer NOT NULL,
-    army_id integer NOT NULL,
-    nation text DEFAULT ''::text NOT NULL,
-    name text DEFAULT ''::text NOT NULL,
-    level integer DEFAULT 1 NOT NULL,
-    descr text DEFAULT ''::text NOT NULL,
-    rating integer DEFAULT 0 NOT NULL,
-    inspiration integer DEFAULT 0 NOT NULL
-);
-
-
-ALTER TABLE public.cmd OWNER TO steve;
 
 --
 -- Name: cmd_action; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
@@ -264,10 +206,22 @@ ALTER SEQUENCE cmd_action_id_seq OWNED BY cmd_action.id;
 
 
 --
--- Name: cmd_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+-- Name: cmd_level; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE SEQUENCE cmd_id_seq
+CREATE TABLE cmd_level (
+    id integer NOT NULL,
+    name text DEFAULT ''::text NOT NULL
+);
+
+
+ALTER TABLE public.cmd_level OWNER TO steve;
+
+--
+-- Name: cmd_level_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE cmd_level_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -275,13 +229,81 @@ CREATE SEQUENCE cmd_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.cmd_id_seq OWNER TO steve;
+ALTER TABLE public.cmd_level_id_seq OWNER TO steve;
 
 --
--- Name: cmd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+-- Name: cmd_level_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
 --
 
-ALTER SEQUENCE cmd_id_seq OWNED BY cmd.id;
+ALTER SEQUENCE cmd_level_id_seq OWNED BY cmd_level.id;
+
+
+--
+-- Name: cmd_rating; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE cmd_rating (
+    id integer NOT NULL,
+    name text DEFAULT ''::text NOT NULL,
+    effect integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.cmd_rating OWNER TO steve;
+
+--
+-- Name: cmd_rating_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE cmd_rating_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.cmd_rating_id_seq OWNER TO steve;
+
+--
+-- Name: cmd_rating_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+--
+
+ALTER SEQUENCE cmd_rating_id_seq OWNED BY cmd_rating.id;
+
+
+--
+-- Name: condition; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE condition (
+    id integer NOT NULL,
+    name text DEFAULT ''::text NOT NULL,
+    effect integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.condition OWNER TO steve;
+
+--
+-- Name: condition_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE condition_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.condition_id_seq OWNER TO steve;
+
+--
+-- Name: condition_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+--
+
+ALTER SEQUENCE condition_id_seq OWNED BY condition.id;
 
 
 --
@@ -329,6 +351,102 @@ ALTER TABLE public.drill_id_seq OWNER TO steve;
 --
 
 ALTER SEQUENCE drill_id_seq OWNED BY drill.id;
+
+
+--
+-- Name: force; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE force (
+    id integer NOT NULL,
+    scenario_id integer DEFAULT 0 NOT NULL,
+    red_team boolean,
+    blue_team boolean,
+    nation text DEFAULT ''::text NOT NULL,
+    name text DEFAULT ''::text NOT NULL,
+    cmdr_name text DEFAULT ''::text NOT NULL,
+    level integer DEFAULT 1 NOT NULL,
+    descr text DEFAULT ''::text NOT NULL,
+    rating integer DEFAULT 0 NOT NULL,
+    inspiration integer DEFAULT 0 NOT NULL,
+    condition integer DEFAULT 2 NOT NULL
+);
+
+
+ALTER TABLE public.force OWNER TO steve;
+
+--
+-- Name: force_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE force_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.force_id_seq OWNER TO steve;
+
+--
+-- Name: force_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+--
+
+ALTER SEQUENCE force_id_seq OWNED BY force.id;
+
+
+--
+-- Name: force_unit; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE force_unit (
+    id integer NOT NULL,
+    force_id integer DEFAULT 0 NOT NULL,
+    path ltree,
+    name text DEFAULT ''::text NOT NULL,
+    commander_name text DEFAULT ''::text NOT NULL,
+    nation text DEFAULT ''::text NOT NULL,
+    utype integer DEFAULT 1 NOT NULL,
+    cmd_level integer DEFAULT 1 NOT NULL,
+    drill integer DEFAULT 1 NOT NULL,
+    bayonets integer DEFAULT 0 NOT NULL,
+    small_arms integer DEFAULT 0 NOT NULL,
+    elite_arms integer DEFAULT 0 NOT NULL,
+    lt_coy integer DEFAULT 0 NOT NULL,
+    jg_coy integer DEFAULT 0 NOT NULL,
+    rating integer DEFAULT 5 NOT NULL,
+    sabres integer DEFAULT 0 NOT NULL,
+    cav_type integer DEFAULT 0 NOT NULL,
+    cav_rating integer DEFAULT 0 NOT NULL,
+    guns integer DEFAULT 0 NOT NULL,
+    gunnery_type integer DEFAULT 0 NOT NULL,
+    gun_condition integer DEFAULT 2 NOT NULL,
+    horse_guns boolean DEFAULT false NOT NULL
+);
+
+
+ALTER TABLE public.force_unit OWNER TO steve;
+
+--
+-- Name: force_unit_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE force_unit_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.force_unit_id_seq OWNER TO steve;
+
+--
+-- Name: force_unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+--
+
+ALTER SEQUENCE force_unit_id_seq OWNED BY force_unit.id;
 
 
 --
@@ -463,11 +581,10 @@ CREATE TABLE game_unit (
     cmd_id integer NOT NULL,
     path ltree,
     name text DEFAULT ''::text NOT NULL,
-    commander_condition integer DEFAULT 10 NOT NULL,
+    commander_control integer DEFAULT 10 NOT NULL,
     nation text DEFAULT ''::text NOT NULL,
     utype integer DEFAULT 1 NOT NULL,
     condition integer DEFAULT 2 NOT NULL,
-    control integer DEFAULT 0 NOT NULL,
     cmd_level integer DEFAULT 1 NOT NULL,
     drill integer DEFAULT 1 NOT NULL,
     table_sector integer DEFAULT 0 NOT NULL,
@@ -488,7 +605,7 @@ CREATE TABLE game_unit (
     small_arms integer DEFAULT 0 NOT NULL,
     elite_arms integer DEFAULT 0 NOT NULL,
     lt_coy integer DEFAULT 0 NOT NULL,
-    jg_coy integer DEFAULT 0 NOT NULL,
+    rifles boolean,
     lt_lost integer DEFAULT 0 NOT NULL,
     lt_mstate integer DEFAULT 0 NOT NULL,
     rating integer DEFAULT 5 NOT NULL,
@@ -610,19 +727,52 @@ ALTER SEQUENCE gunnery_id_seq OWNED BY gunnery.id;
 
 
 --
--- Name: oob_224; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+-- Name: inspiration; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE TABLE oob_224 (
-    path ltree,
-    commander text,
-    inf integer,
-    cav integer,
-    art integer
+CREATE TABLE inspiration (
+    id integer NOT NULL,
+    name text DEFAULT ''::text NOT NULL,
+    effect integer DEFAULT 0 NOT NULL
 );
 
 
-ALTER TABLE public.oob_224 OWNER TO steve;
+ALTER TABLE public.inspiration OWNER TO steve;
+
+--
+-- Name: inspiration_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+--
+
+CREATE SEQUENCE inspiration_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inspiration_id_seq OWNER TO steve;
+
+--
+-- Name: inspiration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+--
+
+ALTER SEQUENCE inspiration_id_seq OWNED BY inspiration.id;
+
+
+--
+-- Name: login; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE login (
+    user_id integer NOT NULL,
+    date timestamp with time zone DEFAULT ('now'::text)::timestamp without time zone NOT NULL,
+    ip_address text DEFAULT ''::text NOT NULL,
+    channel integer DEFAULT 0 NOT NULL
+);
+
+
+ALTER TABLE public.login OWNER TO steve;
 
 --
 -- Name: oob_224_game_446; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
@@ -638,17 +788,6 @@ CREATE TABLE oob_224_game_446 (
 
 
 ALTER TABLE public.oob_224_game_446 OWNER TO steve;
-
---
--- Name: oobtest; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE TABLE oobtest (
-    path ltree
-);
-
-
-ALTER TABLE public.oobtest OWNER TO steve;
 
 --
 -- Name: orders; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
@@ -753,48 +892,6 @@ CREATE TABLE scenario (
 
 
 ALTER TABLE public.scenario OWNER TO steve;
-
---
--- Name: scenario_cmd; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE TABLE scenario_cmd (
-    id integer NOT NULL,
-    scenario_id integer DEFAULT 0 NOT NULL,
-    red_team boolean,
-    blue_team boolean,
-    nation text DEFAULT ''::text NOT NULL,
-    name text DEFAULT ''::text NOT NULL,
-    level integer DEFAULT 1 NOT NULL,
-    descr text DEFAULT ''::text NOT NULL,
-    rating integer DEFAULT 0 NOT NULL,
-    inspiration integer DEFAULT 0 NOT NULL,
-    condition integer DEFAULT 2 NOT NULL
-);
-
-
-ALTER TABLE public.scenario_cmd OWNER TO steve;
-
---
--- Name: scenario_cmd_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
---
-
-CREATE SEQUENCE scenario_cmd_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.scenario_cmd_id_seq OWNER TO steve;
-
---
--- Name: scenario_cmd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
---
-
-ALTER SEQUENCE scenario_cmd_id_seq OWNED BY scenario_cmd.id;
-
 
 --
 -- Name: scenario_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
@@ -1064,10 +1161,15 @@ CREATE TABLE users (
     email text NOT NULL,
     rank integer DEFAULT 1 NOT NULL,
     created timestamp with time zone DEFAULT ('now'::text)::timestamp without time zone NOT NULL,
+    expires timestamp with time zone DEFAULT ('now'::text)::timestamp without time zone NOT NULL,
     channel integer DEFAULT 0 NOT NULL,
+    ip_address text DEFAULT ''::text NOT NULL,
     country text DEFAULT ''::text NOT NULL,
     bloglink text DEFAULT ''::text NOT NULL,
-    notes text DEFAULT ''::text NOT NULL
+    notes text DEFAULT ''::text NOT NULL,
+    banned boolean DEFAULT false NOT NULL,
+    disqus boolean DEFAULT true NOT NULL,
+    newsletter boolean DEFAULT true NOT NULL
 );
 
 
@@ -1151,21 +1253,7 @@ ALTER TABLE ONLY army ALTER COLUMN id SET DEFAULT nextval('army_id_seq'::regclas
 -- Name: id; Type: DEFAULT; Schema: public; Owner: steve
 --
 
-ALTER TABLE ONLY campaign ALTER COLUMN id SET DEFAULT nextval('campaign_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
---
-
 ALTER TABLE ONLY cav_type ALTER COLUMN id SET DEFAULT nextval('cav_type_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
---
-
-ALTER TABLE ONLY cmd ALTER COLUMN id SET DEFAULT nextval('cmd_id_seq'::regclass);
 
 
 --
@@ -1179,7 +1267,42 @@ ALTER TABLE ONLY cmd_action ALTER COLUMN id SET DEFAULT nextval('cmd_action_id_s
 -- Name: id; Type: DEFAULT; Schema: public; Owner: steve
 --
 
+ALTER TABLE ONLY cmd_level ALTER COLUMN id SET DEFAULT nextval('cmd_level_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
+ALTER TABLE ONLY cmd_rating ALTER COLUMN id SET DEFAULT nextval('cmd_rating_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
+ALTER TABLE ONLY condition ALTER COLUMN id SET DEFAULT nextval('condition_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
 ALTER TABLE ONLY drill ALTER COLUMN id SET DEFAULT nextval('drill_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
+ALTER TABLE ONLY force ALTER COLUMN id SET DEFAULT nextval('force_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
+ALTER TABLE ONLY force_unit ALTER COLUMN id SET DEFAULT nextval('force_unit_id_seq'::regclass);
 
 
 --
@@ -1221,6 +1344,13 @@ ALTER TABLE ONLY gunnery ALTER COLUMN id SET DEFAULT nextval('gunnery_id_seq'::r
 -- Name: id; Type: DEFAULT; Schema: public; Owner: steve
 --
 
+ALTER TABLE ONLY inspiration ALTER COLUMN id SET DEFAULT nextval('inspiration_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+--
+
 ALTER TABLE ONLY orders ALTER COLUMN id SET DEFAULT nextval('orders_id_seq'::regclass);
 
 
@@ -1236,13 +1366,6 @@ ALTER TABLE ONLY rating ALTER COLUMN id SET DEFAULT nextval('rating_id_seq'::reg
 --
 
 ALTER TABLE ONLY scenario ALTER COLUMN id SET DEFAULT nextval('scenario_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
---
-
-ALTER TABLE ONLY scenario_cmd ALTER COLUMN id SET DEFAULT nextval('scenario_cmd_id_seq'::regclass);
 
 
 --
@@ -1310,26 +1433,6 @@ SELECT pg_catalog.setval('army_id_seq', 1, false);
 
 
 --
--- Data for Name: campaign; Type: TABLE DATA; Schema: public; Owner: steve
---
-
-COPY campaign (id, author_id, forked_from, name, year, descr, notes, latlon, public) FROM stdin;
-2	1	0	Wagram	1809	Napoleon vs ArchDuke Charles clash near Vienna in a truly massive series of Battle of Epic proportions. 	The Battle of Wagram (5–6 July 1809) was a military engagement of the Napoleonic Wars and ended in a decisive victory for Emperor Napoleon I's French and allied army against the Austrian army under the command of Archduke Charles of Austria-Teschen. The battle led to the breakup of the Fifth Coalition, the Austrian and British-led alliance against France.\n\nIn 1809, the French military presence in Germany was diminished as Napoleon transferred a number of soldiers to fight in the Peninsular War. As a result, the Austrian Empire saw its chance to recover some of its former sphere of influence and invaded the Kingdom of Bavaria, a French ally. Recovering from his initial surprise, Napoleon beat the Austrian forces and occupied Vienna at the beginning of May 1809. Despite the string of sharp defeats and the loss of the empire's capital, Archduke Charles salvaged an army, with which he retreated north of the Danube. This allowed the Austrians to continue the war but, towards the end of May, Napoleon resumed the offensive, suffering a defeat at the Battle of Aspern-Essling.\n\nIt took Napoleon six weeks to prepare his next offensive, for which he amassed a 165,000-man French, German and Italian army in the vicinity of Vienna. The Battle of Wagram began after Napoleon crossed the Danube with the bulk of these forces during the night of 4 July and attacked the 145,000-man strong Austrian army. Having successfully crossed the river, Napoleon attempted an early breakthrough and launched a series of evening attacks against the Austrian army. The Austrians were thinly spread in a wide semicircle, but held a naturally strong position. After the attackers enjoyed some initial success, the defenders regained the upper hand and the attacks failed. Bolstered by his success, the next day at dawn Archduke Charles launched a series of attacks along the entire battle line, seeking to take the opposing army in a double envelopment. The offensive failed against the French right but nearly broke Napoleon's left. However, the Emperor countered by launching a cavalry charge, which temporarily halted the Austrian advance. He then redeployed IV Corps to stabilise his left, while setting up a grand battery, which pounded the Austrian right and centre. The tide of battle turned and the Emperor launched an offensive along the entire line, while Maréchal Louis-Nicolas Davout drove an offensive, which turned the Austrian left, and rendered Charles's position untenable. Towards mid-afternoon on 6 July, Charles admitted defeat and led a retreat, frustrating enemy attempts to pursue. After the battle, Charles remained in command of a cohesive force and decided to retreat to Bohemia. However, the Grande Armée eventually caught up with him and scored a victory at the Battle of Znaim. With the battle still raging, Charles decided to ask for an armistice, effectively ending the war.\n\nThe two-day battle of Wagram was particularly bloody, mainly due to the extensive use of artillery on a flat battlefield packed with some 300,000 men. Although Napoleon was the uncontested winner, he failed to secure a complete victory and the Austrian casualties were only slightly greater than those of the French and allies. Nonetheless, the defeat was serious enough to shatter the morale of the Austrians, who could no longer find the will to continue the struggle. The resulting Treaty of Schönbrunn meant the loss of one sixth of the Austrian Empire's subjects, along with some territories.	\N	t
-1	1	0	Jena Auerstadt	1806	Napoleon's Blitzkrieg tears into Prussia.	The battles began when elements of Napoleon's main force encountered Hohenlohe's troops near Jena. Initially only 48,000 strong, the Emperor took advantage of his carefully planned and flexible dispositions to rapidly build up a crushing superiority. The Prussians were slow to grasp the situation, and slower still to react. Before Ruchel's 15,000 men could arrive from Weimar, Hohenlohe's force was routed. Nevertheless, it was a fierce battle, and Napoleon mistakenly believed that he had faced the main body of the Prussian army.\n\nFurther north at Auerstedt, both Davout and Bernadotte received orders to come to Napoleon's aid. Davout attempted to comply via Ekartsberg; Bernadotte, via Dornburg. Davout's route south, however, was blocked by the Prussian main force of 55,000 men, including the Prussian King, the Duke of Brunswick and Field Marshals von Möllendorf and von Kalckreuth. A savage battle ensued. Although outnumbered two to one, Davout's superbly trained and disciplined III Corps endured repeated attacks before eventually taking the offensive and putting the Prussians to flight. Though in sight of the battle, Bernadotte took no steps to come to Davout's aid, for which he was later censured by Napoleon.\n\n	\N	t
-3	1	0	Bussaco	1810	Wellington vs Masssena in Portugal, a classic Big Battle Campaign in the Peninsula (featuring the 95th Rifles).	The Battle of Buçaco fought on 27 September 1810 during the Peninsular War in the Portuguese mountain range of Serra do Buçaco, resulted in the defeat of French forces by Lord Wellington's Anglo-Portuguese Army.\n\nHaving occupied the heights of Bussaco (a 10-mile (16 km) long ridge located at 40°20'40"N, 8°20'15"W) with 25,000 British and the same number of Portuguese, Wellington was attacked five times successively by 65,000 French under Marshal André Masséna. Masséna was uncertain as to the disposition and strength of the opposing forces because Wellington deployed them on the reverse slope of the ridge, where they could neither be easily seen nor easily softened up with artillery. The actual assaults were delivered by the corps of Marshal Michel Ney and General of Division (Major General) Jean Reynier, but after much fierce fighting they failed to dislodge the allied forces and were driven off after having lost 4,500 men against 1,250 Anglo-Portuguese casualties.	\N	t
-4	2	0	Leipzig	1813	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia.	The Battle of Leipzig or Battle of the Nations (Russian: Битва народов, Bitva narodov; German: Völkerschlacht bei Leipzig; French: Bataille des Nations) was fought from 16 to 19 October 1813, at Leipzig, Saxony. The coalition armies of Russia, Prussia, Austria, and Sweden, led by Tsar Alexander I of Russia and Karl Philipp, Prince of Schwarzenberg, decisively defeated the French army of Napoleon I, Emperor of the French. Napoleon's army also contained Polish and Italian troops, as well as Germans from the Confederation of the Rhine. The battle was the culmination of the 1813 German campaign and involved nearly 600,000 soldiers, making it the largest battle in Europe prior to World War I.\n\nBeing decisively defeated for the first time in battle, Napoleon was compelled to return to France while the Coalition hurried to keep their momentum, invading France early the next year. Napoleon was forced to abdicate and was exiled to Elba in May 1814.	\N	t
-5	2	0	Waterloo	1815	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.	The Battle of Waterloo was fought on Sunday, 18 June 1815, near Waterloo in present-day Belgium, then part of the United Kingdom of the Netherlands. A French army under the command of Napoleon Bonaparte was defeated by two of the armies of the Seventh Coalition: an Anglo-led Allied army under the command of the Duke of Wellington, and a Prussian army under the command of Gebhard Leberecht von Blücher, Prince of Wahlstatt.\n\nUpon Napoleon's return to power in March 1815, many states that had opposed him formed the Seventh Coalition, and began to mobilize armies. Wellington and Blücher's armies were cantoned close to the north-eastern border of France. Napoleon chose to attack them in the hope of destroying them before they could join in a coordinated invasion of France with other members of the coalition.\n\nNapoleon successfully attacked the Prussians at the Battle of Ligny, while at the same time attacking the British at the Battle of Quatre Bras. Despite holding his ground at Quatre Bras, the defeat of the Prussians forced Wellington to withdraw to Waterloo.\n\nNapoleon sent a third of his forces to pursue the Prussians, who had withdraw parallel to Wellington. This resulted in the separate and simultaneous Battle of Wavre with the Prussian rear-guard.\n\nUpon learning that the Prussian army was able to support him, Wellington decided to offer battle on the Mont-Saint-Jean escarpment, across the Brussels road. Here he withstood repeated attacks by the French throughout the afternoon, aided by the progressively arriving Prussians.\n\nIn the evening Napoleon committed his last reserves to a desperate final attack, which was narrowly beaten back. With the Prussians breaking through on the French right flank Wellington's Anglo-allied army counter-attacked in the centre, and the French army was routed.\n\nWaterloo was the decisive engagement of the Waterloo Campaign and Napoleon's last. According to Wellington, the battle was "the nearest-run thing you ever saw in your life". Napoleon abdicated 4 days later, and on 7 July coalition forces entered Paris.\n\nThe defeat at Waterloo ended Napoleon's rule as Emperor of the French, and marked the end of his Hundred Days return from exile.The battle also ended the First French Empire, and set a chronological milestone between serial European wars and decades of relative peace.	\N	t
-\.
-
-
---
--- Name: campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
---
-
-SELECT pg_catalog.setval('campaign_id_seq', 5, true);
-
-
---
 -- Data for Name: cav_type; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
@@ -1344,7 +1447,7 @@ COPY cav_type (id, name, weight, battle, lances, dragoon, cossack, dubious) FROM
 8	Heavy Dragoons	3	t	f	f	f	f
 9	Carabiniers	3	t	f	f	f	f
 10	Mtd Jagers	1	f	f	t	f	f
-11	Irregular	1	f	f	f	t	f
+11	Irregular	1	f	f	f	t	t
 12	Lt Dragoons	1	f	f	t	f	f
 \.
 
@@ -1354,14 +1457,6 @@ COPY cav_type (id, name, weight, battle, lances, dragoon, cossack, dubious) FROM
 --
 
 SELECT pg_catalog.setval('cav_type_id_seq', 1, false);
-
-
---
--- Data for Name: cmd; Type: TABLE DATA; Schema: public; Owner: steve
---
-
-COPY cmd (id, army_id, nation, name, level, descr, rating, inspiration) FROM stdin;
-\.
 
 
 --
@@ -1405,10 +1500,64 @@ SELECT pg_catalog.setval('cmd_action_id_seq', 1, false);
 
 
 --
--- Name: cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+-- Data for Name: cmd_level; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('cmd_id_seq', 1, false);
+COPY cmd_level (id, name) FROM stdin;
+1	Army
+2	Corps
+3	Division
+4	Brigade
+5	Battalion
+6	Company
+\.
+
+
+--
+-- Name: cmd_level_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('cmd_level_id_seq', 1, false);
+
+
+--
+-- Data for Name: cmd_rating; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY cmd_rating (id, name, effect) FROM stdin;
+1	Magnificent	2
+2	Excellent	1
+3	Competent	0
+4	Doddering Fool	-1
+5	Blithering Idiot	-2
+\.
+
+
+--
+-- Name: cmd_rating_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('cmd_rating_id_seq', 1, false);
+
+
+--
+-- Data for Name: condition; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY condition (id, name, effect) FROM stdin;
+1	Parade Order	2
+2	Battle Ready	1
+3	Adequate	0
+4	Tattered	-1
+5	Spent	-3
+\.
+
+
+--
+-- Name: condition_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('condition_id_seq', 1, false);
 
 
 --
@@ -1420,10 +1569,11 @@ COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, 
 2	Green Conscript	3	f	f	f	f	t	f	f	t	f	f	t	4	1
 3	Basic Training	3	f	f	t	f	t	f	t	t	f	f	f	5	2
 4	Prussian Reformed	3	f	f	t	f	t	t	t	f	f	t	f	6	2
-5	French Drilled	3	f	t	f	t	t	t	t	t	f	t	f	8	3
-6	British Drilled	2	t	f	f	t	t	t	t	f	t	t	f	9	2
-7	Irregular Light Infantry	2	f	f	f	t	t	f	f	t	f	f	t	3	3
-8	Drilled Light Infantry	2	f	t	f	t	t	f	f	f	t	t	f	7	4
+5	French Drilled	3	f	t	f	f	t	t	t	t	f	t	f	8	3
+6	French Legere	3	f	t	f	t	t	t	t	t	f	t	f	8	3
+7	British Drilled	2	t	f	f	f	t	t	t	f	t	t	f	9	2
+8	Irregular Light Infantry	2	f	f	f	t	t	f	f	t	f	f	t	3	3
+9	Drilled Light Infantry	2	f	t	f	t	t	f	f	f	t	t	f	7	4
 \.
 
 
@@ -1432,6 +1582,67 @@ COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, 
 --
 
 SELECT pg_catalog.setval('drill_id_seq', 1, false);
+
+
+--
+-- Data for Name: force; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level, descr, rating, inspiration, condition) FROM stdin;
+4	1	t	f	France	IV Corps	Soult	2		3	3	3
+5	1	t	f	France	V Corps	Lannes	2		2	1	3
+6	1	t	f	France	VI Corps	Ney	2		2	3	2
+7	1	t	f	France	VII Corps	Augereau	2		2	3	2
+8	1	t	f	France	Cavalry Reserve	Murat	2		3	2	3
+9	1	t	f	France	Supply		4		4	3	2
+10	1	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2
+11	1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4
+12	1	f	t	Prussia	Army Grp North	Duke of Brunswick	2		4	3	4
+13	1	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1
+14	1	f	t	Prussia	Supply Train		3		4	3	4
+3	1	t	f	France	III Corps	Davout	2		1	3	2
+2	1	t	f	France	I Corps	General Bernadotte	2		3	3	2
+1	1	t	f	France	Imperial Guard	Napoleon	2		1	1	1
+\.
+
+
+--
+-- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('force_id_seq', 1, false);
+
+
+--
+-- Data for Name: force_unit; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_level, drill, bayonets, small_arms, elite_arms, lt_coy, jg_coy, rating, sabres, cav_type, cav_rating, guns, gunnery_type, gun_condition, horse_guns) FROM stdin;
+13	2	2nd_Division.45e_Ligne	45e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
+4	1	Infantry_Division	Infantry Division	Lefebvre	France	1	3	1	0	0	0	0	0	5	0	0	0	0	0	2	f
+14	2	2nd_Division.54e_Ligne	54e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
+5	1	Cavalry_Division	Cavalry Division	Bessieres	France	1	3	1	0	0	0	0	0	5	0	0	0	0	0	2	f
+7	2	2eme_Division	2eme Division	Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+18	2	3rd_Division.95e_Ligne	95e Ligne	Drouet	France	2	4	5	2600	1	0	0	0	5	0	0	0	0	0	0	f
+16	2	3rd_Division.27e_Legere	27e Legere	Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	3	0	f
+11	2	1st_Division.32e_Ligne	32e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
+6	2	1eme_Division	1eme Division	de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+8	2	3rd_Division	3rd Division	Drouet	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
+12	2	1st_Division.96e_Ligne	96e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
+9	2	1st_Division.9e_Legere	9e Legere	de l'Eltang	France	2	4	6	2600	1	2	0	0	4	0	0	0	0	3	0	f
+30	2	1st_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
+31	2	2nd_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
+32	2	3rd_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
+10	2	2nd_Division.4e_Legere	4e Legere	Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
+17	2	3rd_Division.94e_Ligne	94e Ligne	Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
+\.
+
+
+--
+-- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('force_unit_id_seq', 32, true);
 
 
 --
@@ -1492,7 +1703,7 @@ COPY game_players (game_id, player_id, red_team, blue_team) FROM stdin;
 -- Data for Name: game_unit; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_unit (id, cmd_id, path, name, commander_condition, nation, utype, condition, control, cmd_level, drill, table_sector, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, jg_coy, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, gun_max_condition, gun_condition) FROM stdin;
+COPY game_unit (id, cmd_id, path, name, commander_control, nation, utype, condition, cmd_level, drill, table_sector, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, rifles, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, gun_max_condition, gun_condition) FROM stdin;
 \.
 
 
@@ -1525,7 +1736,8 @@ SELECT pg_catalog.setval('gt_formation_id_seq', 1, false);
 COPY gunnery (id, name, cannister, cannister_bad, ranges, good_effect, bad_effect, hw) FROM stdin;
 1	12lb	{{15,15,26,26,30,40},{10,10,16,17,20,27},{8,8,14,14,16,21}}	{{7,7,9,9,9,9},{5,5,5,6,6,6},{4,4,4,4,4,4}}	{0,1,2,4}	{{8,8,13,13,13,20},{5,5,9,9,10,14},{3,3,3,5,5,7},{2,2,3,3,3,4}}	{{4,4,7,7,7,7},{3,3,5,5,5,5},{2,2,2,2,2,2},{1,1,1,1,1,1}}	f
 2	6lb	{{12,20,20,24,24,32},{8,13,13,16,16,21},{6,10,10,12,12,16}}	{{4,4,5,5,8,12},{3,3,3,3,5,8},{2,2,3,3,4,6}}	{0,1,2,3}	{{6,10,10,12,12,16},{4,7,7,8,8,11},{2,2,2,3,3,5},{2,2,3,4,4,6}}	{{3,3,5,5,6,8},{2,2,3,3,5,5},{1,1,1,1,2,2},{1,1,2,2,2,3}}	f
-3	Howitzer	{{0,0,0,0,0,0},{5,7,7,8,8,11},{3,5,5,6,6,8}}	{{0,0,0,0,0,0},{3,3,4,4,5,7},{2,2,3,3,3,5}}	{0,1,2,3}	{{0,0,0,0,0,0},{3,5,5,6,6,8},{2,4,4,5,5,6},{1,2,2,2,2,3}}	{{0,0,0,0,0,0},{2,2,3,3,3,5},{1,1,2,2,2,4},{0,0,1,1,1,2}}	t
+3	Light Guns	{{10,15,15,18,18,24},{4,6,6,8,8,10}}	{{2,3,3,3,5,8},{0,1,1,1,2,5}}	{0,1}	{{4,6,6,8,8,8},{3,4,4,4,5,7}}	{{1,2,3,3,4,5},{1,1,1,2,2,3}}	f
+4	Howitzer	{{0,0,0,0,0,0},{5,7,7,8,8,11},{3,5,5,6,6,8}}	{{0,0,0,0,0,0},{3,3,4,4,5,7},{2,2,3,3,3,5}}	{0,1,2,3}	{{0,0,0,0,0,0},{3,5,5,6,6,8},{2,4,4,5,5,6},{1,2,2,2,2,3}}	{{0,0,0,0,0,0},{2,2,3,3,3,5},{1,1,2,2,2,4},{0,0,1,1,1,2}}	t
 \.
 
 
@@ -1537,14 +1749,244 @@ SELECT pg_catalog.setval('gunnery_id_seq', 1, false);
 
 
 --
--- Data for Name: oob_224; Type: TABLE DATA; Schema: public; Owner: steve
+-- Data for Name: inspiration; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY oob_224 (path, commander, inf, cav, art) FROM stdin;
-I_Corps	Yorckk	4000	100	2
-I_Corps.7_Bde	Yaxxman	200	100	8
-I_Corps.7_Bde.2nd_Silesian	Blitzenburg	6000	300	8
-I_Corps.7_Bde.4th_Silesian	Blitzenburg	8000	100	12
+COPY inspiration (id, name, effect) FROM stdin;
+1	Charismatic	2
+2	Dashing	1
+3	Respected	0
+4	Unlikable	-1
+5	Detested	-2
+\.
+
+
+--
+-- Name: inspiration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+--
+
+SELECT pg_catalog.setval('inspiration_id_seq', 1, false);
+
+
+--
+-- Data for Name: login; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY login (user_id, date, ip_address, channel) FROM stdin;
+1	2016-10-12 23:26:59.686421+10:30	[::1]:48256	1
+1	2016-10-12 23:27:36.117291+10:30	[::1]:48364	1
+1	2016-10-12 23:31:20.800798+10:30	[::1]:48730	1
+1	2016-10-12 23:35:22.140267+10:30	[::1]:49120	1
+1	2016-10-12 23:41:22.817671+10:30	[::1]:49590	1
+1	2016-10-12 23:52:59.648047+10:30	[::1]:50598	1
+1	2016-10-13 00:00:25.886756+10:30	[::1]:51246	1
+1	2016-10-13 00:05:56.30691+10:30	[::1]:51800	1
+1	2016-10-13 00:18:05.130075+10:30	[::1]:52938	1
+1	2016-10-13 00:19:17.239611+10:30	[::1]:53076	1
+1	2016-10-13 00:20:51.822886+10:30	[::1]:53230	1
+1	2016-10-13 00:22:31.750041+10:30	[::1]:53400	1
+1	2016-10-13 00:30:56.710018+10:30	[::1]:53400	1
+1	2016-10-13 00:32:04.90612+10:30	[::1]:54446	1
+1	2016-10-13 00:32:16.794833+10:30	[::1]:54498	2
+1	2016-10-13 00:35:53.879807+10:30	[::1]:54822	3
+1	2016-10-13 00:36:58.601214+10:30	[::1]:54930	1
+1	2016-10-13 00:53:32.904875+10:30	[::1]:56344	1
+1	2016-10-13 00:55:16.763628+10:30	[::1]:56540	1
+1	2016-10-13 00:55:51.602256+10:30	[::1]:56608	1
+1	2016-10-13 00:56:13.463683+10:30	[::1]:56662	1
+1	2016-10-13 01:06:59.080808+10:30	[::1]:57666	1
+1	2016-10-13 01:20:21.325119+10:30	[::1]:58786	1
+1	2016-10-13 01:20:50.555347+10:30	[::1]:58878	1
+1	2016-10-13 01:23:13.070141+10:30	[::1]:59040	1
+1	2016-10-13 01:25:05.14555+10:30	[::1]:59254	1
+1	2016-10-13 01:26:12.116858+10:30	[::1]:59370	1
+1	2016-10-13 01:29:14.180238+10:30	[::1]:59628	1
+1	2016-10-13 01:31:53.622227+10:30	[::1]:59874	1
+1	2016-10-13 01:40:01.126176+10:30	[::1]:60556	1
+1	2016-10-13 01:43:38.189416+10:30	[::1]:60896	1
+1	2016-10-13 01:47:08.828013+10:30	[::1]:32968	1
+1	2016-10-13 01:48:54.773+10:30	[::1]:33136	1
+1	2016-10-13 01:51:29.015742+10:30	[::1]:33374	1
+1	2016-10-13 02:04:47.857762+10:30	[::1]:34466	1
+1	2016-10-13 02:05:25.03052+10:30	[::1]:34574	1
+1	2016-10-13 02:06:11.81404+10:30	[::1]:34666	2
+1	2016-10-13 02:18:07.75527+10:30	[::1]:35618	1
+1	2016-10-13 02:20:41.18272+10:30	[::1]:35876	1
+1	2016-10-13 02:22:06.29642+10:30	[::1]:36006	1
+1	2016-10-13 02:23:41.592536+10:30	[::1]:36146	1
+1	2016-10-13 02:27:14.318715+10:30	[::1]:36422	1
+1	2016-10-13 03:06:45.517827+10:30	[::1]:39644	1
+1	2016-10-13 03:08:24.624386+10:30	[::1]:39894	1
+1	2016-10-13 03:24:40.956238+10:30	[::1]:41384	1
+1	2016-10-13 03:25:36.631725+10:30	[::1]:41520	1
+1	2016-10-13 03:29:12.692289+10:30	[::1]:41702	1
+1	2016-10-13 03:31:24.303036+10:30	[::1]:42006	1
+1	2016-10-13 03:33:41.149817+10:30	[::1]:42206	1
+1	2016-10-13 03:35:50.248042+10:30	[::1]:42354	1
+1	2016-10-13 11:31:18.832289+10:30	127.0.0.1:48948	1
+1	2016-10-13 11:33:21.31689+10:30	127.0.0.1:49152	1
+1	2016-10-13 11:37:52.232066+10:30	127.0.0.1:49228	1
+1	2016-10-13 11:44:43.810825+10:30	127.0.0.1:50150	1
+1	2016-10-13 11:45:55.473509+10:30	127.0.0.1:50308	1
+1	2016-10-13 11:48:49.857402+10:30	127.0.0.1:50614	1
+1	2016-10-13 11:50:24.488859+10:30	127.0.0.1:50796	1
+1	2016-10-13 11:51:50.605548+10:30	127.0.0.1:50932	1
+1	2016-10-13 11:57:23.597872+10:30	127.0.0.1:51374	1
+1	2016-10-13 11:58:06.057944+10:30	127.0.0.1:51486	1
+1	2016-10-13 12:01:17.023718+10:30	127.0.0.1:51774	1
+1	2016-10-13 12:02:25.206696+10:30	127.0.0.1:51880	1
+1	2016-10-13 12:03:08.511512+10:30	127.0.0.1:51952	1
+1	2016-10-13 12:03:44.938071+10:30	127.0.0.1:52042	1
+1	2016-10-13 12:27:37.586528+10:30	127.0.0.1:53972	1
+1	2016-10-13 12:30:55.193022+10:30	127.0.0.1:54298	1
+1	2016-10-13 12:31:39.900518+10:30	127.0.0.1:54382	1
+1	2016-10-13 12:32:27.810173+10:30	127.0.0.1:54466	1
+1	2016-10-13 12:32:48.311835+10:30	127.0.0.1:54532	2
+1	2016-10-13 12:33:18.855874+10:30	127.0.0.1:54590	1
+1	2016-10-13 13:59:30.921813+10:30	127.0.0.1:33372	1
+1	2016-10-13 14:01:34.25583+10:30	127.0.0.1:33372	1
+1	2016-10-13 14:03:08.006377+10:30	127.0.0.1:33372	1
+1	2016-10-13 14:04:02.423565+10:30	127.0.0.1:33372	1
+1	2016-10-13 14:29:48.258432+10:30	127.0.0.1:36006	1
+1	2016-10-13 14:33:31.835241+10:30	127.0.0.1:36358	1
+1	2016-10-13 14:35:02.373569+10:30	127.0.0.1:36520	1
+1	2016-10-13 14:38:19.615376+10:30	127.0.0.1:36794	1
+1	2016-10-13 14:41:02.837713+10:30	127.0.0.1:37046	1
+1	2016-10-13 14:43:32.8563+10:30	127.0.0.1:37280	1
+1	2016-10-13 14:45:00.168689+10:30	127.0.0.1:37418	2
+1	2016-10-13 14:47:15.976811+10:30	127.0.0.1:37632	1
+1	2016-10-13 14:48:57.295428+10:30	127.0.0.1:37788	1
+1	2016-10-13 14:49:38.121371+10:30	127.0.0.1:37874	1
+1	2016-10-13 14:51:30.758406+10:30	127.0.0.1:38066	2
+1	2016-10-13 14:54:43.87611+10:30	127.0.0.1:38508	1
+1	2016-10-13 14:55:40.153822+10:30	127.0.0.1:38604	1
+1	2016-10-13 14:57:52.530237+10:30	127.0.0.1:38826	1
+1	2016-10-13 15:04:18.516262+10:30	127.0.0.1:39324	1
+1	2016-10-13 15:05:20.453726+10:30	127.0.0.1:39456	1
+1	2016-10-13 15:06:42.916952+10:30	127.0.0.1:39590	1
+1	2016-10-13 15:20:30.849734+10:30	127.0.0.1:40714	1
+1	2016-10-13 15:22:13.183816+10:30	127.0.0.1:40922	1
+1	2016-10-13 15:23:09.042574+10:30	127.0.0.1:41022	1
+1	2016-10-13 15:24:30.958757+10:30	127.0.0.1:41150	1
+1	2016-10-13 15:50:28.715738+10:30	127.0.0.1:43202	1
+1	2016-10-13 15:51:58.849172+10:30	127.0.0.1:43370	1
+1	2016-10-13 15:52:56.881037+10:30	127.0.0.1:43476	1
+1	2016-10-13 15:54:50.495654+10:30	127.0.0.1:43640	1
+1	2016-10-13 16:01:30.167581+10:30	127.0.0.1:44166	1
+1	2016-10-13 16:10:12.924324+10:30	127.0.0.1:44962	1
+1	2016-10-13 16:11:02.211559+10:30	127.0.0.1:45042	1
+1	2016-10-13 16:13:56.247565+10:30	127.0.0.1:45310	1
+1	2016-10-13 16:15:18.473711+10:30	127.0.0.1:45448	1
+1	2016-10-13 16:16:59.596493+10:30	127.0.0.1:45612	1
+1	2016-10-13 16:21:00.986003+10:30	127.0.0.1:46412	1
+1	2016-10-13 16:21:32.579544+10:30	127.0.0.1:46480	1
+1	2016-10-13 16:23:07.117415+10:30	127.0.0.1:46644	1
+2	2016-10-13 16:36:24.795911+10:30	192.168.1.105:41591	2
+2	2016-10-13 16:37:29.688852+10:30	192.168.1.105:41647	2
+2	2016-10-13 16:40:29.668174+10:30	192.168.1.105:41783	2
+1	2016-10-13 16:40:41.632732+10:30	127.0.0.1:48578	1
+1	2016-10-13 16:47:30.260398+10:30	127.0.0.1:49164	1
+1	2016-10-13 17:10:11.617005+10:30	127.0.0.1:50992	1
+1	2016-10-13 17:19:05.876383+10:30	127.0.0.1:51822	1
+1	2016-10-13 17:20:03.338827+10:30	127.0.0.1:51822	1
+1	2016-10-13 17:23:05.634204+10:30	127.0.0.1:52162	1
+1	2016-10-13 17:32:58.332112+10:30	127.0.0.1:52984	1
+1	2016-10-13 17:37:50.342193+10:30	192.168.1.101:46285	2
+1	2016-10-13 18:03:33.775314+10:30	127.0.0.1:52984	1
+1	2016-10-13 23:35:14.152618+10:30	127.0.0.1:53956	1
+1	2016-10-13 23:38:50.344644+10:30	127.0.0.1:54314	1
+1	2016-10-13 23:41:25.782975+10:30	127.0.0.1:54544	1
+1	2016-10-13 23:47:19.327351+10:30	127.0.0.1:55012	1
+1	2016-10-13 23:48:13.867695+10:30	127.0.0.1:55164	1
+1	2016-10-14 00:12:18.790476+10:30	127.0.0.1:57166	1
+1	2016-10-14 00:12:58.390599+10:30	127.0.0.1:57276	1
+2	2016-10-14 00:14:22.797565+10:30	192.168.1.105:44785	2
+2	2016-10-14 00:17:04.675116+10:30	192.168.1.105:44959	2
+1	2016-10-14 00:19:46.909727+10:30	127.0.0.1:57878	1
+1	2016-10-14 00:22:34.241192+10:30	127.0.0.1:58122	1
+1	2016-10-14 00:23:07.087023+10:30	127.0.0.1:58210	3
+1	2016-10-14 00:24:12.196319+10:30	127.0.0.1:58316	1
+1	2016-10-14 00:29:41.42935+10:30	127.0.0.1:58774	1
+1	2016-10-14 00:30:35.147287+10:30	127.0.0.1:58892	1
+1	2016-10-14 00:32:50.818037+10:30	127.0.0.1:59088	1
+1	2016-10-14 00:43:02.921124+10:30	127.0.0.1:59940	1
+1	2016-10-14 00:45:44.457912+10:30	127.0.0.1:60214	1
+1	2016-10-14 00:46:49.582993+10:30	127.0.0.1:60318	1
+1	2016-10-14 00:47:54.287741+10:30	127.0.0.1:60430	1
+1	2016-10-14 01:02:12.1283+10:30	127.0.0.1:33348	1
+1	2016-10-14 01:04:11.627177+10:30	127.0.0.1:33566	1
+1	2016-10-14 01:08:01.813609+10:30	127.0.0.1:33892	1
+1	2016-10-14 01:10:08.511785+10:30	127.0.0.1:34088	1
+1	2016-10-14 01:15:09.288501+10:30	127.0.0.1:34588	1
+1	2016-10-14 01:15:28.248556+10:30	127.0.0.1:34588	1
+1	2016-10-14 01:16:14.925943+10:30	127.0.0.1:34718	1
+1	2016-10-14 01:18:01.776876+10:30	127.0.0.1:34882	1
+1	2016-10-14 01:18:09.610449+10:30	127.0.0.1:34882	1
+1	2016-10-14 01:18:19.584834+10:30	127.0.0.1:34882	1
+1	2016-10-14 01:20:15.992299+10:30	127.0.0.1:35074	1
+1	2016-10-14 01:47:36.172042+10:30	127.0.0.1:37160	1
+1	2016-10-14 01:49:36.434785+10:30	127.0.0.1:37472	1
+1	2016-10-14 01:51:38.20964+10:30	127.0.0.1:37664	1
+1	2016-10-14 02:10:18.714035+10:30	127.0.0.1:39192	1
+1	2016-10-14 02:11:04.109894+10:30	127.0.0.1:39312	1
+1	2016-10-14 02:12:18.405197+10:30	127.0.0.1:39444	1
+1	2016-10-14 02:13:22.139263+10:30	127.0.0.1:39558	1
+1	2016-10-14 02:17:34.327356+10:30	127.0.0.1:39966	1
+1	2016-10-14 02:19:02.581218+10:30	127.0.0.1:40116	1
+1	2016-10-14 02:19:49.055267+10:30	127.0.0.1:40224	2
+1	2016-10-14 02:20:25.14137+10:30	127.0.0.1:40286	1
+1	2016-10-14 02:21:36.28524+10:30	127.0.0.1:40562	1
+1	2016-10-14 02:22:22.104947+10:30	127.0.0.1:40638	1
+1	2016-10-14 02:26:25.051021+10:30	127.0.0.1:40988	1
+1	2016-10-14 02:27:18.449932+10:30	127.0.0.1:41080	1
+1	2016-10-14 02:43:21.95231+10:30	127.0.0.1:42488	1
+1	2016-10-14 02:45:32.439833+10:30	127.0.0.1:42708	1
+1	2016-10-14 03:26:06.748304+10:30	127.0.0.1:46704	1
+1	2016-10-14 03:39:20.397025+10:30	127.0.0.1:47824	1
+1	2016-10-14 03:39:55.857691+10:30	127.0.0.1:47928	1
+1	2016-10-14 03:56:23.503224+10:30	127.0.0.1:49258	1
+1	2016-10-14 04:04:00.123444+10:30	127.0.0.1:49900	1
+1	2016-10-14 04:06:08.108017+10:30	127.0.0.1:50132	1
+1	2016-10-14 04:10:36.880324+10:30	127.0.0.1:50556	1
+1	2016-10-14 04:24:26.799439+10:30	127.0.0.1:51830	1
+1	2016-10-14 04:26:19.631679+10:30	127.0.0.1:51966	1
+1	2016-10-14 04:30:49.011064+10:30	127.0.0.1:52376	1
+1	2016-10-14 04:32:20.618407+10:30	127.0.0.1:52520	1
+1	2016-10-14 04:33:51.587696+10:30	127.0.0.1:52680	1
+1	2016-10-14 04:40:29.431757+10:30	127.0.0.1:53198	1
+1	2016-10-14 05:12:57.126559+10:30	127.0.0.1:55988	1
+1	2016-10-14 05:16:13.243865+10:30	127.0.0.1:56290	1
+1	2016-10-14 05:18:52.062939+10:30	127.0.0.1:56518	1
+1	2016-10-14 05:25:00.946819+10:30	127.0.0.1:57060	1
+1	2016-10-14 05:26:58.606872+10:30	127.0.0.1:57282	1
+1	2016-10-14 05:29:45.523215+10:30	127.0.0.1:57282	1
+1	2016-10-14 05:30:36.381944+10:30	127.0.0.1:57282	1
+1	2016-10-14 05:35:57.879216+10:30	127.0.0.1:58066	1
+1	2016-10-14 05:47:51.227274+10:30	127.0.0.1:59080	1
+1	2016-10-14 06:09:38.039228+10:30	127.0.0.1:60810	1
+1	2016-10-14 06:14:45.206561+10:30	127.0.0.1:33020	1
+1	2016-10-14 06:15:44.030453+10:30	127.0.0.1:33148	1
+1	2016-10-14 06:17:58.39267+10:30	127.0.0.1:33326	1
+1	2016-10-14 06:19:50.296671+10:30	127.0.0.1:33532	1
+1	2016-10-14 06:23:29.833916+10:30	127.0.0.1:33832	1
+1	2016-10-14 06:24:06.898423+10:30	127.0.0.1:33924	2
+1	2016-10-14 06:25:52.279889+10:30	127.0.0.1:34058	1
+1	2016-10-14 06:32:20.47637+10:30	127.0.0.1:34592	1
+1	2016-10-14 06:34:19.784645+10:30	127.0.0.1:34800	1
+1	2016-10-14 06:39:36.796127+10:30	127.0.0.1:35232	1
+1	2016-10-14 06:46:26.871616+10:30	127.0.0.1:35838	1
+1	2016-10-14 06:53:35.076555+10:30	127.0.0.1:36384	1
+1	2016-10-14 06:56:05.916841+10:30	127.0.0.1:36710	1
+1	2016-10-14 06:58:33.594412+10:30	127.0.0.1:36976	1
+1	2016-10-14 07:00:30.26438+10:30	127.0.0.1:37144	1
+1	2016-10-14 07:05:17.61442+10:30	127.0.0.1:37542	1
+1	2016-10-14 07:07:10.814986+10:30	127.0.0.1:37700	1
+1	2016-10-14 07:13:18.890573+10:30	127.0.0.1:38200	1
+1	2016-10-14 07:16:36.389791+10:30	127.0.0.1:38510	1
+1	2016-10-14 07:19:38.631596+10:30	127.0.0.1:38770	1
+1	2016-10-14 07:27:19.346005+10:30	127.0.0.1:39394	1
+1	2016-10-14 07:29:11.290625+10:30	127.0.0.1:39596	1
+1	2016-10-14 07:33:01.790536+10:30	127.0.0.1:40240	1
 \.
 
 
@@ -1557,19 +1999,6 @@ I_Corps	Yorckk	4000	100	2
 I_Corps.7_Bde	Yaxxman	200	100	8
 I_Corps.7_Bde.2nd_Silesian	Blitzenburg	6000	300	8
 I_Corps.7_Bde.4th_Silesian	Blitzenburg	8000	100	12
-\.
-
-
---
--- Data for Name: oobtest; Type: TABLE DATA; Schema: public; Owner: steve
---
-
-COPY oobtest (path) FROM stdin;
-III_Corps
-III_Corps.1st_Division
-III_Corps.1st_Division.Bde_Nixdorf
-III_Corps.1st_Division.Bde_Liebermann
-III_Corps.1st_Division.Bde_Tolstoy
 \.
 
 
@@ -1618,40 +2047,19 @@ SELECT pg_catalog.setval('rating_id_seq', 1, false);
 --
 
 COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, notes, year, public, latlon, red_team, red_brief, blue_team, blue_brief) FROM stdin;
-2	0	1	2016-10-11 10:21:22.816557+10:30	0	Wagram	Napoleon vs ArchDuke Charles clash near Vienna in a truly massive series of Battle of Epic proportions. 		1809	t	\N				
-3	0	1	2016-10-11 10:21:22.816557+10:30	0	Bussaco	Wellington vs Masssena in Portugal, a classic Big Battle Campaign in the Peninsula (featuring the 95th Rifles).		1810	t	\N				
-4	0	2	2016-10-11 10:21:22.816557+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia.		1813	t	\N				
-5	0	2	2016-10-11 10:21:22.816557+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	\N				
-9	0	1	2016-10-11 12:38:57.867574+10:30	0	Battel of Deth	The Battel of Deth	lots of deth on this one	4	t	\N	The Morgons		The Flenstars	
-10	0	1	2016-10-11 15:59:00.633009+10:30	0	The Test of Wills			0	f	\N				
-1	0	1	2016-10-11 10:21:22.816557+10:30	0	Jena Auerstadt	Napoleon's Blitzkrieg tears into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. \n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\n\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong)[citation needed] and Louis Nicolas Davout's III Corps (27,000).	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nUse speed and superior strategic movement to locate and force battle with the main Prussian army.\n\nThen converge dispersed Corps to achieve local superiority.	Prussia - Frederick William III	Find the French, and then give battle.\n\nUse your your army's superior firepower and professionalism to end the ambitions of the Great Amatuer.
-6	0	0	2016-10-11 12:16:21.928902+10:30	0	The Battle of Death	The Battle of Death	some notes here	1888	f	\N	The Morgons		The Flenstars	
-7	0	0	2016-10-11 12:17:09.55982+10:30	0	Battle of Death			1800	f	\N				
-8	0	0	2016-10-11 12:21:42.832199+10:30	0	Battle of Death			0	f	\N				
-11	0	1	2016-10-11 16:01:41.380196+10:30	0	All of Vendee Must Die !	The Terror spreads to the Vendee		1799	t	\N				
+2	0	1	2016-10-12 23:21:45.213973+10:30	0	Wagram	Napoleon vs ArchDuke Charles clash near Vienna in a truly massive series of Battle of Epic proportions. 		1809	t	\N				
+3	0	1	2016-10-12 23:21:45.213973+10:30	0	Bussaco	Wellington vs Masssena in Portugal, a classic Big Battle Campaign in the Peninsula (featuring the 95th Rifles).		1810	t	\N				
+4	0	2	2016-10-12 23:21:45.213973+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia.		1813	t	\N				
+5	0	2	2016-10-12 23:21:45.213973+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	\N				
+1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's Blitzkrieg tears into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong)[citation needed] and Louis Nicolas Davout's III Corps (27,000)	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.
 \.
-
-
---
--- Data for Name: scenario_cmd; Type: TABLE DATA; Schema: public; Owner: steve
---
-
-COPY scenario_cmd (id, scenario_id, red_team, blue_team, nation, name, level, descr, rating, inspiration, condition) FROM stdin;
-\.
-
-
---
--- Name: scenario_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
---
-
-SELECT pg_catalog.setval('scenario_cmd_id_seq', 1, false);
 
 
 --
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 11, true);
+SELECT pg_catalog.setval('scenario_id_seq', 5, true);
 
 
 --
@@ -1689,9 +2097,9 @@ SELECT pg_catalog.setval('screnario_id_seq', 1, false);
 --
 
 COPY small_arms (id, name, ranges, effects, covered) FROM stdin;
-2	Muskets	{1,2,4,6}	{{15,20,20,30,30,40},{8,12,15,20,20,30},{4,8,8,15,15,20},{1,4,4,8,8,10}}	{{5,7,7,10,10,14},{3,5,5,7,7,10},{2,3,3,5,5,7},{1,2,2,3,3,4}}
-3	Skirmishers	{1,2,4,6}	{{12,16,16,25,25,30},{6,12,15,16,16,20},{3,6,6,12,12,15},{1,3,3,6,6,8}}	{{3,4,5,8,10,18},{2,4,4,5,5,7},{1,2,2,4,4,5},{0,1,1,2,2,2}}
-4	Jagers	{2,4,6,8}	{{8,12,15,20,20,24},{4,8,8,15,15,20},{2,4,4,8,8,10},{1,2,2,4,4,5}}	{{4,8,8,10,10,12},{2,4,4,8,8,10},{1,2,2,4,4,6},{0,1,1,2,2,3}}
+1	Muskets	{1,2,4,6}	{{15,20,20,30,30,40},{8,12,15,20,20,30},{4,8,8,15,15,20},{1,4,4,8,8,10}}	{{5,7,7,10,10,14},{3,5,5,7,7,10},{2,3,3,5,5,7},{1,2,2,3,3,4}}
+2	Skirmishers	{1,2,4,6}	{{12,16,16,25,25,30},{6,12,15,16,16,20},{3,6,6,12,12,15},{1,3,3,6,6,8}}	{{3,4,5,8,10,18},{2,4,4,5,5,7},{1,2,2,4,4,5},{0,1,1,2,2,2}}
+3	Rifles	{2,4,6,8}	{{8,12,15,20,20,24},{4,8,8,15,15,20},{2,4,4,8,8,10},{1,2,2,4,4,5}}	{{4,8,8,10,10,12},{2,4,4,8,8,10},{1,2,2,4,4,6},{0,1,1,2,2,3}}
 \.
 
 
@@ -1753,9 +2161,9 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY users (id, username, passwd, name, email, rank, created, channel, country, bloglink, notes) FROM stdin;
-1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-08 23:25:58.576517+10:30	0	Australia	http://15mm-madness.blogspot.com	
-2	kat	fysherdog	Kat Formato	kformato@gmail.com	2	2016-10-08 23:25:58.576517+10:30	0	Australia	http://witchwoodstudio.com	
+COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
+2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:44959	Australia	http://witchwoodstudio.com		f	t	t
+1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:40240	Australia	http://15mm-madness.blogspot.com		f	f	t
 \.
 
 
@@ -1774,8 +2182,8 @@ COPY utype (id, name) FROM stdin;
 1	Command
 2	Infantry Brigade
 3	Cavalry Brigade
-4	Artillery Reserve
-5	Other Assets
+4	Artillery Battery
+5	Other Detachment
 \.
 
 
@@ -1803,14 +2211,6 @@ ALTER TABLE ONLY army
 
 
 --
--- Name: campaign_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
---
-
-ALTER TABLE ONLY campaign
-    ADD CONSTRAINT campaign_pkey PRIMARY KEY (id);
-
-
---
 -- Name: cav_type_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
 --
 
@@ -1827,11 +2227,27 @@ ALTER TABLE ONLY cmd_action
 
 
 --
--- Name: cmd_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+-- Name: cmd_level_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
 --
 
-ALTER TABLE ONLY cmd
-    ADD CONSTRAINT cmd_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY cmd_level
+    ADD CONSTRAINT cmd_level_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cmd_rating_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+--
+
+ALTER TABLE ONLY cmd_rating
+    ADD CONSTRAINT cmd_rating_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: condition_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+--
+
+ALTER TABLE ONLY condition
+    ADD CONSTRAINT condition_pkey PRIMARY KEY (id);
 
 
 --
@@ -1840,6 +2256,22 @@ ALTER TABLE ONLY cmd
 
 ALTER TABLE ONLY drill
     ADD CONSTRAINT drill_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: force_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+--
+
+ALTER TABLE ONLY force
+    ADD CONSTRAINT force_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: force_unit_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+--
+
+ALTER TABLE ONLY force_unit
+    ADD CONSTRAINT force_unit_pkey PRIMARY KEY (id);
 
 
 --
@@ -1883,6 +2315,14 @@ ALTER TABLE ONLY gunnery
 
 
 --
+-- Name: inspiration_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+--
+
+ALTER TABLE ONLY inspiration
+    ADD CONSTRAINT inspiration_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: orders_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
 --
 
@@ -1896,14 +2336,6 @@ ALTER TABLE ONLY orders
 
 ALTER TABLE ONLY rating
     ADD CONSTRAINT rating_pkey PRIMARY KEY (id);
-
-
---
--- Name: scenario_cmd_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
---
-
-ALTER TABLE ONLY scenario_cmd
-    ADD CONSTRAINT scenario_cmd_pkey PRIMARY KEY (id);
 
 
 --
@@ -2002,24 +2434,17 @@ CREATE INDEX army_campaign_idx ON army USING btree (campaign_id);
 
 
 --
--- Name: campaign_author_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: force_scenario_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE INDEX campaign_author_idx ON campaign USING btree (author_id);
-
-
---
--- Name: campaign_fork_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE INDEX campaign_fork_idx ON campaign USING btree (forked_from);
+CREATE INDEX force_scenario_idx ON force USING btree (scenario_id);
 
 
 --
--- Name: cmd_army_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: force_unit_force_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE INDEX cmd_army_idx ON cmd USING btree (army_id);
+CREATE INDEX force_unit_force_idx ON force_unit USING btree (force_id);
 
 
 --
@@ -2086,17 +2511,17 @@ CREATE INDEX game_unit_cmd_idx ON game_unit USING btree (cmd_id);
 
 
 --
--- Name: path_btree_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: login_date_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE INDEX path_btree_idx ON oobtest USING btree (path);
+CREATE INDEX login_date_idx ON login USING btree (date);
 
 
 --
--- Name: path_gist_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: login_user_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE INDEX path_gist_idx ON oobtest USING gist (path);
+CREATE INDEX login_user_idx ON login USING btree (user_id);
 
 
 --
@@ -2104,13 +2529,6 @@ CREATE INDEX path_gist_idx ON oobtest USING gist (path);
 --
 
 CREATE INDEX scenario_author_idx ON scenario USING btree (author_id);
-
-
---
--- Name: scenario_cmd_scenario_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE INDEX scenario_cmd_scenario_idx ON scenario_cmd USING btree (scenario_id);
 
 
 --

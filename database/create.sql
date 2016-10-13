@@ -227,6 +227,7 @@ create table force_unit (
 	cav_type int not null default 0,
 	cav_rating int not null default 0,
 	guns int not null default 0,
+	horse_guns bool not null default false,
 	gunnery_type int not null default 0,
 	gun_condition int not null default 2
 );

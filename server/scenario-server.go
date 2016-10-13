@@ -261,12 +261,26 @@ func (s *ScenarioRPC) GetForce(data shared.ScenarioRPCData, retval *shared.Force
 
 	// now get the units attached
 	if err == nil {
-		DB.SQL(`select * from force_unit where force_id=$1`, data.ID).QueryStructs(&retval.Units)
+		DB.SQL(`select * from force_unit where force_id=$1 order by path`, data.ID).QueryStructs(&retval.Units)
 	}
 
 	logger(start, "Session.GetForce", conn,
 		fmt.Sprintf("ID %d", data.ID),
 		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (s *ScenarioRPC) GetForceUnits(data shared.ScenarioRPCData, retval *[]shared.ForceUnit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select * from force_unit where force_id=$1 order by path`, data.ID).QueryStructs(retval)
+
+	logger(start, "Session.GetForceUnits", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%d Units", len(*retval)))
 
 	return err
 }
@@ -314,6 +328,60 @@ func (s *ScenarioRPC) AddCommand(data shared.ScenarioRPCData, retval *shared.For
 	}
 
 	logger(start, "Scenario.AddCommand", conn,
+		fmt.Sprintf("Force %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (s *ScenarioRPC) AddUnit(data shared.ForceUnitRPCData, retval *shared.ForceUnit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	// Strip the ParentPath down
+	paths := strings.Split(data.ParentPath, ".")
+
+	unit := shared.ForceUnit{
+		ForceID:  data.ID,
+		Path:     paths[0],
+		UType:    data.UType,
+		CmdLevel: 4,
+		Name:     "",
+	}
+	switch data.UType {
+	case 2:
+		unit.Path += "._Brigade"
+		unit.Bayonets = 2000
+		unit.Drill = 3
+		unit.SmallArms = 1
+		unit.Rating = 5
+	case 3:
+		unit.Path += "._Cavalry"
+		unit.Sabres = 600
+	case 4:
+		unit.Path += "._Battery"
+		unit.Guns = 8
+		unit.GunneryType = 2
+		unit.GunCondition = 3
+	case 5:
+		unit.Path += "._Detachment"
+	}
+	err := DB.InsertInto("force_unit").
+		Whitelist("name", "force_id", "path", "utype", "cmd_level", "bayonets", "drill", "small_arms",
+			"rating", "sabres", "guns", "gunnery_type", "gun_condition").
+		Record(unit).
+		Returning("id").
+		QueryScalar(&unit.ID)
+
+	if err != nil {
+		println("err = ", err.Error())
+
+	}
+
+	DB.SQL(`select * from force_unit where id=$1`, unit.ID).QueryStruct(retval)
+
+	logger(start, "Scenario.AddUnit", conn,
 		fmt.Sprintf("Force %d", data.ID),
 		fmt.Sprintf("%v", *retval))
 

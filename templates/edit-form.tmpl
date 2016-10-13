@@ -78,7 +78,8 @@
                     </div>
                   {{end}}                  
                   {{if eq .Type "button"}}
-                    <button class="button-primary" name="{{$panelname}}-{{.Model}}">{{.Label}}</button> 
+                    <input type="button" class="button-outline" value="{{.Label}}" name="{{$panelname}}-{{.Model}}">
+                    <!-- <button class="button-primary" name="{{$panelname}}-{{.Model}}">{{.Label}}</button>  -->
                   {{end}}
                   </div>
                 {{end}}
@@ -161,7 +162,8 @@
             </div>
           {{end}}
           {{if eq .Type "button"}}
-            <button class="button-primary" name="{{.Model}}">{{.Label}}</button> 
+            <input type="button" class="button-outline" value="{{.Label}}" name="{{.Model}}">
+            <!-- <button class="button-primary" name="{{.Model}}">{{.Label}}</button>  -->
           {{end}}
         </div>
         {{end}}

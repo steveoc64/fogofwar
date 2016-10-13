@@ -38,7 +38,7 @@ func Login(username string, passwd string) {
 		Session.Lookup = lr.LookupTable
 		loadRoutes(lr.Rank, lr.Routes)
 
-		print("Got Lookups", Session.Lookup)
+		// print("Got Lookups", Session.Lookup)
 
 		// print("got a list of valid routes", lr.Routes)
 

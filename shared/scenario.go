@@ -94,7 +94,7 @@ type ForceUnit struct {
 }
 
 func (u *ForceUnit) GetBases() string {
-	retval := "&nbsp;"
+	retval := ""
 	if u.Bayonets > 75 {
 		cnt := ((u.Bayonets + 350) / 450)
 		if cnt > 1 {
@@ -114,7 +114,10 @@ func (u *ForceUnit) GetBases() string {
 	}
 
 	if u.Sabres > 0 {
-		cnt := ((u.Sabres + 60) / 75)
+		if retval != "" {
+			retval += "<br>\n"
+		}
+		cnt := (u.Sabres + 60) / 75 // total number of half sqns
 		if cnt > 1 {
 			if cnt%2 > 0 {
 				retval += fmt.Sprintf(" %d½ Sqn", cnt/2)
@@ -126,38 +129,66 @@ func (u *ForceUnit) GetBases() string {
 		}
 	}
 	if u.Guns > 0 {
+		if retval != "" {
+			retval += "<br>\n"
+		}
 		cnt := u.Guns // Actual Guns
 		gunType := ""
+		addGun := " gun"
+		horse := ""
+		if u.HorseGuns {
+			horse = "Horse "
+		}
 		switch u.GunneryType {
 		case 1:
 			gunType = " 12lb"
 		case 2:
 			gunType = " 6lb"
 		case 3:
-			gunType = " Hw"
-		case 4:
 			gunType = " 3lb"
+		case 4:
+			gunType = " Hw"
+			horse = ""
+			addGun = ""
 		}
 
+		// Based on 2 guns to a section
+		// 3-4 is a Half Bty
+		// Up to 8 is a Bty
 		if cnt >= 2 { // Then its at least a section
-			if cnt >= 4 { // Then its at least a half bty
-				if cnt >= 6 { // Then its at least a Bty
+			if cnt >= 3 { // Then its at least a half bty
+				if cnt > 4 { // Then its at least a Bty
 					if cnt > 8 { // Then its multiple Btys
-						retval += fmt.Sprintf(" %d Btys %s", 1+(cnt/8), gunType)
+						halfBtys := (cnt + 3) / 4
+						if halfBtys%2 > 0 { // has a half Bty in there somewhere
+							retval += fmt.Sprintf(" %d½ %s %sBtys", halfBtys/2, gunType, horse)
+						} else {
+							retval += fmt.Sprintf(" %d %s %sBtys", halfBtys/2, gunType, horse)
+						}
+
 					} else {
-						retval += " Bty" + gunType
+						retval += gunType + " " + horse + "Bty"
 					}
 				} else {
-					retval += " ½Bty" + gunType
+					retval += " ½Bty of" + gunType
+					if u.HorseGuns {
+						retval += " Horse Art."
+					}
 				}
 			} else {
-				retval += " Sect" + gunType
+				retval += " Sect of" + gunType
+				if u.HorseGuns {
+					retval += " Horse Art."
+				}
 			}
 		} else if cnt > 0 {
-			retval += gunType
+			if retval != "" {
+				retval += " and"
+			}
+			retval += " a" + gunType + addGun
 		}
 	}
-	return retval
+	return "&nbsp;" + retval
 }
 
 type ForceUnitRPCData struct {

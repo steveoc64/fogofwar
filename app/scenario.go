@@ -646,7 +646,7 @@ func forceEdit(context *router.Context) {
 		}
 
 		form.Row(3).
-			AddCustom(1, "Units", "UnitList", "").
+			AddCustom(1, "Order Of Battle", "UnitList", "").
 			AddSwapper(2, "Unit Details", &swapper)
 
 		// Create the swapper panels, one for each unit type :
@@ -664,11 +664,11 @@ func forceEdit(context *router.Context) {
 		cmdPanel := swapper.AddPanel("Cmd")
 		cmdPanel.AddRow(3).
 			AddInput(2, "Command Name", "Name").
-			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
+			AddInput(1, "Nationality", "Nation")
 		cmdPanel.AddRow(3).
 			AddInput(1, "Commander", "CommanderName").
 			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-			AddInput(1, "Nationality", "Nation")
+			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
 
 		bdePanel := swapper.AddPanel("Bde")
 		bdePanel.AddRow(3).
@@ -740,6 +740,11 @@ func forceEdit(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
 		})
 
+		// Add print handlers
+		form.PrintEvent(func(evt dom.Event) {
+			dom.GetWindow().Print()
+		})
+
 		if canEdit {
 			form.SaveEvent(func(evt dom.Event) {
 				evt.PreventDefault()
@@ -767,6 +772,15 @@ func forceEdit(context *router.Context) {
 		swapper.Panels[0].Paint(&shared.ForceUnit{})
 		swapper.Select(0)
 		doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+
+		// Turn off printing for some fields
+		if canEdit {
+			r3 := doc.QuerySelector("[name=row-3]")
+			print("r3", r3)
+			r3c := r3.Class()
+			print("r3c", r3c)
+			r3c.Add("no-print")
+		}
 
 		// Action Grid
 		setActionGrid := func() {

@@ -316,9 +316,10 @@ func (s *ScenarioRPC) AddCommand(data shared.ScenarioRPCData, retval *shared.For
 		Path:     "New_Division",
 		UType:    1,
 		CmdLevel: 3,
+		Rating:   3,
 	}
 	err := DB.InsertInto("force_unit").
-		Whitelist("force_id", "path", "utype", "cmd_level").
+		Whitelist("force_id", "path", "utype", "cmd_level", "rating").
 		Record(unit).
 		Returning("id").
 		QueryScalar(&unit.ID)
@@ -349,24 +350,30 @@ func (s *ScenarioRPC) AddUnit(data shared.ForceUnitRPCData, retval *shared.Force
 		CmdLevel: 4,
 		Name:     "",
 	}
+	if unit.Path != "" {
+		unit.Path += "."
+	}
 	switch data.UType {
 	case 2:
-		unit.Path += "._Brigade"
+		unit.Path += "_Brigade"
 		unit.Bayonets = 2000
 		unit.Drill = 3
 		unit.SmallArms = 1
-		unit.Rating = 5
+		unit.Rating = 5 // default to regular morale
 	case 3:
-		unit.Path += "._Cavalry"
+		unit.Path += "_Cavalry"
 		unit.Sabres = 600
+		unit.Rating = 3 // default to Elite morale
 	case 4:
-		unit.Path += "._Battery"
+		unit.Path += "_Battery"
 		unit.Guns = 8
 		unit.GunneryType = 2
 		unit.GunCondition = 3
+		unit.Rating = 4 // default to crack line morale
 	case 5:
-		unit.Path += "._Detachment"
+		unit.Path += "_Detachment"
 	}
+
 	err := DB.InsertInto("force_unit").
 		Whitelist("name", "force_id", "path", "utype", "cmd_level", "bayonets", "drill", "small_arms",
 			"rating", "sabres", "guns", "gunnery_type", "gun_condition").
@@ -399,7 +406,7 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	if len(paths) > 0 {
 		hackPath := paths[len(paths)-1]
 		println("hackpath", hackPath)
-		hackPath = strings.NewReplacer(" ", "_", ".", "-", ",", "_").Replace(data.ForceUnit.Name)
+		hackPath = strings.NewReplacer(" ", "_", ".", "", ",", "").Replace(data.ForceUnit.Name)
 		println("hackedpath", hackPath)
 		paths[len(paths)-1] = hackPath
 		data.ForceUnit.Path = strings.Join(paths, ".")

@@ -523,8 +523,9 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 		return err
 	}
 
-	// Do the cloning op in 1 pass for all subunits of this one
-	_, err = DB.SQL(`insert into force_unit 
+	// Do the cloning op in 1 pass for all subunits of this one, IF this is a cmd
+	if oldUnit.UType == 1 {
+		_, err = DB.SQL(`insert into force_unit 
 		(force_id,
 			path,
 			name,
@@ -541,6 +542,7 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 		where force_id=$1
 		and nlevel(path)>1
 		and path <@ $2::ltree`, oldUnit.ForceID, oldUnit.Path).Exec()
+	}
 
 	if err != nil {
 		print(err.Error())

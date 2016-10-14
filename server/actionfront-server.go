@@ -87,7 +87,7 @@ func main() {
 	echocors.Init(e, Config.Debug)
 
 	// Do a database backup before we begin
-	out, err := exec.Command("../scripts/cmms-backup.sh").Output()
+	out, err := exec.Command("../scripts/backup.sh").Output()
 	if err != nil {
 		log.Println(err)
 	} else {

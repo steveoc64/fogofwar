@@ -94,21 +94,68 @@ type ForceUnit struct {
 }
 
 func (u *ForceUnit) GetBases() string {
-
-	retval := ""
+	retval := "&nbsp;"
 	if u.Bayonets > 75 {
-		retval = fmt.Sprintf("%d Bases", (u.Bayonets+225)/450)
+		cnt := ((u.Bayonets + 350) / 450)
+		if cnt > 1 {
+			if cnt%2 > 0 {
+				retval += fmt.Sprintf(" %d½ Bn", cnt/2)
+			} else {
+				retval += fmt.Sprintf(" %d Bn", cnt/2)
+			}
+		} else {
+			retval += " ½Bn"
+		}
 	}
 
 	x := u.LtCoy + u.JgCoy
 	if x > 0 {
-		retval += fmt.Sprintf(" %d Sk", x)
+		retval += fmt.Sprintf(" +%d LtCoy", x)
 	}
+
 	if u.Sabres > 0 {
-		retval += fmt.Sprintf(" %d Cav", (u.Sabres+37)/75)
+		cnt := ((u.Sabres + 60) / 75)
+		if cnt > 1 {
+			if cnt%2 > 0 {
+				retval += fmt.Sprintf(" %d½ Sqn", cnt/2)
+			} else {
+				retval += fmt.Sprintf(" %d Sqn", cnt/2)
+			}
+		} else {
+			retval += " ½Sqn"
+		}
 	}
 	if u.Guns > 0 {
-		retval += fmt.Sprintf(" %d Guns", (u.Guns+3)/4)
+		cnt := u.Guns // Actual Guns
+		gunType := ""
+		switch u.GunneryType {
+		case 1:
+			gunType = " 12lb"
+		case 2:
+			gunType = " 6lb"
+		case 3:
+			gunType = " Hw"
+		case 4:
+			gunType = " 3lb"
+		}
+
+		if cnt >= 2 { // Then its at least a section
+			if cnt >= 4 { // Then its at least a half bty
+				if cnt >= 6 { // Then its at least a Bty
+					if cnt > 8 { // Then its multiple Btys
+						retval += fmt.Sprintf(" %d Btys %s", 1+(cnt/8), gunType)
+					} else {
+						retval += " Bty" + gunType
+					}
+				} else {
+					retval += " ½Bty" + gunType
+				}
+			} else {
+				retval += " Sect" + gunType
+			}
+		} else if cnt > 0 {
+			retval += gunType
+		}
 	}
 	return retval
 }

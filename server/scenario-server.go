@@ -406,6 +406,19 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 		println("new path", data.ForceUnit.Path)
 	}
 
+	// Get the existing path
+	oldPath := ""
+	DB.SQL(`select path from force_unit where id=$1`, data.ID).QueryScalar(&oldPath)
+	if oldPath != data.ForceUnit.Path {
+		println("execute path change from ", oldPath, "to", data.ForceUnit.Path)
+		_, eerr := DB.SQL(`update force_unit 
+			set path = $1::ltree || subpath(path,1)
+			where nlevel(path) > 1 and path <@ $2::ltree`, data.ForceUnit.Path, oldPath).Exec()
+		if eerr != nil {
+			println(eerr.Error())
+		}
+	}
+
 	_, err := DB.Update("force_unit").
 		SetWhitelist(data.ForceUnit, "path", "name", "commander_name", "nation", "cmd_level", "drill", "bayonets", "small_arms",
 			"elite_arms", "lt_coy", "jg_coy", "rating", "sabres", "cav_type", "cav_rating", "guns", "gunnery_type", "gun_condition").

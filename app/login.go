@@ -68,7 +68,7 @@ func Login(username string, passwd string) {
 		// })
 		doc.QuerySelector("#menu-scenario").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("TODO - Scenarios")
+			Session.Navigate("/scenarios")
 		})
 		doc.QuerySelector("#menu-game").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()

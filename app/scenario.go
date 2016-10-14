@@ -789,7 +789,7 @@ func forceEdit(context *router.Context) {
 
 		setActionGrid()
 		drawUnitList := func() {
-			// print("draw unit list, and theUnit is", TheUnit)
+			print("draw unit list, and theUnit is", TheUnit)
 			tbody := doc.QuerySelector("#unitlist").(*dom.HTMLTableSectionElement)
 			tbody.SetInnerHTML("")
 
@@ -810,20 +810,24 @@ func forceEdit(context *router.Context) {
 				row.SetAttribute("key", fmt.Sprintf("%d", v.ID))
 				cell := row.InsertCell(-1)
 				cell.SetClass("compressed")
-				cell.SetInnerHTML(v.Path)
 				if v.ID == TheUnit.ID {
 					cell.Class().Add("highlight")
 				}
+				if v.UType == 1 {
+					cell.Class().Add("commander")
+				}
+				cell.SetInnerHTML(v.Path)
 
+				cell = row.InsertCell(-1)
+				cell.SetClass("compressed")
 				descr := ""
 				switch v.UType {
 				case 1:
 					descr = v.CommanderName
+					cell.Class().Add("commander")
 				case 2, 3, 4, 5:
 					descr = v.GetBases()
 				}
-				cell = row.InsertCell(-1)
-				cell.SetClass("compressed")
 				cell.SetInnerHTML(descr)
 			}
 
@@ -848,14 +852,17 @@ func forceEdit(context *router.Context) {
 			drawUnitList()
 		}
 
-		storeTheUnit := func() {
-			for k, v := range force.Units {
-				if v.ID == TheUnit.ID {
-					force.Units[k] = TheUnit
-					break
-				}
-			}
-		}
+		// Dont use this anymore - always get a fresh set from the server
+		// and dont try to maintain a synced version at this end
+
+		// storeTheUnit := func() {
+		// 	for k, v := range force.Units {
+		// 		if v.ID == TheUnit.ID {
+		// 			force.Units[k] = TheUnit
+		// 			break
+		// 		}
+		// 	}
+		// }
 
 		initUnitList()
 		// Change Event
@@ -888,12 +895,22 @@ func forceEdit(context *router.Context) {
 					if TheUnit.UType > 0 {
 						// print("save unit with ID", TheUnit.ID)
 						go func() {
+							newUnit := shared.ForceUnit{}
 							rpcClient.Call("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
 								Channel:   Session.Channel,
 								ID:        TheUnit.ID,
 								ForceUnit: &TheUnit,
-							}, &TheUnit)
-							storeTheUnit()
+							}, &newUnit)
+							TheUnit = newUnit
+							// Have to fetch the whole tree again, as a change in this one
+							// can have a ripple change in all the others
+							newUnits := []shared.ForceUnit{}
+							rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+								Channel: Session.Channel,
+								ID:      force.ID,
+							}, &newUnits)
+							print("got back a whole set of new units", newUnits)
+							force.Units = newUnits
 							drawUnitList()
 						}()
 					}

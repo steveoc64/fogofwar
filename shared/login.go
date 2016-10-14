@@ -40,6 +40,9 @@ type Login struct {
 	Date      *time.Time `db:"date"`
 	IPAddress string     `db:"ip_address"`
 	Channel   int        `db:"channel"`
+	Username  string     `db:"username"`
+	Email     string     `db:"email"`
+	Country   string     `db:"country"`
 }
 
 type LoginRPCData struct {

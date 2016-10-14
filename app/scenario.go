@@ -669,6 +669,11 @@ func forceEdit(context *router.Context) {
 			AddInput(1, "Commander", "CommanderName").
 			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
 			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
+		if canEdit {
+			cmdPanel.AddRow(2).
+				AddButton(1, "Delete", "Delete").
+				AddButton(1, "Copy", "Copy")
+		}
 
 		bdePanel := swapper.AddPanel("Bde")
 		bdePanel.AddRow(3).
@@ -1001,6 +1006,26 @@ func forceEdit(context *router.Context) {
 				doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement).Focus()
 			}()
 		})
+		if canEdit {
+			doc.QuerySelector("[name=Cmd-Delete]").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				go func() {
+					if w.Confirm("Delete this Command ? ... includes all sub-units") {
+						rpcClient.Call("ScenarioRPC.DeleteUnit", shared.ForceUnitRPCData{
+							Channel: Session.Channel,
+							ID:      TheUnit.ID,
+						}, &force.Units)
+						swapper.Select(0)
+						drawUnitList()
+					}
+				}()
+
+			})
+			doc.QuerySelector("[name=Cmd-Copy]").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				print("TODO - copy command")
+			})
+		}
 
 		doc.QuerySelector("[name=AddBde]").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()

@@ -442,3 +442,32 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 
 	return err
 }
+
+func (s *ScenarioRPC) DeleteUnit(data shared.ForceUnitRPCData, retval *[]shared.ForceUnit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	// Get the record to be deleted
+	oldUnit := shared.ForceUnit{}
+	err := DB.SQL(`select * from force_unit where id=$1`, data.ID).QueryStruct(&oldUnit)
+	if err != nil {
+		return err
+	}
+
+	// Kill off subunits
+	_, err = DB.SQL(`delete
+	 from force_unit 
+	 where path <@ $1::ltree`, oldUnit.Path).Exec()
+	if err != nil {
+		return err
+	}
+
+	// Kill this unit
+	_, err = DB.SQL(`delete from force_unit where id=$1`, data.ID).Exec()
+
+	logger(start, "Scenario.DeleteUnit", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	return err
+}

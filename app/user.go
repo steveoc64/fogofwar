@@ -54,6 +54,29 @@ func userList(context *router.Context) {
 
 		form.Render("onlineuser-list", "main", users)
 
+		// Add a list of logins for this user
+		l := []shared.Login{}
+		rpcClient.Call("LoginRPC.ListLast", shared.LoginRPCData{
+			Channel: Session.Channel,
+		}, &l)
+
+		lList := formulate.ListForm{}
+		lList.New("fa-signin", "Last Couple Dozen Sign-Ins")
+
+		// Define the layout
+		lList.DateColumn("Date", "Date")
+		lList.Column("Username", "Username")
+		lList.Column("Email", "Email")
+		lList.Column("IP Address", "IPAddress")
+		lList.Column("Country", "Country")
+
+		w := dom.GetWindow()
+		doc := w.Document()
+		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div.SetID("lastlogin-list")
+		doc.QuerySelector("main").AppendChild(div)
+		lList.Render("lastlogin-list", "#lastlogin-list", l)
+
 		rpcClient.Call("UserRPC.ListOffline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
@@ -84,9 +107,7 @@ func userList(context *router.Context) {
 			Session.Navigate("/user/" + key)
 		})
 
-		w := dom.GetWindow()
-		doc := w.Document()
-		div := doc.CreateElement("div").(*dom.HTMLDivElement)
+		div = doc.CreateElement("div").(*dom.HTMLDivElement)
 		div.SetID("offlineusers")
 		doc.QuerySelector("main").AppendChild(div)
 		formOffline.Render("offlineuser-list", "#offlineusers", users)

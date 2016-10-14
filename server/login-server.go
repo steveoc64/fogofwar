@@ -291,3 +291,21 @@ func (l *LoginRPC) ListByUser(data shared.LoginRPCData, retval *[]shared.Login) 
 
 	return err
 }
+
+func (l *LoginRPC) ListLast(data shared.LoginRPCData, retval *[]shared.Login) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select l.*,u.username,u.country,u.email
+		from login l
+		left join users u on u.id=l.user_id
+		order by date desc
+		limit 40`, data.ID).QueryStructs(retval)
+
+	logger(start, "Login.ListLast", conn,
+		"",
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	return err
+}

@@ -44,7 +44,7 @@ func Login(username string, passwd string) {
 
 		// Create the slideout menu once and for all
 		// Get the users name and set the menu option to that
-		loadTemplate("slidemenu", "#slidemenu-div", nil)
+		loadTemplate("slidemenu", "#slidemenu-div", Session)
 		myName := fmt.Sprintf(`%s %s`, Session.GetRank(), Session.Username)
 		w := dom.GetWindow()
 		doc := w.Document()
@@ -58,11 +58,17 @@ func Login(username string, passwd string) {
 			menu.Class().Remove("cbp-spmenu-open")
 		})
 
+		if Session.Rank > 9 {
+			doc.QuerySelector("#menu-users").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				Session.Navigate("/users")
+			})
+		}
+
 		doc.QuerySelector("#menu-settings").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
 			Session.Navigate("/settings")
 		})
-		// doc.QuerySelector("#menu-campaign").AddEventListener("click", false, func(evt dom.Event) {
 		// 	evt.PreventDefault()
 		// 	print("TODO - Campaigns")
 		// })

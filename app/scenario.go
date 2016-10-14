@@ -637,17 +637,17 @@ func forceEdit(context *router.Context) {
 		}
 
 		if canEdit {
-			form.Row(6).
-				AddButton(2, "Division", "AddCommand").
-				AddButton(1, "Brigade", "AddBde").
-				AddButton(1, "Cavalry Bde", "AddCav").
-				AddButton(1, "Artillery", "AddGun").
-				AddButton(1, "Detachment", "AddOther")
+			form.Row(5).
+				AddButton(1, "Division", "AddCommand").
+				AddButton(1, "Special", "AddOther").
+				AddButton(1, "Inf", "AddBde").
+				AddButton(1, "Cav", "AddCav").
+				AddButton(1, "Guns", "AddGun")
 		}
 
-		form.Row(3).
-			AddCustom(1, "Order Of Battle", "UnitList", "").
-			AddSwapper(2, "Unit Details", &swapper)
+		form.Row(5).
+			AddCustom(2, "Order Of Battle", "UnitList", "").
+			AddSwapper(3, "Unit Details", &swapper)
 
 		// Create the swapper panels, one for each unit type :
 		// -- unit type
@@ -967,7 +967,7 @@ func forceEdit(context *router.Context) {
 				} else {
 					// Looks like one of the bottom parts has changed
 					// print("bottom section has changed", swapper.Selected)
-					print("swapper.Selected", swapper.Selected, swapper)
+					// print("swapper.Selected", swapper.Selected, swapper)
 					panel := swapper.Current()
 					panel.Bind(&TheUnit)
 					// swapper.Panels[swapper.Selected].Bind(&TheUnit)

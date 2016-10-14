@@ -274,7 +274,7 @@ func processAsync(method string, msg shared.AsyncMessage) {
 	case "PingRPC.Ping":
 		// print("Keepalive")
 	default:
-		print("Msg:", method, "Action:", msg.Action, "ID:", msg.ID)
+		// print("Msg:", method, "Action:", msg.Action, "ID:", msg.ID)
 		fn := Session.Subscriptions[method]
 		if fn != nil {
 			go fn(msg.Action, msg.ID)

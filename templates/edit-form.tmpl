@@ -42,9 +42,7 @@
                 {{range .Fields}}
                   <div data-field-span="{{.Span}}">
                   {{if ne .Type "button"}}
-                    {{if ne .Type "checkbox"}}
                       <label>{{.Label}}</label>                  
-                    {{end}}
                   {{end}}
                   {{if eq .Type "text"}}
                     <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>

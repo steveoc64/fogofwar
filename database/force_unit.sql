@@ -18,4 +18,5 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 10	2	2nd_Division.4e_Legere	4e Legere	Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
 17	2	3rd_Division.94e_Ligne	94e Ligne	Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
 \.
-select * from force_unit;
+select * from force_unit order by id;
+select setval(pg_get_serial_sequence('force_unit','id'),(select max(id) from force_unit) ); 

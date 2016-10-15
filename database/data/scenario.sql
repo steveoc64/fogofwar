@@ -28,7 +28,7 @@ COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, no
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 5, true);
+SELECT pg_catalog.setval('scenario_id_seq', 10, true);
 
 
 --

@@ -86,6 +86,17 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: abc; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE abc (
+    path ltree
+);
+
+
+ALTER TABLE public.abc OWNER TO steve;
+
+--
 -- Name: army; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
 --
 
@@ -1418,6 +1429,14 @@ ALTER TABLE ONLY utype ALTER COLUMN id SET DEFAULT nextval('utype_id_seq'::regcl
 
 
 --
+-- Data for Name: abc; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY abc (path) FROM stdin;
+\.
+
+
+--
 -- Data for Name: army; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
@@ -1592,7 +1611,6 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 4	1	t	f	France	IV Corps	Soult	2		3	3	3
 5	1	t	f	France	V Corps	Lannes	2		2	1	3
 6	1	t	f	France	VI Corps	Ney	2		2	3	2
-7	1	t	f	France	VII Corps	Augereau	2		2	3	2
 8	1	t	f	France	Cavalry Reserve	Murat	2		3	2	3
 9	1	t	f	France	Supply		4		4	3	2
 10	1	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2
@@ -1601,8 +1619,10 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 13	1	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1
 14	1	f	t	Prussia	Supply Train		3		4	3	4
 3	1	t	f	France	III Corps	Davout	2		1	3	2
-2	1	t	f	France	I Corps	General Bernadotte	2		3	3	2
 1	1	t	f	France	Imperial Guard	Napoleon	2		1	1	1
+2	1	t	f	France	I Corps	General Bernadotte	2		3	3	2
+7	1	t	f	France	VII Corps	Augereau	2		2	2	2
+16	6	t	f	redland	II Corp	2nd Commander	2		3	3	3
 \.
 
 
@@ -1610,7 +1630,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 1, false);
+SELECT pg_catalog.setval('force_id_seq', 26, true);
 
 
 --
@@ -1619,22 +1639,167 @@ SELECT pg_catalog.setval('force_id_seq', 1, false);
 
 COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_level, drill, bayonets, small_arms, elite_arms, lt_coy, jg_coy, rating, sabres, cav_type, cav_rating, guns, gunnery_type, gun_condition, horse_guns) FROM stdin;
 13	2	2nd_Division.45e_Ligne	45e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-4	1	Infantry_Division	Infantry Division	Lefebvre	France	1	3	1	0	0	0	0	0	5	0	0	0	0	0	2	f
 14	2	2nd_Division.54e_Ligne	54e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-5	1	Cavalry_Division	Cavalry Division	Bessieres	France	1	3	1	0	0	0	0	0	5	0	0	0	0	0	2	f
 7	2	2eme_Division	2eme Division	Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-18	2	3rd_Division.95e_Ligne	95e Ligne	Drouet	France	2	4	5	2600	1	0	0	0	5	0	0	0	0	0	0	f
-16	2	3rd_Division.27e_Legere	27e Legere	Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	3	0	f
 11	2	1st_Division.32e_Ligne	32e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
 6	2	1eme_Division	1eme Division	de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-8	2	3rd_Division	3rd Division	Drouet	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 12	2	1st_Division.96e_Ligne	96e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 9	2	1st_Division.9e_Legere	9e Legere	de l'Eltang	France	2	4	6	2600	1	2	0	0	4	0	0	0	0	3	0	f
 30	2	1st_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
 31	2	2nd_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
-32	2	3rd_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
 10	2	2nd_Division.4e_Legere	4e Legere	Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
-17	2	3rd_Division.94e_Ligne	94e Ligne	Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
+42	1	Infantry_Division.1e_Grenadiers	1e Grenadiers		France	2	4	5	2400	1	0	0	0	1	0	0	0	0	0	0	f
+33	2	Cav_Reserve	Cav Reserve	Tilley	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+44	1	Infantry_Division.2e_Grenadiers	2e Grenadiers		France	2	1	5	2400	1	0	0	0	1	0	0	0	0	0	0	f
+34	2	Cav_Reserve.2e_Hussar	2e Hussar		France	3	4	0	0	0	0	0	0	3	300	2	3	0	0	0	f
+48	1	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			4	4	0	0	0	0	0	0	4	0	0	0	16	1	2	f
+40	1	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval		France	3	4	0	0	0	0	0	0	3	600	3	1	0	0	0	f
+35	2	Cav_Reserve.4e_Hussar	4e Hussar		France	3	1	0	0	0	0	0	0	3	422	2	4	0	0	0	f
+36	2	Artillery_Reserve	Artillery Reserve	Eble	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+45	1	Infantry_Division.1e_Chasseurs	1e Chasseurs		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
+37	2	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+41	1	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval		France	3	1	0	0	0	0	0	0	3	400	8	1	0	0	0	f
+50	1	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			4	1	0	0	0	0	0	0	4	0	0	0	24	2	1	f
+38	1	Guard_Artillery	Guard Artillery	de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
+47	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
+4	1	Infantry_Division	Infantry Division	Lefebvre	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+46	1	Infantry_Division.Foot_Dragoons	Foot Dragoons		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
+5	1	Cavalry_Division	Cavalry Division	Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
+53	3	1eme_Division.13e_Legere	13e Legere		France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f
+52	3	1eme_Division	1eme Division	Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+61	3	2eme_Division.108e_Ligne	108e Ligne		France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f
+56	3	1eme_Division.51e_Ligne	51e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+49	1	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	3	1	f
+54	3	1eme_Division.17e_Ligne	17e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+58	3	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+57	3	1eme_Division.61e_Ligne	61e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+55	3	1eme_Division.30e_Ligne	30e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+8	2	3eme_Division	3eme Division	Drouet	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
+59	3	2eme_Division	2eme Division	Friant	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+18	2	3eme_Division.95e_Ligne	95e Ligne	Drouet	France	2	4	5	2600	1	0	0	0	5	0	0	0	0	0	0	f
+16	2	3eme_Division.27e_Legere	27e Legere	Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	3	0	f
+32	2	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	2	3	f
+17	2	3eme_Division.94e_Ligne	94e Ligne	Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
+100	4	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+62	3	2eme_Division.33e_Ligne	33e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+83	4	2eme_Division	2eme Division	Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+91	4	2eme_Division.28e_Ligne	28e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+79	4	1eme_Division.35e_Ligne	35e Ligne		France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+73	3	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+65	3	2eme_Division.48e_Ligne	48e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+64	3	2eme_Division.111e_Ligne	111e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+97	4	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy		France/Corsica	2	1	6	1300	1	2	0	1	3	0	0	0	0	0	0	f
+85	4	2eme_Division.46e_Ligne	46e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+74	3	Cav_Bde	Cav Bde	Viallanes	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+66	3	3eme_Division	3eme Division	Gudin	France	1	1	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+80	4	1eme_Division.43e_Ligne	43e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+67	3	3eme_Division.12e_Ligne	12e Ligne		France	2	1	5	1300	1	0	0	0	5	0	0	0	0	0	0	f
+88	4	2eme_Division.24e_Legere	24e Legere		France	2	1	6	2000	1	0	0	0	4	0	0	0	0	0	0	f
+71	3	3eme_Division.21e_Ligne	21e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+69	3	3eme_Division.25e_Ligne	25e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+84	4	2eme_Division.4e_Ligne	4e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+70	3	3eme_Division.85e_Ligne	85e Ligne		France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f
+82	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+75	3	Cav_Bde.1e_Chasseur	1e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	3	0	0	0	f
+76	3	Cav_Bde.2e_Chasseur	2e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	3	0	0	0	f
+72	3	Corps_Artillery	Corps Artillery	Hannicque	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+77	4	1eme_Division	1eme Division	St Hilaire	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+95	4	3eme_Division.26e_Legere	26e Legere		France	2	4	6	1600	1	0	0	0	3	0	0	0	0	0	0	f
+78	4	1eme_Division.10e_Legere	10e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
+92	4	2eme_Division.57e_Ligne	57e Ligne		France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
+106	5	Cav_Bde	Cav Bde	Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+93	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+98	4	3eme_Division.18e_Ligne	18e Ligne		France	2	4	5	1800	1	0	0	0	4	0	0	0	0	0	0	f
+63	3	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+68	3	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+103	4	Corps_Cavaly.22e_Chasseur	22e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f
+90	4	1eme_Division.55e_Ligne	55e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
+101	4	Corps_Cavaly	Corps Cavaly	Guyot	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+94	4	3eme_Division	3eme Division	LeGrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+99	4	3eme_Division.75e_Ligne	75e Ligne		France	2	4	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
+96	4	3eme_Division.Po_Legere	Po Legere		France/Italy	2	4	6	1000	1	2	2	0	3	0	0	0	0	0	0	f
+105	4	Corps_Artillery.Heavy_Bty	Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
+104	4	Corps_Artillery	Corps Artillery		France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+102	4	Corps_Cavaly.11e_Chasseur	11e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
+107	5	Cav_Bde.10e_Hussar	10e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
+108	5	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy		France	3	1	0	0	0	0	0	0	3	600	2	3	0	0	0	f
+109	5	Corps_Artillery	Corps Artillery	Careil	France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+110	5	Corps_Artillery.Heavy_Foot	Heavy Foot			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
+111	5	1eme_Division	1eme Division	Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+112	5	1eme_Division.17e_Legere	17e Legere		France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f
+113	5	1eme_Division.34e_Ligne	34e Ligne		France	2	4	5	2500	1	0	0	0	5	0	0	0	0	0	0	f
+114	5	1eme_Division.40e_Ligne	40e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+115	5	1eme_Division.64e_Ligne	64e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+125	6	Cav_Bde.9e_Hussar	9e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
+116	5	1eme_Division.88e_Ligne	88e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+117	5	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+132	6	1eme_Division.39e_Ligne	39e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+118	5	2eme_Division	2eme Division	Gazan	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+142	7	Corps_Cav.7e_Chasseur	7e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
+133	6	1eme_Division.69e_Ligne	69e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+119	5	2eme_Division.21e_Legere	21e Legere		France	2	4	6	1800	1	0	0	0	5	0	0	0	0	0	0	f
+126	6	Cav_Bde.10e_Chasseur	10e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
+134	6	1eme_Division.76e_Ligne	76e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+127	6	Corps_Artillery	Corps Artillery		France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+120	5	2eme_Division.28e_Legere	28e Legere		France	2	4	6	900	1	0	0	0	3	0	0	0	0	0	0	f
+139	6	2eme_Division.59e_Ligne	59e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+128	6	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
+121	5	2eme_Division.100e_Ligne	100e Ligne		France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
+122	5	2eme_Division.103e_Ligne	103e Ligne		France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
+129	6	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	1	2	f
+123	5	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+135	6	2eme_Division	2eme Division	Gardanne	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+130	6	1eme_Division	1eme Division	Marchand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+124	6	Cav_Bde	Cav Bde	Charbanais	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+138	6	2eme_Division.50e_Ligne	50e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+150	7	1eme_Division.105e_Ligne	105e Ligne		France	2	1	3	1700	1	0	0	0	5	0	0	0	0	0	0	f
+140	6	2eme_Division.27e_Ligne	27e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+143	7	Corps_Cav.20e_Chasseur	20e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f
+131	6	1eme_Division.6e_Legere	6e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
+136	6	2eme_Division.25e_Legere	25e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
+148	7	1eme_Division.14e_Ligne	14e Ligne		France	2	4	5	700	1	0	0	0	4	0	0	0	0	0	0	f
+141	7	Corps_Cav	Corps Cav	Durosnel	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+144	7	Corps_Artillery	Corps Artillery		France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+155	7	2eme_Division.63e_Ligne	63e Ligne		France	2	1	5	700	1	0	0	0	5	0	0	0	0	0	0	f
+151	7	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+145	7	Corps_Artillery.Heavy_Bty	Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
+147	7	1eme_Division.16e_Legere	16e Legere		France	2	4	6	2700	1	0	0	0	4	0	0	0	0	0	0	f
+149	7	1eme_Division.44e_Ligne	44e Ligne		France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
+146	7	1eme_Division	1eme Division	Desjardin	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+154	7	2eme_Division.24e_Ligne	24e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
+153	7	2eme_Division.7e_Legere	7e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
+152	7	2eme_Division	2eme Division	Bierre	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+156	7	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt		Hesse	2	1	1	800	1	0	0	0	4	0	0	0	0	0	0	f
+158	7	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+159	8	Corps_Artillery	Corps Artillery		France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+157	7	2eme_Division.Allied_Nassau	Allied Nassau		Nassau	2	1	5	400	1	0	0	0	4	0	0	0	0	0	0	f
+160	8	Corps_Artillery.1e_Horse	1e Horse			4	4	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+161	8	Corps_Artillery.2e_Horse	2e Horse			4	1	0	0	0	0	0	0	4	0	0	0	8	2	2	f
+162	8	1e_Cuirassier_Div	1e Cuirassier Div	Nansouty	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+164	8	1e_Dragoon_Div	1e Dragoon Div	Klein	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+163	8	2e_Cuirassier_Div	2e Cuirassier Div	d'Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+165	8	2e_Dragoon_Div	2e Dragoon Div	Grouchy	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+173	8	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere		France	3	4	0	0	0	0	0	0	3	600	1	4	0	0	0	f
+166	8	3e_Dragoon_Div	3e Dragoon Div	Beaumont	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+184	9	Supply_Train.Supply_Detachment	Supply Detachment			5	4	3	900	1	2	4	0	6	140	3	4	0	0	0	f
+167	8	4e_Dragoon_Div	4e Dragoon Div	Sahut	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+174	8	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice		France	3	1	0	0	0	0	0	0	3	600	1	4	0	0	0	f
+168	8	Light_Div	Light Div	Lasalle	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+182	8	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
+181	8	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
+183	9	Supply_Train	Supply Train		France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+175	8	2e_Dragoon_Div.Bde_Roget	Bde Roget		France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f
+169	8	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance		France	3	4	0	0	0	0	0	0	3	600	9	2	0	0	0	f
+176	8	2e_Dragoon_Div.Bde_Milet	Bde Milet		France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f
+170	8	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye		France	3	1	0	0	0	0	0	0	3	1300	1	2	0	0	0	f
+187	16	Kill_this_one_as_well	Kill this one as well			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+171	8	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz		France	3	4	0	0	0	0	0	0	3	600	5	4	0	0	0	f
+180	8	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche		France	3	1	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
+172	8	1e_Dragoon_Div.Bde_Picard	Bde Picard		France	3	1	0	0	0	0	0	0	3	600	5	4	0	0	0	f
+179	8	4e_Dragoon_Div.Bde_Margaron	Bde Margaron		France	3	4	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
+188	16	Kill_this_one_as_well.2nd_Special_Forces_killer_BDE	2nd Special Forces killer BDE			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
+177	8	3e_Dragoon_Div.Bde_Boye	Bde Boye		France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f
+178	8	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg		France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f
 \.
 
 
@@ -1642,7 +1807,7 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 32, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 214, true);
 
 
 --
@@ -1987,6 +2152,155 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 1	2016-10-14 07:27:19.346005+10:30	127.0.0.1:39394	1
 1	2016-10-14 07:29:11.290625+10:30	127.0.0.1:39596	1
 1	2016-10-14 07:33:01.790536+10:30	127.0.0.1:40240	1
+1	2016-10-14 08:11:55.584997+10:30	127.0.0.1:43552	1
+1	2016-10-14 13:02:16.633575+10:30	127.0.0.1:38634	1
+1	2016-10-14 13:04:28.536182+10:30	127.0.0.1:38830	1
+1	2016-10-14 13:06:44.61775+10:30	127.0.0.1:39082	1
+1	2016-10-14 13:08:53.177493+10:30	127.0.0.1:39296	1
+1	2016-10-14 13:10:30.838141+10:30	127.0.0.1:39380	1
+1	2016-10-14 13:16:16.051754+10:30	127.0.0.1:40114	1
+1	2016-10-14 13:23:06.986373+10:30	127.0.0.1:40456	1
+1	2016-10-14 13:28:04.905905+10:30	127.0.0.1:41194	1
+1	2016-10-14 13:29:43.229428+10:30	127.0.0.1:41382	1
+1	2016-10-14 13:30:25.558415+10:30	127.0.0.1:41476	2
+1	2016-10-14 13:31:24.878385+10:30	127.0.0.1:41588	1
+1	2016-10-14 13:33:06.902678+10:30	127.0.0.1:41786	1
+1	2016-10-14 13:34:01.385231+10:30	127.0.0.1:41910	1
+1	2016-10-14 13:39:13.248433+10:30	127.0.0.1:42410	1
+1	2016-10-14 13:40:02.492693+10:30	127.0.0.1:42558	1
+1	2016-10-14 13:43:59.545342+10:30	127.0.0.1:43118	1
+1	2016-10-14 13:44:26.795212+10:30	127.0.0.1:43200	2
+1	2016-10-14 13:45:05.029392+10:30	127.0.0.1:43272	1
+1	2016-10-14 13:45:28.133002+10:30	127.0.0.1:43338	2
+1	2016-10-14 13:46:03.669482+10:30	127.0.0.1:43448	1
+1	2016-10-14 14:17:43.714792+10:30	127.0.0.1:46262	1
+1	2016-10-14 14:22:03.949196+10:30	127.0.0.1:46656	1
+1	2016-10-14 14:26:31.058896+10:30	127.0.0.1:47060	1
+1	2016-10-14 14:32:22.512558+10:30	127.0.0.1:47528	1
+1	2016-10-14 14:34:49.921704+10:30	127.0.0.1:47776	1
+1	2016-10-14 14:35:20.239382+10:30	127.0.0.1:47850	1
+1	2016-10-14 14:38:39.821763+10:30	127.0.0.1:48122	1
+1	2016-10-14 14:39:54.16981+10:30	127.0.0.1:48254	1
+1	2016-10-14 14:50:27.769328+10:30	127.0.0.1:49168	1
+1	2016-10-14 14:50:53.160222+10:30	127.0.0.1:49226	1
+1	2016-10-14 14:57:50.851115+10:30	127.0.0.1:49792	1
+1	2016-10-14 15:01:10.040849+10:30	127.0.0.1:50102	1
+1	2016-10-14 15:04:47.829461+10:30	127.0.0.1:50400	1
+1	2016-10-14 15:08:47.798964+10:30	127.0.0.1:50748	1
+1	2016-10-14 15:13:08.72971+10:30	127.0.0.1:51132	1
+1	2016-10-14 15:19:26.40323+10:30	127.0.0.1:51640	1
+1	2016-10-14 15:21:20.823275+10:30	127.0.0.1:51870	1
+1	2016-10-14 15:23:40.481218+10:30	127.0.0.1:52086	1
+1	2016-10-14 15:25:04.487627+10:30	127.0.0.1:52232	1
+1	2016-10-14 15:28:16.466499+10:30	127.0.0.1:52500	1
+1	2016-10-14 15:29:06.936241+10:30	127.0.0.1:52600	2
+1	2016-10-14 15:30:16.747894+10:30	127.0.0.1:52750	1
+1	2016-10-14 16:09:17.795682+10:30	127.0.0.1:55938	1
+1	2016-10-14 16:12:46.558233+10:30	127.0.0.1:56284	1
+1	2016-10-14 16:36:07.443259+10:30	127.0.0.1:58710	1
+1	2016-10-14 16:41:43.127211+10:30	127.0.0.1:59216	1
+1	2016-10-14 16:42:17.825285+10:30	127.0.0.1:59342	2
+1	2016-10-14 16:43:30.695415+10:30	127.0.0.1:59468	1
+1	2016-10-14 16:44:12.200855+10:30	127.0.0.1:59540	1
+1	2016-10-14 16:45:50.018469+10:30	127.0.0.1:59676	1
+1	2016-10-14 16:49:17.94491+10:30	127.0.0.1:59962	1
+1	2016-10-14 16:50:10.949788+10:30	127.0.0.1:60056	1
+1	2016-10-14 16:52:23.229862+10:30	127.0.0.1:60274	1
+1	2016-10-14 16:56:42.802513+10:30	127.0.0.1:60664	1
+1	2016-10-14 16:57:57.902292+10:30	127.0.0.1:60786	1
+1	2016-10-14 17:00:23.659684+10:30	127.0.0.1:60996	1
+1	2016-10-14 17:04:09.345438+10:30	127.0.0.1:33100	2
+1	2016-10-14 17:07:06.937973+10:30	127.0.0.1:33382	1
+1	2016-10-14 17:08:53.044346+10:30	127.0.0.1:33526	1
+1	2016-10-14 17:30:34.620447+10:30	127.0.0.1:35502	1
+1	2016-10-14 17:31:47.477431+10:30	127.0.0.1:35662	1
+1	2016-10-14 17:36:21.084375+10:30	127.0.0.1:36062	1
+1	2016-10-14 17:38:00.019263+10:30	127.0.0.1:36240	1
+1	2016-10-14 17:44:53.980332+10:30	127.0.0.1:36866	1
+1	2016-10-14 17:48:19.335486+10:30	127.0.0.1:37180	1
+1	2016-10-14 17:54:13.492207+10:30	127.0.0.1:37682	1
+1	2016-10-14 17:56:09.998375+10:30	127.0.0.1:37900	2
+1	2016-10-14 17:56:46.978033+10:30	127.0.0.1:38000	3
+1	2016-10-14 18:01:40.633366+10:30	127.0.0.1:38454	1
+1	2016-10-14 18:03:00.70295+10:30	127.0.0.1:38592	1
+1	2016-10-14 18:04:11.155175+10:30	127.0.0.1:38716	1
+1	2016-10-14 18:06:16.36706+10:30	127.0.0.1:38854	1
+1	2016-10-14 18:35:08.666976+10:30	127.0.0.1:42576	1
+1	2016-10-14 19:07:36.518836+10:30	127.0.0.1:45300	1
+1	2016-10-14 19:10:35.676608+10:30	127.0.0.1:45510	1
+1	2016-10-14 19:12:16.748802+10:30	127.0.0.1:45736	1
+1	2016-10-14 19:17:03.505615+10:30	127.0.0.1:46080	1
+1	2016-10-14 19:22:31.998198+10:30	127.0.0.1:46614	1
+1	2016-10-14 19:26:34.49004+10:30	127.0.0.1:47006	1
+1	2016-10-14 19:27:18.051969+10:30	127.0.0.1:47100	2
+1	2016-10-14 19:29:45.64951+10:30	127.0.0.1:47362	1
+1	2016-10-14 19:45:26.248961+10:30	127.0.0.1:48542	1
+1	2016-10-14 20:12:35.461906+10:30	127.0.0.1:51120	1
+1	2016-10-14 20:19:13.705212+10:30	127.0.0.1:51702	1
+1	2016-10-14 20:19:33.454666+10:30	127.0.0.1:51786	2
+1	2016-10-14 20:21:19.966791+10:30	127.0.0.1:52008	1
+2	2016-10-14 20:22:11.286858+10:30	192.168.1.105:50008	2
+1	2016-10-14 20:38:04.198827+10:30	127.0.0.1:53450	1
+1	2016-10-14 20:45:53.650187+10:30	127.0.0.1:54060	1
+1	2016-10-15 06:17:22.569156+10:30	127.0.0.1:44014	1
+1	2016-10-15 06:25:54.251344+10:30	127.0.0.1:44838	1
+1	2016-10-15 06:30:56.21691+10:30	127.0.0.1:45280	1
+1	2016-10-15 06:57:48.878489+10:30	127.0.0.1:47590	1
+1	2016-10-15 07:03:05.678585+10:30	127.0.0.1:48110	1
+1	2016-10-15 07:04:02.32717+10:30	127.0.0.1:48226	1
+1	2016-10-15 07:06:53.166336+10:30	127.0.0.1:48512	1
+1	2016-10-15 08:07:12.973586+10:30	127.0.0.1:54044	1
+1	2016-10-15 08:09:57.514605+10:30	127.0.0.1:54348	2
+1	2016-10-15 08:11:50.345377+10:30	127.0.0.1:54550	1
+1	2016-10-15 08:20:34.592312+10:30	127.0.0.1:56018	2
+1	2016-10-15 08:29:22.481985+10:30	127.0.0.1:56794	1
+1	2016-10-15 08:35:54.048992+10:30	127.0.0.1:57382	1
+1	2016-10-15 08:39:13.324077+10:30	127.0.0.1:57832	1
+1	2016-10-15 08:45:16.240859+10:30	127.0.0.1:58370	1
+1	2016-10-15 08:46:50.025152+10:30	127.0.0.1:58566	1
+1	2016-10-15 09:01:55.402563+10:30	127.0.0.1:59788	1
+1	2016-10-15 09:04:23.913528+10:30	127.0.0.1:60042	1
+1	2016-10-15 09:12:03.394107+10:30	127.0.0.1:60646	1
+1	2016-10-15 09:13:43.284927+10:30	127.0.0.1:60820	1
+1	2016-10-15 09:18:26.630621+10:30	127.0.0.1:33014	1
+1	2016-10-15 09:27:26.417509+10:30	127.0.0.1:33770	1
+1	2016-10-15 09:32:18.864519+10:30	127.0.0.1:34244	1
+1	2016-10-15 09:39:16.940275+10:30	127.0.0.1:34948	1
+1	2016-10-15 09:42:59.338615+10:30	127.0.0.1:35320	1
+1	2016-10-15 09:53:03.753359+10:30	127.0.0.1:36152	1
+1	2016-10-15 09:58:27.929267+10:30	127.0.0.1:36626	1
+1	2016-10-15 10:00:46.109403+10:30	127.0.0.1:36878	1
+1	2016-10-15 10:02:31.007187+10:30	127.0.0.1:37032	1
+1	2016-10-15 10:06:48.271169+10:30	127.0.0.1:37422	1
+1	2016-10-15 10:13:54.446306+10:30	127.0.0.1:38010	1
+1	2016-10-15 10:19:22.771554+10:30	127.0.0.1:38534	1
+1	2016-10-15 10:20:30.464376+10:30	127.0.0.1:38680	1
+1	2016-10-15 10:23:22.38721+10:30	127.0.0.1:38680	1
+1	2016-10-15 10:27:36.329639+10:30	127.0.0.1:39298	1
+1	2016-10-15 10:30:36.142438+10:30	127.0.0.1:39646	1
+1	2016-10-15 10:36:08.91514+10:30	127.0.0.1:40218	1
+1	2016-10-15 10:36:46.064617+10:30	127.0.0.1:40218	1
+1	2016-10-15 10:44:38.273997+10:30	127.0.0.1:40976	1
+1	2016-10-15 10:45:13.987914+10:30	127.0.0.1:41106	2
+1	2016-10-15 10:46:48.631336+10:30	127.0.0.1:41252	1
+1	2016-10-15 10:49:47.101739+10:30	127.0.0.1:41494	1
+1	2016-10-15 10:53:15.368819+10:30	127.0.0.1:41846	1
+1	2016-10-15 10:57:53.058577+10:30	127.0.0.1:42242	1
+1	2016-10-15 10:59:39.309414+10:30	127.0.0.1:42408	1
+1	2016-10-15 11:00:53.082114+10:30	127.0.0.1:42568	1
+1	2016-10-15 11:01:18.617516+10:30	127.0.0.1:42640	2
+1	2016-10-15 11:10:43.219344+10:30	127.0.0.1:45750	1
+1	2016-10-15 11:11:55.50065+10:30	127.0.0.1:45944	1
+1	2016-10-15 11:14:51.295773+10:30	127.0.0.1:46236	1
+1	2016-10-15 11:24:30.433105+10:30	127.0.0.1:47212	1
+1	2016-10-15 11:43:33.032527+10:30	127.0.0.1:48824	1
+1	2016-10-15 11:44:38.888277+10:30	127.0.0.1:48952	1
+1	2016-10-15 11:45:01.482319+10:30	127.0.0.1:49028	2
+1	2016-10-15 11:46:21.439524+10:30	127.0.0.1:49178	1
+1	2016-10-15 11:49:37.075149+10:30	127.0.0.1:49494	1
+1	2016-10-15 11:51:36.726554+10:30	127.0.0.1:49688	1
+1	2016-10-15 11:53:34.898688+10:30	127.0.0.1:49886	1
+1	2016-10-15 11:53:51.735956+10:30	127.0.0.1:49886	1
 \.
 
 
@@ -2059,7 +2373,7 @@ COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, no
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 5, true);
+SELECT pg_catalog.setval('scenario_id_seq', 10, true);
 
 
 --
@@ -2162,8 +2476,8 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 --
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
-2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:44959	Australia	http://witchwoodstudio.com		f	t	t
-1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:40240	Australia	http://15mm-madness.blogspot.com		f	f	t
+2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:50008	Australia	http://witchwoodstudio.com		f	t	t
+1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:49886	Australia	http://15mm-madness.blogspot.com		f	f	t
 \.
 
 

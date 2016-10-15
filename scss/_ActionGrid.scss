@@ -58,7 +58,9 @@
 		width: 100%;
 		margin: 0 0 0.25em;
 		padding: 0 0 0.5em;
-		color: $sbs-blue;
+		// color: $sbs-blue;
+		// color: rgba(74, 65, 56, 0.82);
+		color: $dark-mud;
 		border-top: 3px solid $sbs-box;
 
 		// phones
@@ -72,7 +74,7 @@
 
 	.action__icon {
 		transition: 0.6s;
-		color: $sbs-blue;
+		color: $mud-grey;
 		width: 100%;
 		font-size: 4.0rem;
 
@@ -103,20 +105,20 @@
 	}
 
 	&:hover {
-		transition: 0.3s;
+		transition: 0.2s;
 		background-color: #ffef;
 		// outline: 1px solid $sbs-ltblue;
 		.action__title {
-			transition: 0.4s;
-			border-top: 3px solid $sbs-ltblue;	
+			transition: 0.2s;
+			border-top: 3px solid $light-mud;
 		}
 		.action__icon {
 			transition: 0.4s;
-			color: $sbs-ltblue;
+			color: $light-mud;
 			width: 100%;
 		}
 		.action__text {
-			border-bottom: 3px solid $sbs-ltblue;	
+			border-bottom: 3px solid $light-mud;
 		}
 	}
 

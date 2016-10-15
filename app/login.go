@@ -92,12 +92,35 @@ func Login(username string, passwd string) {
 			evt.PreventDefault()
 			print("TODO - Contact")
 		})
+
 		doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			if w.Confirm("Really Log Out ?") {
-				Logout()
-			}
+			el := doc.QuerySelector("#md-confirm-signout")
+			el.Class().Add("md-show")
 		})
+
+		// if el := doc.QuerySelector(".md-confirm-signout"); el != nil {
+		// 	el.AddEventListener("click", false, Logout)
+		// }
+
+		// el.AddEventListener("click", false, func(evt dom.Event) {
+		// 	doc.QuerySelector("#confirm-delete").Class().Add("md-show")
+		// })
+
+		// if el := doc.QuerySelector(".md-close-del"); el != nil {
+		// 	el.AddEventListener("click", false, func(evt dom.Event) {
+		// 		doc.QuerySelector("#confirm-delete").Class().Remove("md-show")
+		// 	})
+		// }
+
+		// if el := doc.QuerySelector("#confirm-delete"); el != nil {
+		// 	el.AddEventListener("keyup", false, func(evt dom.Event) {
+		// 		if evt.(*dom.KeyboardEvent).KeyCode == 27 {
+		// 			evt.PreventDefault()
+		// 			doc.QuerySelector("#confirm-delete").Class().Remove("md-show")
+		// 		}
+		// 	})
+		// }
 		Session.Navigate("/")
 	} else {
 		print("login failed")
@@ -149,6 +172,20 @@ func initForms() {
 		evt.PreventDefault()
 		Session.Navigate("/")
 	})
+
+	doc.QuerySelector("#md-cancel-signout").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		el := doc.QuerySelector("#md-confirm-signout")
+		el.Class().Remove("md-show")
+	})
+
+	doc.QuerySelector("#md-really-signout").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		el := doc.QuerySelector("#md-confirm-signout")
+		el.Class().Remove("md-show")
+		Logout()
+	})
+
 }
 
 func signIn(context *router.Context) {

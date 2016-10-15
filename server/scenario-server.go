@@ -414,7 +414,7 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	if len(paths) > 0 {
 		hackPath := paths[len(paths)-1]
 		println("hackpath", hackPath)
-		hackPath = strings.NewReplacer(" ", "_", ".", "", ",", "").Replace(data.ForceUnit.Name)
+		hackPath = strings.NewReplacer("/", "_", " ", "_", ".", "", ",", "").Replace(data.ForceUnit.Name)
 		println("hackedpath", hackPath)
 		paths[len(paths)-1] = hackPath
 		data.ForceUnit.Path = strings.Join(paths, ".")
@@ -555,6 +555,73 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 	logger(start, "Scenario.CloneUnit", conn,
 		fmt.Sprintf("ID %d", data.ID),
 		fmt.Sprintf("New Total of %d Units", len(*retval)))
+
+	return err
+}
+
+func (s *ScenarioRPC) DeleteForce(data shared.ForceRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	// get the force to be deleted, and check that the scenario is owned by this user
+	force := shared.Force{}
+	scen := shared.Scenario{}
+	DB.SQL(`select * from force where id=$1`, data.ID).QueryStruct(&force)
+	DB.SQL(`select * from scenario where id=$1`, force.ScenarioID).QueryStruct(&scen)
+	if scen.AuthorID != conn.UserID {
+		return errors.New("Cant delete someone else scenario")
+	}
+
+	_, err := DB.SQL(`delete from force where id=$1`, data.ID).Exec()
+	if err != nil {
+		println(err.Error())
+	} else {
+		*done = true
+
+		DB.SQL(`delete from force_unit where force_id=$1`, data.ID).Exec()
+	}
+
+	logger(start, "Scenario.DeleteForce", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		"")
+
+	return err
+}
+
+func (s *ScenarioRPC) Delete(data shared.ScenarioRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.SQL(`delete from scenario where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	if err != nil {
+		println(err.Error())
+	} else {
+		*done = true
+
+		_, eerr := DB.SQL(`delete from force_unit u
+		 where u.force_id in
+		 (select f.id
+		 	from force f
+		 	where f.scenario_id=$1)`, data.ID).Exec()
+		if eerr != nil {
+			println(eerr.Error())
+		}
+
+		_, eerr = DB.SQL(`delete 
+			from force 
+			where scenario_id=$1`, data.ID).Exec()
+		if eerr != nil {
+			println(eerr.Error())
+		}
+	}
+
+	logger(start, "Scenario.Delete", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		"")
 
 	return err
 }

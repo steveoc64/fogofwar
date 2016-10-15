@@ -2,18 +2,25 @@
 /*http://tympanus.net/codrops/2013/04/17/slide-and-push-menus/*/
 
 .cbp-spmenu {
-	background: #47a3da;
+	// background: #47a3da;
+	// background: rgba(20,100,60,0.8);
+	// background-color: rgba(0,48,0,0.2);
+	// background-color: rgba(68, 70, 45, 0.8);
+	background-color: rgb(115, 117, 89);
 	position: fixed;
 	overflow: scroll;
+	// transition: 0.9s all;
 }
 
 .cbp-spmenu h3 {
-	color: #afdefa;
+	// color: #afdefa;
+	color: #ddc;
 	font-size: 2.2rem;
 	padding: 20px;
 	margin: 0;
 	font-weight: 300;
-	background: #0d77b6;
+	// background: #0d77b6;
+	background-color: rgba(68, 70, 45, 1);
 }
 
 .cbp-spmenu a {
@@ -24,7 +31,8 @@
 }
 
 .cbp-spmenu a:hover {
-	background: #258ecd;
+	// background: #258ecd;
+	background-color: rgba(68, 70, 45, 0.9);
 }
 
 .cbp-spmenu a:active {
@@ -42,7 +50,8 @@
 }
 
 .cbp-spmenu-vertical a {
-	border-bottom: 1px solid #258ecd;
+	// border-bottom: 1px solid #258ecd;
+	border-bottom: 1px solid rgba(44,22,00,.3);
 	padding: 1em;
 }
 

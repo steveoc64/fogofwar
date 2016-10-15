@@ -8,3 +8,4 @@ copy scenario(author_id,name,year,descr) from stdin;
 \.
 -- update scenario set public = false where id=5;
 select * from scenario;
+select setval(pg_get_serial_sequence('scenario','id'),(select max(id) from scenario) ); 

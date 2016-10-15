@@ -112,10 +112,11 @@ func scenarioEdit(context *router.Context) {
 		}, &data)
 
 		form := formulate.EditForm{}
+		canEdit := data.AuthorID == Session.UserID
 
 		// Layout the fields
 
-		if data.AuthorID == Session.UserID {
+		if canEdit {
 
 			form.New("fa-sitemap", "Edit Scenario Details - "+data.Name)
 
@@ -139,35 +140,34 @@ func scenarioEdit(context *router.Context) {
 			form.Row(1).
 				AddBigTextarea(1, "Notes", "Notes")
 
-			// form.Row(2).
-			// 	AddTextarea(1, "Red Briefing", "RedBrief").
-			// 	AddTextarea(1, "Blue Briefing", "BlueBrief")
+			form.DeleteEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				go func() {
+					done := false
+					err := rpcClient.Call("ScenarioRPC.Delete", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      data.ID,
+					}, &done)
+					if err != nil {
+						dom.GetWindow().Alert(err.Error())
+					} else {
+						Session.Navigate("/scenarios")
+					}
+				}()
+			})
 
-			// form.DeleteEvent(func(evt dom.Event) {
-			// 	evt.PreventDefault()
-			// 	go func() {
-			// 		data := shared.ScenarioRPCData{
-			// 			Channel:  Session.Channel,
-			// 			Scenario: &s,
-			// 		}
-			// 		done := false
-			// 		rpcClient.Call("ScenarioRPC.Delete", data, &done)
-			// 		Session.Navigate("/scenario")
-			// 	}()
-			// })
-
-			form.SaveEvent(func(evt dom.Event) {
+			// Autosave on change
+			form.ChangeEvent(func(evt dom.Event) {
 				evt.PreventDefault()
 				form.Bind(&data)
-
-				RPCdata := shared.ScenarioRPCData{
-					Channel:  Session.Channel,
-					ID:       id,
-					Scenario: &data,
-				}
 				go func() {
-					rpcClient.Call("ScenarioRPC.Update", RPCdata, &data)
-					Session.Navigate("/scenarios")
+					newData := shared.Scenario{}
+					rpcClient.Call("ScenarioRPC.Update", shared.ScenarioRPCData{
+						Channel:  Session.Channel,
+						ID:       id,
+						Scenario: &data,
+					}, &newData)
+					data = newData
 				}()
 			})
 
@@ -214,7 +214,6 @@ func scenarioEdit(context *router.Context) {
 		form.ActionGrid("scenario-actions", "#action-grid", data, func(url string) {
 			Session.Navigate(url)
 		})
-
 		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
 
 	}()
@@ -265,17 +264,18 @@ func scenarioRed(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
-		form.SaveEvent(func(evt dom.Event) {
+		// Autosave on change
+		form.ChangeEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&data)
-
 			go func() {
+				print("autosave")
+				newData := shared.Scenario{}
 				rpcClient.Call("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
 					ID:       id,
 					Scenario: &data,
-				}, &data)
-				Session.Reload(context)
+				}, &newData)
 			}()
 		})
 
@@ -341,17 +341,18 @@ func scenarioBlue(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
-		form.SaveEvent(func(evt dom.Event) {
+		// Autosave on change
+		form.ChangeEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&data)
-
 			go func() {
+				print("autosave")
+				newData := shared.Scenario{}
 				rpcClient.Call("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
 					ID:       id,
 					Scenario: &data,
-				}, &data)
-				Session.Reload(context)
+				}, &newData)
 			}()
 		})
 
@@ -569,6 +570,8 @@ func forceEdit(context *router.Context) {
 	}
 
 	TheUnit := shared.ForceUnit{}
+	w := dom.GetWindow()
+	doc := w.Document()
 
 	go func() {
 		force := shared.Force{}
@@ -671,8 +674,8 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
 		if canEdit {
 			cmdPanel.AddRow(2).
-				AddButton(1, "Delete", "Delete").
-				AddButton(1, "Copy", "Copy")
+				AddButton(1, "Copy", "Copy").
+				AddButton(1, "Delete", "Delete")
 		}
 
 		bdePanel := swapper.AddPanel("Bde")
@@ -698,8 +701,8 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 		if canEdit {
 			bdePanel.AddRow(2).
-				AddButton(1, "Delete", "Delete").
-				AddButton(1, "Copy", "Copy")
+				AddButton(1, "Copy", "Copy").
+				AddButton(1, "Delete", "Delete")
 		}
 
 		cavPanel := swapper.AddPanel("Cav")
@@ -716,8 +719,8 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 		if canEdit {
 			cavPanel.AddRow(2).
-				AddButton(1, "Delete", "Delete").
-				AddButton(1, "Copy", "Copy")
+				AddButton(1, "Copy", "Copy").
+				AddButton(1, "Delete", "Delete")
 		}
 
 		gunPanel := swapper.AddPanel("Gun")
@@ -730,14 +733,14 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 		if canEdit {
 			gunPanel.AddRow(2).
-				AddButton(1, "Delete", "Delete").
-				AddButton(1, "Copy", "Copy")
+				AddButton(1, "Copy", "Copy").
+				AddButton(1, "Delete", "Delete")
 		}
 
 		otherPanel := swapper.AddPanel("Other")
 		otherPanel.AddRow(3).
 			AddInput(2, "Detachment Name", "Name").
-			AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 5)
+			AddSelect(1, "Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 5)
 		otherPanel.AddRow(4).
 			AddNumber(1, "Bayonets", "Bayonets", "100").
 			AddSelect(1, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Name", 1, 5).
@@ -757,10 +760,10 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 		if canEdit {
 			otherPanel.AddRow(2).
-				AddButton(1, "Delete", "Delete").
-				AddButton(1, "Copy", "Copy")
+				AddButton(1, "Copy", "Copy").
+				AddButton(1, "Delete", "Delete")
 		}
-		print("all done and swapper is", swapper)
+		// print("all done and swapper is", swapper)
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -773,28 +776,22 @@ func forceEdit(context *router.Context) {
 			dom.GetWindow().Print()
 		})
 
-		// Dont need this anymore - using Autosave
-		// if canEdit {
-		// 	form.SaveEvent(func(evt dom.Event) {
-		// 		evt.PreventDefault()
-		// 		form.BindPart(&force, false)
-		// 		NationLastUsed = force.Nation
-
-		// 		RPCdata := shared.ForceRPCData{
-		// 			Channel: Session.Channel,
-		// 			ID:      force.ID,
-		// 			Force:   &force,
-		// 		}
-		// 		go func() {
-		// 			rpcClient.Call("ScenarioRPC.UpdateForce", RPCdata, &force)
-		// 			Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
-		// 			// Session.Reload(context)
-		// 		}()
-		// 	})
-		// }
-
-		w := dom.GetWindow()
-		doc := w.Document()
+		if canEdit {
+			form.DeleteEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				go func() {
+					done := false
+					err := rpcClient.Call("ScenarioRPC.DeleteForce", shared.ForceRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &done)
+					if err != nil {
+						w.Alert(err.Error())
+					}
+					Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
+				}()
+			})
+		}
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &force)
@@ -925,7 +922,47 @@ func forceEdit(context *router.Context) {
 					ID:      TheUnit.ID,
 				}, &newUnits)
 				force.Units = newUnits
+				// Set the current unit to the newly copied unit
+				searchPath := TheUnit.Path + "_Copy"
+				for _, v := range force.Units {
+					if v.Path == searchPath {
+						TheUnit = v
+						break
+					}
+				}
 				drawUnitList()
+				switch TheUnit.UType {
+				case 1: // Command
+					swapper.Panels[1].Paint(&TheUnit)
+					el := doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement)
+					el.Focus()
+					el.Select()
+				case 2: // Bde
+					// print("paint panel 2")
+					swapper.Panels[2].Paint(&TheUnit)
+					el := doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement)
+					el.Focus()
+					el.Select()
+				case 3: // Cav
+					// print("paint panel 2")
+					swapper.Panels[3].Paint(&TheUnit)
+					el := doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement)
+					el.Focus()
+					el.Select()
+				case 4: // Bty
+					// print("paint panel 2")
+					swapper.Panels[4].Paint(&TheUnit)
+					el := doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement)
+					el.Focus()
+					el.Select()
+				case 5: // Other
+					// print("paint panel 2")
+					swapper.Panels[5].Paint(&TheUnit)
+					el := doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement)
+					el.Focus()
+					el.Select()
+				}
+
 			}()
 		}
 
@@ -1070,9 +1107,9 @@ func forceEdit(context *router.Context) {
 		if canEdit {
 			doc.QuerySelector("[name=Cmd-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
-				if w.Confirm("Delete this Command ? ... includes all sub-units") {
-					deleteUnit()
-				}
+				// if w.Confirm("Delete this Command ? ... includes all sub-units") {
+				deleteUnit()
+				// }
 			})
 			doc.QuerySelector("[name=Cmd-Copy]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
@@ -1107,9 +1144,9 @@ func forceEdit(context *router.Context) {
 		if canEdit {
 			doc.QuerySelector("[name=Bde-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
-				if w.Confirm("Delete this Brigade ?") {
-					deleteUnit()
-				}
+				// if w.Confirm("Delete this Brigade ?") {
+				deleteUnit()
+				// }
 			})
 			doc.QuerySelector("[name=Bde-Copy]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
@@ -1129,7 +1166,7 @@ func forceEdit(context *router.Context) {
 					UType:      3,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
-				print("add unit returns ", newUnit)
+				// print("add unit returns ", newUnit)
 				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
@@ -1147,9 +1184,9 @@ func forceEdit(context *router.Context) {
 			doc.QuerySelector("[name=Cav-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
 				go func() {
-					if w.Confirm("Delete this Cavalry Unit ?") {
-						deleteUnit()
-					}
+					// if w.Confirm("Delete this Cavalry Unit ?") {
+					deleteUnit()
+					// }
 				}()
 			})
 			doc.QuerySelector("[name=Cav-Copy]").AddEventListener("click", false, func(evt dom.Event) {
@@ -1170,7 +1207,7 @@ func forceEdit(context *router.Context) {
 					UType:      4,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
-				print("add unit returns ", newUnit)
+				// print("add unit returns ", newUnit)
 				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
@@ -1188,9 +1225,9 @@ func forceEdit(context *router.Context) {
 			doc.QuerySelector("[name=Gun-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
 				go func() {
-					if w.Confirm("Delete this Artillery ?") {
-						deleteUnit()
-					}
+					// if w.Confirm("Delete this Artillery ?") {
+					deleteUnit()
+					// }
 				}()
 
 			})
@@ -1212,7 +1249,7 @@ func forceEdit(context *router.Context) {
 					UType:      5,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
-				print("add unit returns ", newUnit)
+				// print("add unit returns ", newUnit)
 				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
@@ -1230,9 +1267,9 @@ func forceEdit(context *router.Context) {
 			doc.QuerySelector("[name=Other-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
 				go func() {
-					if w.Confirm("Delete this Detachment ?") {
-						deleteUnit()
-					}
+					// if w.Confirm("Delete this Detachment ?") {
+					deleteUnit()
+					// }
 				}()
 
 			})

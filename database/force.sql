@@ -16,3 +16,4 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 14	1	f	t	Prussia	Supply Train		3		4	3	4
 \.
 select * from force;
+select setval(pg_get_serial_sequence('force','id'),(select max(id) from force) ); 

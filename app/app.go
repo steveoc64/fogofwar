@@ -53,10 +53,10 @@ func (s *GlobalSessionData) Navigate(url string) {
 	s.Subscriptions = make(map[string]MessageFunction)
 	s.Router.Navigate(url)
 	s.URL = url
-	go rpcClient.Call("LoginRPC.Nav", shared.Nav{
-		Channel: s.Channel,
-		Route:   url,
-	}, &url)
+	// go RPC("LoginRPC.Nav", shared.Nav{
+	// 	Channel: s.Channel,
+	// 	Route:   url,
+	// }, &url)
 	hideDisqus()
 }
 
@@ -80,7 +80,7 @@ func mainPage(context *router.Context) {
 
 	go func() {
 		// users := []shared.User{}
-		// rpcClient.Call("UserRPC.List", Session.Channel, &users)
+		// RPC("UserRPC.List", Session.Channel, &users)
 
 		form := formulate.ListForm{}
 		form.New("fa-bookmark", "Games")

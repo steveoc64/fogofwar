@@ -93,7 +93,7 @@ func websocketInit() net.Conn {
 
 	// Call PingRPC to burn through the message with seq = 0
 	out := &shared.AsyncMessage{}
-	rpcClient.Call("PingRPC.Ping", "init channel", out)
+	RPC("PingRPC.Ping", "init channel", out)
 
 	w := dom.GetWindow()
 	doc := w.Document()

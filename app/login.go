@@ -25,7 +25,7 @@ func Login(username string, passwd string) {
 	// print("login params", lc)
 
 	lr := &shared.LoginReply{}
-	err := rpcClient.Call("LoginRPC.Login", lc, lr)
+	err := RPC("LoginRPC.Login", lc, lr)
 	if err != nil {
 		print("RPC error", err.Error())
 	}
@@ -366,7 +366,7 @@ func signUp(context *router.Context) {
 					// tied to the current channel, and generate an email with a secret code
 
 					newUser := shared.UserSignup{}
-					err := rpcClient.Call("LoginRPC.NewUserRego", user, &newUser)
+					err := RPC("LoginRPC.NewUserRego", user, &newUser)
 					if err != nil {
 						print(err.Error())
 						errRow.Class().Remove("hidden")
@@ -403,7 +403,7 @@ func signUp(context *router.Context) {
 			// print("username has changed .. check it with the backend", username.Value)
 			go func() {
 				ok := false
-				err := rpcClient.Call("LoginRPC.CheckUsername", username.Value, &ok)
+				err := RPC("LoginRPC.CheckUsername", username.Value, &ok)
 				if err != nil {
 					print("call returns", err.Error())
 				} else {
@@ -432,7 +432,7 @@ func signUp(context *router.Context) {
 			} else {
 				go func() {
 					ok := false
-					rpcClient.Call("LoginRPC.CheckEmail", email.Value, &ok)
+					RPC("LoginRPC.CheckEmail", email.Value, &ok)
 					if !ok {
 						errRow.Class().Remove("hidden")
 						errors.SetTextContent(`Looks like the email address "` + email.Value + `" is already registered ...
@@ -499,7 +499,7 @@ func signUp(context *router.Context) {
 				form.Bind(&user)
 				print("binded", user)
 				ok := false
-				err := rpcClient.Call("LoginRPC.ValidateNewUser", user, &ok)
+				err := RPC("LoginRPC.ValidateNewUser", user, &ok)
 				if err != nil {
 					print(err.Error())
 					errRow.Class().Remove("hidden")

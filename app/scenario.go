@@ -15,8 +15,8 @@ func scenarioList(context *router.Context) {
 	go func() {
 		s1 := []shared.Scenario{}
 		s2 := []shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.List", Session.Channel, &s1)
-		rpcClient.Call("ScenarioRPC.ListPublic", Session.Channel, &s2)
+		RPC("ScenarioRPC.List", Session.Channel, &s1)
+		RPC("ScenarioRPC.ListPublic", Session.Channel, &s2)
 		data := append(s1, s2...)
 
 		form := formulate.ListForm{}
@@ -82,7 +82,7 @@ func scenarioAdd(context *router.Context) {
 				Scenario: &data,
 			}
 			go func() {
-				rpcClient.Call("ScenarioRPC.Insert", data, &data)
+				RPC("ScenarioRPC.Insert", data, &data)
 				Session.Navigate(fmt.Sprintf("/scenario/%d", data.ID))
 			}()
 		})
@@ -106,7 +106,7 @@ func scenarioEdit(context *router.Context) {
 
 	go func() {
 		data := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &data)
@@ -144,7 +144,7 @@ func scenarioEdit(context *router.Context) {
 				evt.PreventDefault()
 				go func() {
 					done := false
-					err := rpcClient.Call("ScenarioRPC.Delete", shared.ScenarioRPCData{
+					err := RPC("ScenarioRPC.Delete", shared.ScenarioRPCData{
 						Channel: Session.Channel,
 						ID:      data.ID,
 					}, &done)
@@ -162,7 +162,7 @@ func scenarioEdit(context *router.Context) {
 				form.Bind(&data)
 				go func() {
 					newData := shared.Scenario{}
-					rpcClient.Call("ScenarioRPC.Update", shared.ScenarioRPCData{
+					RPC("ScenarioRPC.Update", shared.ScenarioRPCData{
 						Channel:  Session.Channel,
 						ID:       id,
 						Scenario: &data,
@@ -237,7 +237,7 @@ func scenarioRed(context *router.Context) {
 
 	go func() {
 		data := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &data)
@@ -270,7 +270,7 @@ func scenarioRed(context *router.Context) {
 			go func() {
 				print("save")
 				newData := shared.Scenario{}
-				rpcClient.Call("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
 					ID:       id,
 					Scenario: &data,
@@ -293,7 +293,7 @@ func scenarioRed(context *router.Context) {
 
 		// print("add action grid")
 		forces := []shared.Force{}
-		rpcClient.Call("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &forces)
@@ -322,7 +322,7 @@ func scenarioBlue(context *router.Context) {
 
 	go func() {
 		data := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &data)
@@ -355,7 +355,7 @@ func scenarioBlue(context *router.Context) {
 			go func() {
 				print("manual save")
 				newData := shared.Scenario{}
-				rpcClient.Call("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
 					ID:       id,
 					Scenario: &data,
@@ -380,7 +380,7 @@ func scenarioBlue(context *router.Context) {
 
 		// print("add action grid")
 		forces := []shared.Force{}
-		rpcClient.Call("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &forces)
@@ -412,7 +412,7 @@ func scenarioRedAdd(context *router.Context) {
 	go func() {
 		data := shared.Force{}
 		scenario := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &scenario)
@@ -453,7 +453,7 @@ func scenarioRedAdd(context *router.Context) {
 			}
 			go func() {
 				print("data", data)
-				rpcClient.Call("ScenarioRPC.InsertForce", RPCdata, &data)
+				RPC("ScenarioRPC.InsertForce", RPCdata, &data)
 				// Session.Navigate(fmt.Sprintf("/scenario/%d/red", id))
 				Session.Reload(context)
 			}()
@@ -474,7 +474,7 @@ func scenarioRedAdd(context *router.Context) {
 
 		// Action Grid
 		forces := []shared.Force{}
-		rpcClient.Call("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &forces)
@@ -502,7 +502,7 @@ func scenarioBlueAdd(context *router.Context) {
 	go func() {
 		data := shared.Force{}
 		scenario := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &scenario)
@@ -542,7 +542,7 @@ func scenarioBlueAdd(context *router.Context) {
 				Force:   &data,
 			}
 			go func() {
-				rpcClient.Call("ScenarioRPC.InsertForce", RPCdata, &data)
+				RPC("ScenarioRPC.InsertForce", RPCdata, &data)
 				// Session.Navigate(fmt.Sprintf("/scenario/%d/blue/add", id))
 				Session.Reload(context)
 			}()
@@ -563,7 +563,7 @@ func scenarioBlueAdd(context *router.Context) {
 
 		// Action Grid
 		forces := []shared.Force{}
-		rpcClient.Call("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &forces)
@@ -594,14 +594,14 @@ func forceEdit(context *router.Context) {
 
 	go func() {
 		force := shared.Force{}
-		rpcClient.Call("ScenarioRPC.GetForce", shared.ForceRPCData{
+		RPC("ScenarioRPC.GetForce", shared.ForceRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &force)
 		// print("got force", force)
 
 		scenario := shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.Get", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      force.ScenarioID,
 		}, &scenario)
@@ -701,6 +701,8 @@ func forceEdit(context *router.Context) {
 		bdePanel.AddRow(3).
 			AddInput(2, "Brigade Name", "Name").
 			AddInput(1, "Nationality", "Nation")
+		bdePanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		bdePanel.AddRow(12).
 			AddNumber(2, "Bayonets", "Bayonets", "100").
 			AddSelect(2, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Code", 1, 5).
@@ -728,6 +730,8 @@ func forceEdit(context *router.Context) {
 		cavPanel.AddRow(3).
 			AddInput(2, "Brigade Name", "Name").
 			AddInput(1, "Nationality", "Nation")
+		cavPanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		cavPanel.AddRow(3).
 			AddNumber(1, "Sabres", "Sabres", "100").
 			AddSelect(1, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
@@ -751,6 +755,8 @@ func forceEdit(context *router.Context) {
 			AddNumber(1, "Guns", "Guns", "0").
 			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
 			AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		gunPanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		if canEdit {
 			gunPanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").
@@ -761,6 +767,8 @@ func forceEdit(context *router.Context) {
 		otherPanel.AddRow(3).
 			AddInput(2, "Detachment Name", "Name").
 			AddSelect(1, "Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 5)
+		otherPanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		otherPanel.AddRow(4).
 			AddNumber(1, "Bayonets", "Bayonets", "100").
 			AddSelect(1, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Name", 1, 5).
@@ -801,7 +809,7 @@ func forceEdit(context *router.Context) {
 				evt.PreventDefault()
 				go func() {
 					done := false
-					err := rpcClient.Call("ScenarioRPC.DeleteForce", shared.ForceRPCData{
+					err := RPC("ScenarioRPC.DeleteForce", shared.ForceRPCData{
 						Channel: Session.Channel,
 						ID:      force.ID,
 					}, &done)
@@ -829,7 +837,7 @@ func forceEdit(context *router.Context) {
 		// Action Grid
 		setActionGrid := func() {
 			forces := []shared.Force{}
-			rpcClient.Call(fmt.Sprintf("ScenarioRPC.Get%sForces", Color), shared.ScenarioRPCData{
+			RPC(fmt.Sprintf("ScenarioRPC.Get%sForces", Color), shared.ScenarioRPCData{
 				Channel: Session.Channel,
 				ID:      force.ScenarioID,
 			}, &forces)
@@ -925,7 +933,7 @@ func forceEdit(context *router.Context) {
 		deleteUnit := func() {
 			go func() {
 				newUnits := []shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.DeleteUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.DeleteUnit", shared.ForceUnitRPCData{
 					Channel: Session.Channel,
 					ID:      TheUnit.ID,
 				}, &newUnits)
@@ -939,7 +947,7 @@ func forceEdit(context *router.Context) {
 		cloneUnit := func() {
 			go func() {
 				newUnits := []shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.CloneUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.CloneUnit", shared.ForceUnitRPCData{
 					Channel: Session.Channel,
 					ID:      TheUnit.ID,
 				}, &newUnits)
@@ -1019,7 +1027,7 @@ func forceEdit(context *router.Context) {
 						Force:   &tempForce,
 					}
 					go func() {
-						rpcClient.Call("ScenarioRPC.UpdateForce", RPCdata, &force)
+						RPC("ScenarioRPC.UpdateForce", RPCdata, &force)
 						// print("and got back data with id", force.ID, force)
 						setActionGrid()
 					}()
@@ -1031,11 +1039,13 @@ func forceEdit(context *router.Context) {
 					panel.Bind(&TheUnit)
 					// swapper.Panels[swapper.Selected].Bind(&TheUnit)
 					TheUnit.UType = swapper.Selected
-					if TheUnit.UType > 0 {
+					if TheUnit.Name == "" {
+						print("name is blank, so wont try to save this one")
+					} else if TheUnit.UType > 0 {
 						// print("save unit with ID", TheUnit.ID)
 						go func() {
 							newUnit := shared.ForceUnit{}
-							rpcClient.Call("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
+							RPC("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
 								Channel:   Session.Channel,
 								ID:        TheUnit.ID,
 								ForceUnit: &TheUnit,
@@ -1044,7 +1054,7 @@ func forceEdit(context *router.Context) {
 							// Have to fetch the whole tree again, as a change in this one
 							// can have a ripple change in all the others
 							newUnits := []shared.ForceUnit{}
-							rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+							RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 								Channel: Session.Channel,
 								ID:      force.ID,
 							}, &newUnits)
@@ -1113,7 +1123,7 @@ func forceEdit(context *router.Context) {
 			go func() {
 				// add a blank Division to the end of the units array
 				newUnit := shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.AddCommand", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.AddCommand", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
 				}, &newUnit)
@@ -1145,13 +1155,13 @@ func forceEdit(context *router.Context) {
 			go func() {
 				// add a blank brigade to the units array
 				newUnit := shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
 					Channel:    Session.Channel,
 					ID:         force.ID,
 					UType:      2,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
-				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
 				}, &force.Units)
@@ -1182,14 +1192,14 @@ func forceEdit(context *router.Context) {
 			go func() {
 				// add a blank brigade to the units array
 				newUnit := shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
 					Channel:    Session.Channel,
 					ID:         force.ID,
 					UType:      3,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
 				// print("add unit returns ", newUnit)
-				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
 				}, &force.Units)
@@ -1223,14 +1233,14 @@ func forceEdit(context *router.Context) {
 			go func() {
 				// add a blank brigade to the units array
 				newUnit := shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
 					Channel:    Session.Channel,
 					ID:         force.ID,
 					UType:      4,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
 				// print("add unit returns ", newUnit)
-				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
 				}, &force.Units)
@@ -1265,14 +1275,14 @@ func forceEdit(context *router.Context) {
 			go func() {
 				// add a blank brigade to the units array
 				newUnit := shared.ForceUnit{}
-				rpcClient.Call("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
 					Channel:    Session.Channel,
 					ID:         force.ID,
 					UType:      5,
 					ParentPath: TheUnit.Path,
 				}, &newUnit)
 				// print("add unit returns ", newUnit)
-				rpcClient.Call("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 					Channel: Session.Channel,
 					ID:      force.ID,
 				}, &force.Units)

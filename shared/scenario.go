@@ -93,6 +93,7 @@ type ForceUnit struct {
 	ForceID       int    `db:"force_id"`
 	Path          string `db:"path"`
 	Name          string `db:"name"`
+	Descr         string `db:"descr"`
 	CommanderName string `db:"commander_name"`
 	Nation        string `db:"nation"`
 	UType         int    `db:"utype"`

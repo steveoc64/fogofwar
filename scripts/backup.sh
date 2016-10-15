@@ -7,9 +7,9 @@ cd ../backup
 echo Latest Backup File
 ls -l $file.sqz
 echo
-echo All Backups
-ls -s
-echo 
-echo Files older than 14 days
-find . -mtime +14
+# echo All Backups
+# ls -s
+# echo 
+# echo Files older than 14 days
+# find . -mtime +14
 

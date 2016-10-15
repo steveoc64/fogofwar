@@ -29,7 +29,7 @@ func showDisqus(id string, title string) {
 				page.Set("url", "http://wargaming.io/#!"+Session.URL[1:])
 				page.Set("title", title)
 				// page.Set("category_id", id)
-				print("DISQUS reset", title, id, Session.URL)
+				// print("DISQUS reset", title, id, Session.URL)
 				return nil
 			}),
 		})

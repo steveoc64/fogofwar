@@ -448,6 +448,10 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 		println("new path", data.ForceUnit.Path)
 	}
 
+	if data.ForceUnit.Path == "" {
+		return errors.New("Blank name .. will not record this change")
+	}
+
 	// Get the existing path
 	oldPath := ""
 	DB.SQL(`select path from force_unit where id=$1`, data.ID).QueryScalar(&oldPath)
@@ -464,7 +468,7 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	}
 
 	_, err := DB.Update("force_unit").
-		SetWhitelist(data.ForceUnit, "path", "name", "commander_name", "nation", "cmd_level",
+		SetWhitelist(data.ForceUnit, "path", "name", "descr", "commander_name", "nation", "cmd_level",
 			"drill", "bayonets", "small_arms", "elite_arms", "lt_coy", "jg_coy", "rating",
 			"sabres", "cav_type", "cav_rating",
 			"guns", "gunnery_type", "gun_condition", "horse_guns").
@@ -495,13 +499,15 @@ func (s *ScenarioRPC) DeleteUnit(data shared.ForceUnitRPCData, retval *[]shared.
 		return err
 	}
 
-	// Kill off subunits
-	_, err = DB.SQL(`delete
+	// Kill off subunits IN THE SAME FORCE
+	if oldUnit.Path != "" {
+		_, err = DB.SQL(`delete
 	 from force_unit 
-	 where path <@ $1::ltree`, oldUnit.Path).Exec()
-	if err != nil {
-		println(err.Error())
-		return err
+	 where path <@ $1::ltree and force_id=$2`, oldUnit.Path, oldUnit.ForceID).Exec()
+		if err != nil {
+			println(err.Error())
+			return err
+		}
 	}
 
 	// Kill this unit
@@ -532,18 +538,22 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 	println("looking for things that match the path", oldUnit.ForceID, oldUnit.Path)
 	newPath := oldUnit.Path + "_Copy"
 
+	if oldUnit.Path == "" {
+		return errors.New("OldPath is blank, so we cant clone this one")
+	}
+
 	// Clone the original unit
 	_, err = DB.SQL(`insert into force_unit
 		(force_id,
 			path,
 			name,
-			commander_name,nation,utype,drill,bayonets,
+			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 			guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			$2,
 			name||'_Copy',
-			commander_name,nation,utype,drill,bayonets,
+			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 			guns,gunnery_type,gun_condition,horse_guns
 		from force_unit
@@ -560,13 +570,13 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 		(force_id,
 			path,
 			name,
-			commander_name,nation,utype,drill,bayonets,
+			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 			guns,horse_guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			text2ltree(ltree2text(subltree(path,0,1))||'_Copy.'||ltree2text(subpath(path,1))||'_Copy'),
 			name||'_Copy',
-			commander_name,nation,utype,drill,bayonets,
+			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 			guns,horse_guns,gunnery_type,gun_condition,horse_guns
 		from force_unit

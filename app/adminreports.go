@@ -39,30 +39,30 @@ func adminUtils(context *router.Context) {
 		go func() {
 			switch url {
 			case "backup":
-				rpcClient.Call("UtilRPC.Backup", Session.Channel, &retval)
+				RPC("UtilRPC.Backup", Session.Channel, &retval)
 			case "top":
-				rpcClient.Call("UtilRPC.Top", Session.Channel, &retval)
+				RPC("UtilRPC.Top", Session.Channel, &retval)
 			case "logs":
-				rpcClient.Call("UtilRPC.Logs", Session.Channel, &retval)
+				RPC("UtilRPC.Logs", Session.Channel, &retval)
 			case "machine":
 				if w.Confirm("Generate Machine Parts ?") {
-					rpcClient.Call("UtilRPC.Machine", Session.Channel, &retval)
+					RPC("UtilRPC.Machine", Session.Channel, &retval)
 				}
 			case "part":
 				if w.Confirm("Generate Part Class ?") {
-					rpcClient.Call("UtilRPC.Parts", Session.Channel, &retval)
+					RPC("UtilRPC.Parts", Session.Channel, &retval)
 				}
 			case "cat":
 				if w.Confirm("Generate Category ?") {
-					rpcClient.Call("UtilRPC.Cats", Session.Channel, &retval)
+					RPC("UtilRPC.Cats", Session.Channel, &retval)
 				}
 			case "mtt":
 				if w.Confirm("Generat MTT Links ?") {
-					rpcClient.Call("UtilRPC.MTT", Session.Channel, &retval)
+					RPC("UtilRPC.MTT", Session.Channel, &retval)
 				}
 			// case "photomove":
 			// 	if w.Confirm("Generate Photos ?") {
-			// 		rpcClient.Call("UtilRPC.PhotoMove", Session.Channel, &retval)
+			// 		RPC("UtilRPC.PhotoMove", Session.Channel, &retval)
 			// 	}
 			case "sms":
 				Session.Navigate("/sms")
@@ -74,13 +74,13 @@ func adminUtils(context *router.Context) {
 				Session.Navigate("/testeditor")
 			case "taskfigs":
 				if w.Confirm("Generate Accumulators on all Tasks ?") {
-					rpcClient.Call("UtilRPC.TaskFigs", Session.Channel, &retval)
+					RPC("UtilRPC.TaskFigs", Session.Channel, &retval)
 				}
 			case "phototest":
 				Session.Navigate("/phototest")
 			case "thumbnails":
 				if w.Confirm("Generate New Thumbnails and Previews ?") {
-					rpcClient.Call("UtilRPC.Thumbnails", Session.Channel, &retval)
+					RPC("UtilRPC.Thumbnails", Session.Channel, &retval)
 				}
 			case "users":
 				Session.Navigate("/usersonline")

@@ -15,7 +15,7 @@ func userList(context *router.Context) {
 
 	go func() {
 		users := []shared.User{}
-		rpcClient.Call("UserRPC.ListOnline", shared.UserRPCData{
+		RPC("UserRPC.ListOnline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
 
@@ -56,7 +56,7 @@ func userList(context *router.Context) {
 
 		// Add a list of logins for this user
 		l := []shared.Login{}
-		rpcClient.Call("LoginRPC.ListLast", shared.LoginRPCData{
+		RPC("LoginRPC.ListLast", shared.LoginRPCData{
 			Channel: Session.Channel,
 		}, &l)
 
@@ -77,7 +77,7 @@ func userList(context *router.Context) {
 		doc.QuerySelector("main").AppendChild(div)
 		lList.Render("lastlogin-list", "#lastlogin-list", l)
 
-		rpcClient.Call("UserRPC.ListOffline", shared.UserRPCData{
+		RPC("UserRPC.ListOffline", shared.UserRPCData{
 			Channel: Session.Channel,
 		}, &users)
 
@@ -128,7 +128,7 @@ func userEdit(context *router.Context) {
 
 	go func() {
 		user := shared.User{}
-		rpcClient.Call("UserRPC.Get", shared.UserRPCData{
+		RPC("UserRPC.Get", shared.UserRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &user)
@@ -181,7 +181,7 @@ func userEdit(context *router.Context) {
 					User:    &user,
 				}
 				done := false
-				rpcClient.Call("UserRPC.Delete", data, &done)
+				RPC("UserRPC.Delete", data, &done)
 				Session.Navigate("/users")
 			}()
 		})
@@ -196,7 +196,7 @@ func userEdit(context *router.Context) {
 				User:    &user,
 			}
 			go func() {
-				rpcClient.Call("UserRPC.Update", data, &user)
+				RPC("UserRPC.Update", data, &user)
 				Session.Navigate("/users")
 			}()
 		})
@@ -213,7 +213,7 @@ func userEdit(context *router.Context) {
 
 		// Add a list of logins for this user
 		l := []shared.Login{}
-		rpcClient.Call("LoginRPC.ListByUser", shared.LoginRPCData{
+		RPC("LoginRPC.ListByUser", shared.LoginRPCData{
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &l)
@@ -232,7 +232,7 @@ func userEdit(context *router.Context) {
 
 		// Add a list of scenarios for this user
 		s := []shared.Scenario{}
-		rpcClient.Call("ScenarioRPC.ListByUser", shared.ScenarioRPCData{
+		RPC("ScenarioRPC.ListByUser", shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &s)
@@ -257,7 +257,7 @@ func userEdit(context *router.Context) {
 
 		// Add a list of games for this user
 		g := []shared.Game{}
-		rpcClient.Call("GameRPC.ListByUser", shared.GameRPCData{
+		RPC("GameRPC.ListByUser", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      user.ID,
 		}, &g)
@@ -326,7 +326,7 @@ func userAdd(context *router.Context) {
 			}
 			go func() {
 				newID := 0
-				rpcClient.Call("UserRPC.Insert", data, &newID)
+				RPC("UserRPC.Insert", data, &newID)
 				print("added user", newID)
 				Session.Navigate("/users")
 			}()
@@ -348,7 +348,7 @@ func usersOnline(context *router.Context) {
 func _usersOnline(action string, id int) {
 
 	users := []shared.UserOnline{}
-	rpcClient.Call("LoginRPC.UsersOnline", Session.Channel, &users)
+	RPC("LoginRPC.UsersOnline", Session.Channel, &users)
 	print("got users", users)
 
 	form := formulate.ListForm{}
@@ -388,9 +388,50 @@ func _usersOnline(action string, id int) {
 }
 
 func userSettings(context *router.Context) {
-	print("TODO - userSettings")
-}
 
-func name() {
+	go func() {
+		user := shared.User{}
+		RPC("UserRPC.Me", Session.Channel, &user)
+		form := formulate.EditForm{}
 
+		// Layout the fields
+
+		form.New("fa-user", "Add User")
+
+		form.Row(4).
+			AddInput(1, "Name", "Name").
+			AddNumber(1, "Number", "Number", "0").
+			AddCheck(1, "Check", "Check")
+
+		form.Row(1).
+			AddBigTextarea(1, "Notes", "Notes")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/")
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			form.Bind(&user)
+
+			RPCdata := shared.UserRPCData{
+				Channel: Session.Channel,
+				User:    &user,
+			}
+			go func() {
+				RPC("UserRPC.Insert", RPCdata, &user)
+				Session.Navigate("/")
+			}()
+		})
+
+		form.PrintEvent(func(evt dom.Event) {
+			dom.GetWindow().Print()
+		})
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &user)
+
+	}()
 }

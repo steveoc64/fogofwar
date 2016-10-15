@@ -131,6 +131,7 @@ drop table if exists rating;
 create table rating (
 	id serial not null primary key,
 	name text not null default '',
+	code text not null default '',
 	shock bool,
 	form_close bool,
 	form_engage bool,
@@ -282,7 +283,7 @@ create table scenario (
 	blue_team text not null default '',
 	blue_brief text not null default ''
 );
-\i scenario.sql
+\i data/scenario.sql
 -- drop index if exists scenario_campaign_idx;
 -- create index scenario_campaign_idx on scenario (campaign_id);
 drop index if exists scenario_author_idx;
@@ -303,7 +304,7 @@ create table force (
 	inspiration int not null default 0,
 	condition int not null default 2
 );
-\i force.sql
+\i data/force.sql
 drop index if exists force_scenario_idx;
 create index force_scenario_idx on force (scenario_id);
 
@@ -314,6 +315,7 @@ create table force_unit (
 	force_id int not null,
 	path ltree,
 	name text not null default '',
+	commander_name text not null default '',
 	nation text not null default '',
 	utype int not null default 1,
 	condition int not null default 2,
@@ -330,8 +332,10 @@ create table force_unit (
 	cav_rating int not null default 0,
 	guns int not null default 0,
 	gunnery_type int not null default 0,
-	gun_condition int not null default 2
+	gun_condition int not null default 2,
+	horse_guns bool default false
 );
+\i data/force_unit.sql
 drop index if exists force_unit_force_idx;
 create index force_unit_force_idx on force_unit (force_id);
 

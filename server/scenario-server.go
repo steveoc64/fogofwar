@@ -414,7 +414,18 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	if len(paths) > 0 {
 		hackPath := paths[len(paths)-1]
 		println("hackpath", hackPath)
-		hackPath = strings.NewReplacer("/", "_", " ", "_", ".", "", ",", "").Replace(data.ForceUnit.Name)
+		hackPath = strings.NewReplacer("ü", "ue", "ö", "oe", "ß", "ss",
+			"/", "_",
+			" ", "_",
+			".", "",
+			"&", "",
+			"(", "",
+			")", "",
+			"[", "",
+			"]", "",
+			"!", "",
+			"-", "",
+			",", "").Replace(data.ForceUnit.Name)
 		println("hackedpath", hackPath)
 		paths[len(paths)-1] = hackPath
 		data.ForceUnit.Path = strings.Join(paths, ".")
@@ -424,13 +435,15 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	// Get the existing path
 	oldPath := ""
 	DB.SQL(`select path from force_unit where id=$1`, data.ID).QueryScalar(&oldPath)
-	if oldPath != data.ForceUnit.Path {
-		println("execute path change from ", oldPath, "to", data.ForceUnit.Path)
+	if oldPath != "" && oldPath != data.ForceUnit.Path {
+		println("execute path change from ", oldPath, "to", data.ForceUnit.Path, "for force", data.ID)
 		_, eerr := DB.SQL(`update force_unit 
 			set path = $1::ltree || subpath(path,1)
-			where nlevel(path) > 1 and path <@ $2::ltree`, data.ForceUnit.Path, oldPath).Exec()
+			where force_id=$3
+			and nlevel(path) > 1 and path <@ $2::ltree`, data.ForceUnit.Path, oldPath, data.ID).Exec()
 		if eerr != nil {
 			println(eerr.Error())
+			return errors.New(eerr.Error())
 		}
 	}
 

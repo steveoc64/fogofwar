@@ -16,6 +16,12 @@ SET search_path = public, pg_catalog;
 --
 
 COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_level, drill, bayonets, small_arms, elite_arms, lt_coy, jg_coy, rating, sabres, cav_type, cav_rating, guns, gunnery_type, gun_condition, horse_guns) FROM stdin;
+215	11	Adv_Guard_Div	Adv Guard Div	Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+216	11	Adv_Guard_Div.von_Pelet_Ruehle_Rabenau	von Pelet, Rühle, Rabenau		Prussia	2	4	9	1400	1	0	0	3	4	0	0	0	0	0	0	f
+217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua		Prussia	2	4	1	2400	1	0	1	0	5	0	0	0	1	3	0	f
+219	11	Adv_Guard_Div.Md_Foot_Bty	Md Foot Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	2	4	f
+220	11	Adv_Guard_Div.Md_Horse_Bty	Md Horse Bty		Prussia	4	1	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+218	11	Adv_Guard_Div.Saxon_Hussars	Saxon Hussars		Saxony	3	4	0	0	0	0	0	0	3	900	2	2	0	0	0	f
 13	2	2nd_Division.45e_Ligne	45e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 14	2	2nd_Division.54e_Ligne	54e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 7	2	2eme_Division	2eme Division	Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -185,7 +191,7 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 214, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 220, true);
 
 
 --

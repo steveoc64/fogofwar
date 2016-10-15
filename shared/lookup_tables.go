@@ -27,6 +27,7 @@ type CmdRating struct {
 type UnitRating struct {
 	ID             int    `db:"id"`
 	Name           string `db:"name"`
+	Code           string `db:"code"`
 	Shock          bool   `db:"shock"`
 	FormClose      bool   `db:"form_close"`
 	FormEngage     bool   `db:"form_engage"`

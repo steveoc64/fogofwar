@@ -142,6 +142,9 @@
 
     // Overide styles when printing to ensure good looking output.
     @media print
+        .full-print
+            width: 100% !important
+
         [data-row-span]
             display: table
             height: 56px
@@ -151,7 +154,7 @@
                 border-right: 1px solid #333333
                 display: table-cell
                 float: none
-         
+
                 &.focus,
                 &:hover
                     background: none 

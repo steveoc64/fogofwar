@@ -21,9 +21,9 @@
 
       {{range $rowindex,$row := .Rows}}
       <div data-row-span="{{.Span}}" name="row-{{$rowindex}}">
-        {{range $row.Fields}}
+        {{range $fieldindex,$ := $row.Fields}}
         {{$fieldModel := .Model}}
-        <div data-field-span="{{.Span}}">
+        <div data-field-span="{{.Span}}" name="grid-{{$rowindex}}-{{$fieldindex}}">
           {{if ne .Type "button"}}
             {{if ne .Type "checkbox"}}
               <label>{{.Label}}</label>

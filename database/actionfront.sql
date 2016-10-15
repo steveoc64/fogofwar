@@ -413,7 +413,7 @@ ALTER SEQUENCE force_id_seq OWNED BY force.id;
 
 CREATE TABLE force_unit (
     id integer NOT NULL,
-    force_id integer DEFAULT 0 NOT NULL,
+    force_id integer NOT NULL,
     path ltree,
     name text DEFAULT ''::text NOT NULL,
     commander_name text DEFAULT ''::text NOT NULL,
@@ -433,7 +433,7 @@ CREATE TABLE force_unit (
     guns integer DEFAULT 0 NOT NULL,
     gunnery_type integer DEFAULT 0 NOT NULL,
     gun_condition integer DEFAULT 2 NOT NULL,
-    horse_guns boolean DEFAULT false NOT NULL
+    horse_guns boolean DEFAULT false
 );
 
 
@@ -844,6 +844,7 @@ ALTER SEQUENCE orders_id_seq OWNED BY orders.id;
 CREATE TABLE rating (
     id integer NOT NULL,
     name text DEFAULT ''::text NOT NULL,
+    code text DEFAULT ''::text NOT NULL,
     shock boolean,
     form_close boolean,
     form_engage boolean,
@@ -1545,7 +1546,7 @@ SELECT pg_catalog.setval('cmd_level_id_seq', 1, false);
 
 COPY cmd_rating (id, name, effect) FROM stdin;
 1	Magnificent	2
-2	Excellent	1
+2	Highly Efficient	1
 3	Competent	0
 4	Doddering Fool	-1
 5	Blithering Idiot	-2
@@ -1638,6 +1639,12 @@ SELECT pg_catalog.setval('force_id_seq', 26, true);
 --
 
 COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_level, drill, bayonets, small_arms, elite_arms, lt_coy, jg_coy, rating, sabres, cav_type, cav_rating, guns, gunnery_type, gun_condition, horse_guns) FROM stdin;
+215	11	Adv_Guard_Div	Adv Guard Div	Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+216	11	Adv_Guard_Div.von_Pelet_Ruehle_Rabenau	von Pelet, Rühle, Rabenau		Prussia	2	4	9	1400	1	0	0	3	4	0	0	0	0	0	0	f
+217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua		Prussia	2	4	1	2400	1	0	1	0	5	0	0	0	1	3	0	f
+219	11	Adv_Guard_Div.Md_Foot_Bty	Md Foot Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	2	4	f
+220	11	Adv_Guard_Div.Md_Horse_Bty	Md Horse Bty		Prussia	4	1	0	0	0	0	0	0	4	0	0	0	8	2	3	f
+218	11	Adv_Guard_Div.Saxon_Hussars	Saxon Hussars		Saxony	3	4	0	0	0	0	0	0	3	900	2	2	0	0	0	f
 13	2	2nd_Division.45e_Ligne	45e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 14	2	2nd_Division.54e_Ligne	54e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 7	2	2eme_Division	2eme Division	Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -1807,7 +1814,7 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 214, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 220, true);
 
 
 --
@@ -2301,6 +2308,30 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 1	2016-10-15 11:51:36.726554+10:30	127.0.0.1:49688	1
 1	2016-10-15 11:53:34.898688+10:30	127.0.0.1:49886	1
 1	2016-10-15 11:53:51.735956+10:30	127.0.0.1:49886	1
+1	2016-10-15 12:11:16.777911+10:30	127.0.0.1:51802	1
+1	2016-10-15 12:22:26.410379+10:30	127.0.0.1:53012	1
+1	2016-10-15 12:30:47.111164+10:30	127.0.0.1:53012	1
+1	2016-10-15 12:35:52.615847+10:30	127.0.0.1:54284	1
+1	2016-10-15 12:40:22.353466+10:30	127.0.0.1:54770	2
+1	2016-10-15 12:41:23.65155+10:30	127.0.0.1:54906	1
+1	2016-10-15 12:43:29.135816+10:30	127.0.0.1:55048	1
+1	2016-10-15 12:47:12.287944+10:30	127.0.0.1:55450	1
+1	2016-10-15 12:48:19.545891+10:30	127.0.0.1:55570	1
+1	2016-10-15 12:48:51.995548+10:30	127.0.0.1:55642	1
+1	2016-10-15 12:49:57.838704+10:30	127.0.0.1:55766	1
+1	2016-10-15 12:50:49.907454+10:30	127.0.0.1:55874	1
+1	2016-10-15 12:51:52.8082+10:30	127.0.0.1:55984	1
+1	2016-10-15 12:52:51.745592+10:30	127.0.0.1:56096	1
+1	2016-10-15 12:57:16.307703+10:30	127.0.0.1:56492	1
+1	2016-10-15 12:59:33.845952+10:30	127.0.0.1:56492	1
+1	2016-10-15 13:02:26.059069+10:30	127.0.0.1:56980	1
+1	2016-10-15 13:43:20.657637+10:30	127.0.0.1:60388	1
+1	2016-10-15 13:53:07.960156+10:30	127.0.0.1:60802	1
+1	2016-10-15 14:06:21.979055+10:30	127.0.0.1:34106	1
+1	2016-10-15 14:07:37.481905+10:30	127.0.0.1:34360	1
+1	2016-10-15 14:10:39.1708+10:30	127.0.0.1:34630	1
+1	2016-10-15 14:21:14.300741+10:30	127.0.0.1:34970	1
+1	2016-10-15 14:24:50.539004+10:30	127.0.0.1:35976	1
 \.
 
 
@@ -2335,17 +2366,17 @@ SELECT pg_catalog.setval('orders_id_seq', 1, false);
 -- Data for Name: rating; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY rating (id, name, shock, form_close, form_engage, sk_close, attack_superior, attack_guns, fire_bonus, melee_bonus, ammo) FROM stdin;
-1	Guard	t	t	t	t	t	t	1	2	10
-2	Grenadier	t	t	t	t	t	t	1	2	9
-3	Elite	f	t	t	t	t	t	1	1	8
-4	Crack Line	f	t	t	f	t	t	1	1	7
-5	Regular Line	f	f	t	f	t	t	0	0	7
-6	Reserve Line	f	f	f	f	t	t	0	0	6
-7	Conscript	f	f	f	f	f	t	0	-1	6
-8	Landwehr	f	f	f	f	f	f	-1	-1	5
-9	Militia	f	f	f	f	f	f	0	-1	7
-10	Rabble	t	f	f	f	t	f	-2	-2	2
+COPY rating (id, name, code, shock, form_close, form_engage, sk_close, attack_superior, attack_guns, fire_bonus, melee_bonus, ammo) FROM stdin;
+1	Guard	Guard	t	t	t	t	t	t	1	2	10
+2	Grenadier	Grend	t	t	t	t	t	t	1	2	9
+3	Elite	Elite	f	t	t	t	t	t	1	1	8
+4	Crack Line	Crack	f	t	t	f	t	t	1	1	7
+5	Regular Line	Reglr	f	f	t	f	t	t	0	0	7
+6	Reserve Line	2ndLn	f	f	f	f	t	t	0	0	6
+7	Conscript	Consr	f	f	f	f	f	t	0	-1	6
+8	Landwehr	Landw	f	f	f	f	f	f	-1	-1	5
+9	Militia	Milit	f	f	f	f	f	f	0	-1	7
+10	Rabble	Mob	t	f	f	f	t	f	-2	-2	2
 \.
 
 
@@ -2477,7 +2508,7 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
 2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:50008	Australia	http://witchwoodstudio.com		f	t	t
-1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:49886	Australia	http://15mm-madness.blogspot.com		f	f	t
+1	steveoc64	unx911zxx	Steve O'Connor	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:35976	Australia	http://15mm-madness.blogspot.com		f	f	t
 \.
 
 

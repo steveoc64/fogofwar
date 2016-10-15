@@ -319,7 +319,6 @@ create table force_unit (
 	commander_name text not null default '',
 	nation text not null default '',
 	utype int not null default 1,
-	condition int not null default 2,
 	cmd_level int not null default 1,
 	drill int not null default 1,
 	bayonets int not null default 0,

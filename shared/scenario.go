@@ -164,10 +164,12 @@ func (u *ForceUnit) GetBases() string {
 		case 1:
 			gunType = " 12lb"
 		case 2:
-			gunType = " 6lb"
+			gunType = " 9lb"
 		case 3:
-			gunType = " 3lb"
+			gunType = " 6lb"
 		case 4:
+			gunType = " 3lb"
+		case 5:
 			gunType = " Hw"
 			horse = ""
 			addGun = ""

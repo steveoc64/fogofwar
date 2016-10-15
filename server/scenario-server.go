@@ -448,8 +448,10 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	}
 
 	_, err := DB.Update("force_unit").
-		SetWhitelist(data.ForceUnit, "path", "name", "commander_name", "nation", "cmd_level", "drill", "bayonets", "small_arms",
-			"elite_arms", "lt_coy", "jg_coy", "rating", "sabres", "cav_type", "cav_rating", "guns", "gunnery_type", "gun_condition").
+		SetWhitelist(data.ForceUnit, "path", "name", "commander_name", "nation", "cmd_level",
+			"drill", "bayonets", "small_arms", "elite_arms", "lt_coy", "jg_coy", "rating",
+			"sabres", "cav_type", "cav_rating",
+			"guns", "gunnery_type", "gun_condition", "horse_guns").
 		Where("id = $1", data.ID).
 		Exec()
 
@@ -521,13 +523,13 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 			name,
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition)
+			guns,horse_guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			$2,
 			name||'_Copy',
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition
+			guns,horse_guns,gunnery_type,gun_condition,horse_guns
 		from force_unit
 		where id=$1`, data.ID, newPath).Exec()
 
@@ -544,13 +546,13 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 			name,
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition)
+			guns,horse_guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			text2ltree(ltree2text(subltree(path,0,1))||'_Copy.'||ltree2text(subpath(path,1))||'_Copy'),
 			name||'_Copy',
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition
+			guns,horse_guns,gunnery_type,gun_condition,horse_guns
 		from force_unit
 		where force_id=$1
 		and nlevel(path)>1

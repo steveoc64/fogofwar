@@ -195,12 +195,23 @@ func (s *ScenarioRPC) GetRedForces(data shared.ScenarioRPCData, retval *[]shared
 
 	conn := Connections.Get(data.Channel)
 
-	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name 
+	// err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name
+	// 	from force f
+	// 		left join cmd_level l on l.id=f.level
+	// 		left join scenario s on s.id=f.scenario_id
+	// 	where f.red_team and f.scenario_id=$1
+	// 	order by id`, data.ID).QueryStructs(retval)
+	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name,
+		sum(u.bayonets) as bayonets, 
+		sum(u.sabres) as sabres,
+		sum(u.guns) as guns
 		from force f 
 			left join cmd_level l on l.id=f.level
 			left join scenario s on s.id=f.scenario_id
+			left join force_unit u on u.force_id=f.id
 		where f.red_team and f.scenario_id=$1
-		order by id`, data.ID).QueryStructs(retval)
+		group by f.id,l.name,s.name
+		order by f.id`, data.ID).QueryStructs(retval)
 
 	logger(start, "Scenario.GetRedForces", conn,
 		fmt.Sprintf("Scenario %d", data.ID),
@@ -214,12 +225,17 @@ func (s *ScenarioRPC) GetBlueForces(data shared.ScenarioRPCData, retval *[]share
 
 	conn := Connections.Get(data.Channel)
 
-	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name 
+	err := DB.SQL(`select f.*,l.name as level_name,s.name as scenario_name,
+		sum(u.bayonets) as bayonets, 
+		sum(u.sabres) as sabres,
+		sum(u.guns) as guns
 		from force f 
 			left join cmd_level l on l.id=f.level
 			left join scenario s on s.id=f.scenario_id
+			left join force_unit u on u.force_id=f.id
 		where f.blue_team and f.scenario_id=$1
-		order by id`, data.ID).QueryStructs(retval)
+		group by f.id,l.name,s.name
+		order by f.id`, data.ID).QueryStructs(retval)
 
 	logger(start, "Scenario.GetBlueForces", conn,
 		fmt.Sprintf("Scenario %d", data.ID),
@@ -523,13 +539,13 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 			name,
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition,horse_guns)
+			guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			$2,
 			name||'_Copy',
 			commander_name,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition,horse_guns
+			guns,gunnery_type,gun_condition,horse_guns
 		from force_unit
 		where id=$1`, data.ID, newPath).Exec()
 

@@ -13,7 +13,7 @@
 		<div class="action__title">{{.Name}}</div>
 		<div class="action__icon"><i class="fa {{if lt .Level 3}}fa-angle-double-up{{end}} {{if gt .Level 2}}fa-angle-up{{end}} fa-lg"></i></div>
 		<div class="action__text">
-			{{.CommanderName}}	
+			{{.CommanderName}}<br>{{.Summarize}}
 		</div>
 	</div>
 	{{end}}

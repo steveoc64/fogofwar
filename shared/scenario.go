@@ -33,7 +33,7 @@ type ScenarioRPCData struct {
 type Force struct {
 	ID            int         `db:"id"`
 	ScenarioID    int         `db:"scenario_id"`
-	ScenarioName  string      `db:"scenario_name"`
+	ScenarioName  string      `db:"scenario_name"` // derived data
 	RedTeam       bool        `db:"red_team"`
 	BlueTeam      bool        `db:"blue_team"`
 	Nation        string      `db:"nation"`
@@ -46,6 +46,26 @@ type Force struct {
 	Inspiration   int         `db:"inspiration"`
 	Condition     int         `db:"condition"`
 	Units         []ForceUnit `db:"units"`
+	Bayonets      *int        `db:"bayonets"` // derived data
+	Sabres        *int        `db:"sabres"`   // derived data
+	Guns          *int        `db:"guns"`     // derived data
+}
+
+func (f *Force) Summarize() string {
+	retval := "( "
+	if f.Bayonets != nil {
+		retval += fmt.Sprintf("%d", *f.Bayonets)
+	}
+	retval += " / "
+	if f.Sabres != nil {
+		retval += fmt.Sprintf("%d", *f.Sabres)
+	}
+	retval += " / "
+	if f.Guns != nil {
+		retval += fmt.Sprintf("%d", *f.Guns)
+	}
+	retval += " )"
+	return retval
 }
 
 func (f *Force) DifferentTo(other Force) bool {

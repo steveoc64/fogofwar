@@ -180,6 +180,7 @@ func initForms() {
 	})
 
 	doc.QuerySelector("#md-really-signout").AddEventListener("click", false, func(evt dom.Event) {
+		print("really sign out")
 		evt.PreventDefault()
 		el := doc.QuerySelector("#md-confirm-signout")
 		el.Class().Remove("md-show")

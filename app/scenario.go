@@ -265,11 +265,10 @@ func scenarioRed(context *router.Context) {
 		})
 
 		// Autosave on change
-		form.ChangeEvent(func(evt dom.Event) {
-			evt.PreventDefault()
+		SaveMe := func() {
 			form.Bind(&data)
 			go func() {
-				print("autosave")
+				print("save")
 				newData := shared.Scenario{}
 				rpcClient.Call("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
@@ -277,7 +276,17 @@ func scenarioRed(context *router.Context) {
 					Scenario: &data,
 				}, &newData)
 			}()
+		}
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			SaveMe()
 		})
+
+		// form.ChangeEvent(func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	SaveMe()
+		// })
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
@@ -341,20 +350,30 @@ func scenarioBlue(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
-		// Autosave on change
-		form.ChangeEvent(func(evt dom.Event) {
-			evt.PreventDefault()
+		SaveMe := func() {
 			form.Bind(&data)
 			go func() {
-				print("autosave")
+				print("manual save")
 				newData := shared.Scenario{}
 				rpcClient.Call("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
 					Channel:  Session.Channel,
 					ID:       id,
 					Scenario: &data,
 				}, &newData)
+				print("got back", newData)
 			}()
+		}
+
+		// Back to saveCB
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			SaveMe()
 		})
+
+		// form.ChangeEvent(func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	SaveMe()
+		// })
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)

@@ -110,10 +110,10 @@ install: sv
 	./terminate
 	cp -Rv dist/* ~/actionfront/current
 	cd ~/actionfront/current && nohup ./actionfront-server &
-	tail -f -n 1000 ~/actionfront/current/nohup.out
+	tail -f -n 1000 ~/logs/actionfront/* ~/actionfront/current/nohup.out
 
 tail:
-	tail -f -n 1000 ~/actionfront/current/nohup.out
+	tail -f -n 1000 ~/logs/actionfront/* ~/actionfront/current/nohup.out
 
 data:
 	pg_dump actionfront > database/actionfront.sql

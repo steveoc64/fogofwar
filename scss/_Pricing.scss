@@ -266,7 +266,9 @@
 	margin: 1em;
 	padding: 0 0 2em;
 	color: #fff;
-	background: #1e1c20;
+	background: rgba(30, 29, 31, 0.88);
+	// background: #1e1c20;
+
 }
 
 .pricing--yama .pricing__title {
@@ -277,6 +279,7 @@
 	width: 290px;
 	margin: 0 auto;
 	padding: 1em 1em 0em;
+	color: rgb(175, 160, 125);
 }
 
 .pricing__amp {
@@ -286,7 +289,8 @@
 
 .pricing--yama .pricing__sentence {
 	margin-bottom: 2em;
-	color: #555357;
+	// color: #555357;
+	color: rgb(192, 179, 228);
 }
 
 .pricing--yama .pricing__price {
@@ -295,10 +299,11 @@
 	position: relative;
 	z-index: 10;
 	overflow: hidden;
-	padding: 0.75em;
+	padding: 0.2em;
 	cursor: default;
 	color: #ef7d46;
-	background: #1a181b;
+	// background: #1a181b;
+	background: rgba(30, 29, 31, 0.88);
 	-webkit-transition: color 0.3s;
 	transition: color 0.3s;
 }
@@ -333,7 +338,7 @@
 	font-size: 0.5em;
 	font-weight: normal;
 	display: block;
-	color: #2a272c;
+	color: #5c575f;
 }
 
 .pricing--yama .pricing__feature-list {
@@ -341,7 +346,7 @@
 	padding: 2em 1em;
 	list-style: none;
 	text-align: center;
-	color: #6a6563;
+	color: #908986;
 }
 
 .pricing--yama .pricing__action {

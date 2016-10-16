@@ -32,15 +32,15 @@ func (g *GlobalSessionData) GetRank() string {
 	case 1:
 		return "Lt"
 	case 2:
-		return "Capt"
+		return "Colonel"
 	case 3:
-		return "Maj"
+		return "Brigadier"
 	case 4:
-		return "Col"
+		return "Marechal"
 	case 5:
-		return "General"
+		return ""
 	case 10:
-		return "Marshal"
+		return "Le Empereur"
 	default:
 		return fmt.Sprintf("%d", g.Rank)
 	}

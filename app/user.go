@@ -483,8 +483,11 @@ func userSettings(context *router.Context) {
 			newEmail := strings.TrimSpace(strings.ToLower(emailField.Value))
 			img.Src = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar",
 				md5.Sum([]byte(newEmail)))
-
 		})
+
+		// Now add a pricing table
+		formulate.AppendDiv("pricing-table")
+		loadTemplate("pricing-table", "#pricing-table", nil)
 
 	}()
 }

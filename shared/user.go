@@ -29,21 +29,17 @@ func (u *User) GetRank() string {
 	case 1:
 		return "Lieutenant"
 	case 2:
-		return "Captain"
-	case 3:
-		return "Major"
-	case 4:
 		return "Colonel"
-	case 5:
+	case 3:
 		return "Brigadier"
-	case 6:
+	case 4:
 		return "General"
-	case 7:
+	case 5:
 		return "Marshal"
 	case 10:
-		return "Emporer"
+		return "Le Empereur"
 	}
-	return "Private"
+	return "NCO."
 }
 
 func (u *User) GetCreated() string {

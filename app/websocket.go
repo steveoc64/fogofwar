@@ -318,8 +318,6 @@ func autoReload() {
 					} else {
 						print("**** Sauve Qui Peut ! ****")
 					}
-				} else {
-					count = 4
 				}
 			}
 		}

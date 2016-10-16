@@ -59,7 +59,7 @@ app-assets: dist/assets.log dist/config.json
 dist/config.json: server/config.json
 	cp server/config.json dist	
 
-ssl:
+cert:
 	mkdir -p cert
 	openssl genrsa -out cert/actionfront.key 2048
 	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650

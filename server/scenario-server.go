@@ -639,13 +639,13 @@ func (s *ScenarioRPC) CloneUnit(data shared.ForceUnitRPCData, retval *[]shared.F
 			name,
 			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition,horse_guns)
+			guns,gunnery_type,gun_condition,horse_guns)
 		select force_id,
 			text2ltree(ltree2text(subltree(path,0,1))||'_Copy.'||ltree2text(subpath(path,1))||'_Copy'),
 			name||'_Copy',
 			commander_name,descr,nation,utype,drill,bayonets,
 			small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
-			guns,horse_guns,gunnery_type,gun_condition,horse_guns
+			guns,gunnery_type,gun_condition,horse_guns
 		from force_unit
 		where force_id=$1
 		and nlevel(path)>1

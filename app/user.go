@@ -70,11 +70,7 @@ func userList(context *router.Context) {
 		lList.Column("IP Address", "IPAddress")
 		lList.Column("Country", "Country")
 
-		w := dom.GetWindow()
-		doc := w.Document()
-		div := doc.CreateElement("div").(*dom.HTMLDivElement)
-		div.SetID("lastlogin-list")
-		doc.QuerySelector("main").AppendChild(div)
+		formulate.AppendDiv("lastlogin-list")
 		lList.Render("lastlogin-list", "#lastlogin-list", l)
 
 		RPC("UserRPC.ListOffline", shared.UserRPCData{
@@ -107,10 +103,8 @@ func userList(context *router.Context) {
 			Session.Navigate("/user/" + key)
 		})
 
-		div = doc.CreateElement("div").(*dom.HTMLDivElement)
-		div.SetID("offlineusers")
-		doc.QuerySelector("main").AppendChild(div)
-		formOffline.Render("offlineuser-list", "#offlineusers", users)
+		formulate.AppendDiv("offline-users")
+		formOffline.Render("offlineuser-list", "#offline-users", users)
 
 	}()
 
@@ -204,11 +198,8 @@ func userEdit(context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
 
-		w := dom.GetWindow()
-		doc := w.Document()
-
 		if user.Channel != 0 {
-			doc.QuerySelector("[name=Activity]").SetInnerHTML("")
+			form.Get("Activity").SetInnerHTML("")
 		}
 
 		// Add a list of logins for this user
@@ -225,9 +216,7 @@ func userEdit(context *router.Context) {
 		lList.DateColumn("Date", "Date")
 		lList.Column("IP Address", "IPAddress")
 
-		div := doc.CreateElement("div").(*dom.HTMLDivElement)
-		div.SetID("userlogin-list")
-		doc.QuerySelector("main").AppendChild(div)
+		formulate.AppendDiv("userlogin-list")
 		lList.Render("userlogin-list", "#userlogin-list", l)
 
 		// Add a list of scenarios for this user
@@ -250,9 +239,7 @@ func userEdit(context *router.Context) {
 			Session.Navigate("/scenario/" + key)
 		})
 
-		div = doc.CreateElement("div").(*dom.HTMLDivElement)
-		div.SetID("userscen-list")
-		doc.QuerySelector("main").AppendChild(div)
+		formulate.AppendDiv("userscen-list")
 		sList.Render("userscen-list", "#userscen-list", s)
 
 		// Add a list of games for this user
@@ -277,9 +264,7 @@ func userEdit(context *router.Context) {
 			Session.Navigate("/game/" + key)
 		})
 
-		div = doc.CreateElement("div").(*dom.HTMLDivElement)
-		div.SetID("usergame-list")
-		doc.QuerySelector("main").AppendChild(div)
+		formulate.AppendDiv("usergame-list")
 		gList.Render("usergame-list", "#usergame-list", g)
 	}()
 
@@ -396,15 +381,39 @@ func userSettings(context *router.Context) {
 
 		// Layout the fields
 
-		form.New("fa-user", "Add User")
+		form.New("fa-cog", "Account Settings - "+user.Username)
+		// 	Username     string     `db:"username"`
+		// 	Name         string     `db:"name"`
+		// 	Passwd       string     `db:"passwd"`
+		// 	Email        string     `db:"email"`
+		// 	Rank         int        `db:"rank"`
+		// 	Notes        string     `db:"notes"`
+		// 	Country      string     `db:"country"`
+		// 	Bloglink     string     `db:"bloglink"`
+		// 	Channel      int        `db:"channel"`
+		// 	IPAddress    string     `db:"ip_address"`
+		// 	Created      *time.Time `db:"created"`
+		// 	Expires      *time.Time `db:"expires"`
+		// 	Banned       bool       `db:"banned"`
+		// 	Disqus       bool       `db:"disqus"`
+		// 	Newsletter   bool       `db:"newsletter"`
+		// 	NumScenarios int        `db:"num_scenarios"`
+		// 	NumGames     int        `db:"num_games"`
+		// }
 
 		form.Row(4).
-			AddInput(1, "Name", "Name").
-			AddNumber(1, "Number", "Number", "0").
-			AddCheck(1, "Check", "Check")
+			AddInput(2, "Full Name", "Name").
+			AddDisplay(1, "Username", "Username").
+			AddInput(1, "Country", "Country")
 
-		form.Row(1).
-			AddBigTextarea(1, "Notes", "Notes")
+		form.Row(4).
+			AddInput(2, "Email", "Email").
+			AddCheck(1, "Subscribe to Newsletter", "Newsletter").
+			AddCheck(1, "Disqus Forum", "Disqus")
+
+		form.Row(4).
+			AddDate(2, "Created", "Created").
+			AddDate(2, "Expires", "Expires")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -415,23 +424,13 @@ func userSettings(context *router.Context) {
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&user)
-
-			RPCdata := shared.UserRPCData{
-				Channel: Session.Channel,
-				User:    &user,
-			}
-			go func() {
-				RPC("UserRPC.Insert", RPCdata, &user)
-				Session.Navigate("/")
-			}()
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
+			print("bind", user)
 		})
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
+		form.ReadOnly("Created", true)
+		form.ReadOnly("Expires", true)
 
 	}()
 }

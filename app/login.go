@@ -317,16 +317,19 @@ func signUp(context *router.Context) {
 			print("binded", user)
 
 			// before we go much further, work out how far into this form we are
-			graphic := doc.QuerySelector("[name=row-7]")
-			print("graphic =", graphic)
-			print("gr class =", graphic.Class().String(), "is hidden", graphic.Class().Contains("hidden"))
+			// graphic := doc.QuerySelector("[name=row-7]")
+			graphic := form.GetRow(7)
+			// print("graphic =", graphic)
+			// print("gr class =", graphic.Class().String(), "is hidden", graphic.Class().Contains("hidden"))
 			if !graphic.Class().Contains("hidden") {
 				print("Looks like we are here because we hit enter whilst we are inside the validate secret code part ... so this is only useful if the email address has been updated, and we want to try again ... need to think this one through a bit more")
 				return
 			}
 
-			errors := doc.QuerySelector("[name=Errors]").(*dom.HTMLDivElement)
-			errRow := doc.QuerySelector("[name=row-0]")
+			// errors := doc.QuerySelector("[name=Errors]").(*dom.HTMLDivElement)
+			errors := form.Get("Errors").(*dom.HTMLDivElement)
+			// errRow := doc.QuerySelector("[name=row-0]")
+			errRow := form.GetRow(0)
 			errRow.Class().Add("hidden")
 			goneBad := false
 			finded := mailAddressRE.FindStringSubmatch(user.Email)
@@ -336,14 +339,16 @@ func signUp(context *router.Context) {
 			if user.Username == "" {
 				errRow.Class().Remove("hidden")
 				errors.SetTextContent("Please enter a unique Username")
-				doc.QuerySelector("[name=Username]").(*dom.HTMLInputElement).Focus()
+				// doc.QuerySelector("[name=Username]").(*dom.HTMLInputElement).Focus()
+				form.Focus("Username")
 				goneBad = true
 			} else {
 				if finded == nil || finded[1] == "" || finded[2] == "" {
 					// print("no email match")
 					errRow.Class().Remove("hidden")
 					errors.SetTextContent("Please enter a valid email address")
-					doc.QuerySelector("[name=Email]").(*dom.HTMLInputElement).Focus()
+					// doc.QuerySelector("[name=Email]").(*dom.HTMLInputElement).Focus()
+					form.Focus("Email")
 					goneBad = true
 				} else {
 					if user.Passwd1 == "" || user.Passwd2 == "" || user.Passwd1 != user.Passwd2 {
@@ -351,9 +356,11 @@ func signUp(context *router.Context) {
 						errors.SetTextContent("Please enter password for this account, and repeat the exact same password in the second field")
 
 						if user.Passwd1 == "" {
-							doc.QuerySelector("[name=Passwd1]").(*dom.HTMLInputElement).Focus()
+							// doc.QuerySelector("[name=Passwd1]").(*dom.HTMLInputElement).Focus()
+							form.Focus("Passwd1")
 						} else {
-							doc.QuerySelector("[name=Passwd2]").(*dom.HTMLInputElement).Focus()
+							// doc.QuerySelector("[name=Passwd2]").(*dom.HTMLInputElement).Focus()
+							form.Focus("Passwd2")
 						}
 						goneBad = true
 					}

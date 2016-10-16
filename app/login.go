@@ -15,6 +15,7 @@ import (
 func Login(username string, passwd string) {
 
 	Session.Username = ""
+	Session.Passwd = ""
 	Session.Rank = 0
 
 	lc := &shared.LoginCredentials{
@@ -32,6 +33,7 @@ func Login(username string, passwd string) {
 	if lr.Result == "OK" {
 		// createMenu(lr.Menu)
 		Session.Username = lc.Username
+		Session.Passwd = lc.Password
 		Session.Rank = lr.Rank
 		Session.UserID = lr.ID
 		Session.Disqus = lr.Disqus

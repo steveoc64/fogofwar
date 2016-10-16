@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"time"
 
@@ -205,7 +206,7 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 	return err
 }
 
-func autoReload() {
+func autoReloadFull() {
 
 	print("Connection has expired !!")
 	print("Logging out in ... 2")
@@ -221,6 +222,107 @@ func autoReload() {
 
 		// Force a reload
 		js.Global.Get("location").Call("replace", "/")
+	}()
+}
+
+func ReConnect() error {
+	Session.Channel = 0
+
+	wsBaseURL := getWSBaseURL()
+	// print("init websocket", wsBaseURL)
+	wss, err := websocket.Dial(wsBaseURL)
+	if err != nil {
+		return errors.New("Reconnect Error " + err.Error())
+	}
+	ws = wss
+
+	encBuf := bufio.NewWriter(ws)
+	client := &myClientCodec{
+		rwc:    ws,
+		dec:    gob.NewDecoder(ws),
+		enc:    gob.NewEncoder(encBuf),
+		encBuf: encBuf,
+	}
+	rpcClient = rpc.NewClientWithCodec(client)
+
+	// Call PingRPC to burn through the message with seq = 0
+	out := &shared.AsyncMessage{}
+	RPC("PingRPC.Ping", "init channel", out)
+
+	// Wait half a sec to get the channel
+	time.Sleep(500 * time.Millisecond)
+
+	lc := &shared.LoginCredentials{
+		Username: Session.Username,
+		Password: Session.Passwd,
+		Channel:  Session.Channel,
+	}
+	// print("login params", lc)
+
+	lr := &shared.LoginReply{}
+	err = RPC("LoginRPC.Login", lc, lr)
+	if err != nil {
+		return errors.New(err.Error())
+	}
+	if lr.Result == "OK" {
+		// createMenu(lr.Menu)
+		Session.Rank = lr.Rank
+		Session.UserID = lr.ID
+		Session.Disqus = lr.Disqus
+		Session.Lookup = lr.LookupTable
+		loadRoutes(lr.Rank, lr.Routes)
+	} else {
+		return errors.New("login failed")
+	}
+	return nil
+}
+
+func autoReload() {
+
+	print("Connection has dropped !!")
+
+	go func() {
+		count := 0
+		keepTrying := true
+		for keepTrying {
+			print("Reconnecting in ... 3")
+			time.Sleep(time.Second)
+			print("................ 2")
+			time.Sleep(time.Second)
+			print("........... 1")
+			time.Sleep(time.Second)
+			err := ReConnect()
+			if err != nil {
+				print(err.Error())
+			} else {
+				print("Reconnected on channel", Session.Channel)
+				if count > 3 {
+					dom.GetWindow().Alert("Reconnected !")
+				}
+				keepTrying = false
+				break
+			}
+			count += 1
+			switch count {
+			case 3:
+				dom.GetWindow().Alert("Your connection has dropped out ... will let you know when its back up.")
+			case 10: // 30 secs
+				// 	dom.GetWindow().Alert(".. No Connection yet, will keep trying.")
+				// case 20: // 1 mins
+				// 	dom.GetWindow().Alert(".. Im still trying to connect :(")
+				// case 40: // 2 mins
+				if !dom.GetWindow().Confirm("Shall I keep trying ?") {
+					keepTrying = false
+					if dom.GetWindow().Confirm("OK. Do you want me to try reloading the app ?") {
+						js.Global.Get("location").Call("replace", "/")
+					} else {
+						print("**** Sauve Qui Peut ! ****")
+					}
+				} else {
+					count = 4
+				}
+			}
+		}
 	}()
 }
 

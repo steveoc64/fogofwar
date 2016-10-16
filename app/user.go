@@ -487,7 +487,7 @@ func userSettings(context *router.Context) {
 
 		// Now add a pricing table
 		formulate.AppendDiv("pricing-table")
-		loadTemplate("pricing-table", "#pricing-table", nil)
+		loadTemplate("pricing-table", "#pricing-table", true)
 
 	}()
 }

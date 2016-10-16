@@ -877,8 +877,11 @@ func forceEdit(context *router.Context) {
 				}
 				if v.UType == 1 {
 					cell.Class().Add("commander")
+					cell.SetInnerHTML(v.Name)
+				} else {
+					cell.SetInnerHTML("&nbsp;&nbsp;" + v.Name)
 				}
-				cell.SetInnerHTML(v.Path)
+				// cell.SetInnerHTML(v.Path)
 
 				cell = row.InsertCell(-1)
 				cell.SetClass("compressed")

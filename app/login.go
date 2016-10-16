@@ -221,6 +221,8 @@ func loginForm() {
 
 func grid1() {
 	loadTemplate("grid1", "main", nil)
+	formulate.AppendDiv("pricing-table")
+	loadTemplate("pricing-table", "#pricing-table", false)
 
 	w := dom.GetWindow()
 	doc := w.Document()

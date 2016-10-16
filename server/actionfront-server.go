@@ -114,8 +114,8 @@ func main() {
 	}
 
 	cachePDFImage()
-	// std := standard.New(fmt.Sprintf(":%d", Config.WebPort))
-	std := standard.WithTLS(fmt.Sprintf(":%d", Config.WebPort), "actionfront.pem", "actionfront.key")
+	std := standard.New(fmt.Sprintf(":%d", Config.WebPort))
+	// std := standard.WithTLS(fmt.Sprintf(":%d", Config.WebPort), "actionfront.pem", "actionfront.key")
 	// func WithTLS(addr, certFile, keyFile string) *Server
 
 	errRun := e.Run(std)

@@ -301,7 +301,7 @@ func (l *LoginRPC) ListLast(data shared.LoginRPCData, retval *[]shared.Login) er
 		from login l
 		left join users u on u.id=l.user_id
 		order by date desc
-		limit 40`, data.ID).QueryStructs(retval)
+		limit 20`, data.ID).QueryStructs(retval)
 
 	logger(start, "Login.ListLast", conn,
 		"",

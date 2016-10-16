@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/md5"
+	"fmt"
 	"strconv"
+	"strings"
 
 	"./shared"
 
@@ -381,7 +384,11 @@ func userSettings(context *router.Context) {
 
 		// Layout the fields
 
+		// title := fmt.Sprintf("Account Settings - %s <img src=https://www.gravatar.com/avatar/%s>",
+		// 	user.Username, "205e460b479e2e5b48aec07710c08d50")
+
 		form.New("fa-cog", "Account Settings - "+user.Username)
+
 		// 	Username     string     `db:"username"`
 		// 	Name         string     `db:"name"`
 		// 	Passwd       string     `db:"passwd"`
@@ -412,8 +419,14 @@ func userSettings(context *router.Context) {
 			AddCheck(1, "Disqus Forum", "Disqus")
 
 		form.Row(4).
-			AddDate(2, "Created", "Created").
-			AddDate(2, "Expires", "Expires")
+			AddDate(2, "Account Created", "Created").
+			AddDate(2, "Commission Expires", "Expires")
+
+		form.Row(1).
+			AddTextarea(1, "Notes", "Notes")
+
+		form.Row(1).
+			AddInput(1, "Blog / Website Address", "Bloglink")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -423,15 +436,55 @@ func userSettings(context *router.Context) {
 
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			form.Bind(&user)
-			print("bind", user)
-			Session.Disqus = user.Disqus
+			go func() {
+				form.Bind(&user)
+				print("bind", user)
+				Session.Disqus = user.Disqus
+				done := false
+				err := RPC("UserRPC.SaveMe", shared.UserRPCData{
+					Channel: Session.Channel,
+					ID:      Session.UserID,
+					User:    &user,
+				}, &done)
+				if err != nil {
+					dom.GetWindow().Alert("Save Error: " + err.Error())
+				} else {
+					Session.Back()
+				}
+			}()
 		})
 
 		// All done, so render the form
-		form.Render("edit-form", "main", &user)
+		formulate.MainContainer("wide-container")
+		form.Render("edit-form", "#main-container", &user)
 		form.ReadOnly("Created", true)
 		form.ReadOnly("Expires", true)
+
+		// Add an avatar to the title
+		w := dom.GetWindow()
+		doc := w.Document()
+
+		// avatar := "205e460b479e2e5b48aec07710c08d50"
+
+		theEmail := strings.TrimSpace(strings.ToLower(user.Email))
+		avatar := md5.Sum([]byte(theEmail))
+		avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar", avatar)
+		// print("avatar", theEmail, avatar, avatarURL)
+		titletext := doc.QuerySelector("#titletext")
+		newSpan := doc.CreateElement("SPAN")
+		titletext.AppendChild(newSpan)
+		newSpan.SetInnerHTML("&nbsp;&nbsp")
+		img := doc.CreateElement("IMG").(*dom.HTMLImageElement)
+		newSpan.AppendChild(img)
+		img.Src = avatarURL
+		emailField := form.Get("Email").(*dom.HTMLInputElement)
+
+		form.OnEvent("Email", "change", func(evt dom.Event) {
+			newEmail := strings.TrimSpace(strings.ToLower(emailField.Value))
+			img.Src = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar",
+				md5.Sum([]byte(newEmail)))
+
+		})
 
 	}()
 }

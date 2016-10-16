@@ -60,6 +60,10 @@ func (s *GlobalSessionData) Navigate(url string) {
 	hideDisqus()
 }
 
+func (s *GlobalSessionData) Back() {
+	s.Router.Back()
+}
+
 func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction) {
 	s.Subscriptions[msg] = fn
 }
@@ -108,7 +112,8 @@ func mainPage(context *router.Context) {
 			Session.Navigate("/game/" + key)
 		})
 
-		form.Render("game-list", "main", nil)
+		formulate.MainContainer("wide-container")
+		form.Render("game-list", "#main-container", nil)
 
 		// print("add action grid")
 		form.ActionGrid("main-actions", "#action-grid", Session, func(url string) {

@@ -109,6 +109,35 @@ func (u *UserRPC) Me(Channel int, retval *shared.User) error {
 	return err
 }
 
+func (u *UserRPC) SaveMe(data shared.UserRPCData, done *bool) error {
+	start := time.Now()
+
+	// check that email is not in use by someone else
+	otherID := 0
+	DB.SQL(`select id from users where email=$1 and id != $2`, data.User.Email, data.ID).QueryScalar(&otherID)
+	if otherID != 0 {
+		return errors.New("That email address is already used")
+	}
+	conn := Connections.Get(data.Channel)
+	if data.User.ID != conn.UserID {
+		return errors.New("Invalid User ID")
+	}
+
+	_, err := DB.Update("users").
+		SetWhitelist(data.User, "name", "email", "notes", "country",
+			"bloglink", "disqus", "newsletter").
+		Where("id = $1", data.ID).
+		Exec()
+
+	if err == nil {
+		*done = true
+	}
+	logger(start, "User.SaveMe", conn,
+		fmt.Sprintf("%v", data.User), "")
+
+	return err
+}
+
 func (u *UserRPC) Update(data shared.UserRPCData, retval *shared.User) error {
 	start := time.Now()
 
@@ -131,6 +160,27 @@ func (u *UserRPC) Update(data shared.UserRPCData, retval *shared.User) error {
 	logger(start, "User.Update", conn,
 		fmt.Sprintf("ID %d %v", data.ID, data.User),
 		fmt.Sprintf("%v", *retval))
+
+	return err
+}
+
+func (u *UserRPC) Delete(data shared.UserRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+	if conn.Rank < 9 {
+		return errors.New("Insufficient Privilege")
+	}
+
+	_, err := DB.SQL(`delete from users where id=$1`, data.ID).Exec()
+	if err == nil {
+		*done = true
+	}
+
+	logger(start, "User.Delete", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		"")
 
 	return err
 }

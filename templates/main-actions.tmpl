@@ -1,13 +1,4 @@
 <div class="action-grid">
-	{{if gt .Rank 9}}
-	<div class="action__item" url="/users">
-		<div class="action__title">Users</div>
-		<div class="action__icon"><i class="fa fa-user fa-lg"></i></div>
-		<div class="action__text">
-			Users Database
-		</div>
-	</div>
-	{{end}}
 	<div class="action__item" url="/game/new">
 		<div class="action__title">New Game</div>
 		<div class="action__icon"><i class="fa fa-plus-circle fa-lg"></i></div>
@@ -36,6 +27,15 @@
 			Account Settings
 		</div>
 	</div>
+	{{if gt .Rank 9}}
+	<div class="action__item" url="/users">
+		<div class="action__title">Users</div>
+		<div class="action__icon"><i class="fa fa-user fa-lg"></i></div>
+		<div class="action__text">
+			Users Database
+		</div>
+	</div>
+	{{end}}
 
 
 </div>

@@ -6,7 +6,12 @@ import (
 	"strings"
 	"time"
 
+	"unicode"
+
 	"../shared"
+
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type ScenarioRPC struct{}
@@ -426,12 +431,15 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 
 	// Calculate the Part of the Path
 	paths := strings.Split(data.ForceUnit.Path, ".")
-	println("paths", paths, len(paths))
+	// println("paths", paths, len(paths))
 	if len(paths) > 0 {
 		hackPath := paths[len(paths)-1]
-		println("hackpath", hackPath)
-		hackPath = strings.NewReplacer("ü", "ue", "ö", "oe", "ß", "ss",
+		// println("hackpath", hackPath)
+		hackPath = strings.NewReplacer(
+			"ß", "ss", "ð", "d",
 			"/", "_",
+			"'", "",
+			"\"", "",
 			" ", "_",
 			".", "",
 			"&", "",
@@ -442,15 +450,39 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 			"!", "",
 			"-", "",
 			",", "").Replace(data.ForceUnit.Name)
-		println("hackedpath", hackPath)
+		// println("hackedpath", hackPath)
 		paths[len(paths)-1] = hackPath
 		data.ForceUnit.Path = strings.Join(paths, ".")
-		println("new path", data.ForceUnit.Path)
+		// println("new path", data.ForceUnit.Path)
 	}
 
 	if data.ForceUnit.Path == "" {
 		return errors.New("Blank name .. will not record this change")
 	}
+
+	isMn := func(r rune) bool {
+		return unicode.Is(unicode.Mn, r) // Mn: nonspacing marks
+	}
+
+	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	result, _, _ := transform.String(t, data.ForceUnit.Path)
+	//"žůžo")
+	// fmt.Println(result)
+	// return nil
+
+	// For double safety, check that the computed path is not blank when converted to an ltree
+	lresult := ""
+	treeErr := DB.SQL(`select $1::ltree`, result).QueryScalar(&lresult)
+	if treeErr != nil {
+		return errors.New("Cannot convert " + result + " to ltree")
+	}
+	// println("was", result, "is", lresult)
+	// return nil
+
+	if lresult == "" {
+		return errors.New("Converted ltree " + result + " is blank - cant allow")
+	}
+	data.ForceUnit.Path = lresult
 
 	// Get the existing path
 	oldPath := ""

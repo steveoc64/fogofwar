@@ -60,7 +60,7 @@ dist/config.json: server/config.json
 	cp server/config.json dist	
 
 ssl:
-	mkdir -p ssl
+	mkdir -p cert
 	openssl genrsa -out cert/actionfront.key 2048
 	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650
 

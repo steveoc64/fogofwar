@@ -4,3 +4,4 @@ copy users (id, username, passwd, name, email, rank, country, bloglink) from std
 2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	Australia	http://witchwoodstudio.com
 \.
 select * from users;
+select setval(pg_get_serial_sequence('users','id'),(select max(id) from users) ); 

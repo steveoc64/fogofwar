@@ -425,6 +425,7 @@ func userSettings(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(&user)
 			print("bind", user)
+			Session.Disqus = user.Disqus
 		})
 
 		// All done, so render the form

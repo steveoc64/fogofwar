@@ -59,6 +59,11 @@ app-assets: dist/assets.log dist/config.json
 dist/config.json: server/config.json
 	cp server/config.json dist	
 
+ssl:
+	mkdir -p ssl
+	openssl genrsa -out cert/actionfront.key 2048
+	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650
+
 dist/assets.log: assets/index.html assets/img/*  assets/fonts/* assets/css/*
 	@mplayer -quiet audio/attention.oga 2> /dev/null > /dev/null
 	@mkdir -p dist/public/css dist/public/font dist/public/js
@@ -93,6 +98,7 @@ dist/actionfront-server: server/*.go shared/*.go
 	cd server && gosimple
 	go build -o dist/actionfront-server server/*.go
 	@ls -l dist/actionfront-server
+	cp cert/actionfront.key cert/actionfront.pem dist
 
 run: 
 	./terminate

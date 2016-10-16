@@ -12,6 +12,7 @@ app/template.go
 template.go
 assets/scss/.sass-cache
 test
+cert
 backup
 templates/old
 *~

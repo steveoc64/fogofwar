@@ -427,6 +427,14 @@ func (s *ScenarioRPC) AddUnit(data shared.ForceUnitRPCData, retval *shared.Force
 func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.ForceUnit) error {
 	start := time.Now()
 
+	if data.ForceUnit.Name == "" {
+		return errors.New("Enter a name to save")
+	}
+
+	if data.ForceUnit.Name == "New Division" && data.ForceUnit.UType == 1 {
+		return errors.New("The name New_Division is reserved, please chosse another name")
+	}
+
 	conn := Connections.Get(data.Channel)
 
 	// Calculate the Part of the Path
@@ -474,14 +482,27 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	lresult := ""
 	treeErr := DB.SQL(`select $1::ltree`, result).QueryScalar(&lresult)
 	if treeErr != nil {
-		return errors.New("Cannot convert " + result + " to ltree")
+		return errors.New("Cannot convert " + result + " to ltree .. try cutting back on the non-printable characters.")
 	}
 	// println("was", result, "is", lresult)
 	// return nil
 
 	if lresult == "" {
-		return errors.New("Converted ltree " + result + " is blank - cant allow")
+		return errors.New("Converted unit full path name " + result + " is blank - cant save, try another name")
 	}
+
+	// Finally, check that the newly computed path is unique within this force
+	samePathCount := 0
+	DB.SQL(`select count(*) from force_unit 
+		where force_id=$2
+		and id != $1
+		and path=$3`, data.ID, data.ForceUnit.ForceID, result).
+		QueryScalar(&samePathCount)
+
+	if samePathCount > 0 {
+		return errors.New("Another Unit in this force uses the same name .. not saved")
+	}
+
 	data.ForceUnit.Path = result
 
 	// Get the existing path
@@ -544,10 +565,12 @@ func (s *ScenarioRPC) DeleteUnit(data shared.ForceUnitRPCData, retval *[]shared.
 	}
 
 	// Kill off subunits IN THE SAME FORCE
-	if oldUnit.Path != "" {
+	if oldUnit.Path != "" && oldUnit.UType == 1 {
 		_, err = DB.SQL(`delete
 	 from force_unit 
-	 where path <@ $1::ltree and force_id=$2`, oldUnit.Path, oldUnit.ForceID).Exec()
+	 where path <@ $1::ltree 
+	 and utype > 1 
+	 and force_id=$2`, oldUnit.Path, oldUnit.ForceID).Exec()
 		if err != nil {
 			println(err.Error())
 			return err

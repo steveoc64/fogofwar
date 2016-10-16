@@ -463,13 +463,10 @@ func scenarioRedAdd(context *router.Context) {
 		data.Nation = NationLastUsed
 		form.Render("edit-form", "main", &data)
 
-		w := dom.GetWindow()
-		doc := w.Document()
-
 		if NationLastUsed == "" {
-			doc.QuerySelector("[name=Nation]").(*dom.HTMLInputElement).Focus()
+			form.Focus("Nation")
 		} else {
-			doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+			form.Focus("Name")
 		}
 
 		// Action Grid
@@ -552,13 +549,10 @@ func scenarioBlueAdd(context *router.Context) {
 		data.Nation = NationLastUsed
 		form.Render("edit-form", "main", &data)
 
-		w := dom.GetWindow()
-		doc := w.Document()
-
 		if NationLastUsed == "" {
-			doc.QuerySelector("[name=Nation]").(*dom.HTMLInputElement).Focus()
+			form.Focus("Nation")
 		} else {
-			doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+			form.Focus("Name")
 		}
 
 		// Action Grid
@@ -827,13 +821,13 @@ func forceEdit(context *router.Context) {
 		form.Render("edit-form", "main", &force)
 		swapper.Panels[0].Paint(&shared.ForceUnit{})
 		swapper.Select(0)
-		doc.QuerySelector("[name=Name]").(*dom.HTMLInputElement).Focus()
+		form.Focus("Name")
 
 		// Turn off printing for some fields
 		if canEdit {
-			doc.QuerySelector("[name=row-3]").Class().Add("no-print")
-			doc.QuerySelector("[name=grid-4-0]").Class().Add("full-print")
-			doc.QuerySelector("[name=grid-4-1]").Class().Add("no-print")
+			form.Class("row-3").Add("no-print")
+			form.Class("grid-4-0").Add("full-print")
+			form.Class("grid-4-1").Add("no-print")
 		}
 
 		// Action Grid
@@ -899,7 +893,7 @@ func forceEdit(context *router.Context) {
 				cell.SetInnerHTML(descr)
 			}
 
-			doc.QuerySelector("[name=Summary]").
+			form.Get("Summary").
 				SetInnerHTML(fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
 					totalCmdrs,
 					totalBayonets,
@@ -907,9 +901,39 @@ func forceEdit(context *router.Context) {
 					totalGuns))
 		}
 
+		drawUnitPanel := func() {
+			// print("drawUnitPanel with TheUnit", TheUnit)
+			switch TheUnit.UType {
+			case 1: // Command
+				swapper.Panels[1].Paint(&TheUnit)
+				swapper.Select(1)
+				form.FocusSelect("Cmd-Name")
+			case 2: // Bde
+				// print("paint panel 2")
+				swapper.Panels[2].Paint(&TheUnit)
+				swapper.Select(2)
+				form.FocusSelect("Bde-Name")
+			case 3: // Cav
+				// print("paint panel 2")
+				swapper.Panels[3].Paint(&TheUnit)
+				swapper.Select(3)
+				form.FocusSelect("Cav-Name")
+			case 4: // Bty
+				// print("paint panel 2")
+				swapper.Panels[4].Paint(&TheUnit)
+				swapper.Select(4)
+				form.FocusSelect("Gun-Name")
+			case 5: // Other
+				// print("paint panel 2")
+				swapper.Panels[5].Paint(&TheUnit)
+				swapper.Select(5)
+				form.FocusSelect("Other-Name")
+			}
+		}
+
 		initUnitList := func() {
 			// print("init unit list")
-			div := doc.QuerySelector("[name=UnitList]").(*dom.HTMLDivElement)
+			div := form.Get("UnitList").(*dom.HTMLDivElement)
 			div.SetInnerHTML("")
 			table := doc.CreateElement("TABLE").(*dom.HTMLTableElement)
 			table.Class().Add("data-table")
@@ -963,39 +987,34 @@ func forceEdit(context *router.Context) {
 					}
 				}
 				drawUnitList()
-				switch TheUnit.UType {
-				case 1: // Command
-					swapper.Panels[1].Paint(&TheUnit)
-					el := doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement)
-					el.Focus()
-					el.Select()
-				case 2: // Bde
-					// print("paint panel 2")
-					swapper.Panels[2].Paint(&TheUnit)
-					el := doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement)
-					el.Focus()
-					el.Select()
-				case 3: // Cav
-					// print("paint panel 2")
-					swapper.Panels[3].Paint(&TheUnit)
-					el := doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement)
-					el.Focus()
-					el.Select()
-				case 4: // Bty
-					// print("paint panel 2")
-					swapper.Panels[4].Paint(&TheUnit)
-					el := doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement)
-					el.Focus()
-					el.Select()
-				case 5: // Other
-					// print("paint panel 2")
-					swapper.Panels[5].Paint(&TheUnit)
-					el := doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement)
-					el.Focus()
-					el.Select()
-				}
-
+				drawUnitPanel()
 			}()
+		}
+
+		goUpOne := func() {
+			for k, v := range force.Units {
+				if v.ID == TheUnit.ID {
+					if k > 0 {
+						TheUnit = force.Units[k-1]
+						drawUnitList()
+						drawUnitPanel()
+					}
+					break
+				}
+			}
+		}
+
+		goDownOne := func() {
+			for k, v := range force.Units {
+				if v.ID == TheUnit.ID {
+					if k < len(force.Units)-1 {
+						TheUnit = force.Units[k+1]
+						drawUnitList()
+						drawUnitPanel()
+					}
+					break
+				}
+			}
 		}
 
 		// Dont use this anymore - always get a fresh set from the server
@@ -1047,12 +1066,17 @@ func forceEdit(context *router.Context) {
 						// print("save unit with ID", TheUnit.ID)
 						go func() {
 							newUnit := shared.ForceUnit{}
-							RPC("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
+							err := RPC("ScenarioRPC.UpdateUnit", shared.ForceUnitRPCData{
 								Channel:   Session.Channel,
 								ID:        TheUnit.ID,
 								ForceUnit: &TheUnit,
 							}, &newUnit)
-							TheUnit = newUnit
+							if err != nil {
+								dom.GetWindow().Alert(err.Error())
+							} else {
+								TheUnit = newUnit
+							}
+
 							// Have to fetch the whole tree again, as a change in this one
 							// can have a ripple change in all the others
 							newUnits := []shared.ForceUnit{}
@@ -1070,7 +1094,7 @@ func forceEdit(context *router.Context) {
 		}
 
 		// Click on the list, fill in the panel
-		doc.QuerySelector("[name=UnitList]").AddEventListener("click", false, func(evt dom.Event) {
+		form.OnEvent("UnitList", "click", func(evt dom.Event) {
 			evt.PreventDefault()
 			td := evt.Target()
 			tr := td.ParentElement()
@@ -1085,41 +1109,31 @@ func forceEdit(context *router.Context) {
 				if v.ID == key {
 					// print("Got matching unit", v)
 					TheUnit = v
+					// print("here with new unit", v)
 					drawUnitList()
-
-					switch TheUnit.UType {
-					case 1: // Command
-						swapper.Panels[1].Paint(&TheUnit)
-						swapper.Select(1)
-						doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement).Focus()
-					case 2: // Bde
-						// print("paint panel 2")
-						swapper.Panels[2].Paint(&TheUnit)
-						swapper.Select(2)
-						doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
-					case 3: // Cav
-						// print("paint panel 2")
-						swapper.Panels[3].Paint(&TheUnit)
-						swapper.Select(3)
-						doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
-					case 4: // Bty
-						// print("paint panel 2")
-						swapper.Panels[4].Paint(&TheUnit)
-						swapper.Select(4)
-						doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
-					case 5: // Other
-						// print("paint panel 2")
-						swapper.Panels[5].Paint(&TheUnit)
-						swapper.Select(5)
-						doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
-					}
+					drawUnitPanel()
 					break
 				}
 			}
 		})
 
+		// Put up down arrows on the name entry fields only, to nav to different units
+		form.OnEvent("grid-4-1", "keydown", func(evt dom.Event) {
+			kevent := evt.(*dom.KeyboardEvent)
+			if evt.Target().TagName() == "INPUT" {
+				switch kevent.KeyCode {
+				case 27:
+					drawUnitPanel() // which restores the screen to the known record
+				case 38:
+					goUpOne()
+				case 40:
+					goDownOne()
+				}
+			}
+		})
+
 		// Add Buttons
-		doc.QuerySelector("[name=AddCommand]").AddEventListener("click", false, func(evt dom.Event) {
+		form.OnEvent("AddCommand", "click", func(evt dom.Event) {
 			evt.PreventDefault()
 			// print("Add Command")
 			go func() {
@@ -1135,23 +1149,23 @@ func forceEdit(context *router.Context) {
 				drawUnitList()
 				swapper.Panels[1].Paint(&TheUnit)
 				swapper.Select(1)
-				doc.QuerySelector("[name=Cmd-Name]").(*dom.HTMLInputElement).Focus()
+				form.Focus("Cmd-Name")
 			}()
 		})
 		if canEdit {
-			doc.QuerySelector("[name=Cmd-Delete]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Cmd-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				// if w.Confirm("Delete this Command ? ... includes all sub-units") {
 				deleteUnit()
 				// }
 			})
-			doc.QuerySelector("[name=Cmd-Copy]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Cmd-Copy", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				cloneUnit()
 			})
 		}
 
-		doc.QuerySelector("[name=AddBde]").AddEventListener("click", false, func(evt dom.Event) {
+		form.OnEvent("AddBde", "click", func(evt dom.Event) {
 			evt.PreventDefault()
 			// print("Add Brigade")
 			go func() {
@@ -1172,23 +1186,23 @@ func forceEdit(context *router.Context) {
 				drawUnitList()
 				swapper.Panels[2].Paint(&TheUnit)
 				swapper.Select(2)
-				doc.QuerySelector("[name=Bde-Name]").(*dom.HTMLInputElement).Focus()
+				form.Focus("Bde-Name")
 			}()
 		})
 		if canEdit {
-			doc.QuerySelector("[name=Bde-Delete]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Bde-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				// if w.Confirm("Delete this Brigade ?") {
 				deleteUnit()
 				// }
 			})
-			doc.QuerySelector("[name=Bde-Copy]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Bde-Copy", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				cloneUnit()
 			})
 		}
 
-		doc.QuerySelector("[name=AddCav]").AddEventListener("click", false, func(evt dom.Event) {
+		form.OnEvent("AddCav", "click", func(evt dom.Event) {
 			evt.PreventDefault()
 			// print("Add Cavalry")
 			go func() {
@@ -1208,22 +1222,16 @@ func forceEdit(context *router.Context) {
 				TheUnit = newUnit
 				// print("theUnit now set to", TheUnit)
 				drawUnitList()
-				swapper.Panels[3].Paint(&TheUnit)
-				swapper.Select(3)
-				doc.QuerySelector("[name=Cav-Name]").(*dom.HTMLInputElement).Focus()
+				drawUnitPanel()
 			}()
 
 		})
 		if canEdit {
-			doc.QuerySelector("[name=Cav-Delete]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Cav-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
-				go func() {
-					// if w.Confirm("Delete this Cavalry Unit ?") {
-					deleteUnit()
-					// }
-				}()
+				deleteUnit()
 			})
-			doc.QuerySelector("[name=Cav-Copy]").AddEventListener("click", false, func(evt dom.Event) {
+			form.OnEvent("Cav-Copy", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				cloneUnit()
 			})

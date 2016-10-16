@@ -261,9 +261,6 @@ func grid1() {
 
 func signUp(context *router.Context) {
 
-	w := dom.GetWindow()
-	doc := w.Document()
-
 	go func() {
 		user := shared.UserSignup{}
 		title := "Sign Up for NEW Account"
@@ -317,7 +314,6 @@ func signUp(context *router.Context) {
 			print("binded", user)
 
 			// before we go much further, work out how far into this form we are
-			// graphic := doc.QuerySelector("[name=row-7]")
 			graphic := form.GetRow(7)
 			// print("graphic =", graphic)
 			// print("gr class =", graphic.Class().String(), "is hidden", graphic.Class().Contains("hidden"))
@@ -326,20 +322,16 @@ func signUp(context *router.Context) {
 				return
 			}
 
-			// errors := doc.QuerySelector("[name=Errors]").(*dom.HTMLDivElement)
 			errors := form.Get("Errors").(*dom.HTMLDivElement)
-			// errRow := doc.QuerySelector("[name=row-0]")
 			errRow := form.GetRow(0)
 			errRow.Class().Add("hidden")
 			goneBad := false
 			finded := mailAddressRE.FindStringSubmatch(user.Email)
-			// print("finded =", finded)
 
 			// validate the input first
 			if user.Username == "" {
 				errRow.Class().Remove("hidden")
 				errors.SetTextContent("Please enter a unique Username")
-				// doc.QuerySelector("[name=Username]").(*dom.HTMLInputElement).Focus()
 				form.Focus("Username")
 				goneBad = true
 			} else {
@@ -347,7 +339,6 @@ func signUp(context *router.Context) {
 					// print("no email match")
 					errRow.Class().Remove("hidden")
 					errors.SetTextContent("Please enter a valid email address")
-					// doc.QuerySelector("[name=Email]").(*dom.HTMLInputElement).Focus()
 					form.Focus("Email")
 					goneBad = true
 				} else {
@@ -356,10 +347,8 @@ func signUp(context *router.Context) {
 						errors.SetTextContent("Please enter password for this account, and repeat the exact same password in the second field")
 
 						if user.Passwd1 == "" {
-							// doc.QuerySelector("[name=Passwd1]").(*dom.HTMLInputElement).Focus()
 							form.Focus("Passwd1")
 						} else {
-							// doc.QuerySelector("[name=Passwd2]").(*dom.HTMLInputElement).Focus()
 							form.Focus("Passwd2")
 						}
 						goneBad = true
@@ -380,15 +369,14 @@ func signUp(context *router.Context) {
 						errors.SetTextContent(err.Error())
 					} else {
 						// hide parts of the display, and raise some new ones
-						doc.QuerySelector("[name=row-2]").Class().Remove("hidden")
-						doc.QuerySelector("[name=row-3]").Class().Add("hidden")
-						doc.QuerySelector("[name=row-4]").Class().Add("hidden")
-						doc.QuerySelector("[name=row-5]").Class().Add("hidden")
-						doc.QuerySelector("[name=row-6]").Class().Add("hidden")
-						gr := doc.QuerySelector("[name=row-7]")
+						form.Show("row-2")
+						form.Hide("row-3")
+						form.Hide("row-4")
+						form.Hide("row-5")
+						form.Hide("row-6")
 						loadTemplate("magic-secret", "[name=Graphic]", &user)
-						gr.Class().Remove("hidden")
-						doc.QuerySelector("[name=Secret]").(*dom.HTMLInputElement).Focus()
+						form.Show("row-7")
+						form.Focus("Secret")
 					}
 				}()
 			}
@@ -396,16 +384,19 @@ func signUp(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &user)
-		doc.QuerySelector("[name=Username]").(*dom.HTMLInputElement).Focus()
+		form.Focus("Username")
 
-		errors := doc.QuerySelector("[name=Errors]").(*dom.HTMLDivElement)
-		errRow := doc.QuerySelector("[name=row-0]")
+		errors := form.Get("Errors").(*dom.HTMLDivElement)
+		errRow := form.GetRow(0)
 		errRow.Class().Add("hidden")
-		magicRow := doc.QuerySelector("[name=row-2]")
-		magicRow.Class().Add("hidden")
-		doc.QuerySelector("[name=row-7]").Class().Add("hidden")
 
-		doc.QuerySelector("[name=Username]").AddEventListener("change", false, func(evt dom.Event) {
+		magicRow := form.GetRow(2)
+		magicRow.Class().Add("hidden")
+
+		form.Hide("row-7")
+
+		form.OnEvent("Username", "change", func(evt dom.Event) {
+
 			username := evt.Target().(*dom.HTMLInputElement)
 			// print("username has changed .. check it with the backend", username.Value)
 			go func() {
@@ -427,7 +418,7 @@ func signUp(context *router.Context) {
 			}()
 		})
 
-		doc.QuerySelector("[name=Email]").AddEventListener("change", false, func(evt dom.Event) {
+		form.OnEvent("Email", "change", func(evt dom.Event) {
 			email := evt.Target().(*dom.HTMLInputElement)
 			// print("email has changed to", email.Value)
 			finded := mailAddressRE.FindStringSubmatch(email.Value)
@@ -435,7 +426,7 @@ func signUp(context *router.Context) {
 				// print("no email match")
 				errRow.Class().Remove("hidden")
 				errors.SetTextContent("Please enter a valid email address")
-				doc.QuerySelector("[name=Email]").(*dom.HTMLInputElement).Focus()
+				form.Focus("Email")
 			} else {
 				go func() {
 					ok := false
@@ -453,8 +444,8 @@ func signUp(context *router.Context) {
 			}
 		})
 
-		doc.QuerySelector("[name=Passwd1]").AddEventListener("blur", false, func(evt dom.Event) {
-			pw1 := doc.QuerySelector("[name=Passwd1]").(*dom.HTMLInputElement)
+		form.OnEvent("Passwd1", "blur", func(evt dom.Event) {
+			pw1 := form.Get("Passwd1").(*dom.HTMLInputElement)
 			if pw1.Value == "" {
 				errRow.Class().Remove("hidden")
 				errors.SetTextContent(`Please enter a non-blank password to proceed`)
@@ -462,8 +453,8 @@ func signUp(context *router.Context) {
 			}
 		})
 
-		doc.QuerySelector("[name=Passwd2]").AddEventListener("blur", false, func(evt dom.Event) {
-			pw2 := doc.QuerySelector("[name=Passwd2]").(*dom.HTMLInputElement)
+		form.OnEvent("Passwd2", "blur", func(evt dom.Event) {
+			pw2 := form.Get("Passwd2").(*dom.HTMLInputElement)
 			if pw2.Value == "" {
 				errRow.Class().Remove("hidden")
 				errors.SetTextContent(`Please enter your new password in BOTH fields`)
@@ -471,9 +462,9 @@ func signUp(context *router.Context) {
 			}
 		})
 
-		doc.QuerySelector("[name=Passwd2]").AddEventListener("change", false, func(evt dom.Event) {
-			pw1 := doc.QuerySelector("[name=Passwd1]").(*dom.HTMLInputElement)
-			pw2 := doc.QuerySelector("[name=Passwd2]").(*dom.HTMLInputElement)
+		form.OnEvent("Passwd2", "change", func(evt dom.Event) {
+			pw1 := form.Get("Passwd1]").(*dom.HTMLInputElement)
+			pw2 := form.Get("Passwd2]").(*dom.HTMLInputElement)
 			goneBad := false
 
 			if pw1.Value == "" {
@@ -499,7 +490,7 @@ func signUp(context *router.Context) {
 			}
 		})
 
-		doc.QuerySelector("[name=Secret]").AddEventListener("change", false, func(evt dom.Event) {
+		form.OnEvent("Secret", "change", func(evt dom.Event) {
 			secret := evt.Target().(*dom.HTMLInputElement)
 			print("SecretCode has changed", secret.Value)
 			go func() {
@@ -515,7 +506,6 @@ func signUp(context *router.Context) {
 					// We are now validated .. autologin
 					go Login(user.Username, user.Passwd1)
 				}
-
 			}()
 
 		})

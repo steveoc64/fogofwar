@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"../shared"
-	"github.com/steveoc64/godev/mail"
+	// "github.com/steveoc64/godev/mail"
 )
 
 type LoginRPC struct{}
@@ -229,7 +229,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 
 	if Config.MailServer != "" {
 
-		m := mail.NewMail()
+		m := NewMail()
 		m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
 		m.SetHeader("To", u.Email)
 		m.SetHeader("Subject", "Welcome to ActionFront")

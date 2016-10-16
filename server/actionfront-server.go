@@ -14,11 +14,9 @@ import (
 	"github.com/steveoc64/godev/db"
 	"github.com/steveoc64/godev/echocors"
 	// _ "github.com/steveoc64/godev/sms"
-	"github.com/steveoc64/godev/mail"
+	// "github.com/steveoc64/godev/mail"
 	"github.com/steveoc64/godev/smt"
 	runner "gopkg.in/mgutz/dat.v1/sqlx-runner"
-
-	gomail "gopkg.in/gomail.v2"
 
 	// "github.com/facebookgo/grace/gracehttp"
 	"golang.org/x/net/websocket"
@@ -27,7 +25,7 @@ import (
 var e *echo.Echo
 var DB *runner.DB
 
-var MailChannel chan *gomail.Message
+// var MailChannel chan *gomail.Message
 
 func main() {
 
@@ -46,8 +44,8 @@ func main() {
 	} else {
 		println("Mail server =", Config.MailServer)
 
-		MailChannel = mail.InitMailer()
-		m := mail.NewMail()
+		MailChannel = InitMailer(Config)
+		m := NewMail()
 		m.SetHeader("From", "ActionFront System <system@wargaming.io>")
 		m.SetHeader("To", "steveoc64@gmail.com")
 		m.SetHeader("Subject", "ActionFront Startup")

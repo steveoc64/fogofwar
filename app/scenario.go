@@ -687,6 +687,8 @@ func forceEdit(context *router.Context) {
 		cmdPanel.AddRow(3).
 			AddInput(2, "Command Name", "Name").
 			AddInput(1, "Nationality", "Nation")
+		cmdPanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		cmdPanel.AddRow(3).
 			AddInput(1, "Commander", "CommanderName").
 			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).

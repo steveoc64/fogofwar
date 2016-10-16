@@ -482,20 +482,32 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	if lresult == "" {
 		return errors.New("Converted ltree " + result + " is blank - cant allow")
 	}
-	data.ForceUnit.Path = lresult
+	data.ForceUnit.Path = result
 
 	// Get the existing path
 	oldPath := ""
 	DB.SQL(`select path from force_unit where id=$1`, data.ID).QueryScalar(&oldPath)
 	if oldPath != "" && oldPath != data.ForceUnit.Path {
-		println("execute path change from ", oldPath, "to", data.ForceUnit.Path, "for force", data.ID)
+		println("execute path change from ", oldPath, "to", data.ForceUnit.Path, "for force", data.ForceUnit.ForceID)
+		// println(`update force_unit
+		// 	set path = '` + data.ForceUnit.Path + `'::ltree || subpath(path,1)
+		// 	where force_id=27
+		// 	and nlevel(path) > 1 and path <@ '` + oldPath + `'::ltree`)
+
+		// println("exec the update")
+
 		_, eerr := DB.SQL(`update force_unit 
 			set path = $1::ltree || subpath(path,1)
 			where force_id=$3
-			and nlevel(path) > 1 and path <@ $2::ltree`, data.ForceUnit.Path, oldPath, data.ID).Exec()
+			and nlevel(path) > 1 and path <@ $2::ltree`, data.ForceUnit.Path, oldPath, data.ForceUnit.ForceID).Exec()
+
+		// println("eerr is", eerr)
+
 		if eerr != nil {
 			println(eerr.Error())
 			return errors.New(eerr.Error())
+			// } else {
+			// println("so we are here now")
 		}
 	}
 

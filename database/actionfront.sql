@@ -90,7 +90,7 @@ SET default_with_oids = false;
 --
 
 CREATE TABLE abc (
-    path ltree
+    thing boolean
 );
 
 
@@ -900,7 +900,8 @@ CREATE TABLE scenario (
     red_team text DEFAULT ''::text NOT NULL,
     red_brief text DEFAULT ''::text NOT NULL,
     blue_team text DEFAULT ''::text NOT NULL,
-    blue_brief text DEFAULT ''::text NOT NULL
+    blue_brief text DEFAULT ''::text NOT NULL,
+    review boolean DEFAULT false
 );
 
 
@@ -1434,7 +1435,8 @@ ALTER TABLE ONLY utype ALTER COLUMN id SET DEFAULT nextval('utype_id_seq'::regcl
 -- Data for Name: abc; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY abc (path) FROM stdin;
+COPY abc (thing) FROM stdin;
+f
 \.
 
 
@@ -1741,13 +1743,13 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 109	5	Corps_Artillery	Corps Artillery	Careil	France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
 110	5	Corps_Artillery.Heavy_Foot	Heavy Foot			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f	
 111	5	1eme_Division	1eme Division	Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
-112	5	1eme_Division.17e_Legere	17e Legere		France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f	
 113	5	1eme_Division.34e_Ligne	34e Ligne		France	2	4	5	2500	1	0	0	0	5	0	0	0	0	0	0	f	
 114	5	1eme_Division.40e_Ligne	40e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
 115	5	1eme_Division.64e_Ligne	64e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
 125	6	Cav_Bde.9e_Hussar	9e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
 116	5	1eme_Division.88e_Ligne	88e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
 65	3	2eme_Division.48e_Ligne	48e Ligne		France	2	1	5	1400	1	0	0	0	1	0	0	0	0	0	0	f	
+112	5	1eme_Division.17e_Legere	17e Legere		France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f	
 132	6	1eme_Division.39e_Ligne	39e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
 118	5	2eme_Division	2eme Division	Gazan	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
 142	7	Corps_Cav.7e_Chasseur	7e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
@@ -2615,6 +2617,183 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 1	2016-10-17 15:46:55.035634+10:30	127.0.0.1:38874	1
 1	2016-10-17 15:47:20.89598+10:30	127.0.0.1:38918	1
 1	2016-10-17 15:52:36.964414+10:30	127.0.0.1:39340	1
+2	2016-10-17 15:54:48.504396+10:30	192.168.1.105:35533	2
+2	2016-10-17 15:55:07.773227+10:30	192.168.1.105:35564	3
+1	2016-10-17 16:09:32.613943+10:30	127.0.0.1:40662	1
+2	2016-10-17 16:09:32.727098+10:30	192.168.1.105:36129	2
+1	2016-10-17 16:11:54.849988+10:30	127.0.0.1:40700	3
+2	2016-10-17 16:13:19.676736+10:30	192.168.1.105:36316	4
+1	2016-10-17 16:14:52.309771+10:30	127.0.0.1:41196	1
+1	2016-10-17 16:15:01.697827+10:30	127.0.0.1:41218	3
+2	2016-10-17 16:15:03.219501+10:30	192.168.1.105:36414	2
+1	2016-10-17 16:30:21.239517+10:30	127.0.0.1:42438	1
+2	2016-10-17 16:30:21.24847+10:30	192.168.1.105:36990	2
+1	2016-10-17 16:30:33.862356+10:30	127.0.0.1:42468	3
+2	2016-10-17 16:30:38.231063+10:30	192.168.1.105:37017	4
+1	2016-10-17 16:31:57.795645+10:30	127.0.0.1:42638	5
+1	2016-10-17 16:36:48.597718+10:30	127.0.0.1:43026	2
+2	2016-10-17 16:36:48.613079+10:30	192.168.1.105:37259	1
+1	2016-10-17 16:36:56.394704+10:30	127.0.0.1:43034	3
+1	2016-10-17 16:37:10.638366+10:30	127.0.0.1:43110	5
+1	2016-10-17 16:37:13.350487+10:30	127.0.0.1:43102	4
+1	2016-10-17 16:38:38.956472+10:30	127.0.0.1:43240	2
+2	2016-10-17 16:38:38.996523+10:30	192.168.1.105:37325	1
+1	2016-10-17 16:38:42.232412+10:30	127.0.0.1:43252	3
+1	2016-10-17 16:39:07.906913+10:30	127.0.0.1:43316	5
+1	2016-10-17 16:39:10.891742+10:30	127.0.0.1:43314	4
+2	2016-10-17 16:39:22.930701+10:30	192.168.1.105:37371	6
+2	2016-10-17 16:45:21.432376+10:30	192.168.1.105:37597	1
+1	2016-10-17 16:45:22.042252+10:30	127.0.0.1:44248	2
+1	2016-10-17 16:45:28.400474+10:30	127.0.0.1:44268	3
+2	2016-10-17 16:47:22.437896+10:30	192.168.1.105:37667	1
+1	2016-10-17 16:47:30.404391+10:30	127.0.0.1:44514	3
+1	2016-10-17 16:48:14.649298+10:30	127.0.0.1:44516	4
+1	2016-10-17 16:48:18.453614+10:30	127.0.0.1:44578	5
+2	2016-10-17 16:48:51.36343+10:30	192.168.1.105:37733	6
+1	2016-10-17 16:54:25.738532+10:30	127.0.0.1:45064	2
+2	2016-10-17 16:54:25.762008+10:30	192.168.1.105:37955	1
+1	2016-10-17 16:54:36.150049+10:30	127.0.0.1:45124	4
+1	2016-10-17 16:54:40.241386+10:30	127.0.0.1:45134	5
+2	2016-10-17 16:54:41.937963+10:30	192.168.1.105:37981	6
+2	2016-10-17 16:56:02.086701+10:30	192.168.1.105:38043	1
+1	2016-10-17 16:56:02.11757+10:30	127.0.0.1:45262	2
+1	2016-10-17 16:56:11.3995+10:30	127.0.0.1:45270	3
+2	2016-10-17 16:56:28.215323+10:30	192.168.1.105:38067	6
+1	2016-10-17 16:56:30.098029+10:30	127.0.0.1:45322	5
+1	2016-10-17 16:56:35.670906+10:30	127.0.0.1:45320	4
+1	2016-10-17 17:09:11.123233+10:30	127.0.0.1:46288	1
+2	2016-10-17 17:09:11.146656+10:30	192.168.1.105:38532	2
+1	2016-10-17 17:09:17.100708+10:30	127.0.0.1:46308	3
+1	2016-10-17 17:09:26.057799+10:30	127.0.0.1:46358	5
+2	2016-10-17 17:09:32.765456+10:30	192.168.1.105:38563	6
+2	2016-10-17 17:14:00.996176+10:30	192.168.1.105:38735	1
+1	2016-10-17 17:14:09.403483+10:30	127.0.0.1:46722	2
+2	2016-10-17 17:16:08.622753+10:30	192.168.1.105:38807	1
+1	2016-10-17 17:16:17.439163+10:30	127.0.0.1:46930	3
+1	2016-10-17 17:16:20.093702+10:30	127.0.0.1:46940	4
+2	2016-10-17 17:16:37.506384+10:30	192.168.1.105:38842	5
+1	2016-10-17 17:17:17.304287+10:30	127.0.0.1:47032	1
+2	2016-10-17 17:17:17.327223+10:30	192.168.1.105:38869	2
+1	2016-10-17 17:17:24.397809+10:30	127.0.0.1:47044	3
+1	2016-10-17 17:18:48.034632+10:30	127.0.0.1:47148	1
+2	2016-10-17 17:18:48.077875+10:30	192.168.1.105:38934	2
+1	2016-10-17 17:18:56.406928+10:30	127.0.0.1:47160	3
+1	2016-10-17 17:19:00.224463+10:30	127.0.0.1:47204	5
+2	2016-10-17 17:19:03.041965+10:30	192.168.1.105:38957	4
+1	2016-10-17 17:21:10.926461+10:30	127.0.0.1:47384	1
+2	2016-10-17 17:21:10.966684+10:30	192.168.1.105:39044	2
+1	2016-10-17 17:21:17.753844+10:30	127.0.0.1:47426	3
+1	2016-10-17 17:21:19.398759+10:30	127.0.0.1:47434	4
+2	2016-10-17 17:22:01.900634+10:30	192.168.1.105:39087	5
+2	2016-10-17 17:51:56.374095+10:30	192.168.1.105:40211	1
+1	2016-10-17 17:52:05.399101+10:30	127.0.0.1:51174	2
+1	2016-10-17 17:52:05.42313+10:30	127.0.0.1:51176	3
+2	2016-10-17 17:52:47.567221+10:30	192.168.1.105:40246	1
+1	2016-10-17 17:52:55.011956+10:30	127.0.0.1:51246	3
+1	2016-10-17 17:52:56.400846+10:30	127.0.0.1:51244	2
+1	2016-10-17 17:53:59.344962+10:30	127.0.0.1:51332	1
+2	2016-10-17 17:53:59.375714+10:30	192.168.1.105:40298	2
+1	2016-10-17 17:54:06.42091+10:30	127.0.0.1:51352	3
+1	2016-10-17 17:54:09.698011+10:30	127.0.0.1:51364	4
+1	2016-10-17 17:58:15.273212+10:30	127.0.0.1:51726	1
+2	2016-10-17 17:58:15.303448+10:30	192.168.1.105:40463	2
+1	2016-10-17 17:58:24.398406+10:30	127.0.0.1:51772	3
+1	2016-10-17 17:58:27.544565+10:30	127.0.0.1:51774	4
+1	2016-10-17 18:21:05.214931+10:30	127.0.0.1:53542	1
+2	2016-10-17 18:21:05.257894+10:30	192.168.1.105:41316	2
+1	2016-10-17 18:21:14.442485+10:30	127.0.0.1:53552	3
+1	2016-10-17 18:22:31.572909+10:30	127.0.0.1:53690	1
+2	2016-10-17 18:22:31.603347+10:30	192.168.1.105:41368	2
+1	2016-10-17 18:22:38.396998+10:30	127.0.0.1:53698	3
+1	2016-10-17 18:22:40.806961+10:30	127.0.0.1:53716	4
+2	2016-10-17 18:23:39.745894+10:30	192.168.1.105:41411	1
+1	2016-10-17 18:23:39.764768+10:30	127.0.0.1:53834	2
+1	2016-10-17 18:23:44.62083+10:30	127.0.0.1:53876	3
+1	2016-10-17 18:23:48.399512+10:30	127.0.0.1:53886	4
+2	2016-10-17 18:26:01.319804+10:30	192.168.1.105:41496	1
+1	2016-10-17 18:26:05.598039+10:30	127.0.0.1:54110	3
+1	2016-10-17 18:26:09.395762+10:30	127.0.0.1:54120	4
+2	2016-10-17 18:26:52.184671+10:30	192.168.1.105:41530	1
+1	2016-10-17 18:26:54.742403+10:30	127.0.0.1:54246	2
+1	2016-10-17 18:27:01.400516+10:30	127.0.0.1:54256	3
+1	2016-10-17 18:27:09.548445+10:30	127.0.0.1:54304	4
+1	2016-10-17 18:28:03.536429+10:30	127.0.0.1:54380	2
+2	2016-10-17 18:28:03.567288+10:30	192.168.1.105:41574	1
+1	2016-10-17 18:28:12.397806+10:30	127.0.0.1:54390	3
+1	2016-10-17 18:28:14.73342+10:30	127.0.0.1:54424	4
+2	2016-10-17 18:28:48.812795+10:30	192.168.1.105:41607	1
+1	2016-10-17 18:28:54.399754+10:30	127.0.0.1:54628	2
+1	2016-10-17 18:28:56.402521+10:30	127.0.0.1:54658	3
+2	2016-10-17 18:30:56.409212+10:30	192.168.1.105:41684	1
+1	2016-10-17 18:31:04.400903+10:30	127.0.0.1:54848	2
+1	2016-10-17 18:31:05.402014+10:30	127.0.0.1:54850	3
+2	2016-10-17 18:31:47.548025+10:30	192.168.1.105:41715	1
+1	2016-10-17 18:31:49.003202+10:30	127.0.0.1:54926	2
+1	2016-10-17 18:31:54.400339+10:30	127.0.0.1:54956	3
+1	2016-10-17 18:31:54.477881+10:30	127.0.0.1:54962	4
+2	2016-10-17 18:33:20.981365+10:30	192.168.1.105:41773	1
+1	2016-10-17 18:33:21.004878+10:30	127.0.0.1:55090	2
+1	2016-10-17 18:33:27.029952+10:30	127.0.0.1:55128	3
+1	2016-10-17 18:33:28.397208+10:30	127.0.0.1:55136	4
+2	2016-10-17 18:35:32.029005+10:30	192.168.1.105:41856	1
+1	2016-10-17 18:35:34.714981+10:30	127.0.0.1:55320	2
+1	2016-10-17 18:35:39.416386+10:30	127.0.0.1:55332	3
+2	2016-10-17 18:36:03.403971+10:30	192.168.1.105:41881	1
+1	2016-10-17 18:36:03.434671+10:30	127.0.0.1:55392	2
+1	2016-10-17 18:36:11.397951+10:30	127.0.0.1:55402	3
+1	2016-10-17 18:36:13.126722+10:30	127.0.0.1:55442	4
+1	2016-10-17 18:36:46.434935+10:30	127.0.0.1:55510	5
+2	2016-10-17 18:37:01.492225+10:30	192.168.1.105:41915	1
+1	2016-10-17 18:37:08.408761+10:30	127.0.0.1:55570	2
+1	2016-10-17 18:37:10.401334+10:30	127.0.0.1:55584	3
+2	2016-10-17 18:38:21.287449+10:30	192.168.1.105:41915	1
+2	2016-10-17 19:58:56.658905+10:30	192.168.1.105:44147	4
+1	2016-10-17 20:02:11.700623+10:30	127.0.0.1:38232	1
+2	2016-10-17 20:02:11.785002+10:30	192.168.1.105:44281	2
+1	2016-10-17 20:02:17.334712+10:30	127.0.0.1:38250	3
+1	2016-10-17 20:02:20.400736+10:30	127.0.0.1:38290	4
+1	2016-10-17 20:07:45.688695+10:30	127.0.0.1:38764	2
+2	2016-10-17 20:07:45.736704+10:30	192.168.1.105:44486	1
+1	2016-10-17 20:07:53.402151+10:30	127.0.0.1:38766	3
+1	2016-10-17 20:40:25.802466+10:30	127.0.0.1:42220	1
+1	2016-10-17 20:40:32.21592+10:30	127.0.0.1:42240	2
+1	2016-10-17 20:40:33.401556+10:30	127.0.0.1:42276	3
+2	2016-10-17 20:41:18.744241+10:30	192.168.1.105:45568	4
+1	2016-10-17 20:45:14.993134+10:30	127.0.0.1:42710	1
+2	2016-10-17 20:45:15.007518+10:30	192.168.1.105:45727	2
+1	2016-10-17 20:45:25.287939+10:30	127.0.0.1:42758	4
+2	2016-10-17 20:45:32.300924+10:30	192.168.1.105:45747	5
+1	2016-10-17 20:47:09.017196+10:30	127.0.0.1:42932	1
+2	2016-10-17 20:47:09.056921+10:30	192.168.1.105:45813	2
+2	2016-10-17 20:49:29.964376+10:30	192.168.1.105:45928	3
+1	2016-10-17 20:49:31.867163+10:30	127.0.0.1:43176	1
+2	2016-10-17 20:50:44.066367+10:30	192.168.1.105:45977	1
+1	2016-10-17 20:50:44.12787+10:30	127.0.0.1:43392	2
+1	2016-10-17 20:56:25.428703+10:30	127.0.0.1:43828	1
+2	2016-10-17 20:56:25.451338+10:30	192.168.1.105:46198	2
+1	2016-10-17 20:56:40.159276+10:30	127.0.0.1:43852	4
+1	2016-10-17 20:58:59.791347+10:30	127.0.0.1:44104	2
+2	2016-10-17 20:58:59.828273+10:30	192.168.1.105:46306	1
+1	2016-10-17 20:59:54.442726+10:30	127.0.0.1:44198	2
+2	2016-10-17 20:59:54.455691+10:30	192.168.1.105:46342	1
+1	2016-10-17 21:00:01.219576+10:30	127.0.0.1:44238	3
+2	2016-10-17 21:00:14.31008+10:30	192.168.1.105:46373	4
+1	2016-10-17 21:05:00.49678+10:30	127.0.0.1:44606	2
+2	2016-10-17 21:05:00.524858+10:30	192.168.1.105:46575	1
+1	2016-10-17 21:05:12.623754+10:30	127.0.0.1:44658	3
+2	2016-10-17 21:06:56.645072+10:30	192.168.1.105:46652	1
+1	2016-10-17 21:06:56.671737+10:30	127.0.0.1:44828	2
+1	2016-10-17 21:07:06.005776+10:30	127.0.0.1:44870	3
+1	2016-10-17 21:10:59.270068+10:30	127.0.0.1:45392	1
+1	2016-10-17 21:11:09.361293+10:30	127.0.0.1:45438	3
+2	2016-10-17 21:11:15.276729+10:30	192.168.1.105:46822	2
+1	2016-10-17 21:12:57.865812+10:30	127.0.0.1:45652	2
+2	2016-10-17 21:12:57.896241+10:30	192.168.1.105:46895	1
+2	2016-10-17 21:13:11.427274+10:30	192.168.1.105:46920	3
+1	2016-10-17 21:15:07.234786+10:30	127.0.0.1:45838	1
+2	2016-10-17 21:15:07.273878+10:30	192.168.1.105:46991	2
+1	2016-10-17 21:15:23.136067+10:30	127.0.0.1:45900	4
+2	2016-10-17 21:15:24.408731+10:30	192.168.1.105:47014	3
 \.
 
 
@@ -2674,10 +2853,10 @@ SELECT pg_catalog.setval('rating_id_seq', 1, false);
 -- Data for Name: scenario; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, notes, year, public, latlon, red_team, red_brief, blue_team, blue_brief) FROM stdin;
-4	0	2	2016-10-12 23:21:45.213973+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia.		1813	t	\N				
-5	0	2	2016-10-12 23:21:45.213973+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	\N				
-1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.
+COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, notes, year, public, latlon, red_team, red_brief, blue_team, blue_brief, review) FROM stdin;
+4	0	2	2016-10-12 23:21:45.213973+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	t	\N					f
+5	0	2	2016-10-12 23:21:45.213973+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	\N					f
+1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	f
 \.
 
 
@@ -2685,7 +2864,7 @@ COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, no
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 11, true);
+SELECT pg_catalog.setval('scenario_id_seq', 12, true);
 
 
 --
@@ -2788,11 +2967,11 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 --
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
-2	kat	fysherdog	Kat Formato	kformato@gmail.com	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:34862	Australia	http://witchwoodstudio.com		f	t	t
 5	a	a		a@a	0	2016-10-16 14:42:17.888037+10:30	2016-10-16 14:42:17.888037+10:30	0					f	t	t
 6	tt	tt		tt@tt.com	0	2016-10-16 15:01:56.744922+10:30	2016-10-16 15:01:56.744922+10:30	0					f	t	t
 7	aa	aa		aa@aa	0	2016-10-16 15:19:18.701593+10:30	2016-10-16 15:19:18.701593+10:30	0					f	t	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:39340	Australia	15mm-madness.blogspot.com		f	f	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	4	127.0.0.1:45900	Australia	15mm-madness.blogspot.com		f	t	t
+2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	3	192.168.1.105:47014	Australia	http://witchwoodstudio.com		f	f	t
 \.
 
 

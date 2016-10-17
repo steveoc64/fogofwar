@@ -1,33 +1,52 @@
 package shared
 
 import (
+	"crypto/md5"
 	"fmt"
+	"strings"
 	"time"
 )
 
 type Game struct {
-	ID         int        `db:"id"`
-	ScenarioID int        `db:"scenario_id"`
-	HostedBy   int        `db:"hosted_by"`
-	Created    *time.Time `db:"created"`
-	Expires    *time.Time `db:"expires"`
-	Turn       int        `db:"turn"`
-	TurnLimit  int        `db:"turn"`
-	Name       string     `db:"name"`
-	Descr      string     `db:"descr"`
-	Notes      string     `db:"notes"`
-	Year       int        `db:"year"`
-	LatLon     *[]int     `db:"latlon"`
-	RedTeam    string     `db:"red_team"`
-	RedBrief   string     `db:"red_brief"`
-	BlueTeam   string     `db:"blue_team"`
-	BlueBrief  string     `db:"blue_brief"`
+	ID             int        `db:"id"`
+	ScenarioID     int        `db:"scenario_id"`
+	HostedBy       int        `db:"hosted_by"`
+	HostName       string     `db:"host_name"`
+	HostEmail      string     `db:"host_email"`
+	Created        *time.Time `db:"created"`
+	Expires        *time.Time `db:"expires"`
+	Turn           int        `db:"turn"`
+	TurnLimit      int        `db:"turn_limit"`
+	Name           string     `db:"name"`
+	Descr          string     `db:"descr"`
+	Notes          string     `db:"notes"`
+	Year           int        `db:"year"`
+	LatLon         *[]int     `db:"latlon"`
+	RedTeam        string     `db:"red_team"`
+	RedBrief       string     `db:"red_brief"`
+	BlueTeam       string     `db:"blue_team"`
+	BlueBrief      string     `db:"blue_brief"`
+	NumRedPlayers  int        `db:"num_red_players"`
+	NumBluePlayers int        `db:"num_blue_players"`
 }
 
 type GameRPCData struct {
 	Channel int
 	ID      int
 	Game    *Game
+}
+
+func (g *Game) GetAvatar(size int) string {
+	theEmail := strings.TrimSpace(strings.ToLower(g.HostEmail))
+	avatar := md5.Sum([]byte(theEmail))
+	// print("compute avatar for", theEmail)
+	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
+	// print("got", avatarURL)
+	return avatarURL
+}
+
+func (g *Game) GetPlayers() string {
+	return fmt.Sprintf("%d vs %d", g.NumRedPlayers, g.NumBluePlayers)
 }
 
 type GameCmd struct {

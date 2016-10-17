@@ -147,6 +147,7 @@ func (u *ForceUnit) GetBases() string {
 
 	x := u.LtCoy + u.JgCoy
 	if x > 0 {
+		print("u has lt", u.LtCoy, "jg", u.JgCoy, "giving", x)
 		retval += fmt.Sprintf(" +%d LtCoy", x)
 	}
 

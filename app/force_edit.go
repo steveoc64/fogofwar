@@ -40,6 +40,9 @@ func forceEdit(context *router.Context) {
 		if scenario.AuthorID == Session.UserID {
 			canEdit = true
 		}
+		if Session.Rank > 9 {
+			canEdit = true
+		}
 
 		form := formulate.EditForm{}
 
@@ -206,8 +209,8 @@ func forceEdit(context *router.Context) {
 			AddSelect(1, "Drill", "Drill", Session.Lookup.DrillType, "ID", "Name", 1, 1).
 			AddSelect(1, "Arms", "SmallArms", Session.Lookup.SmallArms, "ID", "Name", 1, 1)
 		otherPanel.AddRow(3).
-			AddNumber(1, "Light Coys", "LtCoys", "0").
-			AddNumber(1, "Jager Coys", "JgCoys", "0").
+			AddNumber(1, "Light Coys", "LtCoy", "0").
+			AddNumber(1, "Jager Coys", "JgCoy", "0").
 			AddSelect(1, "Arms", "EliteArms", Session.Lookup.SmallArms, "ID", "Name", 0, 0)
 		otherPanel.AddRow(3).
 			AddNumber(1, "Sabres", "Sabres", "10").
@@ -496,6 +499,7 @@ func forceEdit(context *router.Context) {
 					// print("swapper.Selected", swapper.Selected, swapper)
 					panel := swapper.Current()
 					panel.Bind(&TheUnit)
+					print("did a bind into ", TheUnit)
 					// swapper.Panels[swapper.Selected].Bind(&TheUnit)
 					TheUnit.UType = swapper.Selected
 					if TheUnit.Name == "" {
@@ -572,26 +576,26 @@ func forceEdit(context *router.Context) {
 		})
 
 		// Add Buttons
-		form.OnEvent("AddCommand", "click", func(evt dom.Event) {
-			evt.PreventDefault()
-			// print("Add Command")
-			go func() {
-				// add a blank Division to the end of the units array
-				newUnit := shared.ForceUnit{}
-				RPC("ScenarioRPC.AddCommand", shared.ScenarioRPCData{
-					Channel: Session.Channel,
-					ID:      force.ID,
-				}, &newUnit)
-				TheUnit = newUnit
-				force.Units = append(force.Units, TheUnit)
-				// print("theUnit now set to", TheUnit)
-				drawUnitList()
-				swapper.Panels[1].Paint(&TheUnit)
-				swapper.Select(1)
-				form.Focus("Cmd-Name")
-			}()
-		})
 		if canEdit {
+			form.OnEvent("AddCommand", "click", func(evt dom.Event) {
+				evt.PreventDefault()
+				// print("Add Command")
+				go func() {
+					// add a blank Division to the end of the units array
+					newUnit := shared.ForceUnit{}
+					RPC("ScenarioRPC.AddCommand", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &newUnit)
+					TheUnit = newUnit
+					force.Units = append(force.Units, TheUnit)
+					// print("theUnit now set to", TheUnit)
+					drawUnitList()
+					swapper.Panels[1].Paint(&TheUnit)
+					swapper.Select(1)
+					form.Focus("Cmd-Name")
+				}()
+			})
 			form.OnEvent("Cmd-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				// if w.Confirm("Delete this Command ? ... includes all sub-units") {
@@ -604,31 +608,31 @@ func forceEdit(context *router.Context) {
 			})
 		}
 
-		form.OnEvent("AddBde", "click", func(evt dom.Event) {
-			evt.PreventDefault()
-			// print("Add Brigade")
-			go func() {
-				// add a blank brigade to the units array
-				newUnit := shared.ForceUnit{}
-				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
-					Channel:    Session.Channel,
-					ID:         force.ID,
-					UType:      2,
-					ParentPath: TheUnit.Path,
-				}, &newUnit)
-				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
-					Channel: Session.Channel,
-					ID:      force.ID,
-				}, &force.Units)
-				// print("theUnit now set to", TheUnit)
-				TheUnit = newUnit
-				drawUnitList()
-				swapper.Panels[2].Paint(&TheUnit)
-				swapper.Select(2)
-				form.Focus("Bde-Name")
-			}()
-		})
 		if canEdit {
+			form.OnEvent("AddBde", "click", func(evt dom.Event) {
+				evt.PreventDefault()
+				// print("Add Brigade")
+				go func() {
+					// add a blank brigade to the units array
+					newUnit := shared.ForceUnit{}
+					RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+						Channel:    Session.Channel,
+						ID:         force.ID,
+						UType:      2,
+						ParentPath: TheUnit.Path,
+					}, &newUnit)
+					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &force.Units)
+					// print("theUnit now set to", TheUnit)
+					TheUnit = newUnit
+					drawUnitList()
+					swapper.Panels[2].Paint(&TheUnit)
+					swapper.Select(2)
+					form.Focus("Bde-Name")
+				}()
+			})
 			form.OnEvent("Bde-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				// if w.Confirm("Delete this Brigade ?") {
@@ -641,31 +645,31 @@ func forceEdit(context *router.Context) {
 			})
 		}
 
-		form.OnEvent("AddCav", "click", func(evt dom.Event) {
-			evt.PreventDefault()
-			// print("Add Cavalry")
-			go func() {
-				// add a blank brigade to the units array
-				newUnit := shared.ForceUnit{}
-				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
-					Channel:    Session.Channel,
-					ID:         force.ID,
-					UType:      3,
-					ParentPath: TheUnit.Path,
-				}, &newUnit)
-				// print("add unit returns ", newUnit)
-				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
-					Channel: Session.Channel,
-					ID:      force.ID,
-				}, &force.Units)
-				TheUnit = newUnit
-				// print("theUnit now set to", TheUnit)
-				drawUnitList()
-				drawUnitPanel()
-			}()
-
-		})
 		if canEdit {
+			form.OnEvent("AddCav", "click", func(evt dom.Event) {
+				evt.PreventDefault()
+				// print("Add Cavalry")
+				go func() {
+					// add a blank brigade to the units array
+					newUnit := shared.ForceUnit{}
+					RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+						Channel:    Session.Channel,
+						ID:         force.ID,
+						UType:      3,
+						ParentPath: TheUnit.Path,
+					}, &newUnit)
+					// print("add unit returns ", newUnit)
+					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &force.Units)
+					TheUnit = newUnit
+					// print("theUnit now set to", TheUnit)
+					drawUnitList()
+					drawUnitPanel()
+				}()
+
+			})
 			form.OnEvent("Cav-Delete", "click", func(evt dom.Event) {
 				evt.PreventDefault()
 				deleteUnit()
@@ -676,33 +680,33 @@ func forceEdit(context *router.Context) {
 			})
 		}
 
-		doc.QuerySelector("[name=AddGun]").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			// print("Add Battery")
-			go func() {
-				// add a blank brigade to the units array
-				newUnit := shared.ForceUnit{}
-				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
-					Channel:    Session.Channel,
-					ID:         force.ID,
-					UType:      4,
-					ParentPath: TheUnit.Path,
-				}, &newUnit)
-				// print("add unit returns ", newUnit)
-				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
-					Channel: Session.Channel,
-					ID:      force.ID,
-				}, &force.Units)
-				TheUnit = newUnit
-				// print("theUnit now set to", TheUnit)
-				drawUnitList()
-				swapper.Panels[4].Paint(&TheUnit)
-				swapper.Select(4)
-				doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
-			}()
-
-		})
 		if canEdit {
+			doc.QuerySelector("[name=AddGun]").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				// print("Add Battery")
+				go func() {
+					// add a blank brigade to the units array
+					newUnit := shared.ForceUnit{}
+					RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+						Channel:    Session.Channel,
+						ID:         force.ID,
+						UType:      4,
+						ParentPath: TheUnit.Path,
+					}, &newUnit)
+					// print("add unit returns ", newUnit)
+					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &force.Units)
+					TheUnit = newUnit
+					// print("theUnit now set to", TheUnit)
+					drawUnitList()
+					swapper.Panels[4].Paint(&TheUnit)
+					swapper.Select(4)
+					doc.QuerySelector("[name=Gun-Name]").(*dom.HTMLInputElement).Focus()
+				}()
+
+			})
 			doc.QuerySelector("[name=Gun-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
 				go func() {
@@ -718,33 +722,33 @@ func forceEdit(context *router.Context) {
 			})
 		}
 
-		doc.QuerySelector("[name=AddOther]").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			// print("Add Detachment")
-			go func() {
-				// add a blank brigade to the units array
-				newUnit := shared.ForceUnit{}
-				RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
-					Channel:    Session.Channel,
-					ID:         force.ID,
-					UType:      5,
-					ParentPath: TheUnit.Path,
-				}, &newUnit)
-				// print("add unit returns ", newUnit)
-				RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
-					Channel: Session.Channel,
-					ID:      force.ID,
-				}, &force.Units)
-				TheUnit = newUnit
-				// print("theUnit now set to", TheUnit)
-				drawUnitList()
-				swapper.Panels[5].Paint(&TheUnit)
-				swapper.Select(5)
-				doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
-			}()
-
-		})
 		if canEdit {
+			doc.QuerySelector("[name=AddOther]").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				// print("Add Detachment")
+				go func() {
+					// add a blank brigade to the units array
+					newUnit := shared.ForceUnit{}
+					RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
+						Channel:    Session.Channel,
+						ID:         force.ID,
+						UType:      5,
+						ParentPath: TheUnit.Path,
+					}, &newUnit)
+					// print("add unit returns ", newUnit)
+					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      force.ID,
+					}, &force.Units)
+					TheUnit = newUnit
+					// print("theUnit now set to", TheUnit)
+					drawUnitList()
+					swapper.Panels[5].Paint(&TheUnit)
+					swapper.Select(5)
+					doc.QuerySelector("[name=Other-Name]").(*dom.HTMLInputElement).Focus()
+				}()
+
+			})
 			doc.QuerySelector("[name=Other-Delete]").AddEventListener("click", false, func(evt dom.Event) {
 				evt.PreventDefault()
 				go func() {

@@ -34,4 +34,9 @@ func registerRPC() {
 	}
 	log.Println("» Scenario")
 
+	if err := rpc.Register(new(GameRPC)); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("» Game")
+
 }

@@ -84,6 +84,10 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Routes = []shared.UserRoute{}
 			lr.Rank = 0
 			lr.Disqus = false
+			lr.MaxGames = 0
+			lr.MaxScenarios = 0
+			lr.MaxPlayers = 0
+
 		} else {
 			// log.Println("Login OK")
 			lr.Result = "OK"
@@ -94,6 +98,30 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Routes = getRoutes(res.ID, res.Rank)
 			lr.LookupTable = getLookupTable()
 			lr.Rank = res.Rank
+
+			switch res.Rank {
+			case 1:
+				lr.MaxGames = 1
+				lr.MaxScenarios = 2
+				lr.MaxPlayers = 2
+			case 2:
+				lr.MaxGames = 2
+				lr.MaxScenarios = 8
+				lr.MaxPlayers = 4
+			case 3:
+				lr.MaxGames = 4
+				lr.MaxScenarios = 16
+				lr.MaxPlayers = 8
+			case 4:
+				lr.MaxGames = 8
+				lr.MaxScenarios = 32
+				lr.MaxPlayers = 16
+			case 10:
+				lr.MaxGames = 8
+				lr.MaxScenarios = 64
+				lr.MaxPlayers = 16
+			}
+
 			lr.ID = res.ID
 			lr.Disqus = Config.Disqus && res.Disqus
 			conn.Login(lc.Username, res.ID, res.Rank)

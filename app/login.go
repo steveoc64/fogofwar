@@ -38,6 +38,10 @@ func Login(username string, passwd string) {
 		Session.UserID = lr.ID
 		Session.Disqus = lr.Disqus
 		Session.Lookup = lr.LookupTable
+		Session.MaxGames = lr.MaxGames
+		Session.MaxScenarios = lr.MaxScenarios
+		Session.MaxPlayers = lr.MaxPlayers
+
 		loadRoutes(lr.Rank, lr.Routes)
 
 		// print("Got Lookups", Session.Lookup)

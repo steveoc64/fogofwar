@@ -348,7 +348,7 @@ create table game (
 	created timestamptz not null default localtimestamp,
 	expires timestamptz not null default localtimestamp,
 	turn int not null default 1,
-	turn_limit int not null default 1,
+	turn_limit int not null default 12,
 	name text not null default '',
 	descr text not null default '',
 	notes text not null default '',

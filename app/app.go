@@ -6,7 +6,6 @@ import (
 	"./shared"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
-	"honnef.co/go/js/dom"
 )
 
 type MessageFunction func(string, int, *router.Context)
@@ -26,10 +25,15 @@ type GlobalSessionData struct {
 	URL           string
 	Disqus        bool
 	Lookup        shared.LookupTable
+	MaxGames      int
+	MaxScenarios  int
+	MaxPlayers    int
 }
 
 func (g *GlobalSessionData) GetRank() string {
 	switch g.Rank {
+	case 0:
+		return "NCO."
 	case 1:
 		return "Lt"
 	case 2:
@@ -38,12 +42,10 @@ func (g *GlobalSessionData) GetRank() string {
 		return "Brigadier"
 	case 4:
 		return "Marechal"
-	case 5:
-		return ""
 	case 10:
 		return "Le Empereur"
 	default:
-		return fmt.Sprintf("%d", g.Rank)
+		return fmt.Sprintf("Rank %d", g.Rank)
 	}
 }
 
@@ -87,49 +89,4 @@ func main() {
 	websocketInit()
 	initForms()
 	grid1()
-}
-
-func mainPage(context *router.Context) {
-
-	go func() {
-		// users := []shared.User{}
-		// RPC("UserRPC.List", Session.Channel, &users)
-
-		form := formulate.ListForm{}
-		form.New("fa-bookmark", "Games")
-
-		// Define the layout
-		form.Column("Game", "Game")
-		form.Column("Players", "Players")
-		form.Column("Turn", "Turn")
-		form.Column("Hosted By", "HostedBy")
-		form.DateColumn("Created", "Created")
-		form.DateColumn("Expires", "Expires")
-
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/")
-		})
-
-		// form.NewRowEvent(func(evt dom.Event) {
-		// 	evt.PreventDefault()
-		// 	Session.Navigate("/game/add")
-		// })
-
-		form.RowEvent(func(key string) {
-			Session.Navigate("/game/" + key)
-		})
-
-		formulate.MainContainer("wide-container")
-		form.Render("game-list", "#main-container", nil)
-
-		// print("add action grid")
-		form.ActionGrid("main-actions", "#action-grid", Session, func(url string) {
-			// print("clicked on", url)
-			Session.Navigate(url)
-		})
-
-	}()
-
 }

@@ -117,7 +117,7 @@ func (c *Connection) Broadcast(name string, action string, id int) {
 }
 
 // Send an async message to everyone but this connection, if they are admin
-func (c *Connection) BroadcastAllAdmin(name string, action string, id int) {
+func (c *Connection) BroadcastAdmin(name string, action string, id int) {
 
 	data := shared.AsyncMessage{
 		Action: action,
@@ -235,7 +235,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 		}
 	}
 
-	c.BroadcastAllAdmin("login", "delete", conn.ID)
+	c.BroadcastAdmin("login", "delete", conn.ID)
 
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()

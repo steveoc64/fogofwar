@@ -28,14 +28,15 @@ type Scenario struct {
 	BlueBrief   string     `db:"blue_brief"`
 	IsMine      bool       `db:"is_mine"`
 	Admin       bool       `db:"admin"`
+	NumForks    int        `db:"num_forks"`
 }
 
 func (s *Scenario) GetAvatar(size int) string {
 	theEmail := strings.TrimSpace(strings.ToLower(s.AuthorEmail))
 	avatar := md5.Sum([]byte(theEmail))
-	print("compute avatar for", theEmail)
+	// print("compute avatar for", theEmail)
 	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
-	print("got", avatarURL)
+	// print("got", avatarURL)
 	return avatarURL
 }
 

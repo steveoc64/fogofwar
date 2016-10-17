@@ -97,22 +97,53 @@ func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]share
 	return err
 }
 
+func (s *ScenarioRPC) GetForks(data shared.ScenarioRPCData, scenarios *[]shared.Scenario) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select 
+			s.id,s.author_id,a.username as author_name,a.email as author_email,
+			s.name,s.descr,s.year
+		from scenario s
+			left join users a on a.id=s.author_id
+		where forked_from = $1
+		and public
+		order by year`, data.ID).
+		QueryStructs(scenarios)
+
+	logger(start, "Scenario.GetForks", conn,
+		fmt.Sprintf("ID: %d", data.ID),
+		fmt.Sprintf("%d Scenarios", len(*scenarios)))
+
+	return err
+}
+
 func (c *ScenarioRPC) Get(data shared.ScenarioRPCData, retval *shared.Scenario) error {
 	start := time.Now()
 
 	conn := Connections.Get(data.Channel)
 
-	err := DB.SQL(`select * from scenario where id=$1`, data.ID).QueryStruct(retval)
+	err := DB.SQL(`select s.*,u.username as author_name,u.email as author_email
+	 from scenario s
+	 left join users u on u.id=s.author_id
+	 where s.id=$1`, data.ID).QueryStruct(retval)
 
 	retval.IsMine = false
 	if err == nil {
 		retval.IsMine = retval.AuthorID == conn.UserID
 		println("ismine", retval.AuthorID, conn.UserID, retval.IsMine)
+
+		numForks := 0
+		DB.SQL(`select count(*) 
+			from scenario 
+			where forked_from=$1 and public`, data.ID).QueryScalar(&numForks)
+		retval.NumForks = numForks
 	}
 
 	logger(start, "Scenario.Get", conn,
 		fmt.Sprintf("%d", data.ID),
-		fmt.Sprintf("%v", *retval))
+		fmt.Sprintf("%s", retval.Name))
 
 	return err
 }

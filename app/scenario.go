@@ -302,6 +302,61 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 				Session.Navigate(url)
 			}
 		})
+
+		// Show parent, and published forks of this scenario
+		if data.ForkedFrom != 0 {
+			go func() {
+				theParent := shared.Scenario{}
+				err := RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      data.ForkedFrom,
+				}, &theParent)
+				if err == nil && theParent.Public {
+					formulate.AppendDiv("parent-scenario")
+					loadTemplate("parent-scenario", "#parent-scenario", theParent)
+					w := dom.GetWindow()
+					doc := w.Document()
+					doc.QuerySelector("#goto-parent").AddEventListener("click", false, func(evt dom.Event) {
+						evt.PreventDefault()
+						Session.Navigate(fmt.Sprintf("/scenario/%d", data.ForkedFrom))
+					})
+				}
+			}()
+		}
+
+		// Show forks
+		if data.NumForks > 0 {
+			formulate.AppendDiv("forked-scenarios")
+			go func() {
+				forks := []shared.Scenario{}
+				err := RPC("ScenarioRPC.GetForks", shared.ScenarioRPCData{
+					Channel: Session.Channel,
+					ID:      data.ID,
+				}, &forks)
+				if err != nil {
+					return
+				}
+
+				form := formulate.ListForm{}
+				form.New("fa-sitemap", "Copies of this Scenario")
+
+				// Define the layout
+				form.Column("Author", "AuthorName")
+				form.AvatarColumn("Author", "AuthorEmail")
+				form.Column("Name", "Name")
+				form.Column("Year", "Year")
+				form.Column("Description", "Descr")
+				form.BoolColumn("Reviewing", "Review")
+				form.BoolColumn("Published", "Public")
+
+				form.RowEvent(func(key string) {
+					Session.Navigate("/scenario/" + key)
+				})
+
+				form.Render("forked-scenarios-list", "#forked-scenarios", forks)
+			}()
+		}
+
 		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
 
 	}()

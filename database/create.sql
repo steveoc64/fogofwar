@@ -348,10 +348,18 @@ create table game (
 	created timestamptz not null default localtimestamp,
 	expires timestamptz not null default localtimestamp,
 	turn int not null default 1,
-	turn_limit int not null default 1
+	turn_limit int not null default 1,
+	name text not null default '',
+	descr text not null default '',
+	notes text not null default '',
+	year int not null default 1800,
+	latlon point,
+	red_team text not null default '',
+	red_brief text not null default '',
+	blue_team text not null default '',
+	blue_brief text not null default ''
 );
 create index game_scenario_idx on game (scenario_id);
-
 drop table if exists game_objective;
 -- TODO create table
 
@@ -417,20 +425,23 @@ create table gt_formation (
 	march bool,
 	static bool
 );
+\i data/gt_formation.sql
 
 drop table if exists game_unit;
-create table game_unit (
+drop table if exists unit;
+create table unit (
 	id serial not null primary key,
 	cmd_id int not null,
 	path ltree,
 	name text not null default '',
+	descr text not null default '',
+	commander_name text not null default '',
 	commander_control int not null default 10, -- 0-10 = remaining control points to spend  -1 = injured, -2 = dead
 	nation text not null default '',
 	utype int not null default 1,
 	condition int not null default 2,
 	cmd_level int not null default 1,
 	drill int not null default 1,
-	table_sector int not null default 0, -- 0 left, 1 Centre, 2 Right
 	deploy_to int not null default 1, -- 0 advance, 1st Line, 2nd Line, 3 Left Flnk, 4 R Flnk, 5..6.. Reserve lines
 	gt_formation int not null default 1,  
 	sk_out bool,
@@ -448,6 +459,7 @@ create table game_unit (
 	small_arms int not null default 0,
 	elite_arms int not null default 0,
 	lt_coy int not null default 0,
+	jg_coy int not null default 0,
 	rifles bool,
 	lt_lost int not null default 0,
 	lt_mstate int not null default 0,  -- 0 Good 1,2 Repulsed 3,4,5,6 Defeated 12 TotalDefeat
@@ -465,10 +477,12 @@ create table game_unit (
 	guns_limbered bool,
 	guns_mstate int not null default 0,
 	gunnery_type int not null default 0,
+	horse_guns bool,
 	gun_max_condition int not null default 2,
 	gun_condition int not null default 2
 );
-create index game_unit_cmd_idx on game_unit (cmd_id);
+\i data/unit.sql
+create index unit_cmd_idx on unit (cmd_id);
 
 
 

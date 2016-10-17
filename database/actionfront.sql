@@ -472,14 +472,23 @@ CREATE TABLE game (
     created timestamp with time zone DEFAULT ('now'::text)::timestamp without time zone NOT NULL,
     expires timestamp with time zone DEFAULT ('now'::text)::timestamp without time zone NOT NULL,
     turn integer DEFAULT 1 NOT NULL,
-    turn_limit integer DEFAULT 1 NOT NULL
+    turn_limit integer DEFAULT 1 NOT NULL,
+    name text DEFAULT ''::text NOT NULL,
+    descr text DEFAULT ''::text NOT NULL,
+    notes text DEFAULT ''::text NOT NULL,
+    year integer DEFAULT 1800 NOT NULL,
+    latlon point,
+    red_team text DEFAULT ''::text NOT NULL,
+    red_brief text DEFAULT ''::text NOT NULL,
+    blue_team text DEFAULT ''::text NOT NULL,
+    blue_brief text DEFAULT ''::text NOT NULL
 );
 
 
 ALTER TABLE public.game OWNER TO steve;
 
 --
--- Name: game_cmd; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+-- Name: game_cmd; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
 CREATE TABLE game_cmd (
@@ -489,6 +498,7 @@ CREATE TABLE game_cmd (
     blue_team boolean,
     nation text DEFAULT ''::text NOT NULL,
     name text DEFAULT ''::text NOT NULL,
+    cmdr_name text DEFAULT ''::text NOT NULL,
     level integer DEFAULT 1 NOT NULL,
     descr text DEFAULT ''::text NOT NULL,
     rating integer DEFAULT 0 NOT NULL,
@@ -497,10 +507,10 @@ CREATE TABLE game_cmd (
 );
 
 
-ALTER TABLE public.game_cmd OWNER TO steve;
+ALTER TABLE public.game_cmd OWNER TO postgres;
 
 --
--- Name: game_cmd_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+-- Name: game_cmd_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE game_cmd_id_seq
@@ -511,10 +521,10 @@ CREATE SEQUENCE game_cmd_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.game_cmd_id_seq OWNER TO steve;
+ALTER TABLE public.game_cmd_id_seq OWNER TO postgres;
 
 --
--- Name: game_cmd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+-- Name: game_cmd_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE game_cmd_id_seq OWNED BY game_cmd.id;
@@ -583,84 +593,6 @@ CREATE TABLE game_players (
 
 
 ALTER TABLE public.game_players OWNER TO steve;
-
---
--- Name: game_unit; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE TABLE game_unit (
-    id integer NOT NULL,
-    cmd_id integer NOT NULL,
-    path ltree,
-    name text DEFAULT ''::text NOT NULL,
-    commander_control integer DEFAULT 10 NOT NULL,
-    nation text DEFAULT ''::text NOT NULL,
-    utype integer DEFAULT 1 NOT NULL,
-    condition integer DEFAULT 2 NOT NULL,
-    cmd_level integer DEFAULT 1 NOT NULL,
-    drill integer DEFAULT 1 NOT NULL,
-    table_sector integer DEFAULT 0 NOT NULL,
-    deploy_to integer DEFAULT 1 NOT NULL,
-    gt_formation integer DEFAULT 1 NOT NULL,
-    sk_out boolean,
-    woods boolean,
-    rough boolean,
-    cover boolean,
-    rflank boolean,
-    lflank boolean,
-    has_support boolean,
-    bayonets integer DEFAULT 0 NOT NULL,
-    bayonets_lost integer DEFAULT 0 NOT NULL,
-    bayonets_mstate integer DEFAULT 0 NOT NULL,
-    bayonets_moved boolean,
-    bayonets_fired boolean,
-    small_arms integer DEFAULT 0 NOT NULL,
-    elite_arms integer DEFAULT 0 NOT NULL,
-    lt_coy integer DEFAULT 0 NOT NULL,
-    rifles boolean,
-    lt_lost integer DEFAULT 0 NOT NULL,
-    lt_mstate integer DEFAULT 0 NOT NULL,
-    rating integer DEFAULT 5 NOT NULL,
-    sabres integer DEFAULT 0 NOT NULL,
-    sabres_lost integer DEFAULT 0 NOT NULL,
-    sabres_mstate integer DEFAULT 0 NOT NULL,
-    sabres_charged integer DEFAULT 0 NOT NULL,
-    cav_type integer DEFAULT 0 NOT NULL,
-    cav_rating integer DEFAULT 0 NOT NULL,
-    guns integer DEFAULT 0 NOT NULL,
-    guns_lost integer DEFAULT 0 NOT NULL,
-    guns_fired boolean,
-    guns_moved boolean,
-    guns_limbered boolean,
-    guns_mstate integer DEFAULT 0 NOT NULL,
-    gunnery_type integer DEFAULT 0 NOT NULL,
-    gun_max_condition integer DEFAULT 2 NOT NULL,
-    gun_condition integer DEFAULT 2 NOT NULL
-);
-
-
-ALTER TABLE public.game_unit OWNER TO steve;
-
---
--- Name: game_unit_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
---
-
-CREATE SEQUENCE game_unit_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.game_unit_id_seq OWNER TO steve;
-
---
--- Name: game_unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
---
-
-ALTER SEQUENCE game_unit_id_seq OWNED BY game_unit.id;
-
 
 --
 -- Name: gt_formation; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
@@ -1098,37 +1030,67 @@ ALTER SEQUENCE stdimg_id_seq OWNED BY stdimg.id;
 
 
 --
--- Name: unit; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+-- Name: unit; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
 CREATE TABLE unit (
     id integer NOT NULL,
-    cmd_id integer DEFAULT 0 NOT NULL,
+    cmd_id integer NOT NULL,
     path ltree,
     name text DEFAULT ''::text NOT NULL,
+    descr text DEFAULT ''::text NOT NULL,
+    commander_name text DEFAULT ''::text NOT NULL,
+    commander_control integer DEFAULT 10 NOT NULL,
     nation text DEFAULT ''::text NOT NULL,
     utype integer DEFAULT 1 NOT NULL,
+    condition integer DEFAULT 2 NOT NULL,
     cmd_level integer DEFAULT 1 NOT NULL,
     drill integer DEFAULT 1 NOT NULL,
+    deploy_to integer DEFAULT 1 NOT NULL,
+    gt_formation integer DEFAULT 1 NOT NULL,
+    sk_out boolean,
+    woods boolean,
+    rough boolean,
+    cover boolean,
+    rflank boolean,
+    lflank boolean,
+    has_support boolean,
     bayonets integer DEFAULT 0 NOT NULL,
+    bayonets_lost integer DEFAULT 0 NOT NULL,
+    bayonets_mstate integer DEFAULT 0 NOT NULL,
+    bayonets_moved boolean,
+    bayonets_fired boolean,
     small_arms integer DEFAULT 0 NOT NULL,
     elite_arms integer DEFAULT 0 NOT NULL,
     lt_coy integer DEFAULT 0 NOT NULL,
     jg_coy integer DEFAULT 0 NOT NULL,
+    rifles boolean,
+    lt_lost integer DEFAULT 0 NOT NULL,
+    lt_mstate integer DEFAULT 0 NOT NULL,
     rating integer DEFAULT 5 NOT NULL,
     sabres integer DEFAULT 0 NOT NULL,
+    sabres_lost integer DEFAULT 0 NOT NULL,
+    sabres_mstate integer DEFAULT 0 NOT NULL,
+    sabres_charged integer DEFAULT 0 NOT NULL,
     cav_type integer DEFAULT 0 NOT NULL,
     cav_rating integer DEFAULT 0 NOT NULL,
     guns integer DEFAULT 0 NOT NULL,
+    guns_lost integer DEFAULT 0 NOT NULL,
+    guns_fired boolean,
+    guns_moved boolean,
+    guns_limbered boolean,
+    guns_mstate integer DEFAULT 0 NOT NULL,
     gunnery_type integer DEFAULT 0 NOT NULL,
+    horse_guns boolean,
+    gun_max_condition integer DEFAULT 2 NOT NULL,
     gun_condition integer DEFAULT 2 NOT NULL
 );
 
 
-ALTER TABLE public.unit OWNER TO steve;
+ALTER TABLE public.unit OWNER TO postgres;
 
 --
--- Name: unit_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
+-- Name: unit_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE unit_id_seq
@@ -1139,10 +1101,10 @@ CREATE SEQUENCE unit_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.unit_id_seq OWNER TO steve;
+ALTER TABLE public.unit_id_seq OWNER TO postgres;
 
 --
--- Name: unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
+-- Name: unit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE unit_id_seq OWNED BY unit.id;
@@ -1327,17 +1289,10 @@ ALTER TABLE ONLY game ALTER COLUMN id SET DEFAULT nextval('game_id_seq'::regclas
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY game_cmd ALTER COLUMN id SET DEFAULT nextval('game_cmd_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
---
-
-ALTER TABLE ONLY game_unit ALTER COLUMN id SET DEFAULT nextval('game_unit_id_seq'::regclass);
 
 
 --
@@ -1411,7 +1366,7 @@ ALTER TABLE ONLY stdimg ALTER COLUMN id SET DEFAULT nextval('stdimg_id_seq'::reg
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
+-- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY unit ALTER COLUMN id SET DEFAULT nextval('unit_id_seq'::regclass);
@@ -1628,6 +1583,21 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 16	6	t	f	redland	II Corp	2nd Commander	2		3	3	3
 9	1	t	f	France	Supply	Supply Train	4		3	3	2
 28	1	t	f	France	Test		2		3	3	3
+46	14	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
+47	14	t	f	France		Soult	2		3	3	3
+48	14	t	f	France		Lannes	2		2	1	3
+49	14	t	f	France		Ney	2		2	3	2
+50	14	t	f	France		Murat	2		3	2	3
+51	14	f	t	Prussia		Hohenlohe	1		4	3	2
+52	14	f	t	Prussia		Ferdinand	3		4	4	4
+53	14	f	t	Prussia		Duke of Brunswick	2		4	3	4
+54	14	f	t	Prussia		Kalkreuth	3		3	4	1
+55	14	t	f	France		Davout	2		1	3	2
+56	14	t	f	France		Napoleon	2		1	1	1
+57	14	t	f	France		General Bernadotte	2		3	3	2
+58	14	t	f	France		Augereau	2		2	2	2
+59	14	t	f	France		Supply Train	4		3	3	2
+60	14	t	f	France			2		3	3	3
 \.
 
 
@@ -1635,7 +1605,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 30, true);
+SELECT pg_catalog.setval('force_id_seq', 75, true);
 
 
 --
@@ -1870,6 +1840,231 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 296	28	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			2	4	7	1800	1	0	0	0	5	0	0	0	0	0	0	f	
 297	28	2nd_Div.Devils_Bde_as_such	Devils Bde as such		gotta break this	2	4	4	1800	3	0	0	0	5	0	0	0	0	0	0	f	as such six much as such
 288	28	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			2	1	8	1800	2	0	0	0	5	0	0	0	0	0	0	f	
+537	46	Supply_Train	Supply Train	von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f	
+538	46	Supply_Train.Guard_Detachment	Guard Detachment			5	6	8	300	1	2	4	0	10	60	12	7	0	0	0	f	
+539	47	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+540	47	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+541	47	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+542	47	2eme_Division	2eme Division	Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+543	47	2eme_Division.28e_Ligne	28e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+544	47	1eme_Division.35e_Ligne	35e Ligne		France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+545	47	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy		France/Corsica	2	1	6	1300	1	2	0	1	3	0	0	0	0	0	0	f	
+546	47	2eme_Division.46e_Ligne	46e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+547	47	1eme_Division.43e_Ligne	43e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+548	47	2eme_Division.24e_Legere	24e Legere		France	2	1	6	2000	1	0	0	0	4	0	0	0	0	0	0	f	
+549	47	2eme_Division.4e_Ligne	4e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+550	47	1eme_Division	1eme Division	St Hilaire	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+551	47	3eme_Division.26e_Legere	26e Legere		France	2	4	6	1600	1	0	0	0	3	0	0	0	0	0	0	f	
+552	47	1eme_Division.10e_Legere	10e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f	
+553	47	2eme_Division.57e_Ligne	57e Ligne		France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f	
+554	47	3eme_Division.18e_Ligne	18e Ligne		France	2	4	5	1800	1	0	0	0	4	0	0	0	0	0	0	f	
+555	47	Corps_Cavaly.22e_Chasseur	22e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
+556	47	1eme_Division.55e_Ligne	55e Ligne		France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f	
+557	47	Corps_Cavaly	Corps Cavaly	Guyot	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+558	47	3eme_Division	3eme Division	LeGrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+559	47	3eme_Division.75e_Ligne	75e Ligne		France	2	4	5	1700	1	0	0	0	5	0	0	0	0	0	0	f	
+560	47	3eme_Division.Po_Legere	Po Legere		France/Italy	2	4	6	1000	1	2	2	0	3	0	0	0	0	0	0	f	
+561	47	Corps_Artillery.Heavy_Bty	Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f	
+562	47	Corps_Artillery	Corps Artillery		France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+563	47	Corps_Cavaly.11e_Chasseur	11e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
+564	48	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+565	48	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+566	48	Cav_Bde	Cav Bde	Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+567	48	Cav_Bde.10e_Hussar	10e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
+568	48	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy		France	3	1	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
+569	48	Corps_Artillery	Corps Artillery	Careil	France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+570	48	Corps_Artillery.Heavy_Foot	Heavy Foot			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f	
+571	48	1eme_Division	1eme Division	Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+572	48	1eme_Division.17e_Legere	17e Legere		France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f	
+573	48	1eme_Division.34e_Ligne	34e Ligne		France	2	4	5	2500	1	0	0	0	5	0	0	0	0	0	0	f	
+574	48	1eme_Division.40e_Ligne	40e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+575	48	1eme_Division.64e_Ligne	64e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+576	48	1eme_Division.88e_Ligne	88e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+577	48	2eme_Division	2eme Division	Gazan	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+578	48	2eme_Division.21e_Legere	21e Legere		France	2	4	6	1800	1	0	0	0	5	0	1	0	0	0	0	f	
+579	48	2eme_Division.28e_Legere	28e Legere		France	2	4	6	900	1	0	0	0	3	0	0	0	0	0	0	f	
+580	48	2eme_Division.100e_Ligne	100e Ligne		France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+581	48	2eme_Division.103e_Ligne	103e Ligne		France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+582	49	Cav_Bde.9e_Hussar	9e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
+583	49	1eme_Division.39e_Ligne	39e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+584	49	1eme_Division.69e_Ligne	69e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+585	49	Cav_Bde.10e_Chasseur	10e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
+586	49	1eme_Division.76e_Ligne	76e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+587	49	Corps_Artillery	Corps Artillery		France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+588	49	2eme_Division.59e_Ligne	59e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+589	49	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f	
+590	49	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	1	2	f	
+591	49	2eme_Division	2eme Division	Gardanne	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+592	49	1eme_Division	1eme Division	Marchand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+593	49	Cav_Bde	Cav Bde	Charbanais	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+594	49	2eme_Division.50e_Ligne	50e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+595	49	2eme_Division.27e_Ligne	27e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+596	49	1eme_Division.6e_Legere	6e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f	
+597	49	2eme_Division.25e_Legere	25e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f	
+598	50	Corps_Artillery	Corps Artillery		France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+599	50	1e_Cuirassier_Div	1e Cuirassier Div	Nansouty	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+600	50	1e_Dragoon_Div	1e Dragoon Div	Klein	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+601	50	2e_Cuirassier_Div	2e Cuirassier Div	d'Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+602	50	2e_Dragoon_Div	2e Dragoon Div	Grouchy	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+603	50	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere		France	3	4	0	0	0	0	0	0	3	600	1	4	0	0	0	f	
+604	50	3e_Dragoon_Div	3e Dragoon Div	Beaumont	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+605	50	4e_Dragoon_Div	4e Dragoon Div	Sahut	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+606	50	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice		France	3	1	0	0	0	0	0	0	3	600	1	4	0	0	0	f	
+607	50	Light_Div	Light Div	Lasalle	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+608	50	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
+609	50	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar		France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f	
+610	50	2e_Dragoon_Div.Bde_Roget	Bde Roget		France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f	
+611	50	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance		France	3	4	0	0	0	0	0	0	3	600	9	2	0	0	0	f	
+612	50	2e_Dragoon_Div.Bde_Milet	Bde Milet		France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f	
+613	50	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye		France	3	1	0	0	0	0	0	0	3	1300	1	2	0	0	0	f	
+614	50	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz		France	3	4	0	0	0	0	0	0	3	600	5	4	0	0	0	f	
+615	50	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche		France	3	1	0	0	0	0	0	0	3	1200	5	5	0	0	0	f	
+616	50	1e_Dragoon_Div.Bde_Picard	Bde Picard		France	3	1	0	0	0	0	0	0	3	600	5	4	0	0	0	f	
+617	50	4e_Dragoon_Div.Bde_Margaron	Bde Margaron		France	3	4	0	0	0	0	0	0	3	1200	5	5	0	0	0	f	
+618	50	3e_Dragoon_Div.Bde_Boye	Bde Boye		France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f	
+619	50	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg		France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f	
+620	50	Corps_Artillery.1e_Horse	1e Horse			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t	
+621	50	Corps_Artillery.2e_Horse	2e Horse			4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t	
+622	51	2nd_Div.Horse_Bty	Horse Bty		Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+623	51	2nd_Div.von_Burgsdorf	von Burgsdorf		Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f	
+624	51	2nd_Div.von_Dyherrn	von Dyherrn		Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f	
+625	51	1st_Div.Horse_Bty	Horse Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+626	51	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde		Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f	
+627	51	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde		Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f	
+628	51	1st_Div.von_Schimonsky	von Schimonsky		Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f	
+629	51	Reserve_Div.Md_Foot_Bty	Md Foot Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f	
+630	51	3rd_Div	3rd Div	Tauentzein	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+631	51	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement		Prussia	3	4	0	0	0	0	0	0	3	700	2	4	0	0	0	f	
+632	51	3rd_Div.Rosen_Fusilers	Rosen Fusilers		Prussia	2	4	9	400	1	0	0	2	5	0	0	0	0	0	0	f	
+633	51	3rd_Div.von_Schoeneberg	von Schöneberg		Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f	
+634	51	3rd_Div.von_Zweiffel	von Zweiffel		Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f	
+635	51	1st_Div	1st Div	Grawert	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+636	51	3rd_Div.Lt_Bty	Lt Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f	
+637	51	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft		Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f	
+638	51	1st_Div.von_Mueffling	von Müffling		Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f	
+639	51	Reserve_Div	Reserve Div	Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+640	51	Reserve_Div.Heavy_Bty	Heavy Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f	
+641	51	1st_Div.Heavy_Bty	Heavy Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f	
+642	51	1st_Div.Bde_Henkel	Bde Henkel		Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f	
+643	51	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers		Prussia	2	4	9	800	1	0	2	0	5	0	0	0	0	0	0	f	
+644	51	2nd_Div	2nd Div	Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+645	51	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f	
+646	51	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky		Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f	
+647	51	2nd_Div.Heavy_Bty	Heavy Bty		Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f	
+648	52	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler		Saxony	3	1	0	0	0	0	0	0	3	1200	2	4	0	0	0	f	Saxon Hussar Regiment, eight squadrons
+649	52	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f	Schimmelpfennig Hussar Regiment # 6, ten squadrons
+650	52	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 
+651	52	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)
+652	52	Adv_Guard_Div	Adv Guard Div	Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+653	54	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers		Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f	
+654	54	2nd_Div.Md_Foot_Bty	Md Foot Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f	
+655	54	1st_Div.Md_Foot_Bty	Md Foot Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f	
+656	54	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer		Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f	
+657	54	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer		Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f	
+658	54	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer		Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f	
+659	54	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers		Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f	
+660	54	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld		Prussia	2	1	1	2400	1	0	0	1	2	0	0	0	2	4	1	f	
+661	54	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz		Prussia	2	4	1	2400	1	0	0	1	2	0	0	0	2	4	1	f	
+662	54	1st_Div	1st Div	Kuhnheim	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+663	54	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry		Prussia	3	4	0	0	0	0	0	0	3	600	1	1	0	0	0	f	
+664	54	1st_Div.Beeren_Cuirassier	Beeren Cuirassier		Prussia	3	4	0	0	0	0	0	0	3	400	1	2	0	0	0	f	
+665	54	2nd_Div	2nd Div	von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+666	55	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+667	55	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+668	55	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+669	55	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+670	55	1eme_Division.13e_Legere	13e Legere		France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f	
+671	55	1eme_Division	1eme Division	Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+672	55	2eme_Division.108e_Ligne	108e Ligne		France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f	
+673	55	1eme_Division.51e_Ligne	51e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+674	55	1eme_Division.17e_Ligne	17e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+675	55	1eme_Division.61e_Ligne	61e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+676	55	1eme_Division.30e_Ligne	30e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+677	55	2eme_Division	2eme Division	Friant	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+678	55	2eme_Division.33e_Ligne	33e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+679	55	2eme_Division.48e_Ligne	48e Ligne		France	2	1	5	1400	1	0	0	0	1	0	0	0	0	0	0	f	
+680	55	2eme_Division.111e_Ligne	111e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+681	55	Cav_Bde	Cav Bde	Viallanes	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+682	55	3eme_Division	3eme Division	Gudin	France	1	1	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+683	55	3eme_Division.12e_Ligne	12e Ligne		France	2	1	5	1300	1	0	0	0	5	0	0	0	0	0	0	f	
+684	55	3eme_Division.21e_Ligne	21e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+685	55	3eme_Division.25e_Ligne	25e Ligne		France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+686	55	3eme_Division.85e_Ligne	85e Ligne		France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f	
+687	55	Cav_Bde.1e_Chasseur	1e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	3	0	0	0	f	
+688	55	Cav_Bde.2e_Chasseur	2e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	3	0	0	0	f	
+689	55	Corps_Artillery	Corps Artillery	Hannicque	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+737	58	2eme_Division.24e_Ligne	24e Ligne		France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+690	56	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			4	1	0	0	0	0	0	0	4	0	0	0	24	3	1	f	
+691	56	Infantry_Division.1e_Grenadiers	1e Grenadiers		France	2	4	5	2400	1	0	0	0	1	0	0	0	0	0	0	f	
+692	56	Infantry_Division.2e_Grenadiers	2e Grenadiers		France	2	1	5	2400	1	0	0	0	1	0	0	0	0	0	0	f	
+693	56	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			4	4	0	0	0	0	0	0	4	0	0	0	16	1	2	f	
+694	56	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval		France	3	4	0	0	0	0	0	0	3	600	3	1	0	0	0	f	
+695	56	Infantry_Division.1e_Chasseurs	1e Chasseurs		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f	
+696	56	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval		France	3	1	0	0	0	0	0	0	3	400	8	1	0	0	0	f	
+697	56	Guard_Artillery	Guard Artillery	de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f	
+698	56	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f	
+699	56	Infantry_Division	Infantry Division	Lefebvre	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+700	56	Infantry_Division.Foot_Dragoons	Foot Dragoons		France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f	
+701	56	Cavalry_Division	Cavalry Division	Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f	
+702	56	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			4	1	0	0	0	0	0	0	4	0	0	0	8	4	1	t	
+703	57	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			4	1	0	0	0	0	0	0	0	0	0	0	8	3	3	f	
+704	57	3eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f	
+705	57	3eme_Division.27e_Legere	27e Legere	Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f	
+706	57	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f	
+707	57	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f	
+708	57	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f	
+709	57	1eme_Division.9e_Legere	9e Legere	de l'Eltang	France	2	4	6	2600	1	2	0	0	4	0	0	0	0	4	0	f	
+710	57	2eme_Division.45e_Ligne	45e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f	
+711	57	2eme_Division.54e_Ligne	54e Ligne	Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f	
+712	57	2eme_Division	2eme Division	Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+713	57	1eme_Division.32e_Ligne	32e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f	
+714	57	1eme_Division	1eme Division	de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+715	57	1eme_Division.96e_Ligne	96e Ligne	de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f	
+716	57	2eme_Division.4e_Legere	4e Legere	Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f	
+717	57	Cav_Reserve	Cav Reserve	Tilley	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+718	57	Cav_Reserve.2e_Hussar	2e Hussar		France	3	4	0	0	0	0	0	0	3	300	2	3	0	0	0	f	
+719	57	Cav_Reserve.4e_Hussar	4e Hussar		France	3	1	0	0	0	0	0	0	3	422	2	4	0	0	0	f	
+720	57	Artillery_Reserve	Artillery Reserve	Eble	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+721	57	3eme_Division	3eme Division	Drouet	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+722	57	3eme_Division.95e_Ligne	95e Ligne	Drouet	France	2	4	5	2600	1	0	0	0	5	0	0	0	0	0	0	f	
+723	57	3eme_Division.94e_Ligne	94e Ligne	Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f	
+724	58	2eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+725	58	1eme_Division.Md_Foot_Bty	Md Foot Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f	
+726	58	Corps_Cav.7e_Chasseur	7e Chasseur		France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
+727	58	1eme_Division.105e_Ligne	105e Ligne		France	2	1	3	1700	1	0	0	0	5	0	0	0	0	0	0	f	
+728	58	Corps_Cav.20e_Chasseur	20e Chasseur		France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f	
+729	58	1eme_Division.14e_Ligne	14e Ligne		France	2	4	5	700	1	0	0	0	4	0	0	0	0	0	0	f	
+730	58	Corps_Cav	Corps Cav	Durosnel	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+731	58	Corps_Artillery	Corps Artillery		France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+732	58	2eme_Division.63e_Ligne	63e Ligne		France	2	1	5	700	1	0	0	0	5	0	0	0	0	0	0	f	
+733	58	Corps_Artillery.Heavy_Bty	Heavy Bty			4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f	
+734	58	1eme_Division.16e_Legere	16e Legere		France	2	4	6	2700	1	0	0	0	4	0	0	0	0	0	0	f	
+735	58	1eme_Division.44e_Ligne	44e Ligne		France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f	
+736	58	1eme_Division	1eme Division	Desjardin	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+738	58	2eme_Division.7e_Legere	7e Legere		France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f	
+739	58	2eme_Division	2eme Division	Bierre	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+740	58	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt		Hesse	2	1	1	800	1	0	0	0	4	0	0	0	0	0	0	f	
+741	58	2eme_Division.Allied_Nassau	Allied Nassau		Nassau	2	1	5	400	1	0	0	0	4	0	0	0	0	0	0	f	
+742	59	Supply_Train	Supply Train		France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+743	59	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			5	5	6	300	1	2	4	0	6	50	3	0	0	0	0	f	
+744	60	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			2	1	8	1800	2	0	0	0	5	0	0	0	0	0	0	f	
+745	60	2nd_Div.1st_Regt_of_Death	1st Regt of Death			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	with data
+746	60	2nd_Div.Devils_Bde_as_such	Devils Bde as such		gotta break this	2	4	4	1800	3	0	0	0	5	0	0	0	0	0	0	f	as such six much as such
+747	60	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			2	4	7	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+748	60	2nd_Duvussion	2nd Duvussion			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+749	60	7th_Div.4th_Bn	4th Bn			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+750	60	7th_Div.1st_Bn	1st Bn			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+751	60	6th_Division	6th Division			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+752	60	6th_Division.2nd_Regt	2nd Regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+753	60	6th_Division.1st_Regt	1st Regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+754	60	7th_Div	7th Div			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+755	60	2nd_Div.2nd_Regt	2nd Regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+756	60	2nd_Div.1st_Regt	1st Regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+757	60	2nd_Div	2nd Div			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
+758	60	1st_Div.3rd_special_regt	3rd special regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+759	60	1st_Div.2nd_Regt	2nd Regt		France	2	4	3	1800	1	0	0	0	6	0	0	0	0	0	0	f	
+760	60	1st_Div.1st_Regt	1st Regt			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f	
+761	60	1st_Div	1st Div			1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
 \.
 
 
@@ -1877,27 +2072,27 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 311, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 986, true);
 
 
 --
 -- Data for Name: game; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit) FROM stdin;
+COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name, descr, notes, year, latlon, red_team, red_brief, blue_team, blue_brief) FROM stdin;
 \.
 
 
 --
--- Data for Name: game_cmd; Type: TABLE DATA; Schema: public; Owner: steve
+-- Data for Name: game_cmd; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY game_cmd (id, game_id, red_team, blue_team, nation, name, level, descr, rating, inspiration, condition) FROM stdin;
+COPY game_cmd (id, game_id, red_team, blue_team, nation, name, cmdr_name, level, descr, rating, inspiration, condition) FROM stdin;
 \.
 
 
 --
--- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+-- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('game_cmd_id_seq', 1, false);
@@ -1932,21 +2127,6 @@ SELECT pg_catalog.setval('game_id_seq', 1, false);
 
 COPY game_players (game_id, player_id, red_team, blue_team) FROM stdin;
 \.
-
-
---
--- Data for Name: game_unit; Type: TABLE DATA; Schema: public; Owner: steve
---
-
-COPY game_unit (id, cmd_id, path, name, commander_control, nation, utype, condition, cmd_level, drill, table_sector, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, rifles, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, gun_max_condition, gun_condition) FROM stdin;
-\.
-
-
---
--- Name: game_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
---
-
-SELECT pg_catalog.setval('game_unit_id_seq', 1, false);
 
 
 --
@@ -2794,6 +2974,63 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 2	2016-10-17 21:15:07.273878+10:30	192.168.1.105:46991	2
 1	2016-10-17 21:15:23.136067+10:30	127.0.0.1:45900	4
 2	2016-10-17 21:15:24.408731+10:30	192.168.1.105:47014	3
+2	2016-10-17 21:21:25.896196+10:30	192.168.1.105:47249	1
+1	2016-10-17 21:21:25.91002+10:30	127.0.0.1:46382	2
+2	2016-10-17 21:21:46.874017+10:30	192.168.1.105:47264	1
+1	2016-10-17 21:21:46.900368+10:30	127.0.0.1:46444	2
+1	2016-10-17 21:24:08.758896+10:30	127.0.0.1:46662	1
+2	2016-10-17 21:24:08.886749+10:30	192.168.1.105:47357	2
+1	2016-10-17 21:24:19.555273+10:30	127.0.0.1:46714	3
+1	2016-10-17 21:30:36.815536+10:30	127.0.0.1:47432	1
+2	2016-10-17 21:30:36.839427+10:30	192.168.1.105:47589	2
+1	2016-10-17 21:30:45.873718+10:30	127.0.0.1:47460	3
+1	2016-10-17 21:56:54.995507+10:30	127.0.0.1:49712	1
+2	2016-10-17 21:56:55.023814+10:30	192.168.1.105:48592	2
+2	2016-10-17 22:00:15.666246+10:30	192.168.1.105:48713	1
+1	2016-10-17 22:00:15.68364+10:30	127.0.0.1:50008	2
+1	2016-10-17 22:00:20.570921+10:30	127.0.0.1:50054	3
+2	2016-10-17 22:02:08.08618+10:30	192.168.1.105:48789	1
+1	2016-10-17 22:02:08.111177+10:30	127.0.0.1:50238	2
+1	2016-10-17 22:03:11.40264+10:30	127.0.0.1:50338	1
+1	2016-10-17 22:03:52.286475+10:30	127.0.0.1:50406	1
+1	2016-10-17 22:32:30.859585+10:30	192.168.1.101:50296	2
+2	2016-10-17 22:39:20.089677+10:30	192.168.1.105:48858	3
+1	2016-10-17 22:40:41.206326+10:30	127.0.0.1:53340	1
+2	2016-10-17 22:40:41.227765+10:30	192.168.1.105:48906	2
+1	2016-10-17 22:43:02.752767+10:30	127.0.0.1:53368	3
+1	2016-10-17 22:44:10.144659+10:30	127.0.0.1:53708	2
+2	2016-10-17 22:44:10.172898+10:30	192.168.1.105:49030	1
+1	2016-10-17 22:44:23.241178+10:30	127.0.0.1:53748	3
+1	2016-10-17 22:47:52.862646+10:30	127.0.0.1:54032	2
+2	2016-10-17 22:47:52.893477+10:30	192.168.1.105:49173	1
+1	2016-10-17 22:48:06.100592+10:30	127.0.0.1:54076	3
+2	2016-10-17 22:56:55.143648+10:30	192.168.1.105:49493	2
+1	2016-10-17 22:57:27.155883+10:30	127.0.0.1:54824	3
+1	2016-10-17 22:58:10.664754+10:30	127.0.0.1:54966	2
+2	2016-10-17 22:58:10.695631+10:30	192.168.1.105:49537	1
+1	2016-10-17 22:58:19.581414+10:30	127.0.0.1:55010	3
+2	2016-10-17 22:59:38.020453+10:30	192.168.1.105:49590	1
+1	2016-10-17 22:59:38.047945+10:30	127.0.0.1:55116	2
+1	2016-10-17 23:08:23.375329+10:30	127.0.0.1:55770	1
+2	2016-10-17 23:08:23.433906+10:30	192.168.1.105:49915	2
+1	2016-10-17 23:08:52.825731+10:30	127.0.0.1:55818	3
+2	2016-10-17 23:09:59.349287+10:30	192.168.1.105:49978	1
+1	2016-10-17 23:09:59.376951+10:30	127.0.0.1:55966	2
+1	2016-10-17 23:10:13.78512+10:30	127.0.0.1:56022	3
+1	2016-10-18 00:01:06.261715+10:30	127.0.0.1:59888	1
+1	2016-10-18 00:05:00.119863+10:30	127.0.0.1:60210	2
+1	2016-10-18 00:06:23.330582+10:30	127.0.0.1:60360	1
+1	2016-10-18 00:07:06.264432+10:30	127.0.0.1:60444	2
+1	2016-10-18 00:10:11.785878+10:30	127.0.0.1:60684	1
+1	2016-10-18 00:10:16.095121+10:30	127.0.0.1:60718	2
+1	2016-10-18 00:13:48.083296+10:30	127.0.0.1:32776	1
+1	2016-10-18 00:17:38.466767+10:30	127.0.0.1:33106	1
+1	2016-10-18 00:25:28.432974+10:30	127.0.0.1:33758	1
+1	2016-10-18 00:35:05.873247+10:30	127.0.0.1:33802	2
+1	2016-10-18 00:38:29.964584+10:30	127.0.0.1:35064	1
+1	2016-10-18 00:38:40.524613+10:30	127.0.0.1:35098	2
+1	2016-10-18 00:39:48.642258+10:30	127.0.0.1:35252	1
+1	2016-10-18 00:50:55.356802+10:30	127.0.0.1:36112	1
 \.
 
 
@@ -2856,7 +3093,8 @@ SELECT pg_catalog.setval('rating_id_seq', 1, false);
 COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, notes, year, public, latlon, red_team, red_brief, blue_team, blue_brief, review) FROM stdin;
 4	0	2	2016-10-12 23:21:45.213973+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	t	\N					f
 5	0	2	2016-10-12 23:21:45.213973+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	\N					f
-1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	f
+1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	f	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	f
+14	0	2	2016-10-17 21:24:54.130267+10:30	1	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	f
 \.
 
 
@@ -2864,7 +3102,7 @@ COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, no
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 12, true);
+SELECT pg_catalog.setval('scenario_id_seq', 15, true);
 
 
 --
@@ -2940,15 +3178,15 @@ SELECT pg_catalog.setval('stdimg_id_seq', 1, false);
 
 
 --
--- Data for Name: unit; Type: TABLE DATA; Schema: public; Owner: steve
+-- Data for Name: unit; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY unit (id, cmd_id, path, name, nation, utype, cmd_level, drill, bayonets, small_arms, elite_arms, lt_coy, jg_coy, rating, sabres, cav_type, cav_rating, guns, gunnery_type, gun_condition) FROM stdin;
+COPY unit (id, cmd_id, path, name, descr, commander_name, commander_control, nation, utype, condition, cmd_level, drill, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, jg_coy, rifles, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, horse_guns, gun_max_condition, gun_condition) FROM stdin;
 \.
 
 
 --
--- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
+-- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('unit_id_seq', 1, false);
@@ -2970,8 +3208,8 @@ COPY users (id, username, passwd, name, email, rank, created, expires, channel, 
 5	a	a		a@a	0	2016-10-16 14:42:17.888037+10:30	2016-10-16 14:42:17.888037+10:30	0					f	t	t
 6	tt	tt		tt@tt.com	0	2016-10-16 15:01:56.744922+10:30	2016-10-16 15:01:56.744922+10:30	0					f	t	t
 7	aa	aa		aa@aa	0	2016-10-16 15:19:18.701593+10:30	2016-10-16 15:19:18.701593+10:30	0					f	t	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	4	127.0.0.1:45900	Australia	15mm-madness.blogspot.com		f	t	t
-2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	3	192.168.1.105:47014	Australia	http://witchwoodstudio.com		f	f	t
+2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:49978	Australia	http://witchwoodstudio.com		f	f	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:36112	Australia	15mm-madness.blogspot.com		f	f	t
 \.
 
 
@@ -3084,7 +3322,7 @@ ALTER TABLE ONLY force_unit
 
 
 --
--- Name: game_cmd_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+-- Name: game_cmd_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
 ALTER TABLE ONLY game_cmd
@@ -3097,14 +3335,6 @@ ALTER TABLE ONLY game_cmd
 
 ALTER TABLE ONLY game
     ADD CONSTRAINT game_pkey PRIMARY KEY (id);
-
-
---
--- Name: game_unit_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
---
-
-ALTER TABLE ONLY game_unit
-    ADD CONSTRAINT game_unit_pkey PRIMARY KEY (id);
 
 
 --
@@ -3188,7 +3418,7 @@ ALTER TABLE ONLY stdimg
 
 
 --
--- Name: unit_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
+-- Name: unit_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
 ALTER TABLE ONLY unit
@@ -3257,7 +3487,7 @@ CREATE INDEX force_unit_force_idx ON force_unit USING btree (force_id);
 
 
 --
--- Name: game_cmd_game_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: game_cmd_game_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
 CREATE INDEX game_cmd_game_idx ON game_cmd USING btree (game_id);
@@ -3313,13 +3543,6 @@ CREATE INDEX game_scenario_idx ON game USING btree (scenario_id);
 
 
 --
--- Name: game_unit_cmd_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
---
-
-CREATE INDEX game_unit_cmd_idx ON game_unit USING btree (cmd_id);
-
-
---
 -- Name: login_date_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
 --
 
@@ -3348,7 +3571,7 @@ CREATE INDEX scenario_unit_cmd_idx ON scenario_unit USING btree (cmd_id);
 
 
 --
--- Name: unit_cmd_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+-- Name: unit_cmd_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
 CREATE INDEX unit_cmd_idx ON unit USING btree (cmd_id);

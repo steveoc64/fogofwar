@@ -42,6 +42,8 @@ func _scenarioList(action string, id int, context *router.Context) {
 		form.Column("Name", "Name")
 		form.Column("Year", "Year")
 		form.Column("Description", "Descr")
+		form.BoolColumn("Reviewing", "Review")
+		form.BoolColumn("Published", "Public")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -147,6 +149,11 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 		form := formulate.EditForm{}
 		canEdit := data.AuthorID == Session.UserID
 
+		// LeEmpereur can always edit
+		if Session.Rank > 9 {
+			canEdit = true
+		}
+
 		// Layout the fields
 
 		if canEdit {
@@ -158,11 +165,12 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 				AddNumber(1, "Year", "Year", "0")
 
 			if Session.Rank > 9 {
-				rowElem.AddCheck(1, "Publish Scenario", "Public")
+				rowElem.AddCheck(1, "Published", "Public")
+				rowElem.AddCheck(1, "Under Review", "Review")
 			} else {
 				rowElem.AddDisplayCheck(1, "Published", "Public")
+				rowElem.AddDisplayCheck(1, "Under Review", "Review")
 			}
-			rowElem.AddDisplayCheck(1, "Under Review", "Review")
 
 			form.Row(1).
 				AddInput(1, "Description", "Descr")
@@ -249,8 +257,32 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 			data.Admin = true
 		}
 		form.ActionGrid("scenario-actions", "#action-grid", data, func(url string) {
-			if url == "unlock" {
-				print("unlock this scenario")
+			switch url {
+			case "accept":
+				if Session.Rank > 9 {
+					go func() {
+						done := false
+						err := RPC("ScenarioRPC.Accept", shared.ScenarioRPCData{
+							Channel: Session.Channel,
+							ID:      data.ID,
+						}, &done)
+						if err == nil {
+							Session.Navigate("/scenarios")
+						}
+					}()
+				}
+			case "lock":
+				go func() {
+					done := false
+					err := RPC("ScenarioRPC.Lock", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      data.ID,
+					}, &done)
+					if err == nil {
+						Session.Reload(context)
+					}
+				}()
+			case "unlock":
 				go func() {
 					done := false
 					err := RPC("ScenarioRPC.Unlock", shared.ScenarioRPCData{
@@ -265,7 +297,7 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 						}
 					}
 				}()
-			} else {
+			default:
 				Session.Navigate(url)
 			}
 		})

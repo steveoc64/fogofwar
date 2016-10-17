@@ -131,6 +131,7 @@ func (u *UserRPC) SaveMe(data shared.UserRPCData, done *bool) error {
 
 	if err == nil {
 		*done = true
+		conn.BroadcastAdmin("User", "Update", conn.UserID)
 	}
 	logger(start, "User.SaveMe", conn,
 		fmt.Sprintf("%v", data.User), "")
@@ -155,6 +156,7 @@ func (u *UserRPC) Update(data shared.UserRPCData, retval *shared.User) error {
 	if err == nil {
 		err = DB.SQL(`select * from users where id=$1`, data.ID).
 			QueryStruct(retval)
+		conn.BroadcastAdmin("User", "Update", data.ID)
 	}
 
 	logger(start, "User.Update", conn,
@@ -176,6 +178,7 @@ func (u *UserRPC) Delete(data shared.UserRPCData, done *bool) error {
 	_, err := DB.SQL(`delete from users where id=$1`, data.ID).Exec()
 	if err == nil {
 		*done = true
+		conn.BroadcastAdmin("User", "Update", data.ID)
 	}
 
 	logger(start, "User.Delete", conn,

@@ -21,7 +21,7 @@ func (s *ScenarioRPC) List(channel int, scenarios *[]shared.Scenario) error {
 
 	conn := Connections.Get(channel)
 
-	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year,s.public,s.review
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id = $1
@@ -40,19 +40,31 @@ func (c *ScenarioRPC) ListPublic(channel int, scenarios *[]shared.Scenario) erro
 
 	conn := Connections.Get(channel)
 
-	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+	err := error(nil)
+	// if Admin, then include the review flag
+	if conn.Rank > 9 {
+		err = DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year,s.review
+		from scenario s
+			left join users a on a.id=s.author_id
+		where author_id != $1
+			and (public or review)
+		order by year`, conn.UserID).
+			QueryStructs(scenarios)
+	} else {
+		err = DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id != $1
 			and public
 		order by year`, conn.UserID).
-		QueryStructs(scenarios)
+			QueryStructs(scenarios)
+	}
 
 	logger(start, "Scenario.ListPublic", conn,
 		"",
 		fmt.Sprintf("%d Scenarios", len(*scenarios)))
 
-	return nil
+	return err
 }
 
 func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]shared.Scenario) error {
@@ -63,7 +75,7 @@ func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]share
 		return errors.New("Insufficient Privilege")
 	}
 
-	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+	err := DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id = $1
@@ -74,7 +86,7 @@ func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]share
 		"",
 		fmt.Sprintf("%d Scenarios", len(*scenarios)))
 
-	return nil
+	return err
 }
 
 func (c *ScenarioRPC) Get(data shared.ScenarioRPCData, retval *shared.Scenario) error {
@@ -104,7 +116,7 @@ func (c *ScenarioRPC) Unlock(data shared.ScenarioRPCData, done *bool) error {
 
 	*done = false
 
-	err := errors.New("")
+	err := error(nil)
 	if conn.Rank > 9 {
 		_, err = DB.SQL(`update scenario
 		set public=true
@@ -125,15 +137,72 @@ func (c *ScenarioRPC) Unlock(data shared.ScenarioRPCData, done *bool) error {
 	return err
 }
 
+func (c *ScenarioRPC) Lock(data shared.ScenarioRPCData, done *bool) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	*done = false
+
+	_, err := DB.SQL(`update scenario
+		set review=false,public=false
+		where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+
+	if err == nil {
+		*done = true
+		conn.Broadcast("Scenario", "Unlock", data.ID)
+	}
+
+	logger(start, "Scenario.Lock", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	return err
+}
+
+func (c *ScenarioRPC) Accept(data shared.ScenarioRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+	if conn.Rank < 9 {
+		return errors.New("Insufficient Priv")
+	}
+
+	_, err := DB.SQL(`update scenario
+		set public=true,review=false
+		where id=$1 and review=true`, data.ID).Exec()
+
+	if err == nil {
+		*done = true
+		conn.Broadcast("Scenario", "Unlock", data.ID)
+	}
+
+	logger(start, "Scenario.Accept", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	return err
+}
+
 func (c *ScenarioRPC) Update(data shared.ScenarioRPCData, retval *shared.Scenario) error {
 	start := time.Now()
 
 	conn := Connections.Get(data.Channel)
 
-	_, err := DB.Update("scenario").
-		SetWhitelist(data.Scenario, "name", "year", "public", "descr", "notes", "red_team", "red_brief", "blue_team", "blue_brief").
-		Where("id = $1 and author_id=$2", data.ID, conn.UserID).
-		Exec()
+	err := error(nil)
+
+	if conn.Rank > 9 {
+		_, err = DB.Update("scenario").
+			SetWhitelist(data.Scenario, "name", "year", "public", "review", "descr", "notes",
+				"red_team", "red_brief", "blue_team", "blue_brief").
+			Where("id = $1", data.ID, conn.UserID).
+			Exec()
+	} else {
+		_, err = DB.Update("scenario").
+			SetWhitelist(data.Scenario, "name", "year", "public", "descr", "notes",
+				"red_team", "red_brief", "blue_team", "blue_brief").
+			Where("id = $1 and author_id=$2", data.ID, conn.UserID).
+			Exec()
+	}
 
 	if err == nil {
 

@@ -28,7 +28,7 @@ func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
 	*r = conn.Route
 	println("\n----------------------------------")
 	log.Printf("%s:%s -> %s\n", conn.Username, conn.GetRank(), conn.Route)
-	conn.BroadcastAdmin("nav", data.Route, data.Channel)
+	conn.BroadcastAdmin("Nav", data.Route, data.Channel)
 	return nil
 }
 
@@ -98,7 +98,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Disqus = Config.Disqus && res.Disqus
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
-			conn.BroadcastAdmin("login", "insert", lr.ID)
+			conn.BroadcastAdmin("Login", "Login", lr.ID)
 
 			// Create a login record
 			req := conn.Socket.Request()

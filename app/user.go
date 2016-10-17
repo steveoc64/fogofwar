@@ -1,10 +1,7 @@
 package main
 
 import (
-	"crypto/md5"
-	"fmt"
 	"strconv"
-	"strings"
 
 	"./shared"
 
@@ -15,6 +12,12 @@ import (
 
 // Display a list of users
 func userList(context *router.Context) {
+	Session.Subscribe("User", _userList, context)
+	Session.Subscribe("Login", _userList, context)
+	_userList("Users", 0, context)
+}
+
+func _userList(action string, id int, context *router.Context) {
 
 	go func() {
 		users := []shared.User{}
@@ -33,7 +36,7 @@ func userList(context *router.Context) {
 		form.Column("IP", "IPAddress")
 		form.Column("Ch", "Channel")
 		// form.Column("Name", "Name")
-		form.Column("Email", "Email")
+		form.AvatarColumn("Email", "Email")
 		form.Column("Scenarios", "NumScenarios")
 		form.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
@@ -89,7 +92,7 @@ func userList(context *router.Context) {
 		formOffline.Column("Country", "Country")
 		formOffline.Column("LastIP", "IPAddress")
 		formOffline.Column("Name", "Name")
-		formOffline.Column("Email", "Email")
+		formOffline.AvatarColumn("Email", "Email")
 		formOffline.Column("Scenarios", "NumScenarios")
 		formOffline.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
@@ -351,7 +354,7 @@ func _usersOnline(action string, id int, context *router.Context) {
 	form.Column("Browser", "Browser")
 	form.Column("Duration", "Duration")
 	form.Column("Name", "Name")
-	form.Column("Email", "Email")
+	form.AvatarColumn("Email", "Email")
 	form.Column("Mobile", "SMS")
 	form.Column("Role", "Role")
 	form.BoolColumn("Tech ?", "IsTech")
@@ -466,9 +469,10 @@ func userSettings(context *router.Context) {
 
 		// avatar := "205e460b479e2e5b48aec07710c08d50"
 
-		theEmail := strings.TrimSpace(strings.ToLower(user.Email))
-		avatar := md5.Sum([]byte(theEmail))
-		avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar", avatar)
+		// theEmail := strings.TrimSpace(strings.ToLower(user.Email))
+		// avatar := md5.Sum([]byte(theEmail))
+		// avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar", avatar)
+		avatarURL := user.GetAvatar(200)
 		// print("avatar", theEmail, avatar, avatarURL)
 		titletext := doc.QuerySelector("#titletext")
 		newSpan := doc.CreateElement("SPAN")
@@ -480,9 +484,11 @@ func userSettings(context *router.Context) {
 		emailField := form.Get("Email").(*dom.HTMLInputElement)
 
 		form.OnEvent("Email", "change", func(evt dom.Event) {
-			newEmail := strings.TrimSpace(strings.ToLower(emailField.Value))
-			img.Src = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar",
-				md5.Sum([]byte(newEmail)))
+			user.Email = emailField.Value
+			img.Src = user.GetAvatar(200)
+			// newEmail := strings.TrimSpace(strings.ToLower(emailField.Value))
+			// img.Src = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar",
+			// md5.Sum([]byte(newEmail)))
 		})
 
 		// Now add a pricing table

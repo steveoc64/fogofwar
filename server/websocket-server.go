@@ -235,7 +235,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 		}
 	}
 
-	c.BroadcastAdmin("login", "delete", conn.ID)
+	c.BroadcastAdmin("Login", "Drop", conn.ID)
 
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()

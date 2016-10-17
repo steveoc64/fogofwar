@@ -64,7 +64,12 @@ func (s *GlobalSessionData) Navigate(url string) {
 }
 
 func (s *GlobalSessionData) Back() {
+	// On navigate, clear out any subscriptions on events
+	s.Subscriptions = make(map[string]MessageFunction)
+	s.Context = nil
+	s.URL = ""
 	s.Router.Back()
+	hideDisqus()
 }
 
 func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *router.Context) {

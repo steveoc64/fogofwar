@@ -1,6 +1,11 @@
 package shared
 
-import "time"
+import (
+	"crypto/md5"
+	"fmt"
+	"strings"
+	"time"
+)
 
 type User struct {
 	ID           int        `db:"id"`
@@ -21,6 +26,13 @@ type User struct {
 	Newsletter   bool       `db:"newsletter"`
 	NumScenarios int        `db:"num_scenarios"`
 	NumGames     int        `db:"num_games"`
+}
+
+func (u *User) GetAvatar(size int) string {
+	theEmail := strings.TrimSpace(strings.ToLower(u.Email))
+	avatar := md5.Sum([]byte(theEmail))
+	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
+	return avatarURL
 }
 
 func (u *User) GetRank() string {

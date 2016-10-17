@@ -1,5 +1,14 @@
 <div class="action-grid">
 	{{if .Public}}
+		{{if .IsMine}}
+		<div class="action__item" url="lock">
+			<div class="action__title">Lock</div>
+			<div class="action__icon"><i class="fa fa-lock fa-lg"></i></div>
+			<div class="action__text">
+				Un-Publish this Scenario
+			</div>
+		</div>	
+		{{end}}
 	<div class="action__item" url="/scenario/{{.ID}}/fork">
 		<div class="action__title">Copy</div>
 		<div class="action__icon"><i class="fa fa-files-o fa-lg"></i></div>
@@ -8,14 +17,16 @@
 		</div>
 	</div>
 	{{else}}
-		{{if .IsMine}}
-		<div class="action__item" url="unlock">
-			<div class="action__title">Unlock</div>
-			<div class="action__icon"><i class="fa fa-unlock fa-lg"></i></div>
-			<div class="action__text">
-				Publish this Scenario to allow Sharing and Cloning
-			</div>
-		</div>
+		{{if and .IsMine}}
+			{{if not .Review}}
+				<div class="action__item" url="unlock">
+					<div class="action__title">Unlock</div>
+					<div class="action__icon"><i class="fa fa-unlock fa-lg"></i></div>
+					<div class="action__text">
+						Publish this Scenario to allow Sharing and Cloning
+					</div>
+				</div>
+			{{end}}
 		{{end}}
 	{{end}}
 	{{if .Review}}
@@ -27,6 +38,14 @@
 				Looks Good - Accept this Scenario for Publishing.
 			</div>
 		</div>
+		{{else if .IsMine}}
+		<div class="action__item" url="lock">
+			<div class="action__title">Lock</div>
+			<div class="action__icon"><i class="fa fa-lock fa-lg"></i></div>
+			<div class="action__text">
+				Retract this Scenario from Review
+			</div>
+		</div>	
 		{{end}}
 	{{end}}
 	<div class="action__item" url="/scenario/{{.ID}}/red">

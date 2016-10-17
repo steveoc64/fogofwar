@@ -1,30 +1,42 @@
 package shared
 
 import (
+	"crypto/md5"
 	"fmt"
+	"strings"
 	"time"
 )
 
 type Scenario struct {
-	ID         int        `db:"id"`
-	CampaignID int        `db:"campaign_id"`
-	AuthorID   int        `db:"author_id"`
-	AuthorName string     `db:"author_name"`
-	ForkedFrom int        `db:"forked_from"`
-	Name       string     `db:"name"`
-	Year       int        `db:"year"`
-	Descr      string     `db:"descr"`
-	Notes      string     `db:"notes"`
-	Created    *time.Time `db:"created"`
-	LatLon     *[]int     `db:"latlon"`
-	Public     bool       `db:"public"`
-	Review     bool       `db:"review"`
-	RedTeam    string     `db:"red_team"`
-	RedBrief   string     `db:"red_brief"`
-	BlueTeam   string     `db:"blue_team"`
-	BlueBrief  string     `db:"blue_brief"`
-	IsMine     bool       `db:"is_mine"`
-	Admin      bool       `db:"admin"`
+	ID          int        `db:"id"`
+	CampaignID  int        `db:"campaign_id"`
+	AuthorID    int        `db:"author_id"`
+	AuthorName  string     `db:"author_name"`
+	AuthorEmail string     `db:"author_email"`
+	ForkedFrom  int        `db:"forked_from"`
+	Name        string     `db:"name"`
+	Year        int        `db:"year"`
+	Descr       string     `db:"descr"`
+	Notes       string     `db:"notes"`
+	Created     *time.Time `db:"created"`
+	LatLon      *[]int     `db:"latlon"`
+	Public      bool       `db:"public"`
+	Review      bool       `db:"review"`
+	RedTeam     string     `db:"red_team"`
+	RedBrief    string     `db:"red_brief"`
+	BlueTeam    string     `db:"blue_team"`
+	BlueBrief   string     `db:"blue_brief"`
+	IsMine      bool       `db:"is_mine"`
+	Admin       bool       `db:"admin"`
+}
+
+func (s *Scenario) GetAvatar(size int) string {
+	theEmail := strings.TrimSpace(strings.ToLower(s.AuthorEmail))
+	avatar := md5.Sum([]byte(theEmail))
+	print("compute avatar for", theEmail)
+	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
+	print("got", avatarURL)
+	return avatarURL
 }
 
 type ScenarioRPCData struct {

@@ -54,6 +54,7 @@ func enableRoutes(Rank int) {
 		"manual":            manual,
 		"scenarios":         scenarioList,
 		"scenario-add":      scenarioAdd,
+		"scenario-fork":     scenarioFork,
 		"scenario-edit":     scenarioEdit,
 		"scenario-red":      scenarioRed,
 		"scenario-red-add":  scenarioRedAdd,

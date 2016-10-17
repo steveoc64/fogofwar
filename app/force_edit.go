@@ -558,6 +558,7 @@ func forceEdit(context *router.Context) {
 		// Put up down arrows on the name entry fields only, to nav to different units
 		form.OnEvent("grid-4-1", "keydown", func(evt dom.Event) {
 			kevent := evt.(*dom.KeyboardEvent)
+			print("kevent is", kevent.KeyCode)
 			if evt.Target().TagName() == "INPUT" {
 				switch kevent.KeyCode {
 				case 27:

@@ -21,7 +21,9 @@ func (s *ScenarioRPC) List(channel int, scenarios *[]shared.Scenario) error {
 
 	conn := Connections.Get(channel)
 
-	DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year,s.public,s.review
+	DB.SQL(`select 
+		s.id,s.author_id,a.username as author_name,a.email as author_email,
+		s.name,s.descr,s.year,s.public,s.review
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id = $1
@@ -43,7 +45,9 @@ func (c *ScenarioRPC) ListPublic(channel int, scenarios *[]shared.Scenario) erro
 	err := error(nil)
 	// if Admin, then include the review flag
 	if conn.Rank > 9 {
-		err = DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year,s.review
+		err = DB.SQL(`select 
+			s.id,s.author_id,a.username as author_name,a.email as author_email,
+			s.name,s.descr,s.year,s.review
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id != $1
@@ -51,7 +55,9 @@ func (c *ScenarioRPC) ListPublic(channel int, scenarios *[]shared.Scenario) erro
 		order by year`, conn.UserID).
 			QueryStructs(scenarios)
 	} else {
-		err = DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+		err = DB.SQL(`select 
+			s.id,s.author_id,a.username as author_name,a.email as author_email,
+			s.name,s.descr,s.year
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id != $1
@@ -75,7 +81,9 @@ func (s *ScenarioRPC) ListByUser(data shared.ScenarioRPCData, scenarios *[]share
 		return errors.New("Insufficient Privilege")
 	}
 
-	err := DB.SQL(`select s.id,s.author_id,a.username as author_name,s.name,s.descr,s.year
+	err := DB.SQL(`select 
+			s.id,s.author_id,a.username as author_name,a.email as author_email,
+			s.name,s.descr,s.year
 		from scenario s
 			left join users a on a.id=s.author_id
 		where author_id = $1
@@ -299,6 +307,10 @@ func (s *ScenarioRPC) Insert(data shared.ScenarioRPCData, retval *shared.Scenari
 	logger(start, "Scenario.Insert", conn,
 		fmt.Sprintf("%v", data.Scenario),
 		fmt.Sprintf("%d", id))
+
+	if err == nil {
+		conn.Broadcast("Scenario", "Insert", id)
+	}
 
 	return err
 }
@@ -812,7 +824,13 @@ func (s *ScenarioRPC) Delete(data shared.ScenarioRPCData, done *bool) error {
 	*done = false
 	conn := Connections.Get(data.Channel)
 
-	_, err := DB.SQL(`delete from scenario where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	err := error(nil)
+	if conn.Rank > 9 {
+		_, err = DB.SQL(`delete from scenario where id=$1`, data.ID, conn.UserID).Exec()
+	} else {
+		_, err = DB.SQL(`delete from scenario where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	}
+
 	if err != nil {
 		println(err.Error())
 	} else {
@@ -838,6 +856,92 @@ func (s *ScenarioRPC) Delete(data shared.ScenarioRPCData, done *bool) error {
 	logger(start, "Scenario.Delete", conn,
 		fmt.Sprintf("ID %d", data.ID),
 		"")
+
+	if err == nil {
+		conn.Broadcast("Scenario", "Deleted", data.ID)
+	}
+
+	return err
+}
+
+func (s *ScenarioRPC) Fork(data shared.ScenarioRPCData, newID *int) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	*newID = 0
+	oldScen := shared.Scenario{}
+	err := DB.SQL(`select * from scenario where id=$1`, data.ID).QueryStruct(&oldScen)
+	if err != nil {
+		return err
+	}
+
+	if !oldScen.Public {
+		return errors.New("Scenario is not public")
+	}
+
+	// TODO - check that the user has enough slots to allow this
+
+	// Create a new scenario header
+	err = DB.SQL(`insert into scenario
+		(author_id,forked_from,name,year,descr,notes,public,review,
+			red_team,blue_team,red_brief,blue_brief)
+		select  
+		$1,$2, 'Copy of - '||name,year,'Copy of - '||descr,notes,'false','false',
+		red_team,blue_team,red_brief,blue_brief
+		from scenario where id=$2
+		returning id`, conn.UserID, data.ID).QueryScalar(newID)
+	println("newid is ", *newID)
+
+	if err == nil {
+		// now add the forces
+
+		forces := []shared.Force{}
+		err = DB.SQL(`select * from force where scenario_id=$1`, data.ID).QueryStructs(&forces)
+
+		for _, oldForce := range forces {
+			newForceID := 0
+			oldForce.ScenarioID = *newID
+			err := DB.InsertInto("force").
+				Whitelist("scenario_id", "red_team", "blue_team", "nation",
+					"cmdr_name", "level", "descr", "rating", "inspiration", "condition").
+				Record(oldForce).
+				Returning("id").
+				QueryScalar(&newForceID)
+			println("added force", newForceID, "from", oldForce.ID)
+
+			if err == nil {
+				// Now copy all the force units across
+
+				_, err = DB.SQL(`insert into force_unit 
+					(force_id,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
+						guns,gunnery_type,gun_condition,horse_guns)
+					select
+					$2,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
+						guns,gunnery_type,gun_condition,horse_guns
+					from force_unit 
+					where force_id=$1`, oldForce.ID, newForceID).Exec()
+
+				if err != nil {
+					println(err.Error())
+					break
+				}
+			} else {
+				println(err.Error())
+			}
+		}
+	} else {
+		println(err.Error())
+	}
+
+	logger(start, "Scenario.Fork ", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	if err == nil {
+		conn.Broadcast("Scenario", "Fork", data.ID)
+	}
 
 	return err
 }

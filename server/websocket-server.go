@@ -108,6 +108,9 @@ func (c *Connection) Broadcast(name string, action string, id int) {
 		ID:     id,
 	}
 
+	// TODO - IGNORE any connections that are in a Game ... which are
+	// connections that will be chatty enough, so we dont need to create
+	// unnecessary netword traffic
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID != 0 {
 			log.Println("broadcast", name, action, id, "»", v.ID)

@@ -36,7 +36,7 @@ func _userList(action string, id int, context *router.Context) {
 		form.Column("IP", "IPAddress")
 		form.Column("Ch", "Channel")
 		// form.Column("Name", "Name")
-		form.AvatarColumn("Email", "Email")
+		form.EmailAvatarColumn("Email", "Email")
 		form.Column("Scenarios", "NumScenarios")
 		form.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
@@ -92,7 +92,7 @@ func _userList(action string, id int, context *router.Context) {
 		formOffline.Column("Country", "Country")
 		formOffline.Column("LastIP", "IPAddress")
 		formOffline.Column("Name", "Name")
-		formOffline.AvatarColumn("Email", "Email")
+		formOffline.EmailAvatarColumn("Email", "Email")
 		formOffline.Column("Scenarios", "NumScenarios")
 		formOffline.Column("Games", "NumGames")
 		// form.Column("Bloglink", "Bloglink")
@@ -354,7 +354,7 @@ func _usersOnline(action string, id int, context *router.Context) {
 	form.Column("Browser", "Browser")
 	form.Column("Duration", "Duration")
 	form.Column("Name", "Name")
-	form.AvatarColumn("Email", "Email")
+	form.EmailAvatarColumn("Email", "Email")
 	form.Column("Mobile", "SMS")
 	form.Column("Role", "Role")
 	form.BoolColumn("Tech ?", "IsTech")
@@ -472,7 +472,7 @@ func userSettings(context *router.Context) {
 		// theEmail := strings.TrimSpace(strings.ToLower(user.Email))
 		// avatar := md5.Sum([]byte(theEmail))
 		// avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar", avatar)
-		avatarURL := user.GetAvatar(200)
+		avatarURL := user.GetAvatar(80)
 		// print("avatar", theEmail, avatar, avatarURL)
 		titletext := doc.QuerySelector("#titletext")
 		newSpan := doc.CreateElement("SPAN")
@@ -485,7 +485,7 @@ func userSettings(context *router.Context) {
 
 		form.OnEvent("Email", "change", func(evt dom.Event) {
 			user.Email = emailField.Value
-			img.Src = user.GetAvatar(200)
+			img.Src = user.GetAvatar(80)
 			// newEmail := strings.TrimSpace(strings.ToLower(emailField.Value))
 			// img.Src = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar",
 			// md5.Sum([]byte(newEmail)))

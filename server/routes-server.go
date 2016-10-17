@@ -15,6 +15,7 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 		{Route: "/scenarios", Func: "scenarios"},
 		{Route: "/scenario/add", Func: "scenario-add"},
 		{Route: "/scenario/{id}", Func: "scenario-edit"},
+		{Route: "/scenario/{id}/fork", Func: "scenario-fork"},
 		{Route: "/scenario/{id}/red", Func: "scenario-red"},
 		{Route: "/scenario/{id}/red/add", Func: "scenario-red-add"},
 		{Route: "/force/{id}", Func: "force-edit"},

@@ -31,6 +31,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 7	1	t	f	France	VII Corps	Augereau	2		2	2	2
 16	6	t	f	redland	II Corp	2nd Commander	2		3	3	3
 9	1	t	f	France	Supply	Supply Train	4		3	3	2
+28	1	t	f	France	Test		2		3	3	3
 \.
 
 
@@ -38,7 +39,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 26, true);
+SELECT pg_catalog.setval('force_id_seq', 30, true);
 
 
 --

@@ -82,13 +82,38 @@ func (c *ScenarioRPC) Get(data shared.ScenarioRPCData, retval *shared.Scenario) 
 
 	conn := Connections.Get(data.Channel)
 
-	DB.SQL(`select * from scenario where id=$1`, data.ID).QueryStruct(retval)
+	err := DB.SQL(`select * from scenario where id=$1`, data.ID).QueryStruct(retval)
+
+	retval.IsMine = false
+	if err == nil {
+		retval.IsMine = retval.AuthorID == conn.UserID
+		println("ismine", retval.AuthorID, conn.UserID, retval.IsMine)
+	}
 
 	logger(start, "Scenario.Get", conn,
 		fmt.Sprintf("%d", data.ID),
 		fmt.Sprintf("%v", *retval))
 
-	return nil
+	return err
+}
+
+func (c *ScenarioRPC) Unlock(data shared.ScenarioRPCData, done *bool) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	*done = false
+	_, err := DB.SQL(`update scenario
+		set public=true
+		where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	if err == nil {
+		*done = true
+	}
+
+	logger(start, "Scenario.Unlock", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	return err
 }
 
 func (c *ScenarioRPC) Update(data shared.ScenarioRPCData, retval *shared.Scenario) error {

@@ -22,6 +22,7 @@ type Scenario struct {
 	RedBrief   string     `db:"red_brief"`
 	BlueTeam   string     `db:"blue_team"`
 	BlueBrief  string     `db:"blue_brief"`
+	IsMine     bool       `db:"is_mine"`
 }
 
 type ScenarioRPCData struct {

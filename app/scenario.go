@@ -125,7 +125,7 @@ func scenarioEdit(context *router.Context) {
 				AddNumber(1, "Year", "Year", "0")
 
 			if Session.Rank > 9 {
-				rowElem.AddCheck(1, "Public", "Public")
+				rowElem.AddCheck(1, "Publish Scenario", "Public")
 			} else {
 				rowElem.AddDisplayCheck(1, "Public", "Public")
 			}
@@ -212,7 +212,21 @@ func scenarioEdit(context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
 		form.ActionGrid("scenario-actions", "#action-grid", data, func(url string) {
-			Session.Navigate(url)
+			if url == "unlock" {
+				print("unlock this scenario")
+				go func() {
+					done := false
+					err := RPC("ScenarioRPC.Unlock", shared.ScenarioRPCData{
+						Channel: Session.Channel,
+						ID:      data.ID,
+					}, &done)
+					if err == nil {
+						Session.Reload(context)
+					}
+				}()
+			} else {
+				Session.Navigate(url)
+			}
 		})
 		showDisqus(fmt.Sprintf("scenario-%d", id), "Scenario - "+data.Name)
 

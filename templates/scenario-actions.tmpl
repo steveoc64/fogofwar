@@ -1,4 +1,23 @@
 <div class="action-grid">
+	{{if .Public}}
+	<div class="action__item" url="/scenario/{{.ID}}/fork">
+		<div class="action__title">Copy</div>
+		<div class="action__icon"><i class="fa fa-files-o fa-lg"></i></div>
+		<div class="action__text">
+			Copy this Scenario
+		</div>
+	</div>
+	{{else}}
+		{{if .IsMine}}
+		<div class="action__item" url="unlock">
+			<div class="action__title">Unlock</div>
+			<div class="action__icon"><i class="fa fa-unlock fa-lg"></i></div>
+			<div class="action__text">
+				Publish this Scenario to allow Sharing and Cloning
+			</div>
+		</div>
+		{{end}}
+	{{end}}
 	<div class="action__item" url="/scenario/{{.ID}}/red">
 		<div class="action__title">Red Team</div>
 		<div class="action__icon"><i class="fa fa-flag-o fa-lg"></i></div>

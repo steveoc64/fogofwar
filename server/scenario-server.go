@@ -976,3 +976,101 @@ func (s *ScenarioRPC) Fork(data shared.ScenarioRPCData, newID *int) error {
 
 	return err
 }
+
+func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	*newID = 0
+	oldScen := shared.Scenario{}
+	err := DB.SQL(`select * from scenario where id=$1`, data.ID).QueryStruct(&oldScen)
+	if err != nil {
+		return err
+	}
+
+	if oldScen.Public || oldScen.AuthorID == conn.UserID {
+		println("OK to copy")
+	} else {
+		return errors.New("Scenario is not available for creating a game")
+	}
+
+	// TODO - check that the user has enough slots to allow this
+
+	// Create a new game header
+	err = DB.SQL(`insert into game
+		(hosted_by,scenario_id,name,descr,notes,year,latlon,
+			red_team,red_brief,blue_team,blue_brief)
+		select  $1,$2,name,descr,notes,year,latlon,
+			red_team,red_brief,blue_team,blue_brief
+		from scenario 
+		where id=$2
+		returning id`, conn.UserID, data.ID).QueryScalar(newID)
+	println("newid is ", *newID)
+
+	if err == nil {
+		// now add the game_cmd records from the original force records
+
+		forces := []shared.Force{}
+		err = DB.SQL(`select * from force where scenario_id=$1`, data.ID).QueryStructs(&forces)
+
+		for _, oldForce := range forces {
+			newCmdID := 0
+
+			newCmd := shared.GameCmd{
+				GameID:        *newID,
+				RedTeam:       oldForce.RedTeam,
+				BlueTeam:      oldForce.BlueTeam,
+				Nation:        oldForce.Nation,
+				Name:          oldForce.Name,
+				Descr:         oldForce.Descr,
+				CommanderName: oldForce.CommanderName,
+				Level:         oldForce.Level,
+				Rating:        oldForce.Rating,
+				Inspiration:   oldForce.Inspiration,
+				Condition:     oldForce.Condition,
+			}
+			err := DB.InsertInto("game_cmd").
+				Whitelist("game_id", "red_team", "blue_team", "nation", "name",
+					"cmdr_name", "level", "descr", "rating", "inspiration", "condition").
+				Record(newCmd).
+				Returning("id").
+				QueryScalar(&newCmdID)
+			println("added cmd", newCmdID, "from force", oldForce.ID)
+
+			if err == nil {
+				// Now copy all the force units across
+
+				_, err = DB.SQL(`insert into unit 
+					(cmd_id,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
+						guns,gunnery_type,gun_condition,horse_guns)
+					select
+					$2,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
+						guns,gunnery_type,gun_condition,horse_guns
+					from force_unit 
+					where force_id=$1`, oldForce.ID, newCmdID).Exec()
+
+				if err != nil {
+					println(err.Error())
+					break
+				}
+			} else {
+				println(err.Error())
+			}
+		}
+	} else {
+		println(err.Error())
+	}
+
+	logger(start, "Scenario.CreateGame ", conn,
+		fmt.Sprintf("Scenario %d", data.ID),
+		fmt.Sprintf("Game %d", *newID))
+
+	if err == nil {
+		conn.Broadcast("Game", "New", *newID)
+	}
+
+	return err
+}

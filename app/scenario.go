@@ -725,15 +725,17 @@ func scenarioFork(context *router.Context) {
 		return
 	}
 
-	go func() {
-		newID := 0
-		err := RPC("ScenarioRPC.Fork", shared.ScenarioRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &newID)
-		if err == nil {
-			Session.Navigate(fmt.Sprintf("/scenario/%d", newID))
-		}
-	}()
+	if dom.GetWindow().Confirm("Do you want to make a copy of this Scenario ?") {
+		go func() {
+			newID := 0
+			err := RPC("ScenarioRPC.Fork", shared.ScenarioRPCData{
+				Channel: Session.Channel,
+				ID:      id,
+			}, &newID)
+			if err == nil {
+				Session.Navigate(fmt.Sprintf("/scenario/%d", newID))
+			}
+		}()
+	}
 
 }

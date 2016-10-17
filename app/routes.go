@@ -60,6 +60,7 @@ func enableRoutes(Rank int) {
 		"scenario-blue":     scenarioBlue,
 		"scenario-blue-add": scenarioBlueAdd,
 		"force-edit":        forceEdit,
+		"game-new":          gameNew,
 	}
 	switch Rank {
 	case 10:

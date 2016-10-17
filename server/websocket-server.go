@@ -117,7 +117,7 @@ func (c *Connection) Broadcast(name string, action string, id int) {
 }
 
 // Send an async message to everyone but this connection, if they are admin
-func (c *Connection) BroadcastAdmin(name string, action string, id int) {
+func (c *Connection) BroadcastAllAdmin(name string, action string, id int) {
 
 	data := shared.AsyncMessage{
 		Action: action,
@@ -126,7 +126,7 @@ func (c *Connection) BroadcastAdmin(name string, action string, id int) {
 
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID != 0 && v.Rank > 9 {
-			log.Println("broadcastAdmin", name, action, id, "»", v.ID)
+			log.Println("broadcastAllAdmin", name, action, id, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
@@ -165,8 +165,8 @@ func (c *ConnectionsList) BroadcastAll(name string, action string, id int) {
 	}
 }
 
-// Send an async message to all admints that are connected
-func (c *ConnectionsList) BroadcastAllAdmin(name string, action string, id int) {
+// Send an async message to all admins that are connected
+func (c *ConnectionsList) BroadcastAdmin(name string, action string, id int) {
 
 	data := shared.AsyncMessage{
 		Action: action,
@@ -175,7 +175,7 @@ func (c *ConnectionsList) BroadcastAllAdmin(name string, action string, id int) 
 
 	for _, v := range c.cmap {
 		if v.UserID != 0 && v.Rank > 9 {
-			log.Println("BroadcastAllAdmin", name, action, id, "»", v.ID)
+			log.Println("BroadcastAdmin", name, action, id, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
@@ -235,7 +235,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 		}
 	}
 
-	c.BroadcastAll("login", "delete", conn.ID)
+	c.BroadcastAllAdmin("login", "delete", conn.ID)
 
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()
@@ -256,7 +256,11 @@ func (c *ConnectionsList) Show(header string) *ConnectionsList {
 		if theIP = req.Header.Get("X-Real-Ip"); theIP == "" {
 			theIP = req.RemoteAddr
 		}
-		fmt.Printf("  %d:%s\t\t%s\n", conn.ID, theIP, req.Header["User-Agent"])
+		idle := ""
+		if conn.UserID == 0 {
+			idle = "Idle "
+		}
+		fmt.Printf("  %d:%s\t\t%s%s\n", conn.ID, theIP, idle, req.Header["User-Agent"])
 
 		if conn.UserID != 0 {
 			fmt.Println("\t\t\t",

@@ -308,6 +308,10 @@
 	transition: color 0.3s;
 }
 
+.pricing--yama .pricing__currency .pricing__currency--less {
+	color: white
+}
+
 .pricing--yama .pricing__item:hover .pricing__price {
 	color: #fff;
 }

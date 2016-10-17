@@ -68,6 +68,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			and ((lower(username) = lower($1) and lower(passwd) = lower($2))
 			or (lower(email) = lower($1) and lower(passwd) = lower($2)))`, lc.Username, lc.Password).
 			QueryStruct(res)
+		println("attempt login with", lc.Username, lc.Password)
 
 		// println(`select
 		// 	id,username,name,rank
@@ -97,7 +98,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			lr.Disqus = Config.Disqus && res.Disqus
 			conn.Login(lc.Username, res.ID, res.Rank)
 			Connections.Show("connections after new login")
-			conn.Broadcast("login", "insert", lr.ID)
+			conn.BroadcastAdmin("login", "insert", lr.ID)
 
 			// Create a login record
 			req := conn.Socket.Request()

@@ -72,8 +72,11 @@ func Lights() {
 	}
 }
 
+var isReconnecting bool
+
 func websocketInit() net.Conn {
 	Session.Channel = 0
+	isReconnecting = false
 
 	wsBaseURL := getWSBaseURL()
 	// print("init websocket", wsBaseURL)
@@ -249,30 +252,33 @@ func ReConnect() error {
 	out := &shared.AsyncMessage{}
 	RPC("PingRPC.Ping", "init channel", out)
 
-	// Wait half a sec to get the channel
-	time.Sleep(500 * time.Millisecond)
+	// Wait a sec to get the channel
+	time.Sleep(600 * time.Millisecond)
 
-	lc := &shared.LoginCredentials{
-		Username: Session.Username,
-		Password: Session.Passwd,
-		Channel:  Session.Channel,
-	}
-	// print("login params", lc)
+	if Session.UserID != 0 {
+		// They are logged in, so login again
+		lc := &shared.LoginCredentials{
+			Username: Session.Username,
+			Password: Session.Passwd,
+			Channel:  Session.Channel,
+		}
+		// print("login params", lc)
 
-	lr := &shared.LoginReply{}
-	err = RPC("LoginRPC.Login", lc, lr)
-	if err != nil {
-		return errors.New(err.Error())
-	}
-	if lr.Result == "OK" {
-		// createMenu(lr.Menu)
-		Session.Rank = lr.Rank
-		Session.UserID = lr.ID
-		Session.Disqus = lr.Disqus
-		Session.Lookup = lr.LookupTable
-		loadRoutes(lr.Rank, lr.Routes)
-	} else {
-		return errors.New("login failed")
+		lr := &shared.LoginReply{}
+		err = RPC("LoginRPC.Login", lc, lr)
+		if err != nil {
+			return errors.New(err.Error())
+		}
+		if lr.Result == "OK" {
+			// createMenu(lr.Menu)
+			Session.Rank = lr.Rank
+			Session.UserID = lr.ID
+			Session.Disqus = lr.Disqus
+			Session.Lookup = lr.LookupTable
+			loadRoutes(lr.Rank, lr.Routes)
+		} else {
+			return errors.New("login failed")
+		}
 	}
 	return nil
 }
@@ -281,47 +287,49 @@ func autoReload() {
 
 	print("Connection has dropped !!")
 
-	go func() {
-		count := 0
-		keepTrying := true
-		for keepTrying {
-			print("Reconnecting in ... 3")
-			time.Sleep(time.Second)
-			print("................ 2")
-			time.Sleep(time.Second)
-			print("........... 1")
-			time.Sleep(time.Second)
-			err := ReConnect()
-			if err != nil {
-				print(err.Error())
-			} else {
-				print("Reconnected on channel", Session.Channel)
-				if count > 3 {
-					dom.GetWindow().Alert("Reconnected !")
-				}
-				keepTrying = false
-				break
-			}
-			count += 1
-			switch count {
-			case 3:
-				dom.GetWindow().Alert("Your connection has dropped out ... will let you know when its back up.")
-			case 10: // 30 secs
-				// 	dom.GetWindow().Alert(".. No Connection yet, will keep trying.")
-				// case 20: // 1 mins
-				// 	dom.GetWindow().Alert(".. Im still trying to connect :(")
-				// case 40: // 2 mins
-				if !dom.GetWindow().Confirm("Shall I keep trying ?") {
+	if !isReconnecting {
+		go func() {
+			count := 0
+			keepTrying := true
+			isReconnecting = true
+			for keepTrying {
+				print("Reconnecting in ... 3")
+				time.Sleep(time.Second)
+				print("................ 2")
+				time.Sleep(time.Second)
+				print("........... 1")
+				time.Sleep(time.Second)
+				err := ReConnect()
+				if err != nil {
+					print(err.Error())
+				} else {
+					print("Reconnected on channel", Session.Channel)
+					if count > 3 {
+						dom.GetWindow().Alert("Reconnected !")
+					}
 					keepTrying = false
-					if dom.GetWindow().Confirm("OK. Do you want me to try reloading the app ?") {
-						js.Global.Get("location").Call("replace", "/")
-					} else {
-						print("**** Sauve Qui Peut ! ****")
+					break
+				}
+				count += 1
+				switch count {
+				case 5: // 15 secs
+					// 	dom.GetWindow().Alert(".. No Connection yet, will keep trying.")
+					// case 20: // 1 mins
+					// 	dom.GetWindow().Alert(".. Im still trying to connect :(")
+					// case 40: // 2 mins
+					if !dom.GetWindow().Confirm("Your connection has dropped out ... Shall I keep trying ?") {
+						keepTrying = false
+						if dom.GetWindow().Confirm("OK. Do you want me to try reloading the app ?") {
+							js.Global.Get("location").Call("replace", "/")
+						} else {
+							print("**** Sauve Qui Peut ! ****")
+						}
 					}
 				}
 			}
-		}
-	}()
+			isReconnecting = false
+		}()
+	}
 }
 
 func (c *myClientCodec) ReadResponseBody(body interface{}) error {

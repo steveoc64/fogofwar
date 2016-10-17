@@ -385,7 +385,7 @@ func processAsync(method string, msg shared.AsyncMessage) {
 		// print("Msg:", method, "Action:", msg.Action, "ID:", msg.ID)
 		fn := Session.Subscriptions[method]
 		if fn != nil {
-			go fn(msg.Action, msg.ID)
+			go fn(msg.Action, msg.ID, Session.Context)
 		}
 	}
 }

@@ -107,6 +107,7 @@ func enableRoutes(Rank int) {
 func initRouter() {
 	// print("initRouter")
 	Session.Subscriptions = make(map[string]MessageFunction)
+	Session.Context = nil
 	Session.ID = make(map[string]int)
 
 	// Include public routes

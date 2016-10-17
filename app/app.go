@@ -9,7 +9,7 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-type MessageFunction func(string, int)
+type MessageFunction func(string, int, *router.Context)
 
 type GlobalSessionData struct {
 	Username      string
@@ -21,6 +21,7 @@ type GlobalSessionData struct {
 	Router        *router.Router
 	AppFn         map[string]router.Handler
 	Subscriptions map[string]MessageFunction
+	Context       *router.Context
 	ID            map[string]int
 	URL           string
 	Disqus        bool
@@ -52,6 +53,7 @@ func (s *GlobalSessionData) Navigate(url string) {
 	print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
 	s.Subscriptions = make(map[string]MessageFunction)
+	s.Context = nil
 	s.Router.Navigate(url)
 	s.URL = url
 	// go RPC("LoginRPC.Nav", shared.Nav{
@@ -65,8 +67,9 @@ func (s *GlobalSessionData) Back() {
 	s.Router.Back()
 }
 
-func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction) {
+func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *router.Context) {
 	s.Subscriptions[msg] = fn
+	s.Context = context
 }
 
 func (s *GlobalSessionData) Reload(context *router.Context) {

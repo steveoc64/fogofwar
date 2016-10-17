@@ -10,8 +10,23 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-func scenarioList(context *router.Context) {
+//
 
+func scenarioList(context *router.Context) {
+	Session.Subscribe("Scenario", _scenarioList, context)
+	go _scenarioList("List", 0, context)
+}
+
+func _scenarioList(action string, id int, context *router.Context) {
+
+	print("Here with action", action)
+
+	switch action {
+	case "List", "Unlock", "Change":
+		break
+	default:
+		return
+	}
 	go func() {
 		s1 := []shared.Scenario{}
 		s2 := []shared.Scenario{}
@@ -98,9 +113,27 @@ func scenarioAdd(context *router.Context) {
 }
 
 func scenarioEdit(context *router.Context) {
+	Session.Subscribe("Scenario", _scenarioEdit, context)
+	go _scenarioEdit("Edit", 0, context)
+}
+
+func _scenarioEdit(action string, recnum int, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
+		return
+	}
+
+	switch action {
+	case "Edit":
+		break
+	case "Change", "Unlock":
+		if recnum != id {
+			return
+		} else {
+			print("scenario has changed ? reload it")
+		}
+	default:
 		return
 	}
 
@@ -120,15 +153,16 @@ func scenarioEdit(context *router.Context) {
 
 			form.New("fa-sitemap", "Edit Scenario Details - "+data.Name)
 
-			rowElem := form.Row(5).
+			rowElem := form.Row(6).
 				AddInput(3, "Name", "Name").
 				AddNumber(1, "Year", "Year", "0")
 
 			if Session.Rank > 9 {
 				rowElem.AddCheck(1, "Publish Scenario", "Public")
 			} else {
-				rowElem.AddDisplayCheck(1, "Public", "Public")
+				rowElem.AddDisplayCheck(1, "Published", "Public")
 			}
+			rowElem.AddDisplayCheck(1, "Under Review", "Review")
 
 			form.Row(1).
 				AddInput(1, "Description", "Descr")
@@ -157,7 +191,7 @@ func scenarioEdit(context *router.Context) {
 			})
 
 			// Autosave on change
-			form.ChangeEvent(func(evt dom.Event) {
+			form.SaveEvent(func(evt dom.Event) {
 				evt.PreventDefault()
 				form.Bind(&data)
 				go func() {
@@ -167,7 +201,7 @@ func scenarioEdit(context *router.Context) {
 						ID:       id,
 						Scenario: &data,
 					}, &newData)
-					data = newData
+					Session.Reload(context)
 				}()
 			})
 
@@ -211,6 +245,9 @@ func scenarioEdit(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
+		if Session.Rank > 9 {
+			data.Admin = true
+		}
 		form.ActionGrid("scenario-actions", "#action-grid", data, func(url string) {
 			if url == "unlock" {
 				print("unlock this scenario")
@@ -221,7 +258,11 @@ func scenarioEdit(context *router.Context) {
 						ID:      data.ID,
 					}, &done)
 					if err == nil {
-						Session.Reload(context)
+						if Session.Rank < 9 {
+							dom.GetWindow().Alert("Thanks, we will review this scenario for publishing ASAP.")
+						} else {
+							Session.Reload(context)
+						}
 					}
 				}()
 			} else {

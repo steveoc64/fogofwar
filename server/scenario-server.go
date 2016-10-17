@@ -103,11 +103,20 @@ func (c *ScenarioRPC) Unlock(data shared.ScenarioRPCData, done *bool) error {
 	conn := Connections.Get(data.Channel)
 
 	*done = false
-	_, err := DB.SQL(`update scenario
+
+	err := errors.New("")
+	if conn.Rank > 9 {
+		_, err = DB.SQL(`update scenario
 		set public=true
 		where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	} else {
+		_, err = DB.SQL(`update scenario
+		set review=true
+		where id=$1 and author_id=$2`, data.ID, conn.UserID).Exec()
+	}
 	if err == nil {
 		*done = true
+		conn.Broadcast("Scenario", "Unlock", data.ID)
 	}
 
 	logger(start, "Scenario.Unlock", conn,
@@ -126,11 +135,16 @@ func (c *ScenarioRPC) Update(data shared.ScenarioRPCData, retval *shared.Scenari
 		Where("id = $1 and author_id=$2", data.ID, conn.UserID).
 		Exec()
 
-	DB.Select("name", "year", "public", "descr", "notes", "red_team", "red_brief", "blue_team", "blue_brief").
-		From("scenario").
-		Where("id=$1", data.ID).
-		Limit(1).
-		QueryStruct(retval)
+	if err == nil {
+
+		DB.Select("name", "year", "public", "descr", "notes", "red_team", "red_brief", "blue_team", "blue_brief").
+			From("scenario").
+			Where("id=$1", data.ID).
+			Limit(1).
+			QueryStruct(retval)
+
+		conn.Broadcast("Scenario", "Change", data.ID)
+	}
 
 	logger(start, "Scenario.Update", conn,
 		fmt.Sprintf("%d", data.ID),

@@ -18,11 +18,13 @@ type Scenario struct {
 	Created    *time.Time `db:"created"`
 	LatLon     *[]int     `db:"latlon"`
 	Public     bool       `db:"public"`
+	Review     bool       `db:"review"`
 	RedTeam    string     `db:"red_team"`
 	RedBrief   string     `db:"red_brief"`
 	BlueTeam   string     `db:"blue_team"`
 	BlueBrief  string     `db:"blue_brief"`
 	IsMine     bool       `db:"is_mine"`
+	Admin      bool       `db:"admin"`
 }
 
 type ScenarioRPCData struct {

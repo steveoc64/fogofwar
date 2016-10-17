@@ -277,6 +277,7 @@ create table scenario (
 	notes text not null default '',
 	year int not null default 1800,
 	public bool default true,
+	review bool default false, 
 	latlon point,
 	red_team text not null default '',
 	red_brief text not null default '',

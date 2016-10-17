@@ -18,6 +18,17 @@
 		</div>
 		{{end}}
 	{{end}}
+	{{if .Review}}
+		{{if .Admin}}
+		<div class="action__item" url="accept">
+			<div class="action__title">Accept</div>
+			<div class="action__icon"><i class="fa fa-thumbs-up fa-lg"></i></div>
+			<div class="action__text">
+				Looks Good - Accept this Scenario for Publishing.
+			</div>
+		</div>
+		{{end}}
+	{{end}}
 	<div class="action__item" url="/scenario/{{.ID}}/red">
 		<div class="action__title">Red Team</div>
 		<div class="action__icon"><i class="fa fa-flag-o fa-lg"></i></div>

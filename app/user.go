@@ -328,12 +328,12 @@ func userAdd(context *router.Context) {
 }
 
 func usersOnline(context *router.Context) {
-	Session.Subscribe("login", _usersOnline)
-	Session.Subscribe("nav", _usersOnline)
-	go _usersOnline("show", 1)
+	Session.Subscribe("login", _usersOnline, context)
+	Session.Subscribe("nav", _usersOnline, context)
+	go _usersOnline("show", 1, context)
 }
 
-func _usersOnline(action string, id int) {
+func _usersOnline(action string, id int, context *router.Context) {
 
 	users := []shared.UserOnline{}
 	RPC("LoginRPC.UsersOnline", Session.Channel, &users)

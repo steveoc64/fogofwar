@@ -24,7 +24,7 @@ func mainPage(context *router.Context) {
 		title := "My Hosted Games - "
 		if len(games) >= Session.MaxGames {
 			if Session.MaxGames == 1 {
-				title += "(Max of 1 Game on Free Account)"
+				title += "(1 Game Slot on Free Account)"
 			} else {
 				title += fmt.Sprintf("(All %d Slots are Used)", Session.MaxGames)
 			}

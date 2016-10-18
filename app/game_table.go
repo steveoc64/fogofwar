@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 
 	"./shared"
@@ -50,10 +51,29 @@ func gameEditTable(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
+		loadTemplate("game-table-svg", "[name=Map]", game)
 		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
 			print("clicked on", url)
 			Session.Navigate(url)
 		})
 
+		resizeMap := func() {
+			form.Bind(&game)
+			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d00 %d00", game.TableX, game.TableY))
+			rect := form.Get("map-rect")
+			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY))
+			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableY))
+		}
+
+		// Resize the SVG rect whenever the table dimensions change
+		form.OnEvent("TableX", "change", func(evt dom.Event) {
+			print("TableX has changed")
+			resizeMap()
+		})
+
+		form.OnEvent("TableY", "change", func(evt dom.Event) {
+			print("TableY has changed")
+			resizeMap()
+		})
 	}()
 }

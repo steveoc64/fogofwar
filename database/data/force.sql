@@ -16,6 +16,7 @@ SET search_path = public, pg_catalog;
 --
 
 COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level, descr, rating, inspiration, condition) FROM stdin;
+76	4	t	f				2		3	3	3
 14	1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4
 4	1	t	f	France	IV Corps	Soult	2		3	3	3
 5	1	t	f	France	V Corps	Lannes	2		2	1	3
@@ -54,7 +55,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 75, true);
+SELECT pg_catalog.setval('force_id_seq', 76, true);
 
 
 --

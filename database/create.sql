@@ -357,7 +357,10 @@ create table game (
 	red_team text not null default '',
 	red_brief text not null default '',
 	blue_team text not null default '',
-	blue_brief text not null default ''
+	blue_brief text not null default '',
+	table_x int not null default 6,
+	table_y int not null default 4,
+	grid_size int not null default 6
 );
 create index game_scenario_idx on game (scenario_id);
 drop table if exists game_objective;
@@ -389,7 +392,9 @@ create table game_cmd (
 	descr text not null default '',
 	rating int not null default 0,
 	inspiration int not null default 0,
-	condition int not null default 2
+	condition int not null default 2,
+	player_id int,
+	disabled bool default false
 );
 create index game_cmd_game_idx on game_cmd (game_id);
 

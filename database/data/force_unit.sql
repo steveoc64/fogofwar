@@ -26,15 +26,18 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 244	10	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft		Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f	
 241	10	Reserve_Div	Reserve Div	Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
 245	10	Reserve_Div.Heavy_Bty	Heavy Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f	
+987	76	6th_Div	6th Div		Norman	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
 247	13	1st_Div	1st Div	Kuhnheim	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f	
 226	10	1st_Div.Heavy_Bty	Heavy Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f	
 250	13	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry		Prussia	3	4	0	0	0	0	0	0	3	600	1	1	0	0	0	f	
 225	10	1st_Div.Bde_Henkel	Bde Henkel		Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f	
 231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers		Prussia	2	4	9	800	1	0	2	0	5	0	0	0	0	0	0	f	
 251	13	1st_Div.Beeren_Cuirassier	Beeren Cuirassier		Prussia	3	4	0	0	0	0	0	0	3	400	1	2	0	0	0	f	
+988	76	6th_Div.44th_Light_Fusilier	44th Light Fusilier		Norman	2	4	4	2200	1	3	0	1	4	0	0	0	2	4	0	f	
 228	10	2nd_Div	2nd Div	Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
 224	10	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f	
 253	13	2nd_Div	2nd Div	von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f	
+989	76	6th_Div.Devil_Bde	Devil Bde			5	6	9	200	1	2	1	1	3	80	10	0	0	0	0	f	oeu
 261	14	Supply_Train	Supply Train	von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f	
 232	10	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky		Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f	
 237	10	3rd_Div.von_Schoeneberg	von Schöneberg		Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f	
@@ -475,7 +478,7 @@ COPY force_unit (id, force_id, path, name, commander_name, nation, utype, cmd_le
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 986, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 989, true);
 
 
 --

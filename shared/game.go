@@ -28,11 +28,18 @@ type Game struct {
 	BlueBrief      string     `db:"blue_brief"`
 	NumRedPlayers  int        `db:"num_red_players"`
 	NumBluePlayers int        `db:"num_blue_players"`
+	RedCmd         []GameCmd  `db:"red_cmd"`
+	BlueCmd        []GameCmd  `db:"blue_cmd"`
+	TableX         int        `db:"table_x"`
+	TableY         int        `db:"table_y"`
+	GridSize       int        `db:"grid_size"`
 }
 
 type GameRPCData struct {
 	Channel int
 	ID      int
+	Red     bool
+	Blue    bool
 	Game    *Game
 }
 
@@ -64,6 +71,8 @@ type GameCmd struct {
 	Rating        int    `db:"rating"`
 	Inspiration   int    `db:"inspiration"`
 	Condition     int    `db:"condition"`
+	PlayerID      *int   `db:"player_id"`
+	Disabled      bool   `db:"disabled"`
 	Units         []Unit `db:"units"`
 	Bayonets      *int   `db:"bayonets"` // derived data
 	Sabres        *int   `db:"sabres"`   // derived data

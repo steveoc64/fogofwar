@@ -88,6 +88,11 @@ type SmallArms struct {
 	Covered []byte `db:"covered"`
 }
 
+type GridSize struct {
+	ID   int
+	Name string
+}
+
 type LookupTable struct {
 	CmdLevel    []CmdLevel
 	Condition   []Condition
@@ -98,4 +103,5 @@ type LookupTable struct {
 	Gunnery     []Gunnery
 	DrillType   []DrillType
 	SmallArms   []SmallArms
+	GridSizes   []GridSize
 }

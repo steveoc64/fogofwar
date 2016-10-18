@@ -61,7 +61,7 @@ func mainPage(context *router.Context) {
 		// })
 
 		form.RowEvent(func(key string) {
-			Session.Navigate("/game/" + key)
+			Session.Navigate(fmt.Sprintf("/game/%s", key))
 		})
 
 		formulate.MainContainer("wide-container")

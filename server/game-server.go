@@ -53,3 +53,36 @@ func (g *GameRPC) ListInvites(data shared.GameRPCData, retval *[]shared.Game) er
 
 	return err
 }
+
+func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select
+			g.*,u.username as host_name,u.email as host_email,
+				coalesce(p_red.reds, 0) as num_red_players,
+				coalesce(p_blue.blues, 0) as num_blue_players
+		from game g
+			left join users u on u.id=g.hosted_by
+	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
+	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
+		where g.id=$1
+			and g.id in (select game_id from game_players where player_id=$1)`, data.ID).QueryStruct(retval)
+
+	if err == nil {
+		// Fill in the cmd arrays
+		if data.Red {
+			DB.SQL(`select * from game_cmd where game_id=$1 and red_team order by name`, data.ID).QueryStructs(&retval.RedCmd)
+		}
+		if data.Blue {
+			DB.SQL(`select * from game_cmd where game_id=$1 and blue_team order by name`, data.ID).QueryStructs(&retval.BlueCmd)
+		}
+	}
+
+	logger(start, "Game.Get", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	return err
+}

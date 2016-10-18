@@ -185,12 +185,12 @@ func forceEdit(context *router.Context) {
 			AddInput(1, "Battery Name", "Name").
 			AddCheck(1, "Horse Artillery", "HorseGuns").
 			AddInput(1, "Nationality", "Nation")
+		gunPanel.AddRow(1).
+			AddInput(1, "Description", "Descr")
 		gunPanel.AddRow(3).
 			AddNumber(1, "Guns", "Guns", "0").
 			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
 			AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
-		gunPanel.AddRow(1).
-			AddInput(1, "Description", "Descr")
 		if canEdit {
 			gunPanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").

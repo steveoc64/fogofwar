@@ -78,6 +78,10 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		if data.Blue {
 			DB.SQL(`select * from game_cmd where game_id=$1 and blue_team order by name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
+
+		// calculate the x and y km
+		retval.CalcKm()
+
 	}
 
 	logger(start, "Game.Get", conn,

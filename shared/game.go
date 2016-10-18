@@ -32,6 +32,8 @@ type Game struct {
 	BlueCmd        []GameCmd  `db:"blue_cmd"`
 	TableX         int        `db:"table_x"`
 	TableY         int        `db:"table_y"`
+	KmX            int        `db:"km_x"`
+	KmY            int        `db:"km_y"`
 	GridSize       int        `db:"grid_size"`
 }
 
@@ -41,6 +43,25 @@ type GameRPCData struct {
 	Red     bool
 	Blue    bool
 	Game    *Game
+}
+
+func (g *Game) CalcKm() {
+	if g.GridSize == 0 {
+		g.KmX = 0
+		g.KmY = 0
+	} else {
+		g.KmX = (g.TableX * 4800) / g.GridSize
+		g.KmY = (g.TableY * 4800) / g.GridSize
+	}
+}
+
+func (g *Game) ShowKmX() string {
+	print("computing kmx")
+	return fmt.Sprintf("%02f", float64(g.KmX)/1000.0)
+}
+func (g *Game) ShowKmY() string {
+	print("computing kmy")
+	return fmt.Sprintf("%02f", float64(g.KmY)/1000.0)
 }
 
 func (g *Game) GetAvatar(size int) string {

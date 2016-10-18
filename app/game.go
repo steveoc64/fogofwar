@@ -72,7 +72,7 @@ func gameEditOverview(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
@@ -107,7 +107,7 @@ func gameEditOverview(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(&game)
 			go func() {
-				err := rpcClient.Call("GameRPC.Update", shared.GameRPCData{
+				err := RPC("GameRPC.Update", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 					Game:    &game,
@@ -130,7 +130,7 @@ func gameEditOverview(context *router.Context) {
 			print("clicked on", url)
 			Session.Navigate(url)
 		})
-
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -143,7 +143,7 @@ func gameEditRed(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 			Red:     true,
@@ -188,7 +188,7 @@ func gameEditRed(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(&game)
 			go func() {
-				rpcClient.Call("GameRPC.UpdateRed", shared.GameRPCData{
+				RPC("GameRPC.UpdateRed", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 					Game:    &game,
@@ -230,6 +230,7 @@ func gameEditRed(context *router.Context) {
 		}
 		div.AppendChild(bbar)
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -242,7 +243,7 @@ func gameEditBlue(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 			Blue:    true,
@@ -285,7 +286,7 @@ func gameEditBlue(context *router.Context) {
 			form.Bind(&game)
 
 			go func() {
-				rpcClient.Call("GameRPC.UpdateBlue", shared.GameRPCData{
+				RPC("GameRPC.UpdateBlue", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 					Game:    &game,
@@ -327,6 +328,7 @@ func gameEditBlue(context *router.Context) {
 		}
 		div.AppendChild(bbar)
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -339,7 +341,7 @@ func gameEditObj(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
@@ -377,6 +379,7 @@ func gameEditObj(context *router.Context) {
 			Session.Navigate(url)
 		})
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -389,7 +392,7 @@ func gameEditPlayers(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
@@ -430,6 +433,7 @@ func gameEditPlayers(context *router.Context) {
 			Session.Navigate(url)
 		})
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -442,7 +446,7 @@ func gameEditUnits(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
@@ -483,6 +487,7 @@ func gameEditUnits(context *router.Context) {
 			Session.Navigate(url)
 		})
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
 
@@ -495,7 +500,7 @@ func gameEditZone(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		rpcClient.Call("GameRPC.Get", shared.GameRPCData{
+		RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
@@ -536,5 +541,6 @@ func gameEditZone(context *router.Context) {
 			Session.Navigate(url)
 		})
 
+		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }

@@ -1021,6 +1021,21 @@ ALTER SEQUENCE stdimg_id_seq OWNED BY stdimg.id;
 
 
 --
+-- Name: tiles; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE TABLE tiles (
+    game_id integer NOT NULL,
+    i integer NOT NULL,
+    height integer,
+    content integer,
+    owner integer
+);
+
+
+ALTER TABLE public.tiles OWNER TO steve;
+
+--
 -- Name: unit; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -2318,12 +2333,12 @@ COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name,
 1	1	1	2016-10-18 02:09:29.449033+10:30	2016-10-18 02:09:29.449033+10:30	1	12	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6
 2	4	2	2016-10-18 03:02:14.413819+10:30	2016-10-18 03:02:14.413819+10:30	1	12	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	\N					6	4	6
 3	4	1	2016-10-18 03:08:46.70603+10:30	2016-10-18 03:08:46.70603+10:30	1	12	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	\N					6	4	6
-4	5	1	2016-10-18 03:08:53.72631+10:30	2016-10-18 03:08:53.72631+10:30	1	12	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	\N					6	4	6
 5	1	1	2016-10-18 03:09:00.861668+10:30	2016-10-18 03:09:00.861668+10:30	1	12	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6
-6	5	1	2016-10-18 03:29:34.620175+10:30	2016-10-18 03:29:34.620175+10:30	1	12	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	\N					6	4	6
-7	14	1	2016-10-18 03:29:36.421502+10:30	2016-10-18 03:29:36.421502+10:30	1	12	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6
 8	1	1	2016-10-18 03:29:37.094059+10:30	2016-10-18 03:29:37.094059+10:30	1	12	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6
 9	16	2	2016-10-19 07:11:45.042103+10:30	2016-10-19 07:11:45.042103+10:30	1	12	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6
+4	5	1	2016-10-18 03:08:53.72631+10:30	2016-10-18 03:08:53.72631+10:30	1	12	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	\N					8	4	6
+7	14	1	2016-10-18 03:29:36.421502+10:30	2016-10-18 03:29:36.421502+10:30	1	12	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	8
+6	5	1	2016-10-18 03:29:34.620175+10:30	2016-10-18 03:29:34.620175+10:30	1	12	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	\N					6	3	6
 \.
 
 
@@ -3698,6 +3713,106 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 2	2016-10-19 14:41:15.829614+10:30	192.168.1.105:34593	3
 1	2016-10-19 14:42:12.412976+10:30	192.168.1.101:50545	4
 1	2016-10-19 14:51:39.803261+10:30	192.168.1.101:50709	5
+1	2016-10-19 15:49:01.129661+10:30	127.0.0.1:37006	1
+1	2016-10-19 15:49:06.184548+10:30	127.0.0.1:37028	2
+1	2016-10-19 15:49:51.764806+10:30	127.0.0.1:37138	1
+1	2016-10-19 16:14:42.281447+10:30	127.0.0.1:41668	2
+2	2016-10-19 16:14:57.643679+10:30	192.168.1.105:36769	3
+1	2016-10-19 16:16:52.566999+10:30	127.0.0.1:41926	1
+2	2016-10-19 16:16:52.58252+10:30	192.168.1.105:36849	2
+1	2016-10-19 16:16:59.372881+10:30	127.0.0.1:41988	3
+2	2016-10-19 16:43:15.643885+10:30	192.168.1.105:37823	2
+1	2016-10-19 16:43:19.188491+10:30	127.0.0.1:44000	3
+1	2016-10-19 16:44:12.47382+10:30	127.0.0.1:44112	1
+2	2016-10-19 16:44:12.49484+10:30	192.168.1.105:37860	2
+2	2016-10-19 16:45:37.386701+10:30	192.168.1.105:37913	1
+1	2016-10-19 16:45:40.749023+10:30	127.0.0.1:44276	2
+2	2016-10-19 16:50:24.544235+10:30	192.168.1.105:38094	2
+1	2016-10-19 16:50:29.550285+10:30	127.0.0.1:44694	3
+1	2016-10-19 17:03:25.793193+10:30	127.0.0.1:45722	1
+1	2016-10-19 17:10:34.722036+10:30	127.0.0.1:46304	1
+1	2016-10-19 17:10:46.688702+10:30	127.0.0.1:46372	2
+1	2016-10-19 17:13:35.611628+10:30	127.0.0.1:46652	2
+1	2016-10-19 17:18:06.546422+10:30	127.0.0.1:47034	1
+1	2016-10-19 17:18:22.340464+10:30	127.0.0.1:47104	2
+1	2016-10-19 17:24:21.20983+10:30	127.0.0.1:47558	1
+1	2016-10-19 17:24:30.909372+10:30	127.0.0.1:47614	2
+1	2016-10-19 17:26:49.460426+10:30	127.0.0.1:47842	1
+1	2016-10-19 17:26:55.364824+10:30	127.0.0.1:47878	2
+1	2016-10-19 17:51:38.408364+10:30	127.0.0.1:50866	1
+2	2016-10-19 19:21:03.912301+10:30	192.168.1.105:38161	2
+1	2016-10-19 22:04:51.366055+10:30	127.0.0.1:42944	1
+1	2016-10-19 22:10:41.656493+10:30	127.0.0.1:43450	1
+1	2016-10-19 22:12:16.884277+10:30	127.0.0.1:43622	1
+1	2016-10-19 22:14:21.464666+10:30	127.0.0.1:43820	1
+1	2016-10-19 22:14:31.513143+10:30	127.0.0.1:43866	2
+1	2016-10-19 22:15:57.422759+10:30	127.0.0.1:44032	1
+1	2016-10-19 22:21:25.072252+10:30	127.0.0.1:44472	1
+1	2016-10-19 22:23:11.060263+10:30	127.0.0.1:44668	1
+1	2016-10-19 22:23:58.286012+10:30	127.0.0.1:44798	2
+1	2016-10-19 22:25:33.958537+10:30	127.0.0.1:44928	1
+1	2016-10-19 22:25:49.949665+10:30	127.0.0.1:45006	1
+1	2016-10-19 22:36:38.7914+10:30	127.0.0.1:45826	2
+1	2016-10-19 22:37:00.767901+10:30	127.0.0.1:45930	1
+1	2016-10-19 22:37:19.295522+10:30	127.0.0.1:45960	1
+1	2016-10-19 22:37:25.114836+10:30	127.0.0.1:46002	2
+1	2016-10-19 22:41:44.052442+10:30	127.0.0.1:46372	2
+1	2016-10-19 22:43:53.460995+10:30	127.0.0.1:46584	1
+1	2016-10-19 22:45:40.133821+10:30	127.0.0.1:46754	2
+1	2016-10-19 22:49:27.73504+10:30	127.0.0.1:47054	1
+1	2016-10-19 22:49:32.404135+10:30	127.0.0.1:47096	2
+1	2016-10-19 22:50:54.255229+10:30	127.0.0.1:47206	1
+1	2016-10-19 22:51:07.183842+10:30	127.0.0.1:47242	2
+1	2016-10-19 23:00:20.573889+10:30	127.0.0.1:47938	1
+1	2016-10-19 23:00:27.406138+10:30	127.0.0.1:47974	1
+1	2016-10-19 23:00:43.900744+10:30	127.0.0.1:48004	2
+1	2016-10-19 23:02:39.54547+10:30	127.0.0.1:48194	1
+1	2016-10-19 23:07:58.702478+10:30	127.0.0.1:48620	1
+1	2016-10-19 23:11:17.940138+10:30	127.0.0.1:48934	1
+1	2016-10-19 23:18:35.817568+10:30	127.0.0.1:49534	1
+1	2016-10-19 23:18:40.660934+10:30	127.0.0.1:49576	2
+1	2016-10-19 23:19:33.814338+10:30	127.0.0.1:49660	1
+1	2016-10-19 23:19:45.641059+10:30	127.0.0.1:49706	2
+1	2016-10-19 23:23:39.718938+10:30	127.0.0.1:50036	1
+1	2016-10-19 23:23:47.040323+10:30	127.0.0.1:50068	2
+1	2016-10-19 23:38:08.520262+10:30	127.0.0.1:51152	1
+1	2016-10-19 23:38:12.933157+10:30	127.0.0.1:51164	2
+1	2016-10-19 23:40:45.28278+10:30	127.0.0.1:51420	1
+1	2016-10-19 23:40:49.800002+10:30	127.0.0.1:51450	2
+1	2016-10-19 23:42:13.382828+10:30	127.0.0.1:51590	1
+1	2016-10-19 23:44:51.495557+10:30	127.0.0.1:51830	2
+2	2016-10-19 23:47:19.106747+10:30	192.168.1.105:39584	3
+2	2016-10-19 23:47:25.883422+10:30	192.168.1.105:39593	2
+1	2016-10-19 23:47:45.171284+10:30	127.0.0.1:52102	1
+2	2016-10-19 23:48:46.776243+10:30	192.168.1.105:39647	1
+1	2016-10-19 23:48:48.130982+10:30	127.0.0.1:52258	2
+2	2016-10-19 23:49:46.666162+10:30	192.168.1.105:39685	1
+1	2016-10-19 23:49:46.69086+10:30	127.0.0.1:52340	2
+1	2016-10-19 23:49:55.311989+10:30	127.0.0.1:52384	3
+2	2016-10-19 23:55:21.639248+10:30	192.168.1.105:39897	1
+1	2016-10-19 23:55:21.654028+10:30	127.0.0.1:52826	2
+1	2016-10-19 23:55:29.344703+10:30	127.0.0.1:52874	3
+1	2016-10-20 00:03:00.181085+10:30	127.0.0.1:53502	1
+2	2016-10-20 00:03:00.22491+10:30	192.168.1.105:40179	2
+1	2016-10-20 00:03:16.348255+10:30	127.0.0.1:53556	3
+2	2016-10-20 00:09:11.467243+10:30	192.168.1.105:40403	1
+1	2016-10-20 00:09:11.495963+10:30	127.0.0.1:54062	2
+1	2016-10-20 00:09:40.788644+10:30	127.0.0.1:54114	3
+2	2016-10-20 00:25:54.553954+10:30	192.168.1.105:41032	1
+1	2016-10-20 00:25:57.292901+10:30	127.0.0.1:55434	2
+1	2016-10-20 00:28:50.567874+10:30	127.0.0.1:55690	1
+2	2016-10-20 00:28:50.588434+10:30	192.168.1.105:41145	2
+2	2016-10-20 00:30:34.882572+10:30	192.168.1.105:41216	2
+1	2016-10-20 00:30:39.002902+10:30	127.0.0.1:55858	3
+1	2016-10-20 00:35:03.02235+10:30	127.0.0.1:56196	1
+2	2016-10-20 00:35:03.028583+10:30	192.168.1.105:41390	2
+1	2016-10-20 00:35:11.313518+10:30	127.0.0.1:56232	3
+2	2016-10-20 00:37:17.611676+10:30	192.168.1.105:41475	1
+1	2016-10-20 00:37:17.623668+10:30	127.0.0.1:56424	2
+1	2016-10-20 00:38:55.86302+10:30	127.0.0.1:56560	1
+2	2016-10-20 00:38:55.889652+10:30	192.168.1.105:41538	2
+1	2016-10-20 00:39:01.481202+10:30	127.0.0.1:56602	3
+1	2016-10-20 00:42:37.912149+10:30	127.0.0.1:56924	1
 \.
 
 
@@ -3843,6 +3958,268 @@ COPY stdimg (id, code, name, photo, preview, thumb) FROM stdin;
 --
 
 SELECT pg_catalog.setval('stdimg_id_seq', 1, false);
+
+
+--
+-- Data for Name: tiles; Type: TABLE DATA; Schema: public; Owner: steve
+--
+
+COPY tiles (game_id, i, height, content, owner) FROM stdin;
+7	0	0	7	0
+7	1	0	0	0
+7	2	0	1	0
+7	3	0	2	0
+7	4	0	7	0
+7	5	0	0	0
+7	6	0	0	0
+7	7	0	0	0
+7	8	0	0	0
+7	9	0	0	0
+7	10	0	4	0
+7	11	0	2	0
+7	12	0	3	0
+7	13	0	0	0
+7	14	0	7	0
+7	15	0	0	0
+7	16	0	0	0
+7	17	0	0	0
+7	18	0	0	0
+7	19	0	1	0
+7	20	0	3	0
+7	21	0	1	0
+7	22	0	0	0
+7	23	0	6	0
+7	24	0	0	0
+7	25	0	0	0
+7	26	0	0	0
+7	27	0	1	0
+7	28	0	0	0
+7	29	0	2	0
+7	30	0	0	0
+7	31	0	6	0
+7	32	0	0	0
+7	33	0	0	0
+7	34	0	0	0
+7	35	0	0	0
+7	36	0	0	0
+7	37	0	0	0
+7	38	0	2	0
+7	39	0	6	0
+7	40	0	0	0
+7	41	0	0	0
+7	42	0	0	0
+7	43	0	0	0
+7	44	0	0	0
+7	45	0	0	0
+7	46	0	0	0
+7	47	0	6	0
+7	48	0	2	0
+7	49	0	0	0
+7	50	0	0	0
+7	51	0	0	0
+7	52	0	0	0
+7	53	0	0	0
+6	14	1	0	0
+4	0	1	2	0
+4	1	1	2	0
+4	2	1	0	0
+4	3	1	0	0
+4	4	1	0	0
+4	5	1	2	0
+4	6	1	0	0
+4	7	1	0	0
+4	8	1	1	0
+4	9	1	1	0
+4	10	1	1	0
+4	11	1	2	0
+4	12	1	0	0
+4	13	1	0	0
+4	14	1	0	0
+4	15	1	0	0
+4	16	1	0	0
+4	17	1	2	0
+4	18	0	3	0
+4	19	1	2	0
+4	20	1	0	0
+4	21	0	0	0
+4	22	0	2	0
+4	23	1	0	0
+4	24	1	0	0
+4	25	1	1	0
+4	26	1	2	0
+4	27	1	0	0
+4	28	1	2	0
+4	29	1	2	0
+4	30	1	0	0
+4	31	0	0	0
+4	32	1	0	0
+4	33	1	2	0
+4	34	1	2	0
+6	0	1	0	0
+6	1	1	0	0
+6	2	0	3	0
+6	3	0	6	0
+6	4	1	1	0
+6	5	1	2	0
+6	6	1	1	0
+6	7	1	1	0
+6	8	1	1	0
+6	9	1	2	0
+4	35	0	2	0
+4	36	0	0	0
+4	37	0	0	0
+4	38	0	0	0
+4	39	0	2	0
+4	40	1	2	0
+4	41	1	2	0
+4	42	1	0	0
+4	43	1	0	0
+4	44	1	2	0
+4	45	1	0	0
+4	46	0	0	0
+4	47	0	0	0
+4	48	0	0	0
+4	49	0	0	0
+4	50	0	2	0
+4	51	0	0	0
+4	52	0	4	0
+4	53	0	0	0
+4	54	0	2	0
+4	55	0	2	0
+4	56	1	2	0
+4	57	1	2	0
+4	58	0	3	0
+4	59	1	0	0
+4	60	1	1	0
+4	61	0	1	0
+4	62	0	0	0
+4	63	0	0	0
+4	64	0	7	0
+4	65	0	0	0
+4	66	0	2	0
+4	67	0	0	0
+4	68	0	0	0
+4	69	0	0	0
+4	70	0	0	0
+6	10	1	1	0
+6	11	1	1	0
+6	12	1	0	0
+6	13	0	4	0
+6	15	1	0	0
+6	16	0	2	0
+6	17	1	1	0
+6	18	0	1	0
+6	19	1	1	0
+6	20	1	1	0
+6	21	1	2	0
+6	22	1	2	0
+6	23	1	2	0
+6	24	0	0	0
+6	25	0	6	0
+6	26	1	0	0
+6	27	0	0	0
+6	28	0	2	0
+6	29	0	1	0
+6	30	0	1	0
+6	31	0	1	0
+6	32	0	2	0
+6	33	1	2	0
+6	34	1	2	0
+6	35	0	2	0
+6	36	0	6	0
+6	37	0	1	0
+6	38	0	1	0
+6	39	0	0	0
+6	40	0	0	0
+6	41	0	0	0
+6	42	0	0	0
+6	43	0	1	0
+6	44	0	2	0
+6	45	0	2	0
+6	46	0	0	0
+6	47	0	0	0
+6	48	0	1	0
+6	49	0	0	0
+6	50	0	1	0
+6	51	0	2	0
+6	52	0	0	0
+6	53	0	2	0
+6	54	0	0	0
+6	55	0	2	0
+6	56	0	0	0
+6	57	0	0	0
+6	58	0	0	0
+6	59	0	0	0
+6	60	0	0	0
+6	61	0	0	0
+6	62	0	2	0
+6	63	0	2	0
+6	64	0	2	0
+6	65	0	2	0
+6	66	0	0	0
+6	67	0	0	0
+6	68	0	0	0
+6	69	0	0	0
+6	70	0	0	0
+6	71	0	0	0
+4	71	0	2	0
+4	72	0	2	0
+4	73	0	2	0
+4	74	1	0	0
+4	75	1	0	0
+4	76	0	2	0
+4	77	0	1	0
+4	78	0	0	0
+4	79	0	0	0
+4	80	1	1	0
+4	81	0	7	0
+4	82	0	0	0
+4	83	0	0	0
+4	84	0	0	0
+4	85	0	0	0
+4	86	0	2	0
+4	87	0	0	0
+4	88	0	2	0
+4	89	0	0	0
+4	90	0	2	0
+4	91	1	2	0
+4	92	0	0	0
+4	93	0	0	0
+4	94	0	1	0
+4	95	0	0	0
+4	96	1	2	0
+4	97	1	2	0
+4	98	0	7	0
+4	99	0	1	0
+4	100	0	1	0
+4	101	0	0	0
+4	102	0	0	0
+4	103	0	0	0
+4	104	0	0	0
+4	105	0	0	0
+4	106	0	0	0
+4	107	0	2	0
+4	108	0	1	0
+4	109	0	0	0
+4	110	0	0	0
+4	111	0	0	0
+4	112	1	2	0
+4	113	1	0	0
+4	114	1	0	0
+4	115	0	7	0
+4	116	0	3	0
+4	117	0	0	0
+4	118	0	0	0
+4	119	0	2	0
+4	120	0	0	0
+4	121	0	0	0
+4	122	0	0	0
+4	123	0	1	0
+4	124	0	0	0
+4	125	0	0	0
+4	126	0	0	0
+4	127	0	0	0
+\.
 
 
 --
@@ -4998,13 +5375,13 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 --
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
-2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	3	192.168.1.105:34593	Australia	http://witchwoodstudio.com		f	f	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	5	192.168.1.101:50709	Australia	15mm-madness.blogspot.com		f	t	t
 5	a	a		a@a	0	2016-10-16 14:42:17.888037+10:30	2016-10-16 14:42:17.888037+10:30	0					f	t	t
 6	tt	tt		tt@tt.com	0	2016-10-16 15:01:56.744922+10:30	2016-10-16 15:01:56.744922+10:30	0					f	t	t
 7	aa	aa		aa@aa	0	2016-10-16 15:19:18.701593+10:30	2016-10-16 15:19:18.701593+10:30	0					f	t	t
 8	uuu	a		uuu@ccc.nnn	0	2016-10-19 05:24:08.784685+10:30	2016-10-19 05:24:08.784685+10:30	0					f	t	t
 9	iii	ii		iii@ii.iii	0	2016-10-19 05:25:52.554975+10:30	2016-10-19 05:25:52.554975+10:30	0					f	t	t
+2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:41538	Australia	http://witchwoodstudio.com		f	f	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:56924	Australia	15mm-madness.blogspot.com		f	t	t
 \.
 
 
@@ -5350,6 +5727,13 @@ CREATE INDEX scenario_author_idx ON scenario USING btree (author_id);
 --
 
 CREATE INDEX scenario_unit_cmd_idx ON scenario_unit USING btree (cmd_id);
+
+
+--
+-- Name: tiles_game_idx; Type: INDEX; Schema: public; Owner: steve; Tablespace: 
+--
+
+CREATE INDEX tiles_game_idx ON tiles USING btree (game_id, i);
 
 
 --

@@ -362,6 +362,7 @@ create table game (
 	table_y int not null default 4,
 	grid_size int not null default 6
 );
+\i data/game.sql
 create index game_scenario_idx on game (scenario_id);
 drop table if exists game_objective;
 -- TODO create table
@@ -376,6 +377,7 @@ create table game_players (
 	red_team bool,
 	blue_team bool
 );
+\i data/game_players.sql
 create unique index game_player_game_idx on game_players (game_id, player_id);
 create unique index game_player_player_idx on game_players (player_id,game_id);
 
@@ -396,6 +398,7 @@ create table game_cmd (
 	player_id int,
 	disabled bool default false
 );
+\i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);
 
 drop table if exists game_cmd_order;
@@ -414,12 +417,6 @@ create index game_cmd_order_game_idx on game_cmd_order (game_id);
 create index game_cmd_order_cmd_idx on game_cmd_order (cmd_id);
 
 drop table if exists game_cmd_player;
-create table game_cmd_player (
-	cmd_id int not null,
-	player_id int not null
-);
-create unique index game_cmd_player_player_idx on game_cmd_player (player_id,cmd_id);
-create unique index game_cmd_player_cmd_idx on game_cmd_player (cmd_id,player_id);
 
 drop table if exists gt_formation;
 create table gt_formation (

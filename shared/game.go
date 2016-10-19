@@ -7,6 +7,69 @@ import (
 	"time"
 )
 
+const (
+	TileClear int = iota
+	TileRough
+	TileWoods
+	TileBuilding
+	TileFort
+	TileWater
+)
+
+type Tile struct {
+	X       int
+	Y       int
+	Height  int
+	Content int
+	Owner   int // 0 neutral  -1/-2 red 1/2 blue
+}
+
+func (t *Tile) GetCSS() string {
+	return fmt.Sprintf("tile-content-%d-%d", t.Height, t.Content)
+}
+
+func (t *Tile) ApplyMode(mode string) {
+	print("ApplyMode", mode, "to tile", t)
+	switch mode {
+	case "Clear":
+		t.Content = TileClear
+	case "Rough":
+		t.Content = TileRough
+	case "Woods":
+		t.Content = TileWoods
+	case "Built":
+		t.Content = TileBuilding
+	case "Fort":
+		t.Content = TileFort
+	case "Water":
+		t.Content = TileWater
+	case "Higher":
+		if t.Height < 3 {
+			t.Height++
+		}
+	case "Lower":
+		if t.Height > 0 {
+			t.Height--
+		}
+	case "Both Sides":
+	case "Red Objective":
+	case "Blue Objective":
+	case "Neutral":
+		t.Owner = 0
+	case "Red":
+		t.Owner--
+		if t.Owner < -3 {
+			t.Owner = -3
+		}
+	case "Blue":
+		t.Owner++
+		if t.Owner > 3 {
+			t.Owner = 3
+		}
+
+	}
+}
+
 type Game struct {
 	ID             int        `db:"id"`
 	ScenarioID     int        `db:"scenario_id"`
@@ -35,6 +98,11 @@ type Game struct {
 	KmX            int        `db:"km_x"`
 	KmY            int        `db:"km_y"`
 	GridSize       int        `db:"grid_size"`
+	GridX          int        `db:"grid_x"`
+	GridY          int        `db:"grid_y"`
+	Tiles          []Tile     `db:"tiles"`
+	TileX          int        `db:"tile_x"`
+	TileY          int        `db:"tile_y"`
 }
 
 type GameRPCData struct {
@@ -55,12 +123,81 @@ func (g *Game) CalcKm() {
 	}
 }
 
+func (g *Game) CalcGrid() {
+	if g.GridSize == 0 {
+		g.GridX = 0
+		g.GridY = 0
+	} else {
+		g.GridX = (g.TableX * 12) / g.GridSize
+		g.GridY = (g.TableY * 12) / g.GridSize
+	}
+}
+
+func (g *Game) InitTiles() {
+	g.CalcGrid()
+	g.Tiles = make([]Tile, g.GridX*g.GridY)
+	g.TileX = g.GridX
+	g.TileY = g.GridY
+
+	// and then stamp the coords on the actual tile objects
+	i := 0
+	for y := 0; y < g.GridY; y++ {
+		for x := 0; x < g.GridX; x++ {
+			g.Tiles[i].X = x
+			g.Tiles[i].Y = y
+			i++
+		}
+	}
+}
+
+func (g *Game) GetTile(i int) *Tile {
+	// print("GetTile", i)
+	if i < 0 {
+		return nil
+	}
+	if i >= g.TileY*g.TileX {
+		return nil
+	}
+	return &g.Tiles[i]
+}
+
+func (g *Game) GetTileXY(x, y int) Tile {
+	i := (y * g.TileX) + x
+	print("getting old tile ", x, y, i)
+	return g.Tiles[i]
+}
+
+func (g *Game) ResizeTiles() {
+	g.CalcGrid()
+
+	newTiles := make([]Tile, g.GridX*g.GridY)
+	i := 0
+	for y := 0; y < g.TileY && y < g.GridY; y++ {
+		i = y * g.GridX
+		for x := 0; x < g.TileX && x < g.GridX; x++ {
+			print("new offset", x, y, i)
+			if x < g.TileX && y < g.TileY {
+				// then the tile exists in the old grid, so grab it into the new grid
+				newTiles[i] = g.GetTileXY(x, y)
+			} // else new tile is completely fresh
+
+			// And restamp the coords on the new tile
+			newTiles[i].X = x
+			newTiles[i].Y = y
+			i++
+		}
+	}
+	g.TileX = g.GridX
+	g.TileY = g.GridY
+	g.Tiles = newTiles
+}
+
 func (g *Game) ShowKmX() string {
-	print("computing kmx")
+	// print("computing kmx")
 	return fmt.Sprintf("%02f", float64(g.KmX)/1000.0)
 }
 func (g *Game) ShowKmY() string {
-	print("computing kmy")
+	// print("computing kmy")
 	return fmt.Sprintf("%02f", float64(g.KmY)/1000.0)
 }
 

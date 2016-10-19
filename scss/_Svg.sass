@@ -3,15 +3,61 @@
   width: 80vw
   // background-color: $green-100;
   border: 2px
-  stroke: black
+  stroke: rgba(49, 35, 21, 0.95)
   overflow: scroll
   display: block
   margin: auto
   // background-image: linear-gradient(to bottom, rgba(33, 95, 53, 0.69) 0%,rgba(33, 95, 53, 0.69) 100%), url(img/sat1.jpg);
 
-.map-rect:hover
-  fill: rgba(33, 95, 53, 0.9)
-  
+.map-rect
+  // z-index: 9
+  stroke: rgba(49, 35, 21, 0.9)
+  stroke-width: 1
+  fill: rgba(95, 115, 86, 0.7)
+
+  &:hover
+    fill: rgba(95, 115, 86, 0.9)
+
+$tile-color:  rgba(95, 115, 86, 0.6)
+$tile-highlight:  rgba(95, 115, 86, 0.9)
+$tile-border: rgba(49, 35, 21, 0.3)
+$tile-border-highlight: rgba(49, 35, 21, 0.9)
+
+.map-tileset
+  // z-index: 2
+  fill: rgba(0,0,0,0)
+  stroke-width: 0.1
+
+.map-tile 
+  // z-index: 1
+  stroke: $tile-border
+  fill: $tile-color
+
+  &:hover
+    stroke: $tile-border-highlight
+    fill: lighten($tile-highlight, 5%)
+
+
+// Ground level
+.tile-content-0-0 // clear
+
+.tile-content-0-1 // rough
+  fill: yellow
+
+.tile-content-0-2 // woods
+  fill: green
+
+.tile-content-0-3 // building
+  fill: gray
+
+.tile-content-0-4 // fort
+  fill: black
+
+.tile-content-0-5 // water
+  fill: blue
+
+
+
 .satellite-bg
   background-image: url(/img/sat1.jpg);
 

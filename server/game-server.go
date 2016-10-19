@@ -81,6 +81,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 
 		// calculate the x and y km
 		retval.CalcKm()
+		retval.CalcGrid()
 
 	}
 

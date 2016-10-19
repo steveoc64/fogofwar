@@ -15,10 +15,10 @@ import (
 func Login(username string, passwd string) {
 
 	AllowedGridSizes := []shared.GridSize{
-		{0, `No Grid .. Use A Custom Ground Scale (2 Bn in line per Qtr Mile)`},
-		{4, `4" Grid : Micro scale, ~ 1" Base = ½Bn or 60mm frontage = Bn`},
-		{6, `6" Grid : 15mm scale, ~ 40mm frontage Base = ½Bn`},
-		{8, `8" Grid : 28mm scale, ~ 60mm frontage Base = ½Bn`},
+		{0, `No Grid : Use A Custom Ground Scale (2 Bn in line per Qtr Mile)`},
+		{4, `4" Grid : Micro scale, ~ 1" Base = ½Bn, or 60mm frontage = Full Bn`},
+		{6, `6" Grid : 15mm scale,  ~ 40mm frontage Base = ½Bn`},
+		{8, `8" Grid : 28mm scale,  ~ 60mm frontage Base = ½Bn`},
 		{12, `1' Grid : Le Grande Scale, ~ 40mm frontage Base = 1 Coy`},
 	}
 
@@ -480,8 +480,8 @@ func signUp(context *router.Context) {
 		})
 
 		form.OnEvent("Passwd2", "change", func(evt dom.Event) {
-			pw1 := form.Get("Passwd1]").(*dom.HTMLInputElement)
-			pw2 := form.Get("Passwd2]").(*dom.HTMLInputElement)
+			pw1 := form.Get("Passwd1").(*dom.HTMLInputElement)
+			pw2 := form.Get("Passwd2").(*dom.HTMLInputElement)
 			goneBad := false
 
 			if pw1.Value == "" {

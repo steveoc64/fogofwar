@@ -19,10 +19,16 @@ func gameEditTable(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
+		err := RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			Session.Navigate("/games")
+		}
+		game.InitTiles()
+
 		form := formulate.EditForm{}
 
 		// Layout the fields
@@ -70,7 +76,7 @@ func gameEditTable(context *router.Context) {
 		bbar := form.Get("ModeButtons")
 		abar := form.Get("ActionButtons")
 		bbar.SetInnerHTML("")
-		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale.`)
+		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.`)
 		editMode := ""
 
 		// Redraw the mode buttons
@@ -149,15 +155,47 @@ func gameEditTable(context *router.Context) {
 			Session.Navigate(url)
 		})
 
+		tileSet := form.Get("map-tileset")
+		drawTiles := func() {
+			print("call to draw tiles", game.Tiles)
+			tileSet.SetInnerHTML("")
+			if game.GridSize > 0 {
+				newHTML := ""
+				i := 0
+				for y := 0; y < game.GridY; y++ {
+					for x := 0; x < game.GridX; x++ {
+						t := game.Tiles[i]
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
+							x*game.GridSize, y*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							t.GetCSS(),    // self-computed CSS content type
+							x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+						i++
+					}
+				}
+				// print("setting newHTML", newHTML)
+				tileSet.SetInnerHTML(newHTML)
+			}
+		}
+
 		resizeMap := func() {
 			form.Bind(&game)
+			if game.TableX < 1 {
+				game.TableX = 1
+			}
+			if game.TableY < 1 {
+				game.TableY = 1
+			}
+
 			game.CalcKm()
-			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d00 %d00", game.TableX, game.TableY))
+			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", game.TableX*12, game.TableY*12))
 			rect := form.Get("map-rect")
-			rect.SetAttribute("height", fmt.Sprintf("%d00", game.TableY))
-			rect.SetAttribute("width", fmt.Sprintf("%d00", game.TableX))
+			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
+			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
 			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
 			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			game.ResizeTiles()
+			drawTiles()
 		}
 
 		// Resize the SVG rect whenever the table dimensions change
@@ -173,6 +211,23 @@ func gameEditTable(context *router.Context) {
 			resizeMap()
 		})
 
+		// click on a tile and apply editmode
+		form.OnEvent("map-tileset", "click", func(evt dom.Event) {
+			t := evt.Target()
+			if t.TagName() == "rect" {
+				i, _ := strconv.Atoi(t.GetAttribute("data-index"))
+				theTile := game.GetTile(i)
+				// print("Clicked on tile", *theTile)
+				tClass := t.Class()
+				tClass.Remove(theTile.GetCSS())
+				theTile.ApplyMode(editMode)
+				tClass.Add(theTile.GetCSS())
+
+			}
+
+		})
+
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
+		drawTiles()
 	}()
 }

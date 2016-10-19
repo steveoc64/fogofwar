@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -217,6 +218,29 @@ func (l *LoginRPC) CheckEmail(e string, ok *bool) error {
 	return nil
 }
 
+var vcodes []string
+
+func initVCode() {
+	vcodes = []string{
+		"Austerlitz", "Jena", "Talavera", "Ulm", "Smolensk", "Eylau",
+		"Borodino", "Hastings", "Marathon", "Adrennes", "Verdun", "Tobruk", "Kokoda", "Gallipoli", "Somme",
+		"Vendee", "Wellington", "Sharpe", "Elba", "Marengo",
+		"Brusilov", "Rommel", "Zhukov", "Patton", "General", "Napoleon", "IwoJima",
+		"Stalingrad", "Gettysburg", "KheSan", "Inchon", "Sebastopol", "Leningrad",
+		"Abrams", "Leopard", "Tiger", "Cannae", "Blucher", "Brunswick", "Potsdam", "Corporal",
+		"Major", "Adjudant", "LeeEnfield", "Isandhlwana", "Ombudurman", "Fulcrum", "Eurofighter",
+		"Typhoon", "Mustang", "Thunderbolt", "Lavochkin", "Lockheed", "Hornet", "Musket",
+		"Bayonet", "Lancer", "Chasseur", "Cuirassier", "Dragoon", "Landwehr", "Fusilier", "Voltigeur",
+		"Jager",
+	}
+
+}
+
+func getVCode() string {
+	v := vcodes[rand.Intn(len(vcodes))]
+	return fmt.Sprintf("%s%04d", v, 1000+rand.Intn(10000))
+}
+
 func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) error {
 	// attempt to create the new user
 	u.Rank = 0
@@ -251,7 +275,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 	fmt.Printf("Looks ok new user =%v\n", u)
 
 	// and create a new VCODE record for them
-	vcode := "224556"
+	vcode := getVCode()
 	DB.SQL(`delete from vcode where expires > now()`).Exec()
 	DB.SQL(`delete from vcode where uid=$1`, u.ID).Exec()
 	DB.SQL(`insert into vcode (uid,code) values ($1,$2)`, u.ID, vcode).Exec()
@@ -261,6 +285,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 		m := NewMail()
 		m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
 		m.SetHeader("To", u.Email)
+		m.SetHeader("Bcc", "steveoc64@gmail.com")
 		m.SetHeader("Subject", "Welcome to ActionFront")
 		m.SetBody("text/html", fmt.Sprintf(`Your activation code is:
 <br>
@@ -295,7 +320,7 @@ func (l *LoginRPC) ValidateNewUser(u *shared.UserSignup, ok *bool) error {
 		return errors.New("No Validation Code on file")
 	}
 
-	if vcode != strings.Trim(u.Secret, " ") {
+	if strings.ToLower(vcode) != strings.ToLower(u.Secret) {
 		return errors.New("Codes dont match")
 	}
 

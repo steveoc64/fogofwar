@@ -29,6 +29,7 @@ var DB *runner.DB
 
 func main() {
 
+	initVCode()
 	Config = LoadConfig()
 	cpus := smt.Init()
 	fmt.Printf("ActionFront Server running on %d CPU cores\n", cpus)

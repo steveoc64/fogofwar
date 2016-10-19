@@ -67,8 +67,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 			left join users u on u.id=g.hosted_by
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
-		where g.id=$1
-			and g.id in (select game_id from game_players where player_id=$1)`, data.ID).QueryStruct(retval)
+		where g.id=$1`, data.ID).QueryStruct(retval)
 
 	if err == nil {
 		// Fill in the cmd arrays

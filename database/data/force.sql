@@ -17,6 +17,13 @@ SET search_path = public, pg_catalog;
 
 COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level, descr, rating, inspiration, condition) FROM stdin;
 76	4	t	f				2		3	3	3
+77	16	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
+78	16	t	f	France		Soult	2		3	3	3
+79	16	t	f	France		Lannes	2		2	1	3
+80	16	t	f	France		Ney	2		2	3	2
+81	16	t	f	France		Murat	2		3	2	3
+82	16	f	t	Prussia		Hohenlohe	1		4	3	2
+83	16	f	t	Prussia		Ferdinand	3		4	4	4
 14	1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4
 4	1	t	f	France	IV Corps	Soult	2		3	3	3
 5	1	t	f	France	V Corps	Lannes	2		2	1	3
@@ -31,8 +38,16 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 2	1	t	f	France	I Corps	General Bernadotte	2		3	3	2
 7	1	t	f	France	VII Corps	Augereau	2		2	2	2
 16	6	t	f	redland	II Corp	2nd Commander	2		3	3	3
+84	16	f	t	Prussia		Duke of Brunswick	2		4	3	4
+85	16	f	t	Prussia		Kalkreuth	3		3	4	1
+86	16	t	f	France		Davout	2		1	3	2
 9	1	t	f	France	Supply	Supply Train	4		3	3	2
+87	16	t	f	France		Napoleon	2		1	1	1
 28	1	t	f	France	Test		2		3	3	3
+88	16	t	f	France		General Bernadotte	2		3	3	2
+89	16	t	f	France		Augereau	2		2	2	2
+90	16	t	f	France		Supply Train	4		3	3	2
+91	16	t	f	France			2		3	3	3
 46	14	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
 47	14	t	f	France		Soult	2		3	3	3
 48	14	t	f	France		Lannes	2		2	1	3
@@ -55,7 +70,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 76, true);
+SELECT pg_catalog.setval('force_id_seq', 91, true);
 
 
 --

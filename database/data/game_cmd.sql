@@ -76,6 +76,21 @@ COPY game_cmd (id, game_id, red_team, blue_team, nation, name, cmdr_name, level,
 58	8	t	f	France	VII Corps	Augereau	2		2	2	2
 59	8	t	f	France	Supply	Supply Train	4		3	3	2
 60	8	t	f	France	Test		2		3	3	3
+61	9	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
+62	9	t	f	France		Soult	2		3	3	3
+63	9	t	f	France		Lannes	2		2	1	3
+64	9	t	f	France		Ney	2		2	3	2
+65	9	t	f	France		Murat	2		3	2	3
+66	9	f	t	Prussia		Hohenlohe	1		4	3	2
+67	9	f	t	Prussia		Ferdinand	3		4	4	4
+68	9	f	t	Prussia		Duke of Brunswick	2		4	3	4
+69	9	f	t	Prussia		Kalkreuth	3		3	4	1
+70	9	t	f	France		Davout	2		1	3	2
+71	9	t	f	France		Napoleon	2		1	1	1
+72	9	t	f	France		General Bernadotte	2		3	3	2
+73	9	t	f	France		Augereau	2		2	2	2
+74	9	t	f	France		Supply Train	4		3	3	2
+75	9	t	f	France			2		3	3	3
 \.
 
 
@@ -83,7 +98,7 @@ COPY game_cmd (id, game_id, red_team, blue_team, nation, name, cmdr_name, level,
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 60, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 75, true);
 
 
 --

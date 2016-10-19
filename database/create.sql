@@ -367,6 +367,16 @@ create index game_scenario_idx on game (scenario_id);
 drop table if exists game_objective;
 -- TODO create table
 
+drop table if exists tiles;
+create table tiles (
+	game_id int not null,
+	i int not null,
+	height  int,
+	content int,
+	owner   int
+);
+create index tiles_game_idx on tiles (game_id,i);
+
 drop table if exists game_condition;
 -- TODO create table
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -70,6 +71,17 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		where g.id=$1`, data.ID).QueryStruct(retval)
 
 	if err == nil {
+		// TODO - add some security stuff here to ensure that the caller has rights to
+		// be able to get this game - ie, they are either the owner of the game, or their ID
+		// exists in the invite lists (either red of blue)
+		if retval.HostedBy != conn.UserID {
+			count := 0
+			DB.SQL(`select count(*) from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&count)
+			if count == 0 {
+				return errors.New("Insufficient Privilege")
+			}
+		}
+
 		// Fill in the cmd arrays
 		if data.Red {
 			DB.SQL(`select * from game_cmd where game_id=$1 and red_team order by name`, data.ID).QueryStructs(&retval.RedCmd)
@@ -81,12 +93,62 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// calculate the x and y km
 		retval.CalcKm()
 		retval.CalcGrid()
+		retval.TileX = retval.GridX
+		retval.TileY = retval.GridY
+
+		// and fetch the tiles from storage
+		err2 := DB.SQL(`select i,height,content,owner from tiles where game_id=$1 order by i`, data.ID).QueryStructs(&retval.Tiles)
+		if err2 != nil {
+			print("hmmm ... ", err2.Error())
+		}
+
+		//
 
 	}
 
 	logger(start, "Game.Get", conn,
 		fmt.Sprintf("ID %d", data.ID),
-		fmt.Sprintf("%v", *retval))
+		fmt.Sprintf("%s %dx%d on a %d Grid", retval.Name, retval.TableX, retval.TableY, retval.GridSize))
 
+	return err
+}
+
+func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+	if conn.UserID != data.Game.HostedBy {
+		return errors.New("Incorrect owner of game")
+	}
+
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4 where id=$1`,
+		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize).
+		Exec()
+	if err == nil {
+		_, err = DB.SQL(`delete from tiles where game_id=$1`, data.ID).Exec()
+		if err == nil {
+			for _, v := range data.Game.Tiles {
+				_, err := DB.SQL(`insert into tiles (game_id,i,height,content,owner)
+				values ($1,$2,$3,$4,$5)`, data.ID, v.I, v.Height, v.Content, v.Owner).Exec()
+				if err != nil {
+					println(err.Error())
+					break
+				}
+			}
+		}
+	}
+
+	logger(start, "Game.SaveTiles", conn,
+		fmt.Sprintf("Game ID %d", data.ID),
+		fmt.Sprintf("%d Tiles", len(data.Game.Tiles)))
+
+	if err == nil {
+		*done = true
+		tx.Commit()
+	}
 	return err
 }

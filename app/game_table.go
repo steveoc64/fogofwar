@@ -27,7 +27,11 @@ func gameEditTable(context *router.Context) {
 			dom.GetWindow().Alert(err.Error())
 			Session.Navigate("/games")
 		}
-		game.InitTiles()
+		if len(game.Tiles) == 0 {
+			print("No tiles - create a new set")
+			game.InitTiles()
+			print("but after inittiles its", game)
+		}
 
 		form := formulate.EditForm{}
 
@@ -58,10 +62,10 @@ func gameEditTable(context *router.Context) {
 			Session.Navigate("/games")
 		})
 
-		form.SaveEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			print("TODO - save the map")
-		})
+		// form.SaveEvent(func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	print("TODO - save the map")
+		// })
 
 		form.PrintEvent(func(evt dom.Event) {
 			dom.GetWindow().Print()
@@ -81,11 +85,11 @@ func gameEditTable(context *router.Context) {
 
 		// Redraw the mode buttons
 		drawActionBtns := func() {
-			print("draw action btns and editmode is", editMode)
+			// print("draw action btns and editmode is", editMode)
 			btns := abar.QuerySelectorAll(".button")
 			for _, v := range btns {
 				f := v.(*dom.HTMLInputElement).Value
-				print("consider the case of ", f, v)
+				// print("consider the case of ", f, v)
 
 				if f == editMode {
 					v.Class().Remove("button-outline")
@@ -104,7 +108,7 @@ func gameEditTable(context *router.Context) {
 			btn.SetAttribute("type", "button")
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
-				print("editmode now set to", editMode)
+				// print("editmode now set to", editMode)
 				editMode = evt.Target().(*dom.HTMLInputElement).Value
 				drawActionBtns()
 			})
@@ -126,7 +130,9 @@ func gameEditTable(context *router.Context) {
 					actionBtn("Woods")
 					actionBtn("Built")
 					actionBtn("Fort")
-					actionBtn("Water")
+					actionBtn("Water -")
+					actionBtn("Water /")
+					actionBtn(`Water \`)
 					actionBtn("Higher")
 					actionBtn("Lower")
 				case "Objective":
@@ -143,10 +149,57 @@ func gameEditTable(context *router.Context) {
 			bbar.AppendChild(btn)
 		}
 
+		// Add a button to the buttonbar, with event handlers
+		saveButton := func(name string) {
+			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
+			btn.Class().SetString("button button-clear")
+			btn.SetAttribute("type", "button")
+			btn.SetAttribute("name", "save-button")
+			btn.Value = name
+			btn.AddEventListener("click", false, func(evt dom.Event) {
+				print("clicked on the save button")
+				go func() {
+					done := false
+					err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
+						Channel: Session.Channel,
+						ID:      id,
+						Game:    &game,
+					}, &done)
+					if err != nil {
+						dom.GetWindow().Alert(err.Error())
+					} else {
+						b := evt.Target()
+						c := b.Class()
+						c.Remove("button-primary")
+						c.Add("button-clear")
+					}
+				}()
+			})
+			bbar.AppendChild(btn)
+		}
+
+		// Add a button to the buttonbar, to restore the map
+		restoreButton := func(name string) {
+			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
+			btn.Class().SetString("button button-clear")
+			btn.SetAttribute("type", "button")
+			btn.SetAttribute("name", "restore-button")
+			btn.Value = name
+			btn.AddEventListener("click", false, func(evt dom.Event) {
+				print("clicked on the restore button")
+				if dom.GetWindow().Confirm("Restore the Map from file ?") {
+					Session.Reload(context)
+				}
+			})
+			bbar.AppendChild(btn)
+		}
+
 		// Create the mode buttons
 		modeButton("Terrain")
 		modeButton("Objective")
 		modeButton("Zones")
+		saveButton("Save Map")
+		restoreButton("Restore Map")
 
 		// Add a reset all button
 
@@ -157,7 +210,7 @@ func gameEditTable(context *router.Context) {
 
 		tileSet := form.Get("map-tileset")
 		drawTiles := func() {
-			print("call to draw tiles", game.Tiles)
+			// print("call to draw tiles", game.Tiles)
 			tileSet.SetInnerHTML("")
 			if game.GridSize > 0 {
 				newHTML := ""
@@ -165,11 +218,16 @@ func gameEditTable(context *router.Context) {
 				for y := 0; y < game.GridY; y++ {
 					for x := 0; x < game.GridX; x++ {
 						t := game.Tiles[i]
-						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
-							x*game.GridSize, y*game.GridSize, // x and y in inches
-							game.GridSize, game.GridSize, // width and height in inches
-							t.GetCSS(),    // self-computed CSS content type
-							x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+						if t == nil {
+							print("aww snap - t is nil !!")
+							break
+						} else {
+							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
+								x*game.GridSize, y*game.GridSize, // x and y in inches
+								game.GridSize, game.GridSize, // width and height in inches
+								t.GetCSS(),    // self-computed CSS content type
+								x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+						}
 						i++
 					}
 				}
@@ -198,6 +256,39 @@ func gameEditTable(context *router.Context) {
 			drawTiles()
 		}
 
+		scaleImages := func() {
+			gridInches := fmt.Sprintf("%d", game.GridSize)
+			for _, v := range []string{"rough", "woods", "building", "fort", "water", "water1", "water2"} {
+				print("rescale", v)
+				el := doc.QuerySelector("#tile-" + v)
+				el.SetAttribute("height", gridInches)
+				el.SetAttribute("width", gridInches)
+				el = doc.QuerySelector("#tile-" + v + "-img")
+				el.SetAttribute("height", gridInches)
+				el.SetAttribute("width", gridInches)
+			}
+		}
+
+		initMap := func() {
+			if game.TableX < 1 {
+				game.TableX = 1
+			}
+			if game.TableY < 1 {
+				game.TableY = 1
+			}
+			game.TileX = game.GridX
+			game.TileY = game.GridY
+
+			game.CalcKm()
+			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", game.TableX*12, game.TableY*12))
+			rect := form.Get("map-rect")
+			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
+			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
+			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
+			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			drawTiles()
+		}
+
 		// Resize the SVG rect whenever the table dimensions change
 		form.OnEvent("TableX", "change", func(evt dom.Event) {
 			resizeMap()
@@ -209,6 +300,7 @@ func gameEditTable(context *router.Context) {
 
 		form.OnEvent("GridSize", "change", func(evt dom.Event) {
 			resizeMap()
+			scaleImages()
 		})
 
 		// click on a tile and apply editmode
@@ -217,17 +309,21 @@ func gameEditTable(context *router.Context) {
 			if t.TagName() == "rect" {
 				i, _ := strconv.Atoi(t.GetAttribute("data-index"))
 				theTile := game.GetTile(i)
-				// print("Clicked on tile", *theTile)
+				// print("Clicked on tile", *theTile, i)
 				tClass := t.Class()
 				tClass.Remove(theTile.GetCSS())
 				theTile.ApplyMode(editMode)
 				tClass.Add(theTile.GetCSS())
-
+				b := form.Get("save-button")
+				c := b.Class()
+				c.Remove("button-clear")
+				c.Add("button-primary")
 			}
 
 		})
 
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
-		drawTiles()
+		initMap()
+		// drawTiles()
 	}()
 }

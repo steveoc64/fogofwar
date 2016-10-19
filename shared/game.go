@@ -14,14 +14,17 @@ const (
 	TileBuilding
 	TileFort
 	TileWater
+	TileWater1
+	TileWater2
 )
 
 type Tile struct {
-	X       int
-	Y       int
-	Height  int
-	Content int
-	Owner   int // 0 neutral  -1/-2 red 1/2 blue
+	X       int `db:"x"`
+	Y       int `db:"y"`
+	I       int `db:"i"`
+	Height  int `db:"height"`
+	Content int `db:"content"`
+	Owner   int `db:"owner"` // 0 neutral  -1/-2 red 1/2 blue
 }
 
 func (t *Tile) GetCSS() string {
@@ -29,7 +32,7 @@ func (t *Tile) GetCSS() string {
 }
 
 func (t *Tile) ApplyMode(mode string) {
-	print("ApplyMode", mode, "to tile", t)
+	// print("ApplyMode", mode, "to tile", t)
 	switch mode {
 	case "Clear":
 		t.Content = TileClear
@@ -41,11 +44,21 @@ func (t *Tile) ApplyMode(mode string) {
 		t.Content = TileBuilding
 	case "Fort":
 		t.Content = TileFort
-	case "Water":
+	case "Water -":
 		t.Content = TileWater
+		t.Height = 0
+	case "Water /":
+		t.Content = TileWater1
+		t.Height = 0
+	case `Water \`:
+		t.Content = TileWater2
+		t.Height = 0
 	case "Higher":
-		if t.Height < 3 {
+		if t.Height < 1 {
 			t.Height++
+			if t.Content >= TileWater {
+				t.Content = TileClear
+			}
 		}
 	case "Lower":
 		if t.Height > 0 {
@@ -91,8 +104,8 @@ type Game struct {
 	BlueBrief      string     `db:"blue_brief"`
 	NumRedPlayers  int        `db:"num_red_players"`
 	NumBluePlayers int        `db:"num_blue_players"`
-	RedCmd         []GameCmd  `db:"red_cmd"`
-	BlueCmd        []GameCmd  `db:"blue_cmd"`
+	RedCmd         []*GameCmd `db:"red_cmd"`
+	BlueCmd        []*GameCmd `db:"blue_cmd"`
 	TableX         int        `db:"table_x"`
 	TableY         int        `db:"table_y"`
 	KmX            int        `db:"km_x"`
@@ -100,7 +113,7 @@ type Game struct {
 	GridSize       int        `db:"grid_size"`
 	GridX          int        `db:"grid_x"`
 	GridY          int        `db:"grid_y"`
-	Tiles          []Tile     `db:"tiles"`
+	Tiles          []*Tile    `db:"tiles"`
 	TileX          int        `db:"tile_x"`
 	TileY          int        `db:"tile_y"`
 }
@@ -135,7 +148,7 @@ func (g *Game) CalcGrid() {
 
 func (g *Game) InitTiles() {
 	g.CalcGrid()
-	g.Tiles = make([]Tile, g.GridX*g.GridY)
+	g.Tiles = make([]*Tile, g.GridX*g.GridY)
 	g.TileX = g.GridX
 	g.TileY = g.GridY
 
@@ -143,53 +156,80 @@ func (g *Game) InitTiles() {
 	i := 0
 	for y := 0; y < g.GridY; y++ {
 		for x := 0; x < g.GridX; x++ {
-			g.Tiles[i].X = x
-			g.Tiles[i].Y = y
+			g.Tiles[i] = &Tile{
+				X: x,
+				Y: y,
+				I: i,
+			}
+			// g.Tiles[i].X = x
+			// g.Tiles[i].Y = y
 			i++
 		}
 	}
+	// print("done all that, and tiles is now", g.Tiles)
 }
 
 func (g *Game) GetTile(i int) *Tile {
 	// print("GetTile", i)
 	if i < 0 {
+		print("index too low")
 		return nil
 	}
 	if i >= g.TileY*g.TileX {
+		print("too far out")
 		return nil
 	}
-	return &g.Tiles[i]
+	// print("I can see", g.Tiles[i])
+	return g.Tiles[i]
 }
 
-func (g *Game) GetTileXY(x, y int) Tile {
+func (g *Game) GetTileXY(x, y int) *Tile {
 	i := (y * g.TileX) + x
-	print("getting old tile ", x, y, i)
+	// print("getting old tile ", x, y, i)
 	return g.Tiles[i]
 }
 
 func (g *Game) ResizeTiles() {
 	g.CalcGrid()
 
-	newTiles := make([]Tile, g.GridX*g.GridY)
+	newTiles := make([]*Tile, g.GridX*g.GridY)
 	i := 0
-	for y := 0; y < g.TileY && y < g.GridY; y++ {
+	for y := 0; y < g.GridY; y++ {
 		i = y * g.GridX
-		for x := 0; x < g.TileX && x < g.GridX; x++ {
-			print("new offset", x, y, i)
+		for x := 0; x < g.GridX; x++ {
+			// print("new offset", x, y, i)
 			if x < g.TileX && y < g.TileY {
 				// then the tile exists in the old grid, so grab it into the new grid
-				newTiles[i] = g.GetTileXY(x, y)
-			} // else new tile is completely fresh
+				oldTile := g.GetTileXY(x, y)
+				newTiles[i] = &Tile{
+					X:       oldTile.X,
+					Y:       oldTile.Y,
+					I:       i,
+					Height:  oldTile.Height,
+					Content: oldTile.Content,
+					Owner:   oldTile.Owner,
+				}
+				// print("made new tile from old", x, y, i, newTiles[i], oldTile)
+			} else { // else new tile is completely fresh
+				newTiles[i] = &Tile{
+					X:       x,
+					Y:       y,
+					I:       i,
+					Height:  0,
+					Content: 0,
+					Owner:   0,
+				}
+				// print("Fresh new tile", x, y, i, newTiles[i])
+			}
 
 			// And restamp the coords on the new tile
-			newTiles[i].X = x
-			newTiles[i].Y = y
 			i++
 		}
 	}
 	g.TileX = g.GridX
 	g.TileY = g.GridY
 	g.Tiles = newTiles
+	print("is complete", g.Tiles)
 }
 
 func (g *Game) ShowKmX() string {

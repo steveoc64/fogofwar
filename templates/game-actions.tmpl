@@ -1,4 +1,15 @@
 <div class="action-grid">
+	{{if ne .InMode "Checklist"}}
+	<div class="action__item" url="/game/{{.ID}}/checklist">
+		<div class="action__title">Game Checklist</div>
+		<div class="action__icon"><i class="fa fa-check-square-o fa-lg"></i></div>
+		<div class="action__text">
+			Checklist of items to begin Game
+		</div>
+	</div>
+	{{end}}
+
+	{{if ne .InMode "Table"}}
 	<div class="action__item" url="/game/{{.ID}}/table">
 		<div class="action__title">Table Setup</div>
 		<div class="action__icon"><i class="fa fa-table fa-lg"></i></div>
@@ -6,7 +17,9 @@
 			Table Setup
 		</div>
 	</div>
+	{{end}}
 	
+	{{if ne .InMode "Overview"}}
 	<div class="action__item" url="/game/{{.ID}}/overview">
 		<div class="action__title">Overview</div>
 		<div class="action__icon"><i class="fa fa-bookmark fa-lg"></i></div>
@@ -14,13 +27,7 @@
 			Game Overview
 		</div>
 	</div>
-	<div class="action__item" url="/game/{{.ID}}/obj">
-		<div class="action__title">Objectives</div>
-		<div class="action__icon"><i class="fa fa-map-marker fa-lg"></i></div>
-		<div class="action__text">
-			Objectives and Zones
-		</div>
-	</div>
+	{{end}}
 
 	<div class="action__item" url="/game/{{.ID}}/red">
 		<div class="action__title">Red Team</div>
@@ -34,14 +41,6 @@
 		<div class="action__icon"><i class="fa fa-flag fa-lg"></i></div>
 		<div class="action__text">
 			Blue Team Details
-		</div>
-	</div>
-
-	<div class="action__item" url="/game/{{.ID}}/play">
-		<div class="action__title">Start Game</div>
-		<div class="action__icon"><i class="fa fa-play-circle fa-lg"></i></div>
-		<div class="action__text">
-			Start the Game !!
 		</div>
 	</div>
 

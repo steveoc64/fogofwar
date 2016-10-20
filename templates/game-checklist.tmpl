@@ -1,0 +1,120 @@
+<h4>Pre-Game Checklist</h4>
+<p>Once all the checkboxes are ticked, the Game can begin !</p>
+
+<div class="action-grid todo-list">
+	{{if .CheckTable}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Table</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Table setup is good to go !!
+		</div>
+	</div>
+	{{else}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Table</div>
+		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>TABLE</b> Tool to set table dimensions and ground scale.</p>
+			<p>Use the TERRAIN Tool to lay out the approximate terrain on the map.</p>
+		</div>
+	</div>
+	{{end}}
+
+	{{if .CheckObjectives}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Objectives</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Objectives are defined !!
+		</div>
+	</div>
+	{{else}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Objectives</div>
+		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>TABLE-OBJECTIVES</b> Tool to add objectives to the map.</p>
+			<p>Ensure that both Red and Blue Teams have at least 1 Objective defined.</p>
+		</div>
+	</div>
+	{{end}}
+
+	{{if .CheckForces}}
+	<div class="action__item" url="/game/{{.ID}}/red">
+		<div class="action__title">Forces</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Forces have been set !!
+		</div>
+	</div>
+	{{else}}
+	<div class="action__item" url="/game/{{.ID}}/red">
+		<div class="action__title">Forces</div>
+		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>RED-BLUE</b> Tools to setup the forces for the Game for each team.</p>
+			<p>Apply any pre-game attrition, and edit the player briefings.</p>
+		</div>
+	</div>
+	{{end}}
+
+	{{if .CheckZones}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Zones</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Zones have been set !!
+		</div>
+	</div>
+	{{else}}
+	<div class="action__item" url="/game/{{.ID}}/table">
+		<div class="action__title">Zones</div>
+		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>TABLE-ZONES</b> Tool to set zones of control for each Team</p>
+			<p>Each Team needs at least 1 zone under control to be able to deploy to</p>
+		</div>
+	</div>
+	{{end}}
+
+
+	{{if .CheckPlayers}}
+	<div class="action__item" url="/game/{{.ID}}/players">
+		<div class="action__title">Players</div>
+		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
+		<div class="action__text">
+			Player invites are all done !!
+		</div>
+	</div>
+	{{else}}
+	<div class="action__item" url="/game/{{.ID}}/players">
+		<div class="action__title">Players</div>
+		<div class="action__icon"><i class="fa fa-user fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>RED-BLUE</b> Tools to assign players to Teams.</p>
+			<p>Once Player accept command invitations and join the Game, the Battle may begin !</p>
+		</div>
+	</div>
+	{{end}}
+
+	
+	<div class="action__item" url="/game/{{.ID}}/overview">
+		<div class="action__title">Overview</div>
+		<div class="action__icon"><i class="fa fa-pencil-square-o fa-lg"></i></div>
+		<div class="action__text">
+			<p>Use the <b>OVERVEIW</b> Tool to edit any other details for the game.</p>
+		</div>
+	</div>
+
+	{{if .GoodToGo}}
+	</div>
+		<div class="action__item" url="/game/{{.ID}}/start">
+		<div class="action__title">Start !</div>
+		<div class="action__icon"><i class="fa fa-play-circle fa-lg"></i></div>
+		<div class="action__text">
+			<p>All Done - Start the Game !!</p>
+		</div>
+	</div>
+	{{end}}
+</div>

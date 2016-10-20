@@ -25,8 +25,10 @@ func gameEditTable(context *router.Context) {
 		}, &game)
 		if err != nil {
 			dom.GetWindow().Alert(err.Error())
-			Session.Navigate("/games")
+			return
 		}
+		game.InMode = "Table"
+
 		if len(game.Tiles) == 0 {
 			print("No tiles - create a new set")
 			game.InitTiles()
@@ -57,9 +59,8 @@ func gameEditTable(context *router.Context) {
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
-			print("here in the cancel event")
 			evt.PreventDefault()
-			Session.Navigate("/games")
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
 		})
 
 		// form.SaveEvent(func(evt dom.Event) {
@@ -159,12 +160,11 @@ func gameEditTable(context *router.Context) {
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				print("clicked on the save button")
 				go func() {
-					done := false
 					err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
 						Channel: Session.Channel,
 						ID:      id,
 						Game:    &game,
-					}, &done)
+					}, &game.CheckTable)
 					if err != nil {
 						dom.GetWindow().Alert(err.Error())
 					} else {
@@ -254,6 +254,10 @@ func gameEditTable(context *router.Context) {
 			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
 			game.ResizeTiles()
 			drawTiles()
+			b := form.Get("save-button")
+			c := b.Class()
+			c.Remove("button-clear")
+			c.Add("button-primary")
 		}
 
 		scaleImages := func() {

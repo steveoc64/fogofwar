@@ -17,9 +17,43 @@
 	border-top: 1px solid $sbs-dksand;
 }
 
+.todo-list {
+	background: rgba(109, 54, 4, 0.3);
+	padding-top: 0rem;
+	border: 2px;
+	border-top: 2px solid black;
+}
+
+.todo-list-good {
+	background: rgba(79, 222, 79, 0.5);
+	padding-top: 0rem;
+	border: 2px;
+	border-top: 2px solid green;
+}
+
 .action-hidden {
 	display: none !important
 }
+
+.todo-list .action__item {
+	-webkit-flex: 1 1 22rem;
+	flex: 1 1 22rem;
+	height: 32rem;
+
+	&:hover {
+		background: $light2-mud;
+
+		.action__icon {
+			color: rgb(20, 134, 239);
+		}
+	}
+
+	.action__text {
+		font-size: 1.5rem;
+		text-align: left;
+	}
+}
+
 
 .action__item {
 	-webkit-transition: 0.6s;

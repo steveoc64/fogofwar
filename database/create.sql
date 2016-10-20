@@ -24,7 +24,7 @@ create table users (
 \i users.sql
 
 drop table if exists login;
-create table login (
+create unlogged table login (
 	user_id int not null,
 	date timestamptz not null default localtimestamp,
 	ip_address text not null default '',
@@ -34,7 +34,7 @@ create index login_date_idx on login(date);
 create index login_user_idx on login(user_id);
 
 drop table if exists vcode;
-create table vcode (
+create unlogged table vcode (
 	uid int not null primary key,
 	code text not null default '',
 	expires timestamp default now() + interval '2 hour'
@@ -341,7 +341,7 @@ drop index if exists force_unit_force_idx;
 create index force_unit_force_idx on force_unit (force_id);
 
 drop table if exists game;
-create table game (
+create unlogged table game (
 	id serial not null primary key,
 	scenario_id int not null,
 	hosted_by int not null default 0,
@@ -360,7 +360,13 @@ create table game (
 	blue_brief text not null default '',
 	table_x int not null default 6,
 	table_y int not null default 4,
-	grid_size int not null default 6
+	grid_size int not null default 6,
+	check_table bool default false,
+	check_objectives bool default false,
+	check_zones bool default false,
+	check_forces bool default false,
+	check_players bool default false,
+	check_overview bool default false
 );
 \i data/game.sql
 create index game_scenario_idx on game (scenario_id);
@@ -368,7 +374,7 @@ drop table if exists game_objective;
 -- TODO create table
 
 drop table if exists tiles;
-create table tiles (
+create unlogged table tiles (
 	game_id int not null,
 	i int not null,
 	height  int,
@@ -381,7 +387,7 @@ drop table if exists game_condition;
 -- TODO create table
 
 drop table if exists game_players;
-create table game_players (
+create unlogged table game_players (
 	game_id int not null,
 	player_id int not null,
 	red_team bool,
@@ -392,7 +398,7 @@ create unique index game_player_game_idx on game_players (game_id, player_id);
 create unique index game_player_player_idx on game_players (player_id,game_id);
 
 drop table if exists game_cmd;
-create table game_cmd (
+create unlogged table game_cmd (
 	id serial not null primary key,
 	game_id int not null default 0,
 	red_team bool,
@@ -412,7 +418,7 @@ create table game_cmd (
 create index game_cmd_game_idx on game_cmd (game_id);
 
 drop table if exists game_cmd_order;
-create table game_cmd_order (
+create unlogged table game_cmd_order (
 	game_id int not null,
 	cmd_id int not null,
 	turns int not null default 2,  -- Once hits 0, stick. If counts down to 0, replaces existing
@@ -441,7 +447,7 @@ create table gt_formation (
 
 drop table if exists game_unit;
 drop table if exists unit;
-create table unit (
+create unlogged table unit (
 	id serial not null primary key,
 	cmd_id int not null,
 	path ltree,
@@ -496,7 +502,11 @@ create table unit (
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);
 
-
+create table migration (
+	id serial not null primary key,
+	name text,
+	date timestamptz not null default localtimestamp
+);
 
 
 

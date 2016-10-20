@@ -51,7 +51,7 @@ func gameNew(context *router.Context) {
 					}, &newID)
 					if err == nil {
 						print("Created Game", newID)
-						Session.Navigate(fmt.Sprintf("/game/%d/overview", newID))
+						Session.Navigate(fmt.Sprintf("/game/%d/checklist", newID))
 					}
 				}
 
@@ -72,10 +72,15 @@ func gameEditOverview(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
+		err := RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			return
+		}
+		game.InMode = "Overview"
 
 		form := formulate.EditForm{}
 
@@ -100,7 +105,7 @@ func gameEditOverview(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/games")
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
 		})
 
 		form.SaveEvent(func(evt dom.Event) {
@@ -114,8 +119,6 @@ func gameEditOverview(context *router.Context) {
 				}, &game)
 				if err != nil {
 					dom.GetWindow().Alert(err.Error())
-				} else {
-					Session.Navigate("/games")
 				}
 			}()
 		})
@@ -181,7 +184,7 @@ func gameEditRed(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/games")
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
 		})
 
 		form.SaveEvent(func(evt dom.Event) {
@@ -193,7 +196,7 @@ func gameEditRed(context *router.Context) {
 					ID:      id,
 					Game:    &game,
 				}, &game)
-				Session.Navigate("/games")
+				// Session.Navigate("/games")
 			}()
 		})
 
@@ -278,7 +281,7 @@ func gameEditBlue(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/games")
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
 		})
 
 		form.SaveEvent(func(evt dom.Event) {
@@ -291,7 +294,7 @@ func gameEditBlue(context *router.Context) {
 					ID:      id,
 					Game:    &game,
 				}, &game)
-				Session.Navigate("/games")
+				// Session.Navigate("/games")
 			}()
 		})
 
@@ -332,57 +335,6 @@ func gameEditBlue(context *router.Context) {
 	}()
 }
 
-func gameEditObj(context *router.Context) {
-	id, err := strconv.Atoi(context.Params["id"])
-	if err != nil {
-		print(err.Error())
-		return
-	}
-
-	go func() {
-		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &game)
-		print("game objectives", game)
-		// Layout the fields
-
-		form := formulate.EditForm{}
-
-		form.New("fa-bookmark", "Game Table Objectives - "+game.Name)
-
-		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
-			AddNumber(1, "Year", "Year", "1").
-			AddNumber(1, "Turn", "Turn", "1").
-			AddNumber(1, "Turn Limit", "TurnLimit", "1")
-
-		form.Row(1).
-			AddInput(1, "Name", "Name")
-
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/games")
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
-		// All done, so render the form
-		form.Render("edit-form", "main", &game)
-		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
-			print("clicked on", url)
-			Session.Navigate(url)
-		})
-
-		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
-	}()
-}
-
 func gameEditPlayers(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
@@ -400,7 +352,7 @@ func gameEditPlayers(context *router.Context) {
 
 		form := formulate.EditForm{}
 
-		form.New("fa-bookmark", "Allocate Players For Game - "+game.Name)
+		form.New("fa-user", "Allocate Players For Game - "+game.Name)
 
 		form.Row(5).
 			AddDate(1, "Created", "Created").
@@ -419,7 +371,7 @@ func gameEditPlayers(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/games")
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
 		})
 
 		form.PrintEvent(func(evt dom.Event) {
@@ -437,7 +389,9 @@ func gameEditPlayers(context *router.Context) {
 	}()
 }
 
-func gameEditUnits(context *router.Context) {
+func gameChecklist(context *router.Context) {
+	print("TODO - gameChecklist")
+
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -446,29 +400,30 @@ func gameEditUnits(context *router.Context) {
 
 	go func() {
 		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
+		err := RPC("GameRPC.Get", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &game)
-		print("game units of", game)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			return
+		}
+		game.InMode = "Checklist"
+
+		w := dom.GetWindow()
+		doc := w.Document()
 
 		form := formulate.EditForm{}
 
-		form.New("fa-bookmark", "Game Units For Game - "+game.Name)
+		// Layout the fields
 
-		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
-			AddNumber(1, "Year", "Year", "1").
-			AddNumber(1, "Turn", "Turn", "1").
-			AddNumber(1, "Turn Limit", "TurnLimit", "1")
+		form.New("fa-check-square-o", "Game Checklist - "+game.Name)
 
 		form.Row(1).
 			AddInput(1, "Name", "Name")
 
-		form.Row(2).
-			AddInput(1, "Red Team", "RedTeam").
-			AddInput(1, "Blue Team", "BlueTeam")
+		form.Row(1).
+			AddCustom(1, "", "TODO", "game-checklist")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -476,71 +431,42 @@ func gameEditUnits(context *router.Context) {
 			Session.Navigate("/games")
 		})
 
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
-		})
-
-		// All done, so render the form
-		form.Render("edit-form", "main", &game)
-		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
-			print("clicked on", url)
-			Session.Navigate(url)
-		})
-
-		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
-	}()
-}
-
-func gameEditZone(context *router.Context) {
-	id, err := strconv.Atoi(context.Params["id"])
-	if err != nil {
-		print(err.Error())
-		return
-	}
-
-	go func() {
-		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &game)
-		print("zone of ", game)
-
-		form := formulate.EditForm{}
-
-		form.New("fa-bookmark", "Zone Setup For Game - "+game.Name)
-
-		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
-			AddNumber(1, "Year", "Year", "1").
-			AddNumber(1, "Turn", "Turn", "1").
-			AddNumber(1, "Turn Limit", "TurnLimit", "1")
-
-		form.Row(1).
-			AddInput(1, "Name", "Name")
-
-		form.Row(2).
-			AddInput(1, "Red Team", "RedTeam").
-			AddInput(1, "Blue Team", "BlueTeam")
-
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
+		form.DeleteEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/games")
-		})
-
-		form.PrintEvent(func(evt dom.Event) {
-			dom.GetWindow().Print()
+			go func() {
+				done := false
+				RPC("GameRPC.Delete", shared.GameRPCData{
+					Channel: Session.Channel,
+					ID:      id,
+				}, &done)
+				Session.Navigate("/games")
+			}()
 		})
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
-		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
-			print("clicked on", url)
-			Session.Navigate(url)
-		})
 
-		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
+		// Load up the checklist from a template, and manually set a listener on each one
+		loadTemplate("game-checklist", "[name=TODO]", &game)
+		for _, ai := range doc.QuerySelectorAll(".action__item") {
+			url := ai.(*dom.HTMLDivElement).GetAttribute("url")
+			if url != "" {
+				ai.AddEventListener("click", false, func(evt dom.Event) {
+					url := evt.CurrentTarget().GetAttribute("url")
+					Session.Navigate(url)
+				})
+			}
+		}
+		// If good to go, then add the good class
+		// form.Get("TODO").Class().Add("todo-list-good")
+
+		// form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
+		// 	print("clicked on", url)
+		// 	Session.Navigate(url)
+		// })
+
+		// showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
+
 	}()
+
 }

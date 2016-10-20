@@ -125,8 +125,8 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	tx, _ := DB.Begin()
 	defer tx.AutoRollback()
 
-	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4 where id=$1`,
-		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize).
+	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5 where id=$1`,
+		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize, true).
 		Exec()
 	if err == nil {
 		_, err = DB.SQL(`delete from tiles where game_id=$1`, data.ID).Exec()

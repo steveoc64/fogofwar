@@ -84,38 +84,44 @@ func (t *Tile) ApplyMode(mode string) {
 }
 
 type Game struct {
-	ID             int        `db:"id"`
-	ScenarioID     int        `db:"scenario_id"`
-	HostedBy       int        `db:"hosted_by"`
-	HostName       string     `db:"host_name"`
-	HostEmail      string     `db:"host_email"`
-	Created        *time.Time `db:"created"`
-	Expires        *time.Time `db:"expires"`
-	Turn           int        `db:"turn"`
-	TurnLimit      int        `db:"turn_limit"`
-	Name           string     `db:"name"`
-	Descr          string     `db:"descr"`
-	Notes          string     `db:"notes"`
-	Year           int        `db:"year"`
-	LatLon         *[]int     `db:"latlon"`
-	RedTeam        string     `db:"red_team"`
-	RedBrief       string     `db:"red_brief"`
-	BlueTeam       string     `db:"blue_team"`
-	BlueBrief      string     `db:"blue_brief"`
-	NumRedPlayers  int        `db:"num_red_players"`
-	NumBluePlayers int        `db:"num_blue_players"`
-	RedCmd         []*GameCmd `db:"red_cmd"`
-	BlueCmd        []*GameCmd `db:"blue_cmd"`
-	TableX         int        `db:"table_x"`
-	TableY         int        `db:"table_y"`
-	KmX            int        `db:"km_x"`
-	KmY            int        `db:"km_y"`
-	GridSize       int        `db:"grid_size"`
-	GridX          int        `db:"grid_x"`
-	GridY          int        `db:"grid_y"`
-	Tiles          []*Tile    `db:"tiles"`
-	TileX          int        `db:"tile_x"`
-	TileY          int        `db:"tile_y"`
+	ID              int        `db:"id"`
+	ScenarioID      int        `db:"scenario_id"`
+	HostedBy        int        `db:"hosted_by"`
+	HostName        string     `db:"host_name"`
+	HostEmail       string     `db:"host_email"`
+	Created         *time.Time `db:"created"`
+	Expires         *time.Time `db:"expires"`
+	Turn            int        `db:"turn"`
+	TurnLimit       int        `db:"turn_limit"`
+	Name            string     `db:"name"`
+	Descr           string     `db:"descr"`
+	Notes           string     `db:"notes"`
+	Year            int        `db:"year"`
+	LatLon          *[]int     `db:"latlon"`
+	RedTeam         string     `db:"red_team"`
+	RedBrief        string     `db:"red_brief"`
+	BlueTeam        string     `db:"blue_team"`
+	BlueBrief       string     `db:"blue_brief"`
+	NumRedPlayers   int        `db:"num_red_players"`
+	NumBluePlayers  int        `db:"num_blue_players"`
+	RedCmd          []*GameCmd `db:"red_cmd"`
+	BlueCmd         []*GameCmd `db:"blue_cmd"`
+	TableX          int        `db:"table_x"`
+	TableY          int        `db:"table_y"`
+	KmX             int        `db:"km_x"`
+	KmY             int        `db:"km_y"`
+	GridSize        int        `db:"grid_size"`
+	GridX           int        `db:"grid_x"`
+	GridY           int        `db:"grid_y"`
+	Tiles           []*Tile    `db:"tiles"`
+	TileX           int        `db:"tile_x"`
+	TileY           int        `db:"tile_y"`
+	InMode          string     `db:"in_mode"`
+	CheckTable      bool       `db:"check_table"`
+	CheckObjectives bool       `db:"check_objectives"`
+	CheckZones      bool       `db:"check_zones"`
+	CheckForces     bool       `db:"check_forces"`
+	CheckPlayers    bool       `db:"check_players"`
 }
 
 type GameRPCData struct {
@@ -124,6 +130,10 @@ type GameRPCData struct {
 	Red     bool
 	Blue    bool
 	Game    *Game
+}
+
+func (g *Game) GoodToGo() bool {
+	return g.CheckTable && g.CheckObjectives && g.CheckZones && g.CheckPlayers && g.CheckForces
 }
 
 func (g *Game) CalcKm() {

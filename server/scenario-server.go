@@ -408,7 +408,7 @@ func (s *ScenarioRPC) InsertForce(data shared.ForceRPCData, retval *shared.Force
 	id := 0
 	err := DB.InsertInto("force").
 		Whitelist("nation", "name", "level", "scenario_id", "red_team", "blue_team",
-			"cmdr_name", "inspiration", "rating", "condition").
+			"commander_name", "inspiration", "rating", "condition").
 		Record(data.Force).
 		Returning("id").
 		QueryScalar(&id)
@@ -463,7 +463,7 @@ func (s *ScenarioRPC) UpdateForce(data shared.ForceRPCData, retval *shared.Force
 	conn := Connections.Get(data.Channel)
 
 	_, err := DB.Update("force").
-		SetWhitelist(data.Force, "nation", "name", "cmdr_name", "level", "rating", "inspiration", "condition").
+		SetWhitelist(data.Force, "nation", "name", "commander_name", "level", "rating", "inspiration", "condition").
 		Where("id = $1", data.ID).
 		Exec()
 
@@ -935,7 +935,7 @@ func (s *ScenarioRPC) Fork(data shared.ScenarioRPCData, newID *int) error {
 			oldForce.ScenarioID = *newID
 			err := DB.InsertInto("force").
 				Whitelist("scenario_id", "red_team", "blue_team", "nation",
-					"cmdr_name", "level", "descr", "rating", "inspiration", "condition").
+					"commander_name", "level", "descr", "rating", "inspiration", "condition").
 				Record(oldForce).
 				Returning("id").
 				QueryScalar(&newForceID)
@@ -1032,7 +1032,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 			}
 			err := DB.InsertInto("game_cmd").
 				Whitelist("game_id", "red_team", "blue_team", "nation", "name",
-					"cmdr_name", "level", "descr", "rating", "inspiration", "condition").
+					"commander_name", "level", "descr", "rating", "inspiration", "condition").
 				Record(newCmd).
 				Returning("id").
 				QueryScalar(&newCmdID)

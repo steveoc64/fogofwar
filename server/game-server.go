@@ -179,8 +179,7 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 	}
 
 	logger(start, "Game.Delete", conn,
-		fmt.Sprintf("%d", data.ID),
-		fmt.Sprintf("%d Records", len(*retval)))
+		fmt.Sprintf("%d", data.ID), "")
 
 	if err == nil {
 		*done = true

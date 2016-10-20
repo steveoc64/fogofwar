@@ -282,7 +282,7 @@ create table force (
 	blue_team bool,
 	nation text not null default '',
 	name text not null default '',
-	cmdr_name text not null default '',
+	commander_name text not null default '',
 	level int not null default 1,
 	descr text not null default '',
 	rating int not null default 0,
@@ -349,8 +349,7 @@ create unlogged table game (
 	check_objectives bool default false,
 	check_zones bool default false,
 	check_forces bool default false,
-	check_players bool default false,
-	check_overview bool default false
+	check_players bool default false
 );
 \i data/game.sql
 create index game_scenario_idx on game (scenario_id);
@@ -390,7 +389,7 @@ create unlogged table game_cmd (
 	blue_team bool,
 	nation text not null default '',
 	name text not null default '',
-	cmdr_name text not null default '',
+	commander_name text not null default '',
 	level int not null default 1,
 	descr text not null default '',
 	rating int not null default 0,

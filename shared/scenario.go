@@ -54,7 +54,7 @@ type Force struct {
 	BlueTeam      bool        `db:"blue_team"`
 	Nation        string      `db:"nation"`
 	Name          string      `db:"name"`
-	CommanderName string      `db:"cmdr_name"`
+	CommanderName string      `db:"commander_name"`
 	Level         int         `db:"level"`
 	LevelName     string      `db:"level_name"`
 	Descr         string      `db:"descr"`

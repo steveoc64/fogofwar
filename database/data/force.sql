@@ -15,7 +15,7 @@ SET search_path = public, pg_catalog;
 -- Data for Name: force; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY force (id, scenario_id, red_team, blue_team, nation, name, cmdr_name, level, descr, rating, inspiration, condition) FROM stdin;
+COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition) FROM stdin;
 76	4	t	f				2		3	3	3
 77	16	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
 78	16	t	f	France		Soult	2		3	3	3

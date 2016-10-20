@@ -179,6 +179,7 @@ create table drill (
 	third_rank bool,
 	open_order bool,
 	line bool,
+	wline bool,
 	mixed bool,
 	att_col bool,
 	close_col bool,

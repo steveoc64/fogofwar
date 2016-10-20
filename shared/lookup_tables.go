@@ -70,6 +70,7 @@ type DrillType struct {
 	ThirdRank bool   `db:"third_rank"`
 	OpenOrder bool   `db:"open_order"`
 	Line      bool   `db:"line"`
+	WLine     bool   `db:"wline"`
 	Mixed     bool   `db:"mixed"`
 	AttCol    bool   `db:"att_col"`
 	CloseCol  bool   `db:"close_col"`

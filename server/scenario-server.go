@@ -539,7 +539,7 @@ func (s *ScenarioRPC) AddUnit(data shared.ForceUnitRPCData, retval *shared.Force
 	case 4:
 		unit.Path += "_Battery"
 		unit.Guns = 8
-		unit.GunneryType = 2
+		unit.GunneryType = 3
 		unit.GunCondition = 3
 		unit.Rating = 4 // default to crack line morale
 	case 5:

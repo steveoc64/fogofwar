@@ -121,15 +121,25 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 
 func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	start := time.Now()
-
-	if len(data.Game.Tiles) > 240 {
-		return errors.New("Too many Tiles - try a smaller board, or increase the grid size.")
-	}
-
 	*done = false
 	conn := Connections.Get(data.Channel)
 	if conn.UserID != data.Game.HostedBy {
 		return errors.New("Incorrect owner of game")
+	}
+
+	limit := 4
+	switch conn.Rank {
+	case 1:
+		limit = 96 // 6x4 on a 6" grid
+	case 2:
+		limit = 216 // 6x4 on a 4" grid
+	case 3, 4:
+		limit = 360 // 8x5 on a 4" grid
+	case 10:
+		limit = 512 // big table
+	}
+	if len(data.Game.Tiles) > limit {
+		return errors.New("Too many Tiles - try a smaller board, or increase the grid size. Higher Ranks can use a bigger board.")
 	}
 
 	tx, _ := DB.Begin()

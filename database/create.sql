@@ -278,7 +278,7 @@ create table scenario (
 	descr text not null default '',
 	notes text not null default '',
 	year int not null default 1800,
-	public bool default true,
+	public bool default false,
 	review bool default false, 
 	latlon point,
 	red_team text not null default '',
@@ -390,7 +390,6 @@ create index game_scenario_idx on game (scenario_id);
 
 drop table if exists game_objective;
 create table game_objective (
-	id serial not null primary key,
 	game_id int not null,
 	name text not null default '',
 	X int not null default 0,

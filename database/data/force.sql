@@ -16,7 +16,6 @@ SET search_path = public, pg_catalog;
 --
 
 COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition) FROM stdin;
-76	4	t	f				2		3	3	3
 77	16	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
 78	16	t	f	France		Soult	2		3	3	3
 79	16	t	f	France		Lannes	2		2	1	3
@@ -45,26 +44,18 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 89	16	t	f	France		Augereau	2		2	2	2
 90	16	t	f	France		Supply Train	4		3	3	2
 91	16	t	f	France			2		3	3	3
-46	14	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
-47	14	t	f	France		Soult	2		3	3	3
-48	14	t	f	France		Lannes	2		2	1	3
-49	14	t	f	France		Ney	2		2	3	2
-50	14	t	f	France		Murat	2		3	2	3
-51	14	f	t	Prussia		Hohenlohe	1		4	3	2
-52	14	f	t	Prussia		Ferdinand	3		4	4	4
-53	14	f	t	Prussia		Duke of Brunswick	2		4	3	4
-54	14	f	t	Prussia		Kalkreuth	3		3	4	1
-55	14	t	f	France		Davout	2		1	3	2
-56	14	t	f	France		Napoleon	2		1	1	1
-57	14	t	f	France		General Bernadotte	2		3	3	2
-58	14	t	f	France		Augereau	2		2	2	2
-59	14	t	f	France		Supply Train	4		3	3	2
-60	14	t	f	France			2		3	3	3
 12	1	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4
 10	1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2
 92	1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3
 13	1	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1
 93	1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3
+95	17	t	f	France	Aile gauche Lasalle	Lasalle	2		2	2	3
+96	17	t	f	France	Réserve de cavalerie	Murat	2		2	2	3
+97	17	t	f	France	IVe Corps	Soult	2		2	3	3
+98	17	t	f	France	VIIe Corps	Augereau	2		2	3	3
+99	17	t	f	France	III° Corps	Davout	2		2	3	3
+100	17	t	f	France	VIe Corps	Ney	2		2	3	3
+94	17	t	f	France	Garde Impériale	Bessières	2		2	3	2
 \.
 
 
@@ -72,7 +63,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 93, true);
+SELECT pg_catalog.setval('force_id_seq', 100, true);
 
 
 --

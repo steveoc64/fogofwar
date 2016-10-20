@@ -15,15 +15,11 @@ SET search_path = public, pg_catalog;
 -- Data for Name: game_objective; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_objective (id, game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_owner) FROM stdin;
+COPY game_objective (game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_owner) FROM stdin;
+4	Hassenhausen	10	2	2	23	17	0
+4	Poppel	3	6	0	14	14	0
+4	Rehausen	9	9	1	24	18	0
 \.
-
-
---
--- Name: game_objective_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
---
-
-SELECT pg_catalog.setval('game_objective_id_seq', 1, false);
 
 
 --

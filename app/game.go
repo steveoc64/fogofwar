@@ -390,8 +390,6 @@ func gameEditPlayers(context *router.Context) {
 }
 
 func gameChecklist(context *router.Context) {
-	print("TODO - gameChecklist")
-
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())

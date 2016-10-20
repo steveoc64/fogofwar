@@ -90,6 +90,7 @@ type Game struct {
 	HostName        string     `db:"host_name"`
 	HostEmail       string     `db:"host_email"`
 	Created         *time.Time `db:"created"`
+	StartDate       *time.Time `db:"start_date"`
 	Expires         *time.Time `db:"expires"`
 	Turn            int        `db:"turn"`
 	TurnLimit       int        `db:"turn_limit"`

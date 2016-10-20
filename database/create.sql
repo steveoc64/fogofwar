@@ -330,6 +330,7 @@ create unlogged table game (
 	scenario_id int not null,
 	hosted_by int not null default 0,
 	created timestamptz not null default localtimestamp,
+	start_date timestamptz not null default localtimestamp,
 	expires timestamptz not null default localtimestamp,
 	turn int not null default 1,
 	turn_limit int not null default 12,

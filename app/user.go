@@ -265,7 +265,7 @@ func userEdit(context *router.Context) {
 		gList.Column("Year", "Year")
 		gList.Column("Description", "Descr")
 		gList.DateColumn("Created", "Created")
-		gList.DateColumn("Expires", "Expires")
+		gList.DateColumn("Starts", "StartDate")
 		gList.RowEvent(func(key string) {
 			Session.Navigate("/game/" + key)
 		})

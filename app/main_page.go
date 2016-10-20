@@ -46,8 +46,11 @@ func mainPage(context *router.Context) {
 		form.Column(pTitle, "GetPlayers")
 		form.Column("Turn", "Turn")
 		form.Column("Turn Limit", "TurnLimit")
-		form.DateColumn("Created", "Created")
-		form.DateColumn("Expires", "Expires")
+		if Session.Rank > 9 {
+			form.DateColumn("Created", "Created")
+		}
+		form.DateColumn("Start Date", "Start Date")
+		form.DateColumn("Game Ends", "Expires")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -81,7 +84,8 @@ func mainPage(context *router.Context) {
 		formInvite.Column("Players", "GetPlayers")
 		formInvite.Column("Turn", "Turn")
 		formInvite.Column("Turn Limit", "TurnLimit")
-		formInvite.DateColumn("Expires", "Expires")
+		formInvite.DateColumn("Start Date", "StartDate")
+		formInvite.DateColumn("End Date", "Expires")
 
 		formulate.AppendDiv("game-invites").Class().SetString("wide-container")
 		formInvite.Render("game-invites-list", "#game-invites", &invites)

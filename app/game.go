@@ -89,8 +89,8 @@ func gameEditOverview(context *router.Context) {
 		form.New("fa-bookmark", "Edit Game Details - "+game.Name)
 
 		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
+			AddDate(1, "Start Date", "StartDate").
+			AddDate(1, "Game Ends", "Expires").
 			AddNumber(1, "Year", "Year", "1").
 			AddNumber(1, "Turn", "Turn", "1").
 			AddNumber(1, "Turn Limit", "TurnLimit", "1")
@@ -160,8 +160,8 @@ func gameEditRed(context *router.Context) {
 		form.New("fa-bookmark", "Red Team Details - "+game.Name)
 
 		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
+			AddDate(1, "Start Date", "StartDate").
+			AddDate(1, "Game Ends", "Expires").
 			AddNumber(1, "Year", "Year", "1").
 			AddNumber(1, "Turn", "Turn", "1").
 			AddNumber(1, "Turn Limit", "TurnLimit", "1")
@@ -260,8 +260,8 @@ func gameEditBlue(context *router.Context) {
 		form.New("fa-bookmark", "Blue Team Details - "+game.Name)
 
 		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
+			AddDate(1, "Start Date", "StartDate").
+			AddDate(1, "End Date", "End Date").
 			AddNumber(1, "Year", "Year", "1").
 			AddNumber(1, "Turn", "Turn", "1").
 			AddNumber(1, "Turn Limit", "TurnLimit", "1")
@@ -355,8 +355,8 @@ func gameEditPlayers(context *router.Context) {
 		form.New("fa-user", "Allocate Players For Game - "+game.Name)
 
 		form.Row(5).
-			AddDate(1, "Created", "Created").
-			AddDate(1, "Expires", "Expires").
+			AddDate(1, "Start Date", "StartDate").
+			AddDate(1, "Game Ends", "Expires").
 			AddNumber(1, "Year", "Year", "1").
 			AddNumber(1, "Turn", "Turn", "1").
 			AddNumber(1, "Turn Limit", "TurnLimit", "1")

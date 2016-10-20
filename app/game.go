@@ -278,6 +278,9 @@ func gameEditBlue(context *router.Context) {
 		form.Row(1).
 			AddDisplay(1, "# Blue Players", "NumBluePlayers")
 
+		form.Row(1).
+			AddCustom(1, "Commands", "Commands", "")
+
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()

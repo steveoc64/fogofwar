@@ -361,8 +361,8 @@ type GameCmd struct {
 	Inspiration   int    `db:"inspiration"`
 	Condition     int    `db:"condition"`
 	PlayerID      *int   `db:"player_id"`
-	Disabled      bool   `db:"disabled"`
 	Units         []Unit `db:"units"`
+	VP            int    `db:"vp"`
 	Bayonets      *int   `db:"bayonets"` // derived data
 	Sabres        *int   `db:"sabres"`   // derived data
 	Guns          *int   `db:"guns"`     // derived data

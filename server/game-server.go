@@ -145,9 +145,11 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	tx, _ := DB.Begin()
 	defer tx.AutoRollback()
 
+	checkObjectives := (len(data.Game.Objectives) > 0)
+
 	// Update the game header with the table geometry
-	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5 where id=$1`,
-		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize, true).
+	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5,check_objectives=$6 where id=$1`,
+		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize, true, checkObjectives).
 		Exec()
 
 	if err == nil {

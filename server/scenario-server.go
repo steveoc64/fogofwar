@@ -1042,15 +1042,15 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 				// Now copy all the force units across
 
 				_, err = DB.SQL(`insert into unit 
-					(cmd_id,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+					(game_id,cmd_id,path,name,descr,commander_name,nation,utype,cmd_level,drill,
 						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 						guns,gunnery_type,gun_condition,horse_guns)
 					select
-					$2,path,name,descr,commander_name,nation,utype,cmd_level,drill,
+					$3,$2,path,name,descr,commander_name,nation,utype,cmd_level,drill,
 						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 						guns,gunnery_type,gun_condition,horse_guns
 					from force_unit 
-					where force_id=$1`, oldForce.ID, newCmdID).Exec()
+					where force_id=$1`, oldForce.ID, newCmdID, data.ID).Exec()
 
 				if err != nil {
 					println(err.Error())

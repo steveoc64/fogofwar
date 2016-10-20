@@ -435,11 +435,15 @@ func gameChecklist(context *router.Context) {
 			evt.PreventDefault()
 			go func() {
 				done := false
-				RPC("GameRPC.Delete", shared.GameRPCData{
+				err := RPC("GameRPC.Delete", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 				}, &done)
-				Session.Navigate("/games")
+				if err != nil {
+					dom.GetWindow().Alert(err.Error())
+				} else {
+					Session.Navigate("/games")
+				}
 			}()
 		})
 

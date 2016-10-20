@@ -152,3 +152,40 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	}
 	return err
 }
+
+func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	// check that we own the game first
+	oldGame := shared.Game{}
+	DB.SQL(`select * from game where id=$1`, data.ID).QueryStruct(&oldGame)
+	if conn.Rank < 9 && oldGame.HostedBy != conn.UserID {
+		return errors.New("You are not the owner of this game - cannot delete")
+	}
+
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	_, err := DB.SQL(`delete from game where id=$1`, data.ID).Exec()
+	if err == nil {
+		DB.SQL(`delete from tiles where game_id=$1`, data.ID).Exec()
+		DB.SQL(`delete from game_players where game_id=$1`, data.ID).Exec()
+		DB.SQL(`delete from game_cmd where game_id=$1`, data.ID).Exec()
+		DB.SQL(`delete from game_cmd_order where game_id=$1`, data.ID).Exec()
+		DB.SQL(`delete from unit where game_id=$1`, data.ID).Exec()
+	}
+
+	logger(start, "Game.Delete", conn,
+		fmt.Sprintf("%d", data.ID),
+		fmt.Sprintf("%d Records", len(*retval)))
+
+	if err == nil {
+		*done = true
+		tx.Commit()
+	}
+
+	return err
+}

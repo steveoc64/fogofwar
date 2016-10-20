@@ -21,7 +21,7 @@ create table users (
 	disqus bool not null default true,
 	newsletter bool not null default true
 );
-\i users.sql
+\i data/users.sql
 
 drop table if exists login;
 create unlogged table login (
@@ -59,7 +59,7 @@ create table stdimg (
 	preview text not null default '',
 	thumb	text not null default ''
 );
-\i stdimg.sql
+\i data/stdimg.sql
 
 create extension ltree;
 -- create extension postgis;
@@ -77,7 +77,7 @@ create table cmd_level (
 	id serial not null primary key,
 	name text not null default ''
 );
-\i cmd_level.sql 
+\i data/cmd_level.sql 
 
 drop table if exists cmd_rating;
 create table cmd_rating (
@@ -85,7 +85,7 @@ create table cmd_rating (
 	name text not null default '',
 	effect int not null default 0
 );
-\i cmd_rating.sql
+\i data/cmd_rating.sql
 
 drop table if exists inspiration;
 create table inspiration (
@@ -93,7 +93,7 @@ create table inspiration (
 	name text not null default '',
 	effect int not null default 0
 );
-\i inspiration.sql
+\i data/inspiration.sql
 
 drop table if exists condition;
 create table condition (
@@ -101,7 +101,19 @@ create table condition (
 	name text not null default '',
 	effect int not null default 0
 );
-\i condition.sql
+\i data/condition.sql
+
+drop table if exists gt_formation;
+create table gt_formation (
+	id serial not null primary key,
+	name text,
+	speed int,
+	cav_defence bool,
+	march bool,
+	static bool
+);
+\i data/gt_formation.sql
+
 
 -- unit type
 -- 1 Command
@@ -114,7 +126,7 @@ create table utype (
 	id serial not null primary key,
 	name text not null default ''
 );
-\i utype.sql
+\i data/utype.sql
 
 -- ratings
 -- 1 Guard
@@ -142,7 +154,7 @@ create table rating (
 	melee_bonus int not null default 0,
 	ammo int not null default 10
 );
-\i rating.sql
+\i data/rating.sql
 
 -- Drill
 -- 1 Old School Linear
@@ -169,7 +181,7 @@ create table drill (
 	control int not null default 1,
 	speed int not null default 1
 );
-\i drill.sql
+\i data/drill.sql
 
 drop table if exists small_arms;
 create table small_arms (
@@ -179,7 +191,7 @@ create table small_arms (
 	effects int[4][6],
 	covered int[4][6]
 );
-\i small_arms.sql
+\i data/small_arms.sql
 
 drop table if exists gunnery;
 create table gunnery (
@@ -192,7 +204,7 @@ create table gunnery (
 	bad_effect int[4][6],
 	hw bool
 );
-\i gunnery.sql
+\i data/gunnery.sql
 
 drop table if exists cav_type;
 create table cav_type (
@@ -205,35 +217,7 @@ create table cav_type (
 	cossack bool,
 	dubious bool
 );
-\i cav_type.sql
-
-drop table if exists force_unit;
-create table force_unit (
-	id serial not null primary key,
-	force_id int not null default 0,
-	path ltree,
-	name text not null default '',
-	commander_name text not null default '',
-	nation text not null default '',
-	utype int not null default 1,
-	cmd_level int not null default 1,
-	drill int not null default 1,
-	bayonets int not null default 0,
-	small_arms int not null default 0,
-	elite_arms int not null default 0,
-	lt_coy int not null default 0,
-	jg_coy int not null default 0,
-	rating int not null default 5,
-	sabres int not null default 0,
-	cav_type int not null default 0,
-	cav_rating int not null default 0,
-	guns int not null default 0,
-	horse_guns bool not null default false,
-	gunnery_type int not null default 0,
-	gun_condition int not null default 2
-);
-\i force_unit.sql
-create index force_unit_force_idx on force_unit (force_id);
+\i data/cav_type.sql
 
 drop table if exists cmd_action;
 create table cmd_action (
@@ -252,7 +236,7 @@ create table cmd_action (
 	repulsed bool,
 	defeated bool
 );
-\i cmd_action.sql;
+\i data/cmd_action.sql;
 
 drop table if exists orders;
 create table orders (
@@ -263,7 +247,7 @@ create table orders (
 	enemy_unit bool,
 	friendly_unit bool
 );
-\i orders.sql
+\i data/orders.sql
 
 drop table if exists scenario;
 create table scenario (
@@ -381,6 +365,7 @@ create unlogged table tiles (
 	content int,
 	owner   int
 );
+\i data/tiles.sql
 create index tiles_game_idx on tiles (game_id,i);
 
 drop table if exists game_condition;
@@ -427,6 +412,7 @@ create unlogged table game_cmd_order (
 	enemy int not null default 0,
 	friend int not null default 0
 );
+\i data/game_cmd_order.sql
 drop index if exists game_cmd_order_game_idx;
 drop index if exists game_cmd_order_cmd_idx;
 create index game_cmd_order_game_idx on game_cmd_order (game_id);
@@ -434,22 +420,12 @@ create index game_cmd_order_cmd_idx on game_cmd_order (cmd_id);
 
 drop table if exists game_cmd_player;
 
-drop table if exists gt_formation;
-create table gt_formation (
-	id serial not null primary key,
-	name text,
-	speed int,
-	cav_defence bool,
-	march bool,
-	static bool
-);
-\i data/gt_formation.sql
-
 drop table if exists game_unit;
 drop table if exists unit;
 create unlogged table unit (
 	id serial not null primary key,
 	cmd_id int not null,
+	game_id int not null,
 	path ltree,
 	name text not null default '',
 	descr text not null default '',
@@ -501,6 +477,7 @@ create unlogged table unit (
 );
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);
+create index unit_game_idx on unit (game_id);
 
 create table migration (
 	id serial not null primary key,

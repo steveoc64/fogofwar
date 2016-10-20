@@ -83,6 +83,7 @@ func gameEditTable(context *router.Context) {
 		bbar.SetInnerHTML("")
 		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.`)
 		editMode := ""
+		modeSet := ""
 
 		// Redraw the mode buttons
 		drawActionBtns := func() {
@@ -90,7 +91,6 @@ func gameEditTable(context *router.Context) {
 			btns := abar.QuerySelectorAll(".button")
 			for _, v := range btns {
 				f := v.(*dom.HTMLInputElement).Value
-				// print("consider the case of ", f, v)
 
 				if f == editMode {
 					v.Class().Remove("button-outline")
@@ -116,6 +116,13 @@ func gameEditTable(context *router.Context) {
 			abar.AppendChild(btn)
 		}
 
+		// Add an edit field to the abar
+		editField := func(name string) {
+			el := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
+			el.SetAttribute("name", name)
+			abar.AppendChild(el)
+		}
+
 		// Add a button to the buttonbar, with event handlers
 		modeButton := func(name string) {
 			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
@@ -124,7 +131,8 @@ func gameEditTable(context *router.Context) {
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				abar.SetInnerHTML("")
-				switch evt.Target().(*dom.HTMLInputElement).Value {
+				modeSet = evt.Target().(*dom.HTMLInputElement).Value
+				switch modeSet {
 				case "Terrain":
 					actionBtn("Clear")
 					actionBtn("Rough")
@@ -140,6 +148,7 @@ func gameEditTable(context *router.Context) {
 					actionBtn("Both Sides")
 					actionBtn("Red Objective")
 					actionBtn("Blue Objective")
+					editField("ObjectiveName")
 				case "Zones":
 					actionBtn("Neutral")
 					actionBtn("Red")
@@ -315,13 +324,21 @@ func gameEditTable(context *router.Context) {
 				theTile := game.GetTile(i)
 				// print("Clicked on tile", *theTile, i)
 				tClass := t.Class()
-				tClass.Remove(theTile.GetCSS())
-				theTile.ApplyMode(editMode)
-				tClass.Add(theTile.GetCSS())
-				b := form.Get("save-button")
-				c := b.Class()
-				c.Remove("button-clear")
-				c.Add("button-primary")
+
+				switch modeSet {
+				case "Terrain":
+					tClass.Remove(theTile.GetCSS())
+					theTile.ApplyMode(editMode)
+					tClass.Add(theTile.GetCSS())
+					b := form.Get("save-button")
+					c := b.Class()
+					c.Remove("button-clear")
+					c.Add("button-primary")
+				case "Objective":
+					print("click on tile in objective mode")
+				case "Zones":
+					print("click on tile in zone mode")
+				}
 			}
 
 		})

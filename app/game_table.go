@@ -10,6 +10,14 @@ import (
 	"honnef.co/go/js/dom"
 )
 
+var AllowedGridSizes = []shared.GridSize{
+	{0, `No Grid : Use A Custom Ground Scale (2 Bn in line per Qtr Mile)`},
+	{4, `4" Grid : Micro scale : 1"=100m : 1" Base = ½Bn, or 60mm frontage = Full Bn`},
+	{6, `6" Grid : 15mm scale  : 1"=75m : 40mm frontage Base = ½Bn`},
+	{8, `8" Grid : 28mm scale :  1"=50m : 60mm frontage Base = ½Bn`},
+	{12, `1' Grid : Le Grande Scale : 1"=33m : 40mm frontage Base = Company`},
+}
+
 func gameEditTable(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
@@ -33,6 +41,8 @@ func gameEditTable(context *router.Context) {
 			print("No tiles - create a new set")
 			game.InitTiles()
 			print("but after inittiles its", game)
+			// } else {
+			// game.XYTiles()
 		}
 
 		form := formulate.EditForm{}
@@ -75,6 +85,8 @@ func gameEditTable(context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
 		loadTemplate("game-table-svg", "[name=Map]", &game)
+		form.Get("TableX").SetAttribute("max", "16")
+		form.Get("TableY").SetAttribute("max", "8")
 
 		w := dom.GetWindow()
 		doc := w.Document()
@@ -117,10 +129,15 @@ func gameEditTable(context *router.Context) {
 		}
 
 		// Add an edit field to the abar
-		editField := func(name string) {
+		editField := func(span int, div *dom.HTMLDivElement, title, name, theType string) {
+			col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+			col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
 			el := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
 			el.SetAttribute("name", name)
-			abar.AppendChild(el)
+			el.Placeholder = title
+			el.Type = theType
+			col.AppendChild(el)
+			div.AppendChild(col)
 		}
 
 		// Add a button to the buttonbar, with event handlers
@@ -131,6 +148,7 @@ func gameEditTable(context *router.Context) {
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				abar.SetInnerHTML("")
+				oldModeSet := modeSet
 				modeSet = evt.Target().(*dom.HTMLInputElement).Value
 				switch modeSet {
 				case "Terrain":
@@ -145,10 +163,20 @@ func gameEditTable(context *router.Context) {
 					actionBtn("Higher")
 					actionBtn("Lower")
 				case "Objective":
-					actionBtn("Both Sides")
-					actionBtn("Red Objective")
-					actionBtn("Blue Objective")
-					editField("ObjectiveName")
+					// Create a set of fields for the objective details
+					if oldModeSet != modeSet {
+						abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
+						dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+						dd.Class().Add("row")
+						dd.Class().Add("hidden")
+						dd.SetID("objective-fields")
+						dd.SetAttribute("data-row-span", "8")
+						editField(5, dd, "Name", "obj-name", "text")
+						editField(1, dd, "VP Per Turn", "obj-vpperturn", "number")
+						editField(1, dd, "Red VP", "obj-redvp", "number")
+						editField(1, dd, "Blue VP", "obj-bluevp", "number")
+						abar.AppendChild(dd)
+					}
 				case "Zones":
 					actionBtn("Neutral")
 					actionBtn("Red")
@@ -224,20 +252,35 @@ func gameEditTable(context *router.Context) {
 			if game.GridSize > 0 {
 				newHTML := ""
 				i := 0
-				for y := 0; y < game.GridY; y++ {
-					for x := 0; x < game.GridX; x++ {
-						t := game.Tiles[i]
-						if t == nil {
-							print("aww snap - t is nil !!")
-							break
-						} else {
-							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
-								x*game.GridSize, y*game.GridSize, // x and y in inches
-								game.GridSize, game.GridSize, // width and height in inches
-								t.GetCSS(),    // self-computed CSS content type
-								x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+				print("tiles is", game.Tiles)
+				if len(game.Tiles) > 0 {
+
+					for y := 0; y < game.GridY; y++ {
+						for x := 0; x < game.GridX; x++ {
+							t := game.Tiles[i]
+							if t == nil {
+								print("aww snap - t is nil !!")
+								break
+							} else {
+								newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
+									x*game.GridSize, y*game.GridSize, // x and y in inches
+									game.GridSize, game.GridSize, // width and height in inches
+									t.GetCSS(),    // self-computed CSS content type
+									x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+							}
+							i++
 						}
-						i++
+					}
+				}
+				// add objective tiles on top !!
+				if modeSet == "Objective" {
+					for i, v := range game.Objectives {
+						print("adding obj", v)
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
+							v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							v.GetCSS(), // self-computed CSS content type
+							v.X, v.Y, i)
 					}
 				}
 				// print("setting newHTML", newHTML)
@@ -252,6 +295,13 @@ func gameEditTable(context *router.Context) {
 			}
 			if game.TableY < 1 {
 				game.TableY = 1
+			}
+
+			if game.TableX > 16 {
+				game.TableX = 16
+			}
+			if game.TableY > 6 {
+				game.TableY = 6
 			}
 
 			game.CalcKm()
@@ -322,25 +372,42 @@ func gameEditTable(context *router.Context) {
 			if t.TagName() == "rect" {
 				i, _ := strconv.Atoi(t.GetAttribute("data-index"))
 				theTile := game.GetTile(i)
-				// print("Clicked on tile", *theTile, i)
+				print("Clicked on tile", *theTile, i)
 				tClass := t.Class()
+				changed := false
 
 				switch modeSet {
 				case "Terrain":
 					tClass.Remove(theTile.GetCSS())
-					theTile.ApplyMode(editMode)
+					theTile.ApplyTerrain(editMode)
 					tClass.Add(theTile.GetCSS())
+					changed = true
+				case "Objective":
+					print("click on tile in objective mode")
+					doc.QuerySelector("#objective-fields").Class().Remove("hidden")
+					print("the tile is", theTile)
+					theObj := game.AddObjective(theTile.X, theTile.Y)
+					print("got", theObj)
+					form.Focus("obj-name")
+					changed = true
+					drawTiles()
+				case "Zones":
+					print("click on tile in zone mode")
+				}
+				if changed {
 					b := form.Get("save-button")
 					c := b.Class()
 					c.Remove("button-clear")
 					c.Add("button-primary")
-				case "Objective":
-					print("click on tile in objective mode")
-				case "Zones":
-					print("click on tile in zone mode")
 				}
 			}
+		})
 
+		bbar.AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			if evt.Target().TagName() == "INPUT" {
+				drawTiles()
+			}
 		})
 
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))

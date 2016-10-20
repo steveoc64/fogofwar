@@ -2,6 +2,13 @@ drop table if exists campaign;
 drop table if exists scenario_cmd;
 drop table if exists cmd;
 
+create table migration (
+	id serial not null primary key,
+	name text,
+	date timestamptz not null default localtimestamp
+);
+
+
 drop table if exists users;
 create table users (
 	id serial not null primary key,
@@ -249,6 +256,16 @@ create table orders (
 );
 \i data/orders.sql
 
+
+
+
+
+
+
+
+
+-- Scenario Level Data
+
 drop table if exists scenario;
 create table scenario (
 	id serial not null primary key,
@@ -324,8 +341,23 @@ create table force_unit (
 drop index if exists force_unit_force_idx;
 create index force_unit_force_idx on force_unit (force_id);
 
+
+
+
+
+
+
+
+
+
+
+
+-- Game Level Data 
+-- All data from here on is mostly temporary, and those 
+-- files which take lots of small updates are set to unlogged for speed
+
 drop table if exists game;
-create unlogged table game (
+create table game (
 	id serial not null primary key,
 	scenario_id int not null,
 	hosted_by int not null default 0,
@@ -354,8 +386,22 @@ create unlogged table game (
 );
 \i data/game.sql
 create index game_scenario_idx on game (scenario_id);
+
 drop table if exists game_objective;
--- TODO create table
+create table game_objective (
+	id serial not null primary key,
+	game_id int not null,
+	name text not null default '',
+	X int not null default 0,
+	Y int not null default 0,
+	vp_per_turn int not null default 1,
+	red_vp int not null default 20,
+	blue_vp int not null default 20,
+	current_owner int not null default 0
+);
+\i data/game_objective.sql
+create index obj_game_idx on game_objective (game_id);
+
 
 drop table if exists tiles;
 create unlogged table tiles (
@@ -372,7 +418,7 @@ drop table if exists game_condition;
 -- TODO create table
 
 drop table if exists game_players;
-create unlogged table game_players (
+create table game_players (
 	game_id int not null,
 	player_id int not null,
 	red_team bool,
@@ -383,7 +429,7 @@ create unique index game_player_game_idx on game_players (game_id, player_id);
 create unique index game_player_player_idx on game_players (player_id,game_id);
 
 drop table if exists game_cmd;
-create unlogged table game_cmd (
+create  table game_cmd (
 	id serial not null primary key,
 	game_id int not null default 0,
 	red_team bool,
@@ -397,13 +443,13 @@ create unlogged table game_cmd (
 	inspiration int not null default 0,
 	condition int not null default 2,
 	player_id int,
-	disabled bool default false
+	vp int not null default 0
 );
 \i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);
 
 drop table if exists game_cmd_order;
-create unlogged table game_cmd_order (
+create  table game_cmd_order (
 	game_id int not null,
 	cmd_id int not null,
 	turns int not null default 2,  -- Once hits 0, stick. If counts down to 0, replaces existing
@@ -478,13 +524,6 @@ create unlogged table unit (
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);
 create index unit_game_idx on unit (game_id);
-
-create table migration (
-	id serial not null primary key,
-	name text,
-	date timestamptz not null default localtimestamp
-);
-
 
 
 

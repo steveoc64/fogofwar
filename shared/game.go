@@ -31,7 +31,7 @@ func (t *Tile) GetCSS() string {
 	return fmt.Sprintf("tile-content-%d-%d", t.Height, t.Content)
 }
 
-func (t *Tile) ApplyMode(mode string) {
+func (t *Tile) ApplyTerrain(mode string) {
 	// print("ApplyMode", mode, "to tile", t)
 	switch mode {
 	case "Clear":
@@ -83,46 +83,51 @@ func (t *Tile) ApplyMode(mode string) {
 	}
 }
 
+func (t *Tile) ApplyObjective(mode string) {
+	print("creating tile objective")
+}
+
 type Game struct {
-	ID              int        `db:"id"`
-	ScenarioID      int        `db:"scenario_id"`
-	HostedBy        int        `db:"hosted_by"`
-	HostName        string     `db:"host_name"`
-	HostEmail       string     `db:"host_email"`
-	Created         *time.Time `db:"created"`
-	StartDate       *time.Time `db:"start_date"`
-	Expires         *time.Time `db:"expires"`
-	Turn            int        `db:"turn"`
-	TurnLimit       int        `db:"turn_limit"`
-	Name            string     `db:"name"`
-	Descr           string     `db:"descr"`
-	Notes           string     `db:"notes"`
-	Year            int        `db:"year"`
-	LatLon          *[]int     `db:"latlon"`
-	RedTeam         string     `db:"red_team"`
-	RedBrief        string     `db:"red_brief"`
-	BlueTeam        string     `db:"blue_team"`
-	BlueBrief       string     `db:"blue_brief"`
-	NumRedPlayers   int        `db:"num_red_players"`
-	NumBluePlayers  int        `db:"num_blue_players"`
-	RedCmd          []*GameCmd `db:"red_cmd"`
-	BlueCmd         []*GameCmd `db:"blue_cmd"`
-	TableX          int        `db:"table_x"`
-	TableY          int        `db:"table_y"`
-	KmX             int        `db:"km_x"`
-	KmY             int        `db:"km_y"`
-	GridSize        int        `db:"grid_size"`
-	GridX           int        `db:"grid_x"`
-	GridY           int        `db:"grid_y"`
-	Tiles           []*Tile    `db:"tiles"`
-	TileX           int        `db:"tile_x"`
-	TileY           int        `db:"tile_y"`
-	InMode          string     `db:"in_mode"`
-	CheckTable      bool       `db:"check_table"`
-	CheckObjectives bool       `db:"check_objectives"`
-	CheckZones      bool       `db:"check_zones"`
-	CheckForces     bool       `db:"check_forces"`
-	CheckPlayers    bool       `db:"check_players"`
+	ID              int              `db:"id"`
+	ScenarioID      int              `db:"scenario_id"`
+	HostedBy        int              `db:"hosted_by"`
+	HostName        string           `db:"host_name"`
+	HostEmail       string           `db:"host_email"`
+	Created         *time.Time       `db:"created"`
+	StartDate       *time.Time       `db:"start_date"`
+	Expires         *time.Time       `db:"expires"`
+	Turn            int              `db:"turn"`
+	TurnLimit       int              `db:"turn_limit"`
+	Name            string           `db:"name"`
+	Descr           string           `db:"descr"`
+	Notes           string           `db:"notes"`
+	Year            int              `db:"year"`
+	LatLon          *[]int           `db:"latlon"`
+	RedTeam         string           `db:"red_team"`
+	RedBrief        string           `db:"red_brief"`
+	BlueTeam        string           `db:"blue_team"`
+	BlueBrief       string           `db:"blue_brief"`
+	NumRedPlayers   int              `db:"num_red_players"`
+	NumBluePlayers  int              `db:"num_blue_players"`
+	RedCmd          []*GameCmd       `db:"red_cmd"`
+	BlueCmd         []*GameCmd       `db:"blue_cmd"`
+	Objectives      []*GameObjective `db:"objectives"`
+	TableX          int              `db:"table_x"`
+	TableY          int              `db:"table_y"`
+	KmX             int              `db:"km_x"`
+	KmY             int              `db:"km_y"`
+	GridSize        int              `db:"grid_size"`
+	GridX           int              `db:"grid_x"`
+	GridY           int              `db:"grid_y"`
+	Tiles           []*Tile          `db:"tiles"`
+	TileX           int              `db:"tile_x"`
+	TileY           int              `db:"tile_y"`
+	InMode          string           `db:"in_mode"`
+	CheckTable      bool             `db:"check_table"`
+	CheckObjectives bool             `db:"check_objectives"`
+	CheckZones      bool             `db:"check_zones"`
+	CheckForces     bool             `db:"check_forces"`
+	CheckPlayers    bool             `db:"check_players"`
 }
 
 type GameRPCData struct {
@@ -131,6 +136,29 @@ type GameRPCData struct {
 	Red     bool
 	Blue    bool
 	Game    *Game
+}
+
+func (g *Game) AddObjective(x, y int) *GameObjective {
+
+	// Firstly, see if its already there
+	for _, v := range g.Objectives {
+		if v.X == x && v.Y == y {
+			print("got existing at that location")
+			return v
+		}
+	}
+
+	// Need to create a new one
+	newObj := &GameObjective{
+		X:         x,
+		Y:         y,
+		RedVP:     20,
+		BlueVP:    20,
+		VPPerTurn: 1,
+	}
+	g.Objectives = append(g.Objectives, newObj)
+	print("added new obj", g.Objectives)
+	return newObj
 }
 
 func (g *Game) GoodToGo() bool {
@@ -180,6 +208,23 @@ func (g *Game) InitTiles() {
 	// print("done all that, and tiles is now", g.Tiles)
 }
 
+// Utility func for getting the tile X and Y coords in sync with the grid size
+func (g *Game) XYTiles() {
+	g.CalcGrid()
+	print("XY stamping all the tiles")
+
+	// and then stamp the coords on the actual tile objects
+	i := 0
+	for y := 0; y < g.GridY; y++ {
+		for x := 0; x < g.GridX; x++ {
+			g.Tiles[i].X = x
+			g.Tiles[i].Y = y
+			i++
+		}
+	}
+	// print("done all that, and tiles is now", g.Tiles)
+}
+
 func (g *Game) GetTile(i int) *Tile {
 	// print("GetTile", i)
 	if i < 0 {
@@ -191,6 +236,14 @@ func (g *Game) GetTile(i int) *Tile {
 		return nil
 	}
 	// print("I can see", g.Tiles[i])
+	if g.TileX > 0 {
+		row := i / g.TileX
+		print("that looks to be on row", row)
+		g.Tiles[i].Y = row
+		col := i - (row * g.TileX)
+		print("col looks like", col)
+		g.Tiles[i].X = col
+	}
 	return g.Tiles[i]
 }
 
@@ -202,6 +255,13 @@ func (g *Game) GetTileXY(x, y int) *Tile {
 
 func (g *Game) ResizeTiles() {
 	g.CalcGrid()
+
+	if g.TableX > 16 {
+		g.TableX = 16
+	}
+	if g.TableY > 8 {
+		g.TableY = 8
+	}
 
 	newTiles := make([]*Tile, g.GridX*g.GridY)
 	i := 0
@@ -455,4 +515,20 @@ func (u *Unit) GetBases() string {
 		}
 	}
 	return "&nbsp;" + retval
+}
+
+type GameObjective struct {
+	ID           int    `db:"id"`
+	Name         string `db:"name"`
+	GameID       int    `db:"game_id"`
+	X            int    `db:"x"`
+	Y            int    `db:"y"`
+	VPPerTurn    int    `db:"vp_per_turn"`
+	RedVP        int    `db:"red_vp"`
+	BlueVP       int    `db:"blue_vp"`
+	CurrentOwner int    `db:"current_owner"`
+}
+
+func (g *GameObjective) GetCSS() string {
+	return "tile-objective"
 }

@@ -49,7 +49,7 @@ func mainPage(context *router.Context) {
 		if Session.Rank > 9 {
 			form.DateColumn("Created", "Created")
 		}
-		form.DateColumn("Start Date", "Start Date")
+		form.DateColumn("Start Date", "StartDate")
 		form.DateColumn("Game Ends", "Expires")
 
 		// Add event handlers

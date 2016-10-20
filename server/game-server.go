@@ -102,7 +102,13 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 			print("hmmm ... ", err2.Error())
 		}
 
-		//
+		// and fetch the objectives
+		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
+
+		// TODO - pull in the players on this game
+
+		// Dont need the orders for each corps at this level
+		// Dont need the units for each corps at this level
 
 	}
 
@@ -115,6 +121,10 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 
 func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	start := time.Now()
+
+	if len(data.Game.Tiles) > 240 {
+		return errors.New("Too many Tiles - try a smaller board, or increase the grid size.")
+	}
 
 	*done = false
 	conn := Connections.Get(data.Channel)
@@ -175,6 +185,7 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`delete from game_players where game_id=$1`, data.ID).Exec()
 		DB.SQL(`delete from game_cmd where game_id=$1`, data.ID).Exec()
 		DB.SQL(`delete from game_cmd_order where game_id=$1`, data.ID).Exec()
+		DB.SQL(`delete from game_objective where game_id=$1`, data.ID).Exec()
 		DB.SQL(`delete from unit where game_id=$1`, data.ID).Exec()
 	}
 

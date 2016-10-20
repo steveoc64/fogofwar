@@ -14,14 +14,6 @@ import (
 
 func Login(username string, passwd string) {
 
-	AllowedGridSizes := []shared.GridSize{
-		{0, `No Grid : Use A Custom Ground Scale (2 Bn in line per Qtr Mile)`},
-		{4, `4" Grid : Micro scale : 1"=100m : 1" Base = ½Bn, or 60mm frontage = Full Bn`},
-		{6, `6" Grid : 15mm scale  : 1"=75m : 40mm frontage Base = ½Bn`},
-		{8, `8" Grid : 28mm scale :  1"=50m : 60mm frontage Base = ½Bn`},
-		{12, `1' Grid : Le Grande Scale : 1"=33m : 40mm frontage Base = Company`},
-	}
-
 	Session.Username = ""
 	Session.Passwd = ""
 	Session.Rank = 0

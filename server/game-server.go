@@ -145,18 +145,38 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	tx, _ := DB.Begin()
 	defer tx.AutoRollback()
 
+	// Update the game header with the table geometry
 	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5 where id=$1`,
 		data.ID, data.Game.TableX, data.Game.TableY, data.Game.GridSize, true).
 		Exec()
+
 	if err == nil {
+		// Zap and re-write the tiles
 		_, err = DB.SQL(`delete from tiles where game_id=$1`, data.ID).Exec()
 		if err == nil {
 			for _, v := range data.Game.Tiles {
-				_, err := DB.SQL(`insert into tiles (game_id,i,height,content,owner)
+				_, err = DB.SQL(`insert into tiles (game_id,i,height,content,owner)
 				values ($1,$2,$3,$4,$5)`, data.ID, v.I, v.Height, v.Content, v.Owner).Exec()
 				if err != nil {
 					println(err.Error())
 					break
+				}
+			}
+
+			// Zap and re-write the objective markers
+			_, err := DB.SQL(`delete from game_objective where game_id=$1`, data.ID).Exec()
+			if err == nil {
+				for _, v := range data.Game.Objectives {
+					_, err = DB.SQL(`insert
+						into game_objective
+						(game_id,name,x,y,vp_per_turn,red_vp,blue_vp,current_owner)
+						values ($1,$2,$3,$4,$5,$6,$7,$8)`,
+						data.ID, v.Name, v.X, v.Y, v.VPPerTurn, v.RedVP, v.BlueVP, v.CurrentOwner).
+						Exec()
+					if err != nil {
+						println(err.Error())
+						break
+					}
 				}
 			}
 		}

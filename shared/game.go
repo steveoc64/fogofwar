@@ -138,12 +138,32 @@ type GameRPCData struct {
 	Game    *Game
 }
 
+func (g *Game) GetObjective(x, y int) *GameObjective {
+
+	// Firstly, see if its already there
+	for _, v := range g.Objectives {
+		if v.X == x && v.Y == y {
+			print("got existing objective at that location")
+			return v
+		}
+	}
+	return nil
+}
+
+func (g *Game) RemoveObjective(x, y int) {
+	for i, v := range g.Objectives {
+		if v.X == x && v.Y == y {
+			g.Objectives = append(g.Objectives[:i], g.Objectives[i+1:]...)
+		}
+	}
+}
+
 func (g *Game) AddObjective(x, y int) *GameObjective {
 
 	// Firstly, see if its already there
 	for _, v := range g.Objectives {
 		if v.X == x && v.Y == y {
-			print("got existing at that location")
+			print("got existing objective at that location")
 			return v
 		}
 	}
@@ -518,7 +538,6 @@ func (u *Unit) GetBases() string {
 }
 
 type GameObjective struct {
-	ID           int    `db:"id"`
 	Name         string `db:"name"`
 	GameID       int    `db:"game_id"`
 	X            int    `db:"x"`

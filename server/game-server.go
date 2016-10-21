@@ -96,14 +96,14 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 				for _, v := range retval.RedCmd {
 					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 						v.ID, data.ID).QueryStructs(&v.Units)
-					println("red", v.ID, data.ID, v.Units)
+					// println("red", v.ID, data.ID, v.Units)
 				}
 			}
 			if data.Blue {
 				for _, v := range retval.BlueCmd {
 					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 						v.ID, data.ID).QueryStructs(&v.Units)
-					println("blue", v.ID, data.ID, v.Units)
+					// println("blue", v.ID, data.ID, v.Units)
 				}
 			}
 		}

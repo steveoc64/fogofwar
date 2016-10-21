@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
 
 	"./shared"
@@ -30,7 +31,7 @@ func gameEditTeam(context *router.Context) {
 			Blue:     team == "Blue",
 			GetUnits: true,
 		}, &game)
-		print("game red", game)
+		// print("game red", game)
 
 		form := formulate.EditForm{}
 
@@ -87,10 +88,8 @@ func gameEditTeam(context *router.Context) {
 		viewUnits.Class().Add("hidden")
 
 		TheCmd := &shared.GameCmd{}
-		TheUnit := shared.Unit{}
 
 		drawUnitList := func() {
-			print("draw unit list, and theUnit is", TheUnit)
 			viewUnits.Class().Remove("hidden")
 			tbody := form.Get("UnitList").(*dom.HTMLTableSectionElement)
 			tbody.SetInnerHTML("")
@@ -99,12 +98,11 @@ func gameEditTeam(context *router.Context) {
 			totalSabres := 0
 			totalGuns := 0
 			totalCmdrs := 0
-			print("ranging over these units", TheCmd.Units)
 
-			for _, v := range TheCmd.Units {
-				totalBayonets += v.Bayonets
-				totalSabres += v.Sabres
-				totalGuns += v.Guns
+			for unitIndex, v := range TheCmd.Units {
+				totalBayonets += v.Bayonets - v.BayonetsLost
+				totalSabres += v.Sabres - v.SabresLost
+				totalGuns += v.Guns - v.GunsLost
 				if v.UType == 1 {
 					totalCmdrs += 1
 				}
@@ -112,37 +110,198 @@ func gameEditTeam(context *router.Context) {
 				row.SetClass("data-row")
 				row.SetAttribute("key", fmt.Sprintf("%d", v.ID))
 
-				// Add the Unit name colunm
-				cell := row.InsertCell(-1)
-				cell.SetClass("compressed")
-				if v.ID == TheUnit.ID {
-					cell.Class().Add("highlight")
-				}
+				// Add columns depending on type
 				if v.UType == 1 {
+					cell := row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.Class().Add("highlight")
 					cell.Class().Add("commander")
 					cell.SetInnerHTML(v.Name)
-				} else {
-					cell.SetInnerHTML("&nbsp;&nbsp;" + v.Name)
-				}
-				// cell.SetInnerHTML(v.Path)
 
-				// Add the Unit summary column
-				cell = row.InsertCell(-1)
-				cell.SetClass("compressed")
-				descr := ""
-				switch v.UType {
-				case 1:
-					descr = v.CommanderName
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.Class().Add("highlight")
 					cell.Class().Add("commander")
-				case 2, 3, 4, 5:
-					descr = v.GetBases()
-				}
-				cell.SetInnerHTML(descr)
+					cell.SetInnerHTML(v.CommanderName)
 
-				// Add the Unit details column
-				cell = row.InsertCell(-1)
-				cell.SetClass("compressed")
-				cell.SetInnerHTML(v.GetSitrep())
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.Class().Add("highlight")
+					cell.Class().Add("commander")
+					cell.SetInnerHTML(Session.Lookup.CmdRating[v.Rating-1].Name)
+
+					// Add the Unit Condition column
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.Class().Add("highlight")
+					cell.Class().Add("commander")
+					cell.SetInnerHTML(v.Nation)
+					cell.SetInnerHTML(fmt.Sprintf(`
+<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down"></i> %s 
+<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up"></i>`,
+						unitIndex, v.Nation, unitIndex))
+					cell.AddEventListener("click", false, func(evt dom.Event) {
+						t := evt.Target()
+						if t.TagName() == "I" {
+							x := 1
+							if t.GetAttribute("data-dir") == "up" {
+								x = -1
+							}
+							// Get the command associated with this ID
+							u, _ := strconv.Atoi(t.GetAttribute("data-unit"))
+							doIt := false
+							for i, v := range TheCmd.Units {
+								if i == u { // Got the Division, so next set are all childs of this
+									doIt = true
+									continue
+								}
+								if doIt && v.UType == 1 { // Into another Division now, so we are done
+									break
+								}
+								if doIt {
+									// This unit is a valid child of the selected Division
+									v.Condition += x
+									if v.Condition < 1 {
+										v.Condition = 1
+									}
+									if v.Condition > 5 {
+										v.Condition = 5
+									}
+									// now re-draw the condition field of the affected thing
+									theCell := doc.QuerySelector(fmt.Sprintf("[name=condition-%d]", v.ID))
+									theCell.SetInnerHTML(Session.Lookup.Condition[v.Condition-1].Name)
+								}
+							}
+						}
+					})
+
+					// Add the Unit details column
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.Class().Add("highlight")
+					cell.SetInnerHTML(fmt.Sprintf(`
+<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down"></i> Adjust 
+<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up"></i>`,
+						unitIndex, unitIndex))
+					cell.AddEventListener("click", false, func(evt dom.Event) {
+						t := evt.Target()
+						if t.TagName() == "I" {
+							x := 1
+							if t.GetAttribute("data-dir") == "up" {
+								x = -1
+							}
+							// Get the command associated with this ID
+							u, _ := strconv.Atoi(t.GetAttribute("data-unit"))
+							doIt := false
+							totalBayonets := 0
+							totalSabres := 0
+							totalGuns := 0
+							totalCmdrs := 0
+
+							for i, v := range TheCmd.Units {
+								if v.UType == 1 {
+									totalCmdrs += 1
+								}
+
+								if i == u { // Got the Division, so next set are all childs of this
+									doIt = true
+									continue
+								}
+								if doIt && v.UType == 1 { // Into another Division now, so we are done
+									break
+								}
+								theCell := doc.QuerySelector(fmt.Sprintf("[name=descr-%d]", v.ID))
+								r := 1
+								if doIt {
+									// This unit is a valid child of the selected Division
+									// Increment or decrement the losses in 1% increments
+									switch v.UType {
+									case 2:
+										r = x * (rand.Intn(6) + 1)
+										v.BayonetsLost += ((r * v.Bayonets) / 100)
+										if v.BayonetsLost < 0 {
+											v.BayonetsLost = 0
+										}
+										if v.BayonetsLost >= v.Bayonets-150 {
+											v.BayonetsLost = v.Bayonets - 150
+										}
+										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:\n%s", v.Bayonets-v.BayonetsLost, v.Descr))
+									case 3:
+										r = x * (rand.Intn(3) + 1)
+										v.SabresLost += ((r * v.Sabres) / 100)
+										if v.SabresLost < 0 {
+											v.SabresLost = 0
+										}
+										if v.SabresLost >= (v.Sabres - 50) {
+											v.SabresLost = v.Sabres - 50
+										}
+										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:\n%s", v.Sabres-v.SabresLost, v.Descr))
+									case 4:
+										v.GunsLost += x
+										if v.GunsLost < 0 {
+											v.GunsLost = 0
+										}
+										if v.GunsLost >= v.Guns {
+											v.GunsLost = v.Guns - 1
+										}
+										theCell.SetInnerHTML(fmt.Sprintf("%d Guns:\n%s", v.Guns-v.GunsLost, v.Descr))
+									}
+									theCell = doc.QuerySelector(fmt.Sprintf("[name=bases-%d]", v.ID))
+									theCell.SetInnerHTML(v.GetBases())
+								}
+								totalBayonets += v.Bayonets - v.BayonetsLost
+								totalSabres += v.Sabres - v.SabresLost
+								totalGuns += v.Guns - v.GunsLost
+							}
+
+							form.Get("Summary").
+								SetInnerHTML(fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
+									totalCmdrs,
+									totalBayonets,
+									totalSabres,
+									totalGuns))
+						} // on click - if I
+					}) // on click event handler
+
+				} else {
+					cell := row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.SetInnerHTML("&nbsp;&nbsp;" + v.Name)
+
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.SetAttribute("name", fmt.Sprintf("bases-%d", v.ID))
+					cell.SetInnerHTML(v.GetBases())
+
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					if v.UType == 4 {
+						cell.SetInnerHTML("Gun Crew")
+					} else {
+						cell.SetInnerHTML(Session.Lookup.UnitRating[v.Rating-1].Name)
+					}
+
+					// Add the Unit Condition column
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.SetAttribute("name", fmt.Sprintf("condition-%d", v.ID))
+					cell.SetInnerHTML(Session.Lookup.Condition[v.Condition-1].Name)
+
+					// Add the Unit details column
+					cell = row.InsertCell(-1)
+					cell.SetClass("compressed")
+					cell.SetAttribute("name", fmt.Sprintf("descr-%d", v.ID))
+					addMe := ""
+					switch v.UType {
+					case 2:
+						addMe = fmt.Sprintf("%d Bayonets:\n", v.Bayonets-v.BayonetsLost)
+					case 3:
+						addMe = fmt.Sprintf("%d Sabres:\n", v.Sabres-v.SabresLost)
+					case 4:
+						addMe = fmt.Sprintf("%d Guns:\n", v.Guns-v.GunsLost)
+					}
+					cell.SetInnerHTML(addMe + v.Descr)
+				}
 
 			}
 
@@ -169,6 +328,7 @@ func gameEditTeam(context *router.Context) {
 			btn.Class().SetString("button button-outline")
 			btn.Value = v.Name
 			btn.SetAttribute("data-cmd-id", fmt.Sprintf("%d", v.ID))
+			btn.SetAttribute("type", "button")
 			bbar.AppendChild(btn)
 
 			btn.AddEventListener("click", false, func(evt dom.Event) {
@@ -180,9 +340,7 @@ func gameEditTeam(context *router.Context) {
 				b.Class().SetString("button button-primary")
 				k, _ := strconv.Atoi(b.GetAttribute("data-cmd-id"))
 				if k > 0 {
-					print("clicked on red command ", k)
 					TheCmd = game.GetCmd(team, k)
-					print("cmd = ", TheCmd)
 					drawUnitList()
 				}
 			})

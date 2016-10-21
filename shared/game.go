@@ -460,8 +460,11 @@ func (u *Unit) GetSitrep() string {
 
 func (u *Unit) GetBases() string {
 	retval := ""
-	if u.Bayonets > 75 {
-		cnt := ((u.Bayonets + 350) / 450)
+	bb := u.Bayonets - u.BayonetsLost
+	ss := u.Sabres - u.SabresLost
+	gg := u.Guns - u.GunsLost
+	if bb > 75 {
+		cnt := ((bb + 350) / 450)
 		if cnt > 1 {
 			if cnt%2 > 0 {
 				retval += fmt.Sprintf(" %d½ Bn", cnt/2)
@@ -478,11 +481,11 @@ func (u *Unit) GetBases() string {
 		retval += fmt.Sprintf(" +%d LtCoy", x)
 	}
 
-	if u.Sabres > 0 {
+	if ss > 0 {
 		if retval != "" {
 			retval += "<br>\n"
 		}
-		cnt := (u.Sabres + 60) / 75 // total number of half sqns
+		cnt := (ss + 60) / 75 // total number of half sqns
 		if cnt > 1 {
 			if cnt%2 > 0 {
 				retval += fmt.Sprintf(" %d½ Sqn", cnt/2)
@@ -493,11 +496,11 @@ func (u *Unit) GetBases() string {
 			retval += " ½Sqn"
 		}
 	}
-	if u.Guns > 0 {
+	if gg > 0 {
 		if retval != "" {
 			retval += "<br>\n"
 		}
-		cnt := u.Guns // Actual Guns
+		cnt := gg // Actual Guns
 		gunType := ""
 		addGun := " gun"
 		horse := ""

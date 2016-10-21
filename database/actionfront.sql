@@ -338,7 +338,7 @@ CREATE TABLE drill (
     mob boolean,
     control integer DEFAULT 1 NOT NULL,
     speed integer DEFAULT 1 NOT NULL,
-    wline boolean DEFAULT true
+    lines boolean DEFAULT true
 );
 
 
@@ -501,7 +501,7 @@ ALTER TABLE public.game OWNER TO steve;
 -- Name: game_cmd; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
 --
 
-CREATE UNLOGGED TABLE game_cmd (
+CREATE TABLE game_cmd (
     id integer NOT NULL,
     game_id integer DEFAULT 0 NOT NULL,
     red_team boolean,
@@ -515,7 +515,7 @@ CREATE UNLOGGED TABLE game_cmd (
     inspiration integer DEFAULT 0 NOT NULL,
     condition integer DEFAULT 2 NOT NULL,
     player_id integer,
-    disabled boolean DEFAULT false
+    vp integer DEFAULT 0 NOT NULL
 );
 
 
@@ -585,7 +585,6 @@ ALTER SEQUENCE game_id_seq OWNED BY game.id;
 --
 
 CREATE TABLE game_objective (
-    id integer NOT NULL,
     game_id integer NOT NULL,
     name text DEFAULT ''::text NOT NULL,
     x integer DEFAULT 0 NOT NULL,
@@ -598,27 +597,6 @@ CREATE TABLE game_objective (
 
 
 ALTER TABLE public.game_objective OWNER TO steve;
-
---
--- Name: game_objective_id_seq; Type: SEQUENCE; Schema: public; Owner: steve
---
-
-CREATE SEQUENCE game_objective_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.game_objective_id_seq OWNER TO steve;
-
---
--- Name: game_objective_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: steve
---
-
-ALTER SEQUENCE game_objective_id_seq OWNED BY game_objective.id;
-
 
 --
 -- Name: game_players; Type: TABLE; Schema: public; Owner: steve; Tablespace: 
@@ -901,7 +879,7 @@ CREATE TABLE scenario (
     descr text DEFAULT ''::text NOT NULL,
     notes text DEFAULT ''::text NOT NULL,
     year integer DEFAULT 1800 NOT NULL,
-    public boolean DEFAULT true,
+    public boolean DEFAULT false,
     review boolean DEFAULT false,
     latlon point,
     red_team text DEFAULT ''::text NOT NULL,
@@ -1404,13 +1382,6 @@ ALTER TABLE ONLY game_cmd ALTER COLUMN id SET DEFAULT nextval('game_cmd_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: steve
 --
 
-ALTER TABLE ONLY game_objective ALTER COLUMN id SET DEFAULT nextval('game_objective_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: steve
---
-
 ALTER TABLE ONLY gt_formation ALTER COLUMN id SET DEFAULT nextval('gt_formation_id_seq'::regclass);
 
 
@@ -1661,7 +1632,7 @@ SELECT pg_catalog.setval('condition_id_seq', 1, false);
 -- Data for Name: drill; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, mixed, att_col, close_col, oblique, square, mob, control, speed, wline) FROM stdin;
+COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, mixed, att_col, close_col, oblique, square, mob, control, speed, lines) FROM stdin;
 1	Linear	3	f	f	f	f	t	f	f	t	t	t	f	8	2	t
 2	Green Conscript	3	f	f	f	f	t	f	f	t	f	f	t	4	1	t
 3	Basic Training	3	f	f	t	f	t	f	t	t	f	f	f	5	2	t
@@ -1686,7 +1657,6 @@ SELECT pg_catalog.setval('drill_id_seq', 1, false);
 --
 
 COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition) FROM stdin;
-76	4	t	f				2		3	3	3
 77	16	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
 78	16	t	f	France		Soult	2		3	3	3
 79	16	t	f	France		Lannes	2		2	1	3
@@ -1715,26 +1685,18 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 89	16	t	f	France		Augereau	2		2	2	2
 90	16	t	f	France		Supply Train	4		3	3	2
 91	16	t	f	France			2		3	3	3
-46	14	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4
-47	14	t	f	France		Soult	2		3	3	3
-48	14	t	f	France		Lannes	2		2	1	3
-49	14	t	f	France		Ney	2		2	3	2
-50	14	t	f	France		Murat	2		3	2	3
-51	14	f	t	Prussia		Hohenlohe	1		4	3	2
-52	14	f	t	Prussia		Ferdinand	3		4	4	4
-53	14	f	t	Prussia		Duke of Brunswick	2		4	3	4
-54	14	f	t	Prussia		Kalkreuth	3		3	4	1
-55	14	t	f	France		Davout	2		1	3	2
-56	14	t	f	France		Napoleon	2		1	1	1
-57	14	t	f	France		General Bernadotte	2		3	3	2
-58	14	t	f	France		Augereau	2		2	2	2
-59	14	t	f	France		Supply Train	4		3	3	2
-60	14	t	f	France			2		3	3	3
 12	1	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4
 10	1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2
 92	1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3
 13	1	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1
 93	1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3
+95	17	t	f	France	Aile gauche Lasalle	Lasalle	2		2	2	3
+96	17	t	f	France	Réserve de cavalerie	Murat	2		2	2	3
+97	17	t	f	France	IVe Corps	Soult	2		2	3	3
+98	17	t	f	France	VIIe Corps	Augereau	2		2	3	3
+99	17	t	f	France	III° Corps	Davout	2		2	3	3
+100	17	t	f	France	VIe Corps	Ney	2		2	3	3
+94	17	t	f	France	Garde Impériale	Bessières	2		2	3	2
 \.
 
 
@@ -1742,7 +1704,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 93, true);
+SELECT pg_catalog.setval('force_id_seq', 100, true);
 
 
 --
@@ -1760,17 +1722,15 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 244	10	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f
 241	10	Reserve_Div	Reserve Div		Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 245	10	Reserve_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
-987	76	6th_Div	6th Div			Norman	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 247	13	1st_Div	1st Div		Kuhnheim	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 226	10	1st_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f
 250	13	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			Prussia	3	4	0	0	0	0	0	0	3	600	1	1	0	0	0	f
 225	10	1st_Div.Bde_Henkel	Bde Henkel			Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f
 251	13	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			Prussia	3	4	0	0	0	0	0	0	3	400	1	2	0	0	0	f
-988	76	6th_Div.44th_Light_Fusilier	44th Light Fusilier			Norman	2	4	4	2200	1	3	0	1	4	0	0	0	2	4	0	f
+1274	94	Infanterie_de_la_garde	Infanterie de la garde		Soulès	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 228	10	2nd_Div	2nd Div		Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 224	10	1st_Div.Erichsen_Fusilers	Erichsen Fusilers				2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f
 253	13	2nd_Div	2nd Div		von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-989	76	6th_Div.Devil_Bde	Devil Bde	oeu			5	6	9	200	1	2	1	1	3	80	10	0	0	0	0	f
 261	14	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
 232	10	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
 237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
@@ -1798,6 +1758,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 995	78	2eme_Division	2eme Division		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 38	1	Guard_Artillery	Guard Artillery		de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 47	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
+1275	94	Infanterie_de_la_garde.Bde_Soules	Bde Soulès	1°/2° Rgt. de chasseurs à pied de la Garde impériale		France	2	4	6	1800	1	0	0	0	1	0	0	0	0	0	0	f
 4	1	Infantry_Division	Infantry Division		Lefebvre	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 46	1	Infantry_Division.Foot_Dragoons	Foot Dragoons			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 5	1	Cavalry_Division	Cavalry Division		Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
@@ -2203,231 +2164,18 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1212	91	1st_Div.2nd_Regt	2nd Regt			France	2	4	3	1800	1	0	0	0	6	0	0	0	0	0	0	f
 1213	91	1st_Div.1st_Regt	1st Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
 1214	91	1st_Div	1st Div				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-537	46	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
-538	46	Supply_Train.Guard_Detachment	Guard Detachment				5	6	8	300	1	2	4	0	10	60	12	7	0	0	0	f
-539	47	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-540	47	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-541	47	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-542	47	2eme_Division	2eme Division		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-543	47	2eme_Division.28e_Ligne	28e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-544	47	1eme_Division.35e_Ligne	35e Ligne			France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-545	47	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			France/Corsica	2	1	6	1300	1	2	0	1	3	0	0	0	0	0	0	f
-546	47	2eme_Division.46e_Ligne	46e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-547	47	1eme_Division.43e_Ligne	43e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-548	47	2eme_Division.24e_Legere	24e Legere			France	2	1	6	2000	1	0	0	0	4	0	0	0	0	0	0	f
-549	47	2eme_Division.4e_Ligne	4e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-550	47	1eme_Division	1eme Division		St Hilaire	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-551	47	3eme_Division.26e_Legere	26e Legere			France	2	4	6	1600	1	0	0	0	3	0	0	0	0	0	0	f
-552	47	1eme_Division.10e_Legere	10e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
-553	47	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
-554	47	3eme_Division.18e_Ligne	18e Ligne			France	2	4	5	1800	1	0	0	0	4	0	0	0	0	0	0	f
-555	47	Corps_Cavaly.22e_Chasseur	22e Chasseur			France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f
-556	47	1eme_Division.55e_Ligne	55e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
-557	47	Corps_Cavaly	Corps Cavaly		Guyot	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-558	47	3eme_Division	3eme Division		LeGrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-559	47	3eme_Division.75e_Ligne	75e Ligne			France	2	4	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
-560	47	3eme_Division.Po_Legere	Po Legere			France/Italy	2	4	6	1000	1	2	2	0	3	0	0	0	0	0	0	f
-561	47	Corps_Artillery.Heavy_Bty	Heavy Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
-562	47	Corps_Artillery	Corps Artillery			France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-563	47	Corps_Cavaly.11e_Chasseur	11e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
-564	48	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-565	48	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-566	48	Cav_Bde	Cav Bde		Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-567	48	Cav_Bde.10e_Hussar	10e Hussar			France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
-568	48	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			France	3	1	0	0	0	0	0	0	3	600	2	3	0	0	0	f
-569	48	Corps_Artillery	Corps Artillery		Careil	France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-570	48	Corps_Artillery.Heavy_Foot	Heavy Foot				4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
-571	48	1eme_Division	1eme Division		Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-572	48	1eme_Division.17e_Legere	17e Legere			France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f
-573	48	1eme_Division.34e_Ligne	34e Ligne			France	2	4	5	2500	1	0	0	0	5	0	0	0	0	0	0	f
-574	48	1eme_Division.40e_Ligne	40e Ligne			France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-575	48	1eme_Division.64e_Ligne	64e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-576	48	1eme_Division.88e_Ligne	88e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-577	48	2eme_Division	2eme Division		Gazan	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-578	48	2eme_Division.21e_Legere	21e Legere			France	2	4	6	1800	1	0	0	0	5	0	1	0	0	0	0	f
-579	48	2eme_Division.28e_Legere	28e Legere			France	2	4	6	900	1	0	0	0	3	0	0	0	0	0	0	f
-580	48	2eme_Division.100e_Ligne	100e Ligne			France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-581	48	2eme_Division.103e_Ligne	103e Ligne			France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-582	49	Cav_Bde.9e_Hussar	9e Hussar			France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
-583	49	1eme_Division.39e_Ligne	39e Ligne			France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-584	49	1eme_Division.69e_Ligne	69e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-585	49	Cav_Bde.10e_Chasseur	10e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
-586	49	1eme_Division.76e_Ligne	76e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-587	49	Corps_Artillery	Corps Artillery			France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-588	49	2eme_Division.59e_Ligne	59e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-589	49	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
-590	49	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	1	2	f
-591	49	2eme_Division	2eme Division		Gardanne	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-592	49	1eme_Division	1eme Division		Marchand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-593	49	Cav_Bde	Cav Bde		Charbanais	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-594	49	2eme_Division.50e_Ligne	50e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-595	49	2eme_Division.27e_Ligne	27e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-596	49	1eme_Division.6e_Legere	6e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
-597	49	2eme_Division.25e_Legere	25e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
-598	50	Corps_Artillery	Corps Artillery			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-599	50	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-600	50	1e_Dragoon_Div	1e Dragoon Div		Klein	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-601	50	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-602	50	2e_Dragoon_Div	2e Dragoon Div		Grouchy	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-603	50	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			France	3	4	0	0	0	0	0	0	3	600	1	4	0	0	0	f
-604	50	3e_Dragoon_Div	3e Dragoon Div		Beaumont	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-605	50	4e_Dragoon_Div	4e Dragoon Div		Sahut	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-606	50	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			France	3	1	0	0	0	0	0	0	3	600	1	4	0	0	0	f
-607	50	Light_Div	Light Div		Lasalle	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-608	50	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
-609	50	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			France	3	4	0	0	0	0	0	0	3	600	2	3	0	0	0	f
-610	50	2e_Dragoon_Div.Bde_Roget	Bde Roget			France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f
-611	50	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			France	3	4	0	0	0	0	0	0	3	600	9	2	0	0	0	f
-612	50	2e_Dragoon_Div.Bde_Milet	Bde Milet			France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f
-613	50	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			France	3	1	0	0	0	0	0	0	3	1300	1	2	0	0	0	f
-614	50	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			France	3	4	0	0	0	0	0	0	3	600	5	4	0	0	0	f
-615	50	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche			France	3	1	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
-616	50	1e_Dragoon_Div.Bde_Picard	Bde Picard			France	3	1	0	0	0	0	0	0	3	600	5	4	0	0	0	f
-617	50	4e_Dragoon_Div.Bde_Margaron	Bde Margaron			France	3	4	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
-618	50	3e_Dragoon_Div.Bde_Boye	Bde Boye			France	3	4	0	0	0	0	0	0	3	900	5	5	0	0	0	f
-619	50	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			France	3	1	0	0	0	0	0	0	3	600	5	5	0	0	0	f
-620	50	Corps_Artillery.1e_Horse	1e Horse				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t
-621	50	Corps_Artillery.2e_Horse	2e Horse				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t
-622	51	2nd_Div.Horse_Bty	Horse Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-623	51	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f
-624	51	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f
-625	51	1st_Div.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-626	51	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f
-627	51	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f
-628	51	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f
-629	51	Reserve_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f
-630	51	3rd_Div	3rd Div		Tauentzein	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-631	51	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			Prussia	3	4	0	0	0	0	0	0	3	700	2	4	0	0	0	f
-632	51	3rd_Div.Rosen_Fusilers	Rosen Fusilers			Prussia	2	4	9	400	1	0	0	2	5	0	0	0	0	0	0	f
-633	51	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
-634	51	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f
-635	51	1st_Div	1st Div		Grawert	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-636	51	3rd_Div.Lt_Bty	Lt Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f
-637	51	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f
-638	51	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f
-639	51	Reserve_Div	Reserve Div		Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-640	51	Reserve_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
-641	51	1st_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f
-642	51	1st_Div.Bde_Henkel	Bde Henkel			Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f
-643	51	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	0	2	0	5	0	0	0	0	0	0	f
-644	51	2nd_Div	2nd Div		Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-645	51	1st_Div.Erichsen_Fusilers	Erichsen Fusilers				2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f
-646	51	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
-647	51	2nd_Div.Heavy_Bty	Heavy Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
-648	52	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		Saxony	3	1	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
-649	52	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f
-650	52	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f
-651	52	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f
-652	52	Adv_Guard_Div	Adv Guard Div		Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-653	54	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-654	54	2nd_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
-655	54	1st_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
-656	54	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-657	54	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-658	54	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-659	54	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-660	54	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			Prussia	2	1	1	2400	1	0	0	1	2	0	0	0	2	4	1	f
-661	54	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			Prussia	2	4	1	2400	1	0	0	1	2	0	0	0	2	4	1	f
-662	54	1st_Div	1st Div		Kuhnheim	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-663	54	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			Prussia	3	4	0	0	0	0	0	0	3	600	1	1	0	0	0	f
-664	54	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			Prussia	3	4	0	0	0	0	0	0	3	400	1	2	0	0	0	f
-665	54	2nd_Div	2nd Div		von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-666	55	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-667	55	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-668	55	Corps_Artillery.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-669	55	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-670	55	1eme_Division.13e_Legere	13e Legere			France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f
-671	55	1eme_Division	1eme Division		Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-672	55	2eme_Division.108e_Ligne	108e Ligne			France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f
-673	55	1eme_Division.51e_Ligne	51e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-674	55	1eme_Division.17e_Ligne	17e Ligne			France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-675	55	1eme_Division.61e_Ligne	61e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-676	55	1eme_Division.30e_Ligne	30e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-677	55	2eme_Division	2eme Division		Friant	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-678	55	2eme_Division.33e_Ligne	33e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-679	55	2eme_Division.48e_Ligne	48e Ligne			France	2	1	5	1400	1	0	0	0	1	0	0	0	0	0	0	f
-680	55	2eme_Division.111e_Ligne	111e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-681	55	Cav_Bde	Cav Bde		Viallanes	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-682	55	3eme_Division	3eme Division		Gudin	France	1	1	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-683	55	3eme_Division.12e_Ligne	12e Ligne			France	2	1	5	1300	1	0	0	0	5	0	0	0	0	0	0	f
-684	55	3eme_Division.21e_Ligne	21e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-685	55	3eme_Division.25e_Ligne	25e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-686	55	3eme_Division.85e_Ligne	85e Ligne			France	2	1	5	1600	1	0	0	0	5	0	0	0	0	0	0	f
-687	55	Cav_Bde.1e_Chasseur	1e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	3	0	0	0	f
-688	55	Cav_Bde.2e_Chasseur	2e Chasseur			France	3	1	0	0	0	0	0	0	3	600	3	3	0	0	0	f
-689	55	Corps_Artillery	Corps Artillery		Hannicque	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-737	58	2eme_Division.24e_Ligne	24e Ligne			France	2	4	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
-690	56	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery				4	1	0	0	0	0	0	0	4	0	0	0	24	3	1	f
-691	56	Infantry_Division.1e_Grenadiers	1e Grenadiers			France	2	4	5	2400	1	0	0	0	1	0	0	0	0	0	0	f
-692	56	Infantry_Division.2e_Grenadiers	2e Grenadiers			France	2	1	5	2400	1	0	0	0	1	0	0	0	0	0	0	f
-693	56	Guard_Artillery.Army_Artillery_Park	Army Artillery Park				4	4	0	0	0	0	0	0	4	0	0	0	16	1	2	f
-694	56	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			France	3	4	0	0	0	0	0	0	3	600	3	1	0	0	0	f
-695	56	Infantry_Division.1e_Chasseurs	1e Chasseurs			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
-696	56	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			France	3	1	0	0	0	0	0	0	3	400	8	1	0	0	0	f
-697	56	Guard_Artillery	Guard Artillery		de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
-698	56	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
-699	56	Infantry_Division	Infantry Division		Lefebvre	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-700	56	Infantry_Division.Foot_Dragoons	Foot Dragoons			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
-701	56	Cavalry_Division	Cavalry Division		Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
-702	56	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	4	1	t
-703	57	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy				4	1	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-704	57	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-705	57	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f
-706	57	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-707	57	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-708	57	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-709	57	1eme_Division.9e_Legere	9e Legere		de l'Eltang	France	2	4	6	2600	1	2	0	0	4	0	0	0	0	4	0	f
-710	57	2eme_Division.45e_Ligne	45e Ligne		Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-711	57	2eme_Division.54e_Ligne	54e Ligne		Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-712	57	2eme_Division	2eme Division		Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-713	57	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
-714	57	1eme_Division	1eme Division		de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-715	57	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-716	57	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
-717	57	Cav_Reserve	Cav Reserve		Tilley	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-718	57	Cav_Reserve.2e_Hussar	2e Hussar			France	3	4	0	0	0	0	0	0	3	300	2	3	0	0	0	f
-719	57	Cav_Reserve.4e_Hussar	4e Hussar			France	3	1	0	0	0	0	0	0	3	422	2	4	0	0	0	f
-720	57	Artillery_Reserve	Artillery Reserve		Eble	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-721	57	3eme_Division	3eme Division		Drouet	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
-722	57	3eme_Division.95e_Ligne	95e Ligne		Drouet	France	2	4	5	2600	1	0	0	0	5	0	0	0	0	0	0	f
-723	57	3eme_Division.94e_Ligne	94e Ligne		Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
-724	58	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-725	58	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-726	58	Corps_Cav.7e_Chasseur	7e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
-727	58	1eme_Division.105e_Ligne	105e Ligne			France	2	1	3	1700	1	0	0	0	5	0	0	0	0	0	0	f
-728	58	Corps_Cav.20e_Chasseur	20e Chasseur			France	3	1	0	0	0	0	0	0	3	600	3	4	0	0	0	f
-729	58	1eme_Division.14e_Ligne	14e Ligne			France	2	4	5	700	1	0	0	0	4	0	0	0	0	0	0	f
-730	58	Corps_Cav	Corps Cav		Durosnel	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-731	58	Corps_Artillery	Corps Artillery			France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-732	58	2eme_Division.63e_Ligne	63e Ligne			France	2	1	5	700	1	0	0	0	5	0	0	0	0	0	0	f
-733	58	Corps_Artillery.Heavy_Bty	Heavy Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	1	2	f
-734	58	1eme_Division.16e_Legere	16e Legere			France	2	4	6	2700	1	0	0	0	4	0	0	0	0	0	0	f
-735	58	1eme_Division.44e_Ligne	44e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
-736	58	1eme_Division	1eme Division		Desjardin	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-738	58	2eme_Division.7e_Legere	7e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
-739	58	2eme_Division	2eme Division		Bierre	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-740	58	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			Hesse	2	1	1	800	1	0	0	0	4	0	0	0	0	0	0	f
-741	58	2eme_Division.Allied_Nassau	Allied Nassau			Nassau	2	1	5	400	1	0	0	0	4	0	0	0	0	0	0	f
-742	59	Supply_Train	Supply Train			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-743	59	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment				5	5	6	300	1	2	4	0	6	50	3	0	0	0	0	f
-744	60	2nd_Div.3rd_special_regt_von_X	3rd special regt von X				2	1	8	1800	2	0	0	0	5	0	0	0	0	0	0	f
-745	60	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data			2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-746	60	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		gotta break this	2	4	4	1800	3	0	0	0	5	0	0	0	0	0	0	f
-747	60	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ				2	4	7	1800	1	0	0	0	5	0	0	0	0	0	0	f
-748	60	2nd_Duvussion	2nd Duvussion				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-749	60	7th_Div.4th_Bn	4th Bn				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-750	60	7th_Div.1st_Bn	1st Bn				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-751	60	6th_Division	6th Division				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-752	60	6th_Division.2nd_Regt	2nd Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-753	60	6th_Division.1st_Regt	1st Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-754	60	7th_Div	7th Div				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-755	60	2nd_Div.2nd_Regt	2nd Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-756	60	2nd_Div.1st_Regt	1st Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-757	60	2nd_Div	2nd Div				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-758	60	1st_Div.3rd_special_regt	3rd special regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-759	60	1st_Div.2nd_Regt	2nd Regt			France	2	4	3	1800	1	0	0	0	6	0	0	0	0	0	0	f
-760	60	1st_Div.1st_Regt	1st Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
-761	60	1st_Div	1st Div				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1281	94	Division_de_cavalerie_de_la_Garde.Mamelouks_de_la_Garde_imperiale	Mamelouks de la Garde impériale			Egypt	3	4	0	0	0	0	0	0	3	100	2	1	0	0	0	f
+1276	94	Infanterie_de_la_garde.Bde_Dorsenne	Bde Dorsenne	1°/2° Rgt. de Grenadiers à pied de la Garde impériale		France	2	4	5	1600	1	0	0	0	1	0	0	0	0	0	0	f
+1280	94	Division_de_cavalerie_de_la_Garde.Brigade_Dahlmann	Brigade Dahlmann	1° Rgt. de chasseurs à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	600	3	1	0	0	0	f
+1282	94	Division_de_cavalerie_de_la_Garde.Brigade_Jacquin	Brigade Jacquin	1° Rgt. de la gendarmerie d’élite		France	3	4	0	0	0	0	0	0	3	200	8	1	0	0	0	f
+1278	94	Division_de_cavalerie_de_la_Garde	Division de cavalerie de la Garde		Walther		1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
+1283	94	Artillerie	Artillerie			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1279	94	Division_de_cavalerie_de_la_Garde.Brigade_de_Vieille_Garde_Lepic	Brigade de Vieille Garde Lepic	Grenadiers à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	900	8	1	0	0	0	f
+1284	94	Artillerie.Horse_Bty_1.Horse_Bty_3	Horse Bty 3	1° Co. 6e d’Art. à cheval		France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t
+1289	94	Artillerie.Horse_Bty_2	Horse Bty 2	2° Co. d’Art. à cheval		France	4	1	0	0	0	0	0	0	4	0	0	0	9	3	2	t
+1288	94	Artillerie.Horse_Bty_1	Horse Bty 1	1° Co. d’Art. à cheval		France	4	4	0	0	0	0	0	0	4	0	0	0	9	3	2	t
+1290	94	Artillerie.Foot_Bty_1	Foot Bty 1	2° Co. 1° d’Art. de Pied		France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
+1291	94	Artillerie.Foot_Bty_2	Foot Bty 2	6° Co. 1° d’Art. de Pied		France	4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 1215	12	Adv_Guard	Adv Guard	Blucher own	Blucher	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1218	12	3rd_Division	3rd Division		von Schmettau	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1217	12	2nd_Div	2nd Div		Wartensleben	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -2491,7 +2239,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 1273, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 1291, true);
 
 
 --
@@ -2499,8 +2247,7 @@ SELECT pg_catalog.setval('force_unit_id_seq', 1273, true);
 --
 
 COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name, descr, notes, year, latlon, red_team, red_brief, blue_team, blue_brief, table_x, table_y, grid_size, check_table, check_objectives, check_zones, check_forces, check_players, start_date) FROM stdin;
-1	14	1	2016-10-20 15:37:26.529801+10:30	2016-10-20 15:37:26.529801+10:30	1	12	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	8	3	6	t	f	f	f	f	2016-10-20 15:52:43.010878+10:30
-3	4	1	2016-10-20 18:41:13.279906+10:30	2016-10-20 18:41:13.279906+10:30	1	12	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	\N					16	6	8	t	f	f	f	f	2016-10-20 18:41:13.279906+10:30
+4	1	1	2016-10-20 23:03:08.180909+10:30	2016-10-20 23:03:08.180909+10:30	1	12	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	8	5	6	t	t	f	f	f	2016-10-20 23:03:08.180909+10:30
 \.
 
 
@@ -2508,38 +2255,39 @@ COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name,
 -- Data for Name: game_cmd; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_cmd (id, game_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition, player_id, disabled) FROM stdin;
-1	1	f	t	Prussia		Officer of Supply von Schulze	5		5	1	4	\N	f
-2	1	t	f	France		Soult	2		3	3	3	\N	f
-3	1	t	f	France		Lannes	2		2	1	3	\N	f
-4	1	t	f	France		Ney	2		2	3	2	\N	f
-5	1	t	f	France		Murat	2		3	2	3	\N	f
-6	1	f	t	Prussia		Hohenlohe	1		4	3	2	\N	f
-7	1	f	t	Prussia		Ferdinand	3		4	4	4	\N	f
-8	1	f	t	Prussia		Duke of Brunswick	2		4	3	4	\N	f
-9	1	f	t	Prussia		Kalkreuth	3		3	4	1	\N	f
-10	1	t	f	France		Davout	2		1	3	2	\N	f
-11	1	t	f	France		Napoleon	2		1	1	1	\N	f
-12	1	t	f	France		General Bernadotte	2		3	3	2	\N	f
-13	1	t	f	France		Augereau	2		2	2	2	\N	f
-14	1	t	f	France		Supply Train	4		3	3	2	\N	f
-15	1	t	f	France			2		3	3	3	\N	f
-16	2	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	\N	f
-17	2	t	f	France	IV Corps	Soult	2		3	3	3	\N	f
-18	2	t	f	France	V Corps	Lannes	2		2	1	3	\N	f
-19	2	t	f	France	VI Corps	Ney	2		2	3	2	\N	f
-20	2	t	f	France	Cavalry Reserve	Murat	2		3	2	3	\N	f
-21	2	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2	\N	f
-22	2	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	\N	f
-23	2	f	t	Prussia	Army Grp North	Duke of Brunswick	2		4	3	4	\N	f
-24	2	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1	\N	f
-25	2	t	f	France	III Corps	Davout	2		1	3	2	\N	f
-26	2	t	f	France	Imperial Guard	Napoleon	2		1	1	1	\N	f
-27	2	t	f	France	I Corps	General Bernadotte	2		3	3	2	\N	f
-28	2	t	f	France	VII Corps	Augereau	2		2	2	2	\N	f
-29	2	t	f	France	Supply	Supply Train	4		3	3	2	\N	f
-30	2	t	f	France	Test		2		3	3	3	\N	f
-31	3	t	f				2		3	3	3	\N	f
+COPY game_cmd (id, game_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition, player_id, vp) FROM stdin;
+16	2	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	\N	0
+17	2	t	f	France	IV Corps	Soult	2		3	3	3	\N	0
+18	2	t	f	France	V Corps	Lannes	2		2	1	3	\N	0
+19	2	t	f	France	VI Corps	Ney	2		2	3	2	\N	0
+20	2	t	f	France	Cavalry Reserve	Murat	2		3	2	3	\N	0
+21	2	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2	\N	0
+22	2	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	\N	0
+23	2	f	t	Prussia	Army Grp North	Duke of Brunswick	2		4	3	4	\N	0
+24	2	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1	\N	0
+25	2	t	f	France	III Corps	Davout	2		1	3	2	\N	0
+26	2	t	f	France	Imperial Guard	Napoleon	2		1	1	1	\N	0
+27	2	t	f	France	I Corps	General Bernadotte	2		3	3	2	\N	0
+28	2	t	f	France	VII Corps	Augereau	2		2	2	2	\N	0
+29	2	t	f	France	Supply	Supply Train	4		3	3	2	\N	0
+30	2	t	f	France	Test		2		3	3	3	\N	0
+32	4	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	\N	0
+33	4	t	f	France	IV Corps	Soult	2		3	3	3	\N	0
+34	4	t	f	France	V Corps	Lannes	2		2	1	3	\N	0
+35	4	t	f	France	VI Corps	Ney	2		2	3	2	\N	0
+36	4	t	f	France	Cavalry Reserve	Murat	2		3	2	3	\N	0
+37	4	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	\N	0
+38	4	t	f	France	III Corps	Davout	2		1	3	2	\N	0
+39	4	t	f	France	Imperial Guard	Napoleon	2		1	1	1	\N	0
+40	4	t	f	France	I Corps	General Bernadotte	2		3	3	2	\N	0
+41	4	t	f	France	VII Corps	Augereau	2		2	2	2	\N	0
+42	4	t	f	France	Supply	Supply Train	4		3	3	2	\N	0
+43	4	t	f	France	Test		2		3	3	3	\N	0
+44	4	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	\N	0
+45	4	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	\N	0
+46	4	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	\N	0
+47	4	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	\N	0
+48	4	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	\N	0
 \.
 
 
@@ -2547,7 +2295,7 @@ COPY game_cmd (id, game_id, red_team, blue_team, nation, name, commander_name, l
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 31, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 1, false);
 
 
 --
@@ -2562,22 +2310,18 @@ COPY game_cmd_order (game_id, cmd_id, turns, new_order, objective, enemy, friend
 -- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_id_seq', 3, true);
+SELECT pg_catalog.setval('game_id_seq', 4, true);
 
 
 --
 -- Data for Name: game_objective; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_objective (id, game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_owner) FROM stdin;
+COPY game_objective (game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_owner) FROM stdin;
+4	Hassenhausen	10	2	2	23	17	0
+4	Poppel	3	6	0	14	14	0
+4	Rehausen	9	9	1	24	18	0
 \.
-
-
---
--- Name: game_objective_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
---
-
-SELECT pg_catalog.setval('game_objective_id_seq', 1, false);
 
 
 --
@@ -2710,6 +2454,94 @@ COPY login (user_id, date, ip_address, channel) FROM stdin;
 1	2016-10-20 21:04:18.702148+10:30	127.0.0.1:41418	1
 1	2016-10-20 21:19:06.605123+10:30	127.0.0.1:42826	1
 1	2016-10-20 21:20:24.965284+10:30	127.0.0.1:42992	2
+1	2016-10-20 22:34:02.399146+10:30	127.0.0.1:48748	1
+1	2016-10-20 22:34:58.401274+10:30	127.0.0.1:48816	1
+1	2016-10-20 23:10:25.673378+10:30	127.0.0.1:51782	1
+1	2016-10-20 23:11:06.377216+10:30	127.0.0.1:51854	2
+1	2016-10-20 23:50:53.978131+10:30	127.0.0.1:55074	1
+1	2016-10-20 23:57:56.232464+10:30	127.0.0.1:55324	2
+1	2016-10-21 00:01:24.781805+10:30	127.0.0.1:56666	1
+1	2016-10-21 00:01:35.489066+10:30	127.0.0.1:56688	2
+1	2016-10-21 00:13:35.021349+10:30	127.0.0.1:57674	1
+1	2016-10-21 00:20:36.664771+10:30	127.0.0.1:58236	1
+1	2016-10-21 00:20:41.262882+10:30	127.0.0.1:58258	2
+1	2016-10-21 00:33:41.255428+10:30	127.0.0.1:59280	1
+1	2016-10-21 00:40:17.694096+10:30	127.0.0.1:59818	1
+1	2016-10-21 00:40:22.956272+10:30	127.0.0.1:59838	2
+1	2016-10-21 00:54:10.219902+10:30	127.0.0.1:60934	1
+1	2016-10-21 00:54:17.038476+10:30	127.0.0.1:60962	2
+1	2016-10-21 00:58:59.707659+10:30	127.0.0.1:33128	1
+1	2016-10-21 00:59:11.318303+10:30	127.0.0.1:33170	2
+1	2016-10-21 01:02:52.35687+10:30	127.0.0.1:33470	1
+1	2016-10-21 01:03:23.993159+10:30	127.0.0.1:33512	1
+1	2016-10-21 01:06:29.727623+10:30	127.0.0.1:33752	2
+1	2016-10-21 01:07:02.415329+10:30	127.0.0.1:33834	1
+1	2016-10-21 01:07:39.540013+10:30	127.0.0.1:33898	1
+1	2016-10-21 01:40:43.796985+10:30	127.0.0.1:36704	2
+1	2016-10-21 02:09:31.813549+10:30	127.0.0.1:39100	1
+1	2016-10-21 02:10:51.207085+10:30	127.0.0.1:39240	2
+1	2016-10-21 02:12:41.774074+10:30	127.0.0.1:39414	1
+1	2016-10-21 02:13:01.424108+10:30	127.0.0.1:39484	2
+1	2016-10-21 02:20:07.764162+10:30	127.0.0.1:40128	1
+1	2016-10-21 02:23:31.762232+10:30	127.0.0.1:40178	2
+1	2016-10-21 02:29:33.198636+10:30	127.0.0.1:40948	1
+1	2016-10-21 02:30:01.63415+10:30	127.0.0.1:40998	2
+1	2016-10-21 02:32:12.0722+10:30	127.0.0.1:41220	1
+1	2016-10-21 02:32:16.602446+10:30	127.0.0.1:41256	2
+1	2016-10-21 02:35:40.02432+10:30	127.0.0.1:41524	1
+1	2016-10-21 02:39:35.603837+10:30	127.0.0.1:41854	2
+1	2016-10-21 02:41:06.518015+10:30	127.0.0.1:42022	1
+1	2016-10-21 02:41:55.778944+10:30	127.0.0.1:42146	3
+1	2016-10-21 02:43:14.653724+10:30	127.0.0.1:42262	1
+1	2016-10-21 02:43:44.330621+10:30	127.0.0.1:42282	2
+1	2016-10-21 02:46:52.696431+10:30	127.0.0.1:42574	1
+1	2016-10-21 02:47:13.699597+10:30	127.0.0.1:42610	1
+1	2016-10-21 02:47:29.515745+10:30	127.0.0.1:42652	2
+1	2016-10-21 02:48:22.912578+10:30	127.0.0.1:42762	1
+1	2016-10-21 02:49:40.911221+10:30	127.0.0.1:42882	1
+1	2016-10-21 02:49:52.244346+10:30	127.0.0.1:42902	1
+1	2016-10-21 02:50:00.156349+10:30	127.0.0.1:42942	2
+1	2016-10-21 02:53:22.910198+10:30	127.0.0.1:43206	1
+1	2016-10-21 02:53:27.134854+10:30	127.0.0.1:43230	1
+1	2016-10-21 02:54:24.829535+10:30	127.0.0.1:43370	2
+1	2016-10-21 02:57:20.542877+10:30	127.0.0.1:43648	1
+1	2016-10-21 02:57:31.373356+10:30	127.0.0.1:43696	2
+1	2016-10-21 03:00:58.574965+10:30	127.0.0.1:43958	1
+1	2016-10-21 03:02:55.470054+10:30	127.0.0.1:44146	2
+1	2016-10-21 03:08:36.865063+10:30	127.0.0.1:44656	1
+1	2016-10-21 13:05:49.514885+10:30	127.0.0.1:32934	1
+1	2016-10-21 13:07:42.102878+10:30	127.0.0.1:33090	2
+1	2016-10-21 13:14:07.071187+10:30	127.0.0.1:33612	1
+1	2016-10-21 13:14:16.29782+10:30	127.0.0.1:33644	2
+1	2016-10-21 13:16:29.483894+10:30	127.0.0.1:33866	1
+1	2016-10-21 13:17:09.449295+10:30	127.0.0.1:33946	2
+1	2016-10-21 13:20:06.313398+10:30	127.0.0.1:34530	1
+1	2016-10-21 13:20:38.358536+10:30	127.0.0.1:34578	1
+1	2016-10-21 13:20:59.93999+10:30	127.0.0.1:34620	2
+1	2016-10-21 13:23:28.869806+10:30	127.0.0.1:34838	1
+1	2016-10-21 13:25:13.792743+10:30	127.0.0.1:34986	1
+1	2016-10-21 13:55:39.07538+10:30	127.0.0.1:37244	2
+1	2016-10-21 14:01:11.029389+10:30	127.0.0.1:37698	1
+1	2016-10-21 14:01:22.892848+10:30	127.0.0.1:37712	2
+1	2016-10-21 14:06:52.370228+10:30	127.0.0.1:38170	2
+1	2016-10-21 14:07:56.90084+10:30	127.0.0.1:38320	1
+1	2016-10-21 14:13:52.098297+10:30	127.0.0.1:38756	1
+1	2016-10-21 14:14:13.998599+10:30	127.0.0.1:38812	1
+1	2016-10-21 14:15:18.205351+10:30	127.0.0.1:38966	1
+1	2016-10-21 14:16:48.007162+10:30	127.0.0.1:39104	1
+1	2016-10-21 14:17:20.583855+10:30	127.0.0.1:39180	1
+1	2016-10-21 14:18:28.370375+10:30	127.0.0.1:39310	1
+1	2016-10-21 14:19:14.073523+10:30	127.0.0.1:39370	1
+1	2016-10-21 14:19:29.580549+10:30	127.0.0.1:39414	2
+1	2016-10-21 14:20:09.231682+10:30	127.0.0.1:39468	1
+1	2016-10-21 14:22:34.768498+10:30	127.0.0.1:39694	1
+1	2016-10-21 14:24:00.180835+10:30	127.0.0.1:39824	1
+1	2016-10-21 14:24:05.772286+10:30	127.0.0.1:39866	2
+1	2016-10-21 14:38:53.37643+10:30	127.0.0.1:40994	1
+1	2016-10-21 14:40:28.931074+10:30	127.0.0.1:41120	1
+1	2016-10-21 14:40:36.536106+10:30	127.0.0.1:41156	2
+1	2016-10-21 14:48:24.794588+10:30	127.0.0.1:41770	1
+1	2016-10-21 14:48:32.351762+10:30	127.0.0.1:41796	2
 \.
 
 
@@ -2786,11 +2618,9 @@ SELECT pg_catalog.setval('rating_id_seq', 1, false);
 --
 
 COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, notes, year, public, review, latlon, red_team, red_brief, blue_team, blue_brief) FROM stdin;
-4	0	2	2016-10-12 23:21:45.213973+10:30	0	Leipzig	Napoleon vs The Rest of the World as he makes yet another miraculous comeback after the disasters in Russia. change		1813	t	f	\N				
-5	0	2	2016-10-12 23:21:45.213973+10:30	0	Waterloo	Napoleon vs Wellington, after he makes yet another miraculous comeback after escaping from the Island of Elba.		1815	t	f	\N				
 16	0	2	2016-10-19 07:11:36.217287+10:30	1	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	f	f	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.
-14	0	2	2016-10-17 21:24:54.130267+10:30	1	Copy of - Jena Auerstadt	Copy of - Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	f	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.
 1	0	1	2016-10-12 23:21:45.213973+10:30	0	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	t	f	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.
+17	0	1	2016-10-20 22:38:30.124184+10:30	0	Eylau	France vs Russia, Poland, Winter of 1807.	The Battle of Eylau or Battle of Preussisch-Eylau, 7 and 8 February 1807, was a bloody and inconclusive battle between Napoléon's Grande Armée and an army of the Russian Empire under the command of Levin August, Count von Bennigsen near the town of Preußisch Eylau in East Prussia.\n\nLate in the battle, the Russians received a timely reinforcement from a Prussian division. The town is now called Bagrationovsk and is a part of Kaliningrad Oblast, Russia. The engagement was fought during the War of the Fourth Coalition, part of the Napoleonic Wars. Of all Napoleonic battles, this is considered to be the most uncertain and mysterious for several reasons — mainly the strength of Murat's reserve cavalry.	1807	f	f	\N	Napoleon			
 \.
 
 
@@ -2798,7 +2628,7 @@ COPY scenario (id, campaign_id, author_id, created, forked_from, name, descr, no
 -- Name: scenario_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('scenario_id_seq', 16, true);
+SELECT pg_catalog.setval('scenario_id_seq', 17, true);
 
 
 --
@@ -2878,318 +2708,166 @@ SELECT pg_catalog.setval('stdimg_id_seq', 1, false);
 --
 
 COPY tiles (game_id, i, height, content, owner) FROM stdin;
-1	0	0	2	0
-1	1	0	0	0
-1	2	0	3	0
-1	3	0	0	0
-1	4	0	0	0
-1	5	0	0	0
-1	6	0	6	0
-1	7	0	0	0
-1	8	1	2	0
-1	9	1	0	0
-1	10	0	2	0
-1	11	1	0	0
-1	12	0	2	0
-1	13	1	0	0
-1	14	1	0	0
-1	15	1	0	0
-1	16	0	5	0
-1	17	0	5	0
-1	18	0	5	0
-1	19	0	5	0
-1	20	0	5	0
-1	21	0	4	0
-1	22	0	0	0
-1	23	0	0	0
-1	24	0	0	0
-1	25	0	2	0
-1	26	0	3	0
-1	27	0	2	0
-1	28	1	0	0
-1	29	1	2	0
-1	30	1	2	0
-1	31	0	2	0
-1	32	0	0	0
-1	33	0	0	0
-1	34	0	0	0
-1	35	0	0	0
-1	36	0	0	0
-1	37	0	1	0
-1	38	0	7	0
-1	39	0	0	0
-1	40	0	0	0
-1	41	0	0	0
-1	42	0	3	0
-1	43	0	3	0
-1	44	0	3	0
-1	45	1	2	0
-1	46	1	0	0
-1	47	0	6	0
-1	48	0	0	0
-1	49	0	0	0
-1	50	0	0	0
-1	51	0	0	0
-1	52	0	1	0
-1	53	0	0	0
-1	54	0	1	0
-1	55	0	7	0
-1	56	0	4	0
-1	57	0	0	0
-1	58	0	0	0
-1	59	0	3	0
-1	60	0	2	0
-1	61	0	2	0
-1	62	0	6	0
-1	63	1	2	0
-1	64	0	0	0
-1	65	0	0	0
-1	66	0	0	0
-1	67	0	0	0
-1	68	0	0	0
-1	69	0	0	0
-1	70	0	0	0
-1	71	0	6	0
-1	72	0	1	0
-1	73	0	0	0
-1	74	0	0	0
-1	75	0	0	0
-1	76	0	0	0
-1	77	0	6	0
-1	78	1	2	0
-1	79	1	2	0
-1	80	0	0	0
-1	81	0	0	0
-1	82	0	0	0
-1	83	0	0	0
-1	84	0	0	0
-1	85	0	0	0
-1	86	0	6	0
-1	87	0	0	0
-1	88	0	0	0
-1	89	0	0	0
-1	90	0	0	0
-1	91	0	0	0
-1	92	0	6	0
-1	93	0	2	0
-1	94	1	2	0
-1	95	1	0	0
-3	0	0	0	0
-3	1	0	0	0
-3	2	0	0	0
-3	3	0	0	0
-3	4	0	0	0
-3	5	0	0	0
-3	6	0	0	0
-3	7	0	0	0
-3	8	0	0	0
-3	9	0	0	0
-3	10	0	0	0
-3	11	0	0	0
-3	12	0	0	0
-3	13	0	0	0
-3	14	0	0	0
-3	15	0	0	0
-3	16	0	0	0
-3	17	0	0	0
-3	18	0	0	0
-3	19	0	0	0
-3	20	0	0	0
-3	21	0	0	0
-3	22	0	0	0
-3	23	0	0	0
-3	24	0	0	0
-3	25	0	0	0
-3	26	0	0	0
-3	27	0	0	0
-3	28	0	0	0
-3	29	0	0	0
-3	30	0	0	0
-3	31	0	0	0
-3	32	0	0	0
-3	33	0	0	0
-3	34	0	0	0
-3	35	0	0	0
-3	36	0	0	0
-3	37	0	0	0
-3	38	0	0	0
-3	39	0	0	0
-3	40	0	0	0
-3	41	0	0	0
-3	42	0	0	0
-3	43	0	0	0
-3	44	0	0	0
-3	45	0	0	0
-3	46	0	0	0
-3	47	0	0	0
-3	48	0	0	0
-3	49	0	0	0
-3	50	0	0	0
-3	51	0	0	0
-3	52	0	0	0
-3	53	0	0	0
-3	54	0	0	0
-3	55	0	0	0
-3	56	0	0	0
-3	57	0	0	0
-3	58	0	0	0
-3	59	0	0	0
-3	60	0	0	0
-3	61	0	0	0
-3	62	0	0	0
-3	63	0	0	0
-3	64	0	0	0
-3	65	0	0	0
-3	66	0	0	0
-3	67	0	0	0
-3	68	0	0	0
-3	69	0	0	0
-3	70	0	0	0
-3	71	0	0	0
-3	72	0	0	0
-3	73	0	0	0
-3	74	0	0	0
-3	75	0	0	0
-3	76	0	0	0
-3	77	0	0	0
-3	78	0	0	0
-3	79	0	0	0
-3	80	0	0	0
-3	81	0	0	0
-3	82	0	0	0
-3	83	0	0	0
-3	84	0	0	0
-3	85	0	0	0
-3	86	0	0	0
-3	87	0	0	0
-3	88	0	0	0
-3	89	0	0	0
-3	90	0	0	0
-3	91	0	0	0
-3	92	0	0	0
-3	93	0	0	0
-3	94	0	0	0
-3	95	0	0	0
-3	96	0	0	0
-3	97	0	0	0
-3	98	0	0	0
-3	99	0	0	0
-3	100	0	0	0
-3	101	0	0	0
-3	102	0	0	0
-3	103	0	0	0
-3	104	0	0	0
-3	105	0	0	0
-3	106	0	0	0
-3	107	0	0	0
-3	108	0	0	0
-3	109	0	0	0
-3	110	0	0	0
-3	111	0	0	0
-3	112	0	0	0
-3	113	0	0	0
-3	114	0	0	0
-3	115	0	0	0
-3	116	0	0	0
-3	117	0	0	0
-3	118	0	0	0
-3	119	0	0	0
-3	120	0	0	0
-3	121	0	0	0
-3	122	0	0	0
-3	123	0	0	0
-3	124	0	0	0
-3	125	0	0	0
-3	126	0	0	0
-3	127	0	0	0
-3	128	0	0	0
-3	129	0	0	0
-3	130	0	0	0
-3	131	0	0	0
-3	132	0	0	0
-3	133	0	0	0
-3	134	0	0	0
-3	135	0	0	0
-3	136	0	0	0
-3	137	0	0	0
-3	138	0	0	0
-3	139	0	0	0
-3	140	0	0	0
-3	141	0	0	0
-3	142	0	0	0
-3	143	0	0	0
-3	144	0	0	0
-3	145	0	0	0
-3	146	0	0	0
-3	147	0	0	0
-3	148	0	0	0
-3	149	0	0	0
-3	150	0	0	0
-3	151	0	0	0
-3	152	0	0	0
-3	153	0	0	0
-3	154	0	0	0
-3	155	0	0	0
-3	156	0	0	0
-3	157	0	0	0
-3	158	0	0	0
-3	159	0	0	0
-3	160	0	0	0
-3	161	0	0	0
-3	162	0	0	0
-3	163	0	0	0
-3	164	0	0	0
-3	165	0	0	0
-3	166	0	0	0
-3	167	0	0	0
-3	168	0	0	0
-3	169	0	0	0
-3	170	0	0	0
-3	171	0	0	0
-3	172	0	0	0
-3	173	0	0	0
-3	174	0	0	0
-3	175	0	0	0
-3	176	0	0	0
-3	177	0	0	0
-3	178	0	0	0
-3	179	0	0	0
-3	180	0	0	0
-3	181	0	0	0
-3	182	0	0	0
-3	183	0	0	0
-3	184	0	0	0
-3	185	0	0	0
-3	186	0	0	0
-3	187	0	0	0
-3	188	0	0	0
-3	189	0	0	0
-3	190	0	0	0
-3	191	0	0	0
-3	192	0	0	0
-3	193	0	0	0
-3	194	0	0	0
-3	195	0	0	0
-3	196	0	0	0
-3	197	0	0	0
-3	198	0	0	0
-3	199	0	0	0
-3	200	0	0	0
-3	201	0	0	0
-3	202	0	0	0
-3	203	0	0	0
-3	204	0	0	0
-3	205	0	0	0
-3	206	0	0	0
-3	207	0	0	0
-3	208	0	0	0
-3	209	0	0	0
-3	210	0	0	0
-3	211	0	0	0
-3	212	0	0	0
-3	213	0	0	0
-3	214	0	0	0
-3	215	0	0	0
+4	0	0	0	0
+4	1	0	0	0
+4	2	0	0	0
+4	3	0	0	0
+4	4	0	0	0
+4	5	0	0	0
+4	6	0	0	0
+4	7	0	0	0
+4	8	0	0	0
+4	9	1	0	0
+4	10	1	0	0
+4	11	1	0	0
+4	12	1	0	0
+4	13	0	7	0
+4	14	0	0	0
+4	15	0	0	0
+4	16	0	0	0
+4	17	0	0	0
+4	18	0	0	0
+4	19	0	0	0
+4	20	0	0	0
+4	21	0	0	0
+4	22	0	0	0
+4	23	0	0	0
+4	24	0	0	0
+4	25	0	0	0
+4	26	0	3	0
+4	27	1	0	0
+4	28	1	0	0
+4	29	1	0	0
+4	30	0	7	0
+4	31	0	0	0
+4	32	0	0	0
+4	33	0	0	0
+4	34	0	0	0
+4	35	0	0	0
+4	36	0	0	0
+4	37	0	0	0
+4	38	0	0	0
+4	39	0	0	0
+4	40	0	0	0
+4	41	0	3	0
+4	42	1	3	0
+4	43	0	3	0
+4	44	1	0	0
+4	45	1	0	0
+4	46	1	0	0
+4	47	0	7	0
+4	48	0	0	0
+4	49	0	0	0
+4	50	0	0	0
+4	51	0	0	0
+4	52	0	0	0
+4	53	0	0	0
+4	54	0	0	0
+4	55	0	0	0
+4	56	0	0	0
+4	57	0	0	0
+4	58	0	3	0
+4	59	1	3	0
+4	60	1	0	0
+4	61	1	2	0
+4	62	1	0	0
+4	63	0	6	0
+4	64	0	0	0
+4	65	0	0	0
+4	66	0	0	0
+4	67	0	0	0
+4	68	0	0	0
+4	69	0	0	0
+4	70	0	0	0
+4	71	0	0	0
+4	72	0	0	0
+4	73	0	0	0
+4	74	1	0	0
+4	75	1	0	0
+4	76	1	2	0
+4	77	1	2	0
+4	78	0	6	0
+4	79	0	0	0
+4	80	0	0	0
+4	81	0	0	0
+4	82	0	0	0
+4	83	0	0	0
+4	84	0	0	0
+4	85	0	0	0
+4	86	0	0	0
+4	87	0	0	0
+4	88	1	0	0
+4	89	1	0	0
+4	90	1	0	0
+4	91	1	2	0
+4	92	1	0	0
+4	93	0	2	0
+4	94	0	7	0
+4	95	0	0	0
+4	96	0	0	0
+4	97	0	0	0
+4	98	0	0	0
+4	99	0	0	0
+4	100	1	0	0
+4	101	1	0	0
+4	102	0	0	0
+4	103	0	0	0
+4	104	1	0	0
+4	105	0	7	0
+4	106	0	2	0
+4	107	1	0	0
+4	108	0	0	0
+4	109	0	0	0
+4	110	0	6	0
+4	111	0	0	0
+4	112	0	0	0
+4	113	0	0	0
+4	114	0	0	0
+4	115	1	0	0
+4	116	1	0	0
+4	117	1	0	0
+4	118	0	0	0
+4	119	0	0	0
+4	120	0	0	0
+4	121	0	3	0
+4	122	0	7	0
+4	123	0	5	0
+4	124	0	5	0
+4	125	0	6	0
+4	126	0	1	0
+4	127	0	0	0
+4	128	0	0	0
+4	129	0	0	0
+4	130	1	0	0
+4	131	1	0	0
+4	132	1	0	0
+4	133	1	0	0
+4	134	1	0	0
+4	135	0	0	0
+4	136	0	0	0
+4	137	0	3	0
+4	138	1	0	0
+4	139	0	0	0
+4	140	0	6	0
+4	141	0	0	0
+4	142	0	1	0
+4	143	0	0	0
+4	144	0	0	0
+4	145	1	0	0
+4	146	1	0	0
+4	147	1	0	0
+4	148	1	0	0
+4	149	1	0	0
+4	150	0	0	0
+4	151	0	0	0
+4	152	0	3	0
+4	153	1	0	0
+4	154	0	1	0
+4	155	0	6	0
+4	156	0	0	0
+4	157	0	1	0
+4	158	0	0	0
+4	159	0	0	0
 \.
 
 
@@ -3460,459 +3138,513 @@ COPY tiles2 (game_id, i, height, content, owner) FROM stdin;
 --
 
 COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_control, nation, utype, condition, cmd_level, drill, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, jg_coy, rifles, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, horse_guns, gun_max_condition, gun_condition) FROM stdin;
-1128	1	14	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1129	1	14	Supply_Train.Guard_Detachment	Guard Detachment			10		5	2	6	8	1	1	\N	\N	\N	\N	\N	\N	\N	300	0	0	\N	\N	1	2	4	0	\N	0	0	10	60	0	0	0	12	7	0	0	\N	\N	\N	0	0	f	2	0
-1130	2	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1131	2	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1132	2	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1133	2	14	2eme_Division	2eme Division		Leval	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1134	2	14	2eme_Division.28e_Ligne	28e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1135	2	14	1eme_Division.35e_Ligne	35e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1136	2	14	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	1300	0	0	\N	\N	1	2	0	1	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1137	2	14	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1138	2	14	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1139	2	14	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1140	2	14	2eme_Division.4e_Ligne	4e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1141	2	14	1eme_Division	1eme Division		St Hilaire	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1142	2	14	3eme_Division.26e_Legere	26e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1143	2	14	1eme_Division.10e_Legere	10e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1144	2	14	2eme_Division.57e_Ligne	57e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1145	2	14	3eme_Division.18e_Ligne	18e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1146	2	14	Corps_Cavaly.22e_Chasseur	22e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1147	2	14	1eme_Division.55e_Ligne	55e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1148	2	14	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1149	2	14	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1150	2	14	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1151	2	14	3eme_Division.Po_Legere	Po Legere			10	France/Italy	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1000	0	0	\N	\N	1	2	2	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1152	2	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1153	2	14	Corps_Artillery	Corps Artillery			10	France	1	2	5	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1154	2	14	Corps_Cavaly.11e_Chasseur	11e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1155	3	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1156	3	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1157	3	14	Cav_Bde	Cav Bde		Trelliard	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1158	3	14	Cav_Bde.10e_Hussar	10e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1159	3	14	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1160	3	14	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1161	3	14	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1162	3	14	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1163	3	14	1eme_Division.17e_Legere	17e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2100	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1164	3	14	1eme_Division.34e_Ligne	34e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2500	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1165	3	14	1eme_Division.40e_Ligne	40e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1166	3	14	1eme_Division.64e_Ligne	64e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1167	3	14	1eme_Division.88e_Ligne	88e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1168	3	14	2eme_Division	2eme Division		Gazan	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1169	3	14	2eme_Division.21e_Legere	21e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	1	0	0	0	\N	\N	\N	0	0	f	2	0
-1170	3	14	2eme_Division.28e_Legere	28e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	900	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1171	3	14	2eme_Division.100e_Ligne	100e Ligne			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1172	3	14	2eme_Division.103e_Ligne	103e Ligne			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1173	4	14	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1174	4	14	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1175	4	14	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1176	4	14	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1177	4	14	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1178	4	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1179	4	14	2eme_Division.59e_Ligne	59e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1180	4	14	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1181	4	14	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1182	4	14	2eme_Division	2eme Division		Gardanne	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1183	4	14	1eme_Division	1eme Division		Marchand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1184	4	14	Cav_Bde	Cav Bde		Charbanais	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1185	4	14	2eme_Division.50e_Ligne	50e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1186	4	14	2eme_Division.27e_Ligne	27e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1187	4	14	1eme_Division.6e_Legere	6e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1188	4	14	2eme_Division.25e_Legere	25e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1189	5	14	Corps_Artillery	Corps Artillery			10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1190	5	14	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1191	5	14	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1192	5	14	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1193	5	14	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1194	5	14	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	4	0	0	\N	\N	\N	0	0	f	2	0
-1195	5	14	3e_Dragoon_Div	3e Dragoon Div		Beaumont	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1196	5	14	4e_Dragoon_Div	4e Dragoon Div		Sahut	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1197	5	14	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	4	0	0	\N	\N	\N	0	0	f	2	0
-1198	5	14	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1199	5	14	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1200	5	14	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1201	5	14	2e_Dragoon_Div.Bde_Roget	Bde Roget			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1202	5	14	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	9	2	0	0	\N	\N	\N	0	0	f	2	0
-1203	5	14	2e_Dragoon_Div.Bde_Milet	Bde Milet			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1204	5	14	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1300	0	0	0	1	2	0	0	\N	\N	\N	0	0	f	2	0
-1205	5	14	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	4	0	0	\N	\N	\N	0	0	f	2	0
-1206	5	14	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1207	5	14	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	4	0	0	\N	\N	\N	0	0	f	2	0
-1208	5	14	4e_Dragoon_Div.Bde_Margaron	Bde Margaron			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1209	5	14	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1210	5	14	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1211	5	14	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	t	2	2
-1212	5	14	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	t	2	2
-1213	6	14	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1214	6	14	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	1	0	\N	\N	\N	0	4	f	2	3
-1215	6	14	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	4200	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1216	6	14	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1217	6	14	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3300	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1218	6	14	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	4200	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1219	6	14	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1220	6	14	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	4
-1221	6	14	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1222	6	14	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	700	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1223	6	14	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	400	0	0	\N	\N	1	0	0	2	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1224	6	14	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	4
-1225	6	14	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	0
-1226	6	14	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1227	6	14	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	6	0	\N	\N	\N	0	4	f	2	3
-1228	6	14	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	12	3	0	0	\N	\N	\N	0	0	f	2	0
-1229	6	14	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3600	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1230	6	14	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1231	6	14	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1232	6	14	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	4
-1233	6	14	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	3	0	0	\N	\N	\N	0	0	f	2	0
-1234	6	14	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	800	0	0	\N	\N	1	0	2	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1235	6	14	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1236	6	14	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	1	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1237	6	14	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	200	0	0	0	1	3	0	0	\N	\N	\N	0	0	f	2	0
-1238	6	14	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1239	7	14	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1240	7	14	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1500	0	0	0	2	4	6	0	\N	\N	\N	0	3	f	2	3
-1241	7	14	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	6	0	\N	\N	\N	0	3	f	2	3
-1242	7	14	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	5100	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	6	0	\N	\N	\N	0	4	f	2	0
-1243	7	14	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1244	9	14	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1245	9	14	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	1
-1246	9	14	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	1
-1247	9	14	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1248	9	14	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1249	9	14	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1250	9	14	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1251	9	14	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	1	\N	0	0	2	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1252	9	14	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	1	\N	0	0	2	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1253	9	14	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1254	9	14	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	1	0	0	\N	\N	\N	0	0	f	2	0
-1255	9	14	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	400	0	0	0	1	2	0	0	\N	\N	\N	0	0	f	2	0
-1256	9	14	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1257	10	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1258	10	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1259	10	14	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1260	10	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1261	10	14	1eme_Division.13e_Legere	13e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1262	10	14	1eme_Division	1eme Division		Morand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1263	10	14	2eme_Division.108e_Ligne	108e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1264	10	14	1eme_Division.51e_Ligne	51e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1265	10	14	1eme_Division.17e_Ligne	17e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1266	10	14	1eme_Division.61e_Ligne	61e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1267	10	14	1eme_Division.30e_Ligne	30e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1268	10	14	2eme_Division	2eme Division		Friant	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1269	10	14	2eme_Division.33e_Ligne	33e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1270	10	14	2eme_Division.48e_Ligne	48e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1271	10	14	2eme_Division.111e_Ligne	111e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1272	10	14	Cav_Bde	Cav Bde		Viallanes	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1273	10	14	3eme_Division	3eme Division		Gudin	10	France	1	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1274	10	14	3eme_Division.12e_Ligne	12e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1300	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1275	10	14	3eme_Division.21e_Ligne	21e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1276	10	14	3eme_Division.25e_Ligne	25e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1277	10	14	3eme_Division.85e_Ligne	85e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1278	10	14	Cav_Bde.1e_Chasseur	1e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	3	0	0	\N	\N	\N	0	0	f	2	0
-1279	10	14	Cav_Bde.2e_Chasseur	2e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	3	0	0	\N	\N	\N	0	0	f	2	0
-1280	10	14	Corps_Artillery	Corps Artillery		Hannicque	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1281	11	14	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	24	0	\N	\N	\N	0	3	f	2	1
-1282	11	14	Infantry_Division.1e_Grenadiers	1e Grenadiers			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1283	11	14	Infantry_Division.2e_Grenadiers	2e Grenadiers			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1284	11	14	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	16	0	\N	\N	\N	0	1	f	2	2
-1285	11	14	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	1	0	0	\N	\N	\N	0	0	f	2	0
-1286	11	14	Infantry_Division.1e_Chasseurs	1e Chasseurs			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1287	11	14	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	400	0	0	0	8	1	0	0	\N	\N	\N	0	0	f	2	0
-1288	11	14	Guard_Artillery	Guard Artillery		de Lamartiniére	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	2	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1289	11	14	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1290	11	14	Infantry_Division	Infantry Division		Lefebvre	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1291	11	14	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1292	11	14	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1293	11	14	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	4	t	2	1
-1294	12	14	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1295	12	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1296	12	14	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1500	0	0	\N	\N	1	0	2	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	4	f	2	0
-1297	12	14	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1298	12	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1299	12	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1300	12	14	1eme_Division.9e_Legere	9e Legere		de l'Eltang	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2600	0	0	\N	\N	1	2	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	4	f	2	0
-1301	12	14	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1302	12	14	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1303	12	14	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1304	12	14	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1305	12	14	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1306	12	14	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1307	12	14	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1308	12	14	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1309	12	14	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	300	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1310	12	14	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	422	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1311	12	14	Artillery_Reserve	Artillery Reserve		Eble	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1312	12	14	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1313	12	14	3eme_Division.95e_Ligne	95e Ligne		Drouet	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1314	12	14	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1500	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1315	13	14	2eme_Division.24e_Ligne	24e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1316	13	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1317	13	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1318	13	14	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1319	13	14	1eme_Division.105e_Ligne	105e Ligne			10	France	2	2	1	3	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1320	13	14	Corps_Cav.20e_Chasseur	20e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1321	13	14	1eme_Division.14e_Ligne	14e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1322	13	14	Corps_Cav	Corps Cav		Durosnel	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1323	13	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1324	13	14	2eme_Division.63e_Ligne	63e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1325	13	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1326	13	14	1eme_Division.16e_Legere	16e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2700	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1327	13	14	1eme_Division.44e_Ligne	44e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1328	13	14	1eme_Division	1eme Division		Desjardin	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1329	13	14	2eme_Division.7e_Legere	7e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1330	13	14	2eme_Division	2eme Division		Bierre	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1331	13	14	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			10	Hesse	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1332	13	14	2eme_Division.Allied_Nassau	Allied Nassau			10	Nassau	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	400	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1333	14	14	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1334	14	14	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			10		5	2	5	6	1	1	\N	\N	\N	\N	\N	\N	\N	300	0	0	\N	\N	1	2	4	0	\N	0	0	6	50	0	0	0	3	0	0	0	\N	\N	\N	0	0	f	2	0
-1335	15	14	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			10		2	2	1	8	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	2	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1336	15	14	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data		10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1337	15	14	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		10	gotta break this	2	2	4	4	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	3	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1338	15	14	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			10		2	2	4	7	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1339	15	14	2nd_Duvussion	2nd Duvussion			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1340	15	14	7th_Div.4th_Bn	4th Bn			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1341	15	14	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1342	15	14	6th_Division	6th Division			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1343	15	14	6th_Division.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1344	15	14	6th_Division.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1345	15	14	7th_Div	7th Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1346	15	14	2nd_Div.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1347	15	14	2nd_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1348	15	14	2nd_Div	2nd Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1349	15	14	1st_Div.3rd_special_regt	3rd special regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1350	15	14	1st_Div.2nd_Regt	2nd Regt			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	6	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1351	15	14	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1352	15	14	1st_Div	1st Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1353	16	1	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1354	16	1	Supply_Train.Guard_Detachment	Guard Detachment			10		5	2	6	8	1	1	\N	\N	\N	\N	\N	\N	\N	300	0	0	\N	\N	1	2	4	0	\N	0	0	10	60	0	0	0	12	7	0	0	\N	\N	\N	0	0	f	2	0
-1355	17	1	2eme_Division	2eme Division		Leval	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1356	17	1	2eme_Division.28e_Ligne	28e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1357	17	1	1eme_Division.35e_Ligne	35e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1358	17	1	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	1300	0	0	\N	\N	1	2	0	1	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1359	17	1	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1360	17	1	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1361	17	1	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1362	17	1	2eme_Division.4e_Ligne	4e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1363	17	1	1eme_Division	1eme Division		St Hilaire	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1364	17	1	3eme_Division.26e_Legere	26e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1365	17	1	1eme_Division.10e_Legere	10e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1366	17	1	2eme_Division.57e_Ligne	57e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1367	17	1	3eme_Division.18e_Ligne	18e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1368	17	1	Corps_Cavaly.22e_Chasseur	22e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1369	17	1	1eme_Division.55e_Ligne	55e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1370	17	1	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1371	17	1	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1372	17	1	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1373	17	1	3eme_Division.Po_Legere	Po Legere			10	France/Italy	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1000	0	0	\N	\N	1	2	2	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1374	17	1	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1375	17	1	Corps_Artillery	Corps Artillery			10	France	1	2	5	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1376	17	1	Corps_Cavaly.11e_Chasseur	11e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1377	17	1	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1378	17	1	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1379	17	1	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1380	18	1	Cav_Bde	Cav Bde		Trelliard	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1381	18	1	Cav_Bde.10e_Hussar	10e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1382	18	1	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1383	18	1	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1384	18	1	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1385	18	1	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1386	18	1	1eme_Division.34e_Ligne	34e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2500	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1387	18	1	1eme_Division.40e_Ligne	40e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1388	18	1	1eme_Division.64e_Ligne	64e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1389	18	1	1eme_Division.88e_Ligne	88e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1390	18	1	1eme_Division.17e_Legere	17e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2100	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1391	18	1	2eme_Division	2eme Division		Gazan	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1392	18	1	2eme_Division.28e_Legere	28e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	900	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1393	18	1	2eme_Division.100e_Ligne	100e Ligne			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1394	18	1	2eme_Division.103e_Ligne	103e Ligne			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1395	18	1	2eme_Division.21e_Legere	21e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	1	0	0	0	\N	\N	\N	0	0	f	2	0
-1396	18	1	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1397	18	1	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1398	19	1	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1399	19	1	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1400	19	1	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1401	19	1	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1402	19	1	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1403	19	1	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1404	19	1	2eme_Division.59e_Ligne	59e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1405	19	1	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1406	19	1	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1407	19	1	2eme_Division	2eme Division		Gardanne	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1408	19	1	1eme_Division	1eme Division		Marchand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1409	19	1	Cav_Bde	Cav Bde		Charbanais	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1410	19	1	2eme_Division.50e_Ligne	50e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1411	19	1	2eme_Division.27e_Ligne	27e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1412	19	1	1eme_Division.6e_Legere	6e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1413	19	1	2eme_Division.25e_Legere	25e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1414	20	1	Corps_Artillery	Corps Artillery			10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1415	20	1	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1416	20	1	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1417	20	1	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1418	20	1	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1419	20	1	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	4	0	0	\N	\N	\N	0	0	f	2	0
-1420	20	1	3e_Dragoon_Div	3e Dragoon Div		Beaumont	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1421	20	1	4e_Dragoon_Div	4e Dragoon Div		Sahut	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1422	20	1	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	4	0	0	\N	\N	\N	0	0	f	2	0
-1423	20	1	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1424	20	1	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1425	20	1	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1426	20	1	2e_Dragoon_Div.Bde_Roget	Bde Roget			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1427	20	1	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	9	2	0	0	\N	\N	\N	0	0	f	2	0
-1428	20	1	2e_Dragoon_Div.Bde_Milet	Bde Milet			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1429	20	1	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1300	0	0	0	1	2	0	0	\N	\N	\N	0	0	f	2	0
-1430	20	1	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	4	0	0	\N	\N	\N	0	0	f	2	0
-1431	20	1	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1432	20	1	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	4	0	0	\N	\N	\N	0	0	f	2	0
-1433	20	1	4e_Dragoon_Div.Bde_Margaron	Bde Margaron			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1434	20	1	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1435	20	1	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	5	5	0	0	\N	\N	\N	0	0	f	2	0
-1436	20	1	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	t	2	2
-1437	20	1	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	t	2	2
-1438	21	1	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1439	21	1	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	700	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1440	21	1	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	400	0	0	\N	\N	1	0	0	2	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1441	21	1	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1442	21	1	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	12	3	0	0	\N	\N	\N	0	0	f	2	0
-1443	21	1	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1444	21	1	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1445	21	1	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	4
-1446	21	1	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	900	0	0	0	5	3	0	0	\N	\N	\N	0	0	f	2	0
-1447	21	1	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	800	0	0	\N	\N	1	0	2	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1448	21	1	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1449	21	1	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	1	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1450	21	1	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	200	0	0	0	1	3	0	0	\N	\N	\N	0	0	f	2	0
-1451	21	1	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	4
-1452	21	1	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	0
-1453	21	1	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	6	0	\N	\N	\N	0	4	f	2	3
-1454	21	1	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3600	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1455	21	1	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	3
-1456	21	1	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	4
-1457	21	1	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1458	21	1	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	4200	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1459	21	1	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3300	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1460	21	1	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1461	21	1	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	4200	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	3
-1462	21	1	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	3400	0	0	\N	\N	1	0	1	0	\N	0	0	4	0	0	0	0	0	0	1	0	\N	\N	\N	0	4	f	2	3
-1463	21	1	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1464	22	1	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1465	22	1	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	2	\N	0	0	4	0	0	0	0	0	0	6	0	\N	\N	\N	0	3	f	2	3
-1466	22	1	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1500	0	0	0	2	4	6	0	\N	\N	\N	0	3	f	2	3
-1467	22	1	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	5100	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	6	0	\N	\N	\N	0	4	f	2	0
-1468	22	1	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	1200	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1469	24	1	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1470	24	1	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	1	1	0	0	\N	\N	\N	0	0	f	2	0
-1471	24	1	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	400	0	0	0	1	2	0	0	\N	\N	\N	0	0	f	2	0
-1472	24	1	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1473	24	1	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	1	\N	0	0	2	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1474	24	1	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	1	\N	0	0	2	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1475	24	1	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1476	24	1	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1477	24	1	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1478	24	1	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			10	Prussia	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1479	24	1	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	1
-1480	24	1	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	1
-1481	24	1	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			10	Prussia	2	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	1
-1482	25	1	1eme_Division.13e_Legere	13e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1483	25	1	1eme_Division	1eme Division		Morand	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1484	25	1	2eme_Division.108e_Ligne	108e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1485	25	1	1eme_Division.51e_Ligne	51e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1486	25	1	1eme_Division.17e_Ligne	17e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1487	25	1	1eme_Division.61e_Ligne	61e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1488	25	1	1eme_Division.30e_Ligne	30e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1489	25	1	2eme_Division	2eme Division		Friant	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1490	25	1	2eme_Division.33e_Ligne	33e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1491	25	1	2eme_Division.111e_Ligne	111e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1492	25	1	Cav_Bde	Cav Bde		Viallanes	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1493	25	1	3eme_Division	3eme Division		Gudin	10	France	1	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1494	25	1	3eme_Division.12e_Ligne	12e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1300	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1495	25	1	3eme_Division.21e_Ligne	21e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1496	25	1	3eme_Division.25e_Ligne	25e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1497	25	1	3eme_Division.85e_Ligne	85e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1498	25	1	Cav_Bde.1e_Chasseur	1e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	3	0	0	\N	\N	\N	0	0	f	2	0
-1499	25	1	Cav_Bde.2e_Chasseur	2e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	3	0	0	\N	\N	\N	0	0	f	2	0
-1500	25	1	Corps_Artillery	Corps Artillery		Hannicque	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1501	25	1	2eme_Division.48e_Ligne	48e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1502	25	1	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1503	25	1	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1504	25	1	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1505	25	1	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1506	26	1	Infantry_Division.1e_Grenadiers	1e Grenadiers			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1507	26	1	Infantry_Division.2e_Grenadiers	2e Grenadiers			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1508	26	1	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	16	0	\N	\N	\N	0	1	f	2	2
-1509	26	1	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	1	0	0	\N	\N	\N	0	0	f	2	0
-1510	26	1	Infantry_Division.1e_Chasseurs	1e Chasseurs			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1511	26	1	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	400	0	0	0	8	1	0	0	\N	\N	\N	0	0	f	2	0
-1512	26	1	Guard_Artillery	Guard Artillery		de Lamartiniére	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	2	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1513	26	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1514	26	1	Infantry_Division	Infantry Division		Lefebvre	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1515	26	1	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	\N	\N	\N	\N	\N	\N	\N	2400	0	0	\N	\N	1	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1516	26	1	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	1	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1517	26	1	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	4	t	2	1
-1518	26	1	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	24	0	\N	\N	\N	0	3	f	2	1
-1519	27	1	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1520	27	1	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	300	0	0	0	2	3	0	0	\N	\N	\N	0	0	f	2	0
-1521	27	1	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	422	0	0	0	2	4	0	0	\N	\N	\N	0	0	f	2	0
-1522	27	1	Artillery_Reserve	Artillery Reserve		Eble	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1523	27	1	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1524	27	1	3eme_Division.95e_Ligne	95e Ligne		Drouet	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2600	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1525	27	1	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1500	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1526	27	1	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1527	27	1	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1528	27	1	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1529	27	1	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1530	27	1	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1531	27	1	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2000	0	0	\N	\N	1	0	1	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1532	27	1	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1533	27	1	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	2
-1534	27	1	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1500	0	0	\N	\N	1	0	2	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	4	f	2	0
-1535	27	1	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1536	27	1	1eme_Division.9e_Legere	9e Legere		de l'Eltang	10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2600	0	0	\N	\N	1	2	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	4	f	2	0
-1537	27	1	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1538	27	1	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1539	27	1	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	0	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1540	28	1	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1541	28	1	1eme_Division.105e_Ligne	105e Ligne			10	France	2	2	1	3	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1542	28	1	Corps_Cav.20e_Chasseur	20e Chasseur			10	France	3	2	1	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	600	0	0	0	3	4	0	0	\N	\N	\N	0	0	f	2	0
-1543	28	1	1eme_Division.14e_Ligne	14e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1544	28	1	Corps_Cav	Corps Cav		Durosnel	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1545	28	1	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1546	28	1	2eme_Division.63e_Ligne	63e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1547	28	1	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	1	f	2	2
-1548	28	1	1eme_Division.16e_Legere	16e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	2700	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1549	28	1	1eme_Division.44e_Ligne	44e Ligne			10	France	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	1700	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1550	28	1	1eme_Division	1eme Division		Desjardin	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1551	28	1	2eme_Division.24e_Ligne	24e Ligne			10	France	2	2	4	5	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1552	28	1	2eme_Division.7e_Legere	7e Legere			10	France	2	2	4	6	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1553	28	1	2eme_Division	2eme Division		Bierre	10	France	1	2	4	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1554	28	1	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			10	Hesse	2	2	1	1	1	1	\N	\N	\N	\N	\N	\N	\N	800	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1555	28	1	2eme_Division.Allied_Nassau	Allied Nassau			10	Nassau	2	2	1	5	1	1	\N	\N	\N	\N	\N	\N	\N	400	0	0	\N	\N	1	0	0	0	\N	0	0	4	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1556	28	1	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1557	28	1	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	4	0	0	0	0	0	0	8	0	\N	\N	\N	0	3	f	2	3
-1558	29	1	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1559	29	1	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			10		5	2	5	6	1	1	\N	\N	\N	\N	\N	\N	\N	300	0	0	\N	\N	1	2	4	0	\N	0	0	6	50	0	0	0	3	0	0	0	\N	\N	\N	0	0	f	2	0
-1560	30	1	1st_Div.3rd_special_regt	3rd special regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1561	30	1	1st_Div	1st Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1562	30	1	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data		10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1563	30	1	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1564	30	1	2nd_Div	2nd Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1565	30	1	1st_Div.2nd_Regt	2nd Regt			10	France	2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	6	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1566	30	1	2nd_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1567	30	1	2nd_Div.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1568	30	1	6th_Division	6th Division			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1569	30	1	6th_Division.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1570	30	1	7th_Div	7th Div			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1571	30	1	6th_Division.1st_Regt	1st Regt			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1572	30	1	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1573	30	1	7th_Div.4th_Bn	4th Bn			10		2	2	4	3	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1574	30	1	2nd_Duvussion	2nd Duvussion			10		1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1575	30	1	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			10		2	2	4	7	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	1	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1576	30	1	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		10	gotta break this	2	2	4	4	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	3	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1577	30	1	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			10		2	2	1	8	1	1	\N	\N	\N	\N	\N	\N	\N	1800	0	0	\N	\N	2	0	0	0	\N	0	0	5	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	0
-1578	31	4	6th_Div	6th Div			10	Norman	1	2	3	1	1	1	\N	\N	\N	\N	\N	\N	\N	0	0	0	\N	\N	0	0	0	0	\N	0	0	3	0	0	0	0	0	0	0	0	\N	\N	\N	0	0	f	2	2
-1579	31	4	6th_Div.44th_Light_Fusilier	44th Light Fusilier			10	Norman	2	2	4	4	1	1	\N	\N	\N	\N	\N	\N	\N	2200	0	0	\N	\N	1	3	0	1	\N	0	0	4	0	0	0	0	0	0	2	0	\N	\N	\N	0	4	f	2	0
-1580	31	4	6th_Div.Devil_Bde	Devil Bde	oeu		10		5	2	6	9	1	1	\N	\N	\N	\N	\N	\N	\N	200	0	0	\N	\N	1	2	1	1	\N	0	0	3	80	0	0	0	10	0	0	0	\N	\N	\N	0	0	f	2	0
+1160	3	14	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1161	3	14	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1162	3	14	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1163	3	14	1eme_Division.17e_Legere	17e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2100	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1164	3	14	1eme_Division.34e_Ligne	34e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1165	3	14	1eme_Division.40e_Ligne	40e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1166	3	14	1eme_Division.64e_Ligne	64e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1167	3	14	1eme_Division.88e_Ligne	88e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1168	3	14	2eme_Division	2eme Division		Gazan	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1169	3	14	2eme_Division.21e_Legere	21e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	1	0	0	0	f	f	f	0	0	f	2	0
+1170	3	14	2eme_Division.28e_Legere	28e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	900	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1171	3	14	2eme_Division.100e_Ligne	100e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1172	3	14	2eme_Division.103e_Ligne	103e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1173	4	14	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1174	4	14	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1175	4	14	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1176	4	14	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1177	4	14	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1178	4	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1179	4	14	2eme_Division.59e_Ligne	59e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1180	4	14	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1181	4	14	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1182	4	14	2eme_Division	2eme Division		Gardanne	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1183	4	14	1eme_Division	1eme Division		Marchand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1145	2	14	3eme_Division.18e_Ligne	18e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1146	2	14	Corps_Cavaly.22e_Chasseur	22e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1147	2	14	1eme_Division.55e_Ligne	55e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1148	2	14	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1149	2	14	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1150	2	14	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1151	2	14	3eme_Division.Po_Legere	Po Legere			10	France/Italy	2	2	4	6	1	1	f	f	f	f	f	f	f	1000	0	0	f	f	1	2	2	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1152	2	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1153	2	14	Corps_Artillery	Corps Artillery			10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1154	2	14	Corps_Cavaly.11e_Chasseur	11e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1155	3	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1156	3	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1157	3	14	Cav_Bde	Cav Bde		Trelliard	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1158	3	14	Cav_Bde.10e_Hussar	10e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1159	3	14	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1649	36	4	4e_Dragoon_Div	4e Dragoon Div		Sahut	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1650	36	4	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+1651	36	4	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1652	36	4	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1653	36	4	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1654	36	4	2e_Dragoon_Div.Bde_Roget	Bde Roget			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1655	36	4	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	9	2	0	0	f	f	f	0	0	f	2	0
+1656	36	4	2e_Dragoon_Div.Bde_Milet	Bde Milet			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1657	36	4	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1300	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1658	36	4	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1659	36	4	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1660	36	4	4e_Dragoon_Div.Bde_Margaron	Bde Margaron	17th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 27th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1661	36	4	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1662	36	4	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1211	5	14	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+1212	5	14	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+1666	37	4	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1667	37	4	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1696	39	4	Infantry_Division.2e_Grenadiers	2e Grenadiers			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1293	11	14	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	1
+1761	43	4	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1786	44	4	3rd_Division.Bde_von_Alvensleben	Bde von Alvensleben	Schack Grenadier Battalion Alvensleben Infantry Regiment # 33, two battalions Prince Heinrich Infantry Regiment # 35, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1789	45	4	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	700	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1790	45	4	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1816	46	4	Corps_de_Bataille	Corps de Bataille		General Karl August, Grand Duke of Saxe-Weimar-Eisenach	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1817	46	4	Adv_Guard.Bde_von_Wobeser	Bde von Wobeser	Ernst Fusilier Battalion # 19 One Foot Jäger company Wobeser Dragoon Regiment # 14, five squadrons Lehmann Horse Artillery Battery # 4 (-), four 4-pound guns		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	3	0	1	f	0	0	4	750	0	0	0	5	4	4	0	f	f	f	0	4	f	2	2
+1841	47	4	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1842	48	4	Reserve_Cavalry	Reserve Cavalry			10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1843	48	4	Adv_Guard	Adv Guard		General-Major Johann von Hinrichs	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1663	36	4	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+1664	36	4	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+1706	39	4	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	1
+1776	44	4	Cav_Bde_Blucher.Schorlemmer	Schorlemmer	Schorlemmer Horse Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	3
+1778	44	4	2nd_Div.Merkatz	Merkatz	Merkatz Horse Artillery Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	2
+1787	44	4	1st_Div.Willmann	Willmann	Willmann Horse Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	2
+1821	46	4	Adv_Guard.Horse_Bty_Nr_12	Horse Bty Nr 12			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	3
+1826	46	4	Corps_Artillery.Kirchfeld_Nr_16.Schaefer_Nr_17.Kirchfeld_Nr_16.Horse_Bty_Nr_11	Horse Bty Nr 11			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	3	t	2	3
+1855	48	4	Adv_Guard.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	t	2	4
+1859	48	4	Reserve_Cavalry.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	3
+1184	4	14	Cav_Bde	Cav Bde		Charbanais	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1185	4	14	2eme_Division.50e_Ligne	50e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1186	4	14	2eme_Division.27e_Ligne	27e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1187	4	14	1eme_Division.6e_Legere	6e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1188	4	14	2eme_Division.25e_Legere	25e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1189	5	14	Corps_Artillery	Corps Artillery			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1190	5	14	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1191	5	14	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1192	5	14	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1193	5	14	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1194	5	14	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+1195	5	14	3e_Dragoon_Div	3e Dragoon Div		Beaumont	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1196	5	14	4e_Dragoon_Div	4e Dragoon Div		Sahut	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1197	5	14	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+1198	5	14	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1199	5	14	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1200	5	14	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1201	5	14	2e_Dragoon_Div.Bde_Roget	Bde Roget			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1202	5	14	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	9	2	0	0	f	f	f	0	0	f	2	0
+1203	5	14	2e_Dragoon_Div.Bde_Milet	Bde Milet			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1204	5	14	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1300	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1205	5	14	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1206	5	14	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1207	5	14	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1208	5	14	4e_Dragoon_Div.Bde_Margaron	Bde Margaron			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1209	5	14	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1210	5	14	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1214	6	14	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
+1215	6	14	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1216	6	14	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1217	6	14	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3300	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1218	6	14	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1219	6	14	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1220	6	14	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	4
+1221	6	14	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1222	6	14	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	700	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1223	6	14	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1224	6	14	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
+1225	6	14	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
+1226	6	14	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1227	6	14	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
+1228	6	14	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	12	3	0	0	f	f	f	0	0	f	2	0
+1229	6	14	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1230	6	14	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1231	6	14	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1232	6	14	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	4
+1233	6	14	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
+1234	6	14	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1235	6	14	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1236	6	14	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	1	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1237	6	14	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
+1238	6	14	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1239	7	14	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1240	7	14	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	4	6	0	f	f	f	0	3	f	2	3
+1241	7	14	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1242	7	14	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	0
+1243	7	14	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1244	9	14	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1245	9	14	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+1246	9	14	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+1247	9	14	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1248	9	14	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1249	9	14	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1250	9	14	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1251	9	14	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1252	9	14	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1253	9	14	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1254	9	14	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	1	0	0	f	f	f	0	0	f	2	0
+1255	9	14	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1256	9	14	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1257	10	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1258	10	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1259	10	14	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1260	10	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1261	10	14	1eme_Division.13e_Legere	13e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1262	10	14	1eme_Division	1eme Division		Morand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1263	10	14	2eme_Division.108e_Ligne	108e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1264	10	14	1eme_Division.51e_Ligne	51e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1265	10	14	1eme_Division.17e_Ligne	17e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1266	10	14	1eme_Division.61e_Ligne	61e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1267	10	14	1eme_Division.30e_Ligne	30e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1268	10	14	2eme_Division	2eme Division		Friant	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1269	10	14	2eme_Division.33e_Ligne	33e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1270	10	14	2eme_Division.48e_Ligne	48e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1271	10	14	2eme_Division.111e_Ligne	111e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1272	10	14	Cav_Bde	Cav Bde		Viallanes	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1213	6	14	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1273	10	14	3eme_Division	3eme Division		Gudin	10	France	1	2	1	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1274	10	14	3eme_Division.12e_Ligne	12e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1275	10	14	3eme_Division.21e_Ligne	21e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1276	10	14	3eme_Division.25e_Ligne	25e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1277	10	14	3eme_Division.85e_Ligne	85e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1278	10	14	Cav_Bde.1e_Chasseur	1e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+1279	10	14	Cav_Bde.2e_Chasseur	2e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+1280	10	14	Corps_Artillery	Corps Artillery		Hannicque	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1281	11	14	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	24	0	f	f	f	0	3	f	2	1
+1282	11	14	Infantry_Division.1e_Grenadiers	1e Grenadiers			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1283	11	14	Infantry_Division.2e_Grenadiers	2e Grenadiers			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1284	11	14	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	16	0	f	f	f	0	1	f	2	2
+1285	11	14	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	1	0	0	f	f	f	0	0	f	2	0
+1286	11	14	Infantry_Division.1e_Chasseurs	1e Chasseurs			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1287	11	14	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	8	1	0	0	f	f	f	0	0	f	2	0
+1288	11	14	Guard_Artillery	Guard Artillery		de Lamartiniére	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1289	11	14	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1290	11	14	Infantry_Division	Infantry Division		Lefebvre	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1291	11	14	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1292	11	14	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1294	12	14	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1295	12	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1296	12	14	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1297	12	14	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1298	12	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1299	12	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1300	12	14	1eme_Division.9e_Legere	9e Legere		de l'Eltang	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	2	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1301	12	14	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1302	12	14	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1303	12	14	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1304	12	14	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1305	12	14	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1307	12	14	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1308	12	14	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1309	12	14	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1310	12	14	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	422	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1311	12	14	Artillery_Reserve	Artillery Reserve		Eble	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1312	12	14	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1313	12	14	3eme_Division.95e_Ligne	95e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1314	12	14	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1315	13	14	2eme_Division.24e_Ligne	24e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1316	13	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1317	13	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1318	13	14	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1319	13	14	1eme_Division.105e_Ligne	105e Ligne			10	France	2	2	1	3	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1320	13	14	Corps_Cav.20e_Chasseur	20e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1321	13	14	1eme_Division.14e_Ligne	14e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1322	13	14	Corps_Cav	Corps Cav		Durosnel	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1323	13	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1324	13	14	2eme_Division.63e_Ligne	63e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1325	13	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1326	13	14	1eme_Division.16e_Legere	16e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1327	13	14	1eme_Division.44e_Ligne	44e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1328	13	14	1eme_Division	1eme Division		Desjardin	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1329	13	14	2eme_Division.7e_Legere	7e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1330	13	14	2eme_Division	2eme Division		Bierre	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1331	13	14	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			10	Hesse	2	2	1	1	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1332	13	14	2eme_Division.Allied_Nassau	Allied Nassau			10	Nassau	2	2	1	5	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1333	14	14	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1334	14	14	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			10		5	2	5	6	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	6	50	0	0	0	3	0	0	0	f	f	f	0	0	f	2	0
+1335	15	14	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			10		2	2	1	8	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	2	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1336	15	14	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data		10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1337	15	14	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		10	gotta break this	2	2	4	4	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	3	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1341	15	14	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1342	15	14	6th_Division	6th Division			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1343	15	14	6th_Division.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1344	15	14	6th_Division.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1345	15	14	7th_Div	7th Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1346	15	14	2nd_Div.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1347	15	14	2nd_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1128	1	14	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1129	1	14	Supply_Train.Guard_Detachment	Guard Detachment			10		5	2	6	8	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	10	60	0	0	0	12	7	0	0	f	f	f	0	0	f	2	0
+1130	2	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1131	2	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1132	2	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1133	2	14	2eme_Division	2eme Division		Leval	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1134	2	14	2eme_Division.28e_Ligne	28e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1135	2	14	1eme_Division.35e_Ligne	35e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1136	2	14	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	2	0	1	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1137	2	14	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1138	2	14	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1139	2	14	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1140	2	14	2eme_Division.4e_Ligne	4e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1141	2	14	1eme_Division	1eme Division		St Hilaire	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1142	2	14	3eme_Division.26e_Legere	26e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1143	2	14	1eme_Division.10e_Legere	10e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1348	15	14	2nd_Div	2nd Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1349	15	14	1st_Div.3rd_special_regt	3rd special regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1350	15	14	1st_Div.2nd_Regt	2nd Regt			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	6	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1351	15	14	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1352	15	14	1st_Div	1st Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1578	31	4	6th_Div	6th Div			10	Norman	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1579	31	4	6th_Div.44th_Light_Fusilier	44th Light Fusilier			10	Norman	2	2	4	4	1	1	f	f	f	f	f	f	f	2200	0	0	f	f	1	3	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
+1580	31	4	6th_Div.Devil_Bde	Devil Bde	oeu		10		5	2	6	9	1	1	f	f	f	f	f	f	f	200	0	0	f	f	1	2	1	1	f	0	0	3	80	0	0	0	10	0	0	0	f	f	f	0	0	f	2	0
+1585	33	4	1eme_Division.35e_Ligne	35e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1586	33	4	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	2	0	1	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1587	33	4	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1588	33	4	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1589	33	4	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1590	33	4	2eme_Division.4e_Ligne	4e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1591	33	4	1eme_Division	1eme Division		St Hilaire	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1592	33	4	3eme_Division.26e_Legere	26e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1593	33	4	1eme_Division.10e_Legere	10e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1594	33	4	2eme_Division.57e_Ligne	57e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1595	33	4	3eme_Division.18e_Ligne	18e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1596	33	4	Corps_Cavaly.22e_Chasseur	22e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1597	33	4	1eme_Division.55e_Ligne	55e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1598	33	4	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1599	33	4	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1600	33	4	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1601	33	4	3eme_Division.Po_Legere	Po Legere			10	France/Italy	2	2	4	6	1	1	f	f	f	f	f	f	f	1000	0	0	f	f	1	2	2	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1602	33	4	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1603	33	4	Corps_Artillery	Corps Artillery			10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1604	33	4	Corps_Cavaly.11e_Chasseur	11e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1605	33	4	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1606	33	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1607	33	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1608	34	4	Cav_Bde	Cav Bde		Trelliard	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1609	34	4	Cav_Bde.10e_Hussar	10e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1610	34	4	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1611	34	4	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1613	34	4	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1614	34	4	1eme_Division.34e_Ligne	34e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1615	34	4	1eme_Division.40e_Ligne	40e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1616	34	4	1eme_Division.64e_Ligne	64e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1617	34	4	1eme_Division.88e_Ligne	88e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1618	34	4	1eme_Division.17e_Legere	17e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2100	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1619	34	4	2eme_Division	2eme Division		Gazan	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1620	34	4	2eme_Division.28e_Legere	28e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	900	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1621	34	4	2eme_Division.100e_Ligne	100e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1622	34	4	2eme_Division.103e_Ligne	103e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1623	34	4	2eme_Division.21e_Legere	21e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	1	0	0	0	f	f	f	0	0	f	2	0
+1624	34	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1625	34	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1626	35	4	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1627	35	4	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1628	35	4	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1629	35	4	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1630	35	4	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1631	35	4	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1646	36	4	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1647	36	4	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+1648	36	4	3e_Dragoon_Div	3e Dragoon Div		Beaumont	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1665	36	4	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche	18th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 19th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+1668	37	4	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	4	6	0	f	f	f	0	3	f	2	3
+1669	37	4	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	0
+1670	37	4	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1671	38	4	1eme_Division.13e_Legere	13e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1672	38	4	1eme_Division	1eme Division		Morand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1673	38	4	2eme_Division.108e_Ligne	108e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1674	38	4	1eme_Division.51e_Ligne	51e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1675	38	4	1eme_Division.17e_Ligne	17e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1676	38	4	1eme_Division.61e_Ligne	61e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1677	38	4	1eme_Division.30e_Ligne	30e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1678	38	4	2eme_Division	2eme Division		Friant	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1679	38	4	2eme_Division.33e_Ligne	33e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1680	38	4	2eme_Division.111e_Ligne	111e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1681	38	4	Cav_Bde	Cav Bde		Viallanes	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1682	38	4	3eme_Division	3eme Division		Gudin	10	France	1	2	1	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1683	38	4	3eme_Division.12e_Ligne	12e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1684	38	4	3eme_Division.21e_Ligne	21e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1685	38	4	3eme_Division.25e_Ligne	25e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1686	38	4	3eme_Division.85e_Ligne	85e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1687	38	4	Cav_Bde.1e_Chasseur	1e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+1688	38	4	Cav_Bde.2e_Chasseur	2e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+1689	38	4	Corps_Artillery	Corps Artillery		Hannicque	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1690	38	4	2eme_Division.48e_Ligne	48e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1691	38	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1692	38	4	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1693	38	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1694	38	4	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1695	39	4	Infantry_Division.1e_Grenadiers	1e Grenadiers			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1697	39	4	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	16	0	f	f	f	0	1	f	2	2
+1698	39	4	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	1	0	0	f	f	f	0	0	f	2	0
+1699	39	4	Infantry_Division.1e_Chasseurs	1e Chasseurs			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1700	39	4	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	8	1	0	0	f	f	f	0	0	f	2	0
+1701	39	4	Guard_Artillery	Guard Artillery		de Lamartiniére	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1702	39	4	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1703	39	4	Infantry_Division	Infantry Division		Lefebvre	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1704	39	4	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1705	39	4	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1707	39	4	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	24	0	f	f	f	0	3	f	2	1
+1708	40	4	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1709	40	4	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1710	40	4	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	422	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1711	40	4	Artillery_Reserve	Artillery Reserve		Eble	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1712	40	4	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1713	40	4	3eme_Division.95e_Ligne	95e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1714	40	4	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1715	40	4	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1716	40	4	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1717	40	4	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1718	40	4	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1719	40	4	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1720	40	4	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1721	40	4	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1722	40	4	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+1723	40	4	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1724	40	4	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1725	40	4	1eme_Division.9e_Legere	9e Legere		de l'Eltang	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	2	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1726	40	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1727	40	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1728	40	4	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1729	41	4	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1730	41	4	1eme_Division.105e_Ligne	105e Ligne			10	France	2	2	1	3	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1731	41	4	Corps_Cav.20e_Chasseur	20e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+1732	41	4	1eme_Division.14e_Ligne	14e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1733	41	4	Corps_Cav	Corps Cav		Durosnel	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1734	41	4	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1735	41	4	2eme_Division.63e_Ligne	63e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1736	41	4	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1737	41	4	1eme_Division.16e_Legere	16e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1738	41	4	1eme_Division.44e_Ligne	44e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1739	41	4	1eme_Division	1eme Division		Desjardin	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1740	41	4	2eme_Division.24e_Ligne	24e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1741	41	4	2eme_Division.7e_Legere	7e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1742	41	4	2eme_Division	2eme Division		Bierre	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1743	41	4	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			10	Hesse	2	2	1	1	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1744	41	4	2eme_Division.Allied_Nassau	Allied Nassau			10	Nassau	2	2	1	5	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1745	41	4	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1746	41	4	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1748	42	4	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			10		5	2	5	6	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	6	50	0	0	0	3	0	0	0	f	f	f	0	0	f	2	0
+1749	43	4	1st_Div.3rd_special_regt	3rd special regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1750	43	4	1st_Div	1st Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1751	43	4	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data		10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1752	43	4	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1306	12	14	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1753	43	4	2nd_Div	2nd Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1754	43	4	1st_Div.2nd_Regt	2nd Regt			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	6	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1755	43	4	2nd_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1756	43	4	2nd_Div.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1757	43	4	6th_Division	6th Division			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1758	43	4	6th_Division.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1759	43	4	7th_Div	7th Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1760	43	4	6th_Division.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1762	43	4	7th_Div.4th_Bn	4th Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1763	43	4	2nd_Duvussion	2nd Duvussion			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1764	43	4	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			10		2	2	4	7	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1765	43	4	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		10	gotta break this	2	2	4	4	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	3	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1766	43	4	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			10		2	2	1	8	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	2	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1767	44	4	Adv_Guard	Adv Guard	Blucher own	Blucher	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1768	44	4	1st_Div	1st Div		Pr Wiliam of Orange	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1769	44	4	2nd_Div	2nd Div		Wartensleben	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1770	44	4	Adv_Guard.Lt_Bde_Oswald	Lt Bde Oswald	Weimar Fusilier Battalion Greiffenberg Fusilier Battalion # 4 Oswald Fusilier Battalion # 14 Kloch Fusilier Battalion # 18		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2300	0	0	f	f	1	3	0	4	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1771	44	4	3rd_Division	3rd Division		von Schmettau	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1772	44	4	Cav_Bde_Blucher.Wurttemberg_Hussars_Nr_4	Württemberg Hussars Nr 4	Württemberg Hussar Regiment # 4		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1773	44	4	Cav_Bde_Blucher.Blucher_Hussar_Regt_Nr_8	Blucher Hussar Regt Nr 8			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+1774	44	4	Cav_Bde_Blucher	Cav Bde Blucher	Bluchers cav bde as part of the advance guard	Blucher	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1775	44	4	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1777	44	4	2nd_Div.Bde_von_Renouard	Bde von Renouard	Alt-Braun Grenadier Battalion Prince Louis Infantry Regiment # 20, two battalions Brunswick Infantry Regiment # 21, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1779	44	4	1st_Div.Bde_Prinz_Henry	Bde Prinz Henry	Rheinbaben Grenadier Battalion Prince Ferdinand Infantry Regiment # 34, two battalions Puttkammer Infantry Regiment # 36, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1780	44	4	2nd_Div.Bde_von_Wedel	Bde von Wedel	Hanstein Grenadier Battalion Renouard Infantry Regiment # 3, two battalions Kleist Infantry Regiment # 5, two battalions Wilkins Foot Artillery battery, six 8-pound guns		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1812	45	4	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1338	15	14	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			10		2	2	4	7	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1340	15	14	7th_Div.4th_Bn	4th Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1781	44	4	1st_Div.Bde_von_Lutzow	Bde von Lützow	Knebel Grenadier Battalion Möllendorf Infantry Regiment # 25, two battalions Wartensleben Infantry Regiment # 59, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1782	44	4	3rd_Division.Bde_von_Schimonsky	Bde von Schimonsky	Krafft Grenadier Battalion Malschitsky Infantry Regiment # 28, two battalions Schimonsky Infantry Regiment # 40, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+1783	44	4	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	5	4	6	0	f	f	f	0	4	f	2	0
+1747	42	4	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1784	44	4	1st_Div.Cav_Bde_Prinz_Wilhelm	Cav Bde Prinz Wilhelm	Leib Carabinier Regiment # 12, five squadrons Garde du Corps Cuirassier Regiment # 14, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1785	44	4	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1800	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1791	45	4	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1792	45	4	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	12	3	0	0	f	f	f	0	0	f	2	0
+1793	45	4	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1794	45	4	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1795	45	4	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	4
+1796	45	4	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
+1797	45	4	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1798	45	4	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	1	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1799	45	4	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
+1800	45	4	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
+1801	45	4	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
+1802	45	4	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
+1803	45	4	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1804	45	4	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1805	45	4	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	4
+1806	45	4	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1807	45	4	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1612	34	4	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1808	45	4	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3300	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1809	45	4	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1810	45	4	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1811	45	4	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
+1813	45	4	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	2	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1814	46	4	Corps_de_Bataille.3rd_Bde	3rd Bde	Sobbe Fusilier Battalion # 18 Wedell Infantry Regiment # 10, two battalions Tschepe Infantry Regiment # 37, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1815	46	4	Adv_Guard	Adv Guard	part of the OOB, but they didnt make it to the actual battle	von Winning	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1818	46	4	Adv_Guard.Bde_von_Winning	Bde von Winning	Kaiserlingk Fusilier Battalion # 1 Bila Fusilier Battalion # 2 Tschammer Infantry Regiment # 27, two battalions Two Foot Jäger companies		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1819	46	4	Adv_Guard.Bty_Nr_19	Bty Nr 19			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1820	46	4	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1822	46	4	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1823	46	4	Corps_de_Bataille.Katte_Dragoon_Regt_Nr_4	Katte Dragoon Regt Nr 4			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	800	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1824	46	4	Corps_de_Bataille.Bailliodz_Cuirassier_Nr_5	Bailliodz Cuirassier Nr 5			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	800	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1825	46	4	Corps_Artillery.Kirchfeld_Nr_16.Schaefer_Nr_17	Schaefer Nr 17			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1827	46	4	Corps_Artillery	Corps Artillery			10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1828	46	4	Corps_Artillery.Kirchfeld_Nr_16	Kirchfeld Nr 16			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+1829	47	4	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1830	47	4	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	1	0	0	f	f	f	0	0	f	2	0
+1831	47	4	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+1832	47	4	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1833	47	4	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1834	47	4	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1835	47	4	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1836	47	4	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1581	32	4	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1582	32	4	Supply_Train.Guard_Detachment	Guard Detachment			10		5	2	6	8	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	10	60	0	0	0	12	7	0	0	f	f	f	0	0	f	2	0
+1583	33	4	2eme_Division	2eme Division		Leval	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1584	33	4	2eme_Division.28e_Ligne	28e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1837	47	4	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1838	47	4	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+1839	47	4	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+1840	47	4	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+1845	48	4	1st_Div	1st Div		von Natzmer	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1846	48	4	2nd_Div	2nd Div		von Larisch	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1847	48	4	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17		10		2	2	4	9	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	-3	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1848	48	4	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	5400	0	0	f	f	1	0	3	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1849	48	4	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1632	35	4	2eme_Division.59e_Ligne	59e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1788	45	4	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1633	35	4	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1634	35	4	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1635	35	4	2eme_Division	2eme Division		Gardanne	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1636	35	4	1eme_Division	1eme Division		Marchand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1637	35	4	Cav_Bde	Cav Bde		Charbanais	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1638	35	4	2eme_Division.50e_Ligne	50e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1639	35	4	2eme_Division.27e_Ligne	27e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1640	35	4	1eme_Division.6e_Legere	6e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1641	35	4	2eme_Division.25e_Legere	25e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1642	36	4	Corps_Artillery	Corps Artillery			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1643	36	4	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1644	36	4	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1645	36	4	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1844	48	4	New_Division				10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1339	15	14	2nd_Duvussion	2nd Duvussion			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1144	2	14	2eme_Division.57e_Ligne	57e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1850	48	4	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1851	48	4	1st_Div.Foot_Bti	Foot Bti			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
+1852	48	4	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1853	48	4	2nd_Div.Foot_Bty	Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
+1854	48	4	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1856	48	4	Reserve_Cavalry.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, four squadrons Katte Dragoon Regiment # 10, four squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+1857	48	4	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1858	48	4	1st_Div.Grenadier_Bde	Grenadier Bde	Schmeling Grenadier Battalion Crety Grenadier Battalion		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 \.
 
 
@@ -3920,7 +3652,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 -- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('unit_id_seq', 1580, true);
+SELECT pg_catalog.setval('unit_id_seq', 1859, true);
 
 
 --
@@ -3942,7 +3674,7 @@ COPY users (id, username, passwd, name, email, rank, created, expires, channel, 
 8	uuu	a		uuu@ccc.nnn	0	2016-10-19 05:24:08.784685+10:30	2016-10-19 05:24:08.784685+10:30	0					f	t	t
 9	iii	ii		iii@ii.iii	0	2016-10-19 05:25:52.554975+10:30	2016-10-19 05:25:52.554975+10:30	0					f	t	t
 2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:48299	Australia	http://witchwoodstudio.com		f	f	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	2	127.0.0.1:42992	Australia	15mm-madness.blogspot.com		f	t	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	2	127.0.0.1:41796	Australia	15mm-madness.blogspot.com		f	f	t
 \.
 
 
@@ -4059,14 +3791,6 @@ ALTER TABLE ONLY force_unit
 
 ALTER TABLE ONLY game_cmd
     ADD CONSTRAINT game_cmd_pkey PRIMARY KEY (id);
-
-
---
--- Name: game_objective_pkey; Type: CONSTRAINT; Schema: public; Owner: steve; Tablespace: 
---
-
-ALTER TABLE ONLY game_objective
-    ADD CONSTRAINT game_objective_pkey PRIMARY KEY (id);
 
 
 --

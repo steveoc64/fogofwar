@@ -15,7 +15,7 @@ SET search_path = public, pg_catalog;
 -- Data for Name: drill; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, mixed, att_col, close_col, oblique, square, mob, control, speed, wline) FROM stdin;
+COPY drill (id, name, ranks, flankers, elite_coy, third_rank, open_order, line, mixed, att_col, close_col, oblique, square, mob, control, speed, lines) FROM stdin;
 1	Linear	3	f	f	f	f	t	f	f	t	t	t	f	8	2	t
 2	Green Conscript	3	f	f	f	f	t	f	f	t	f	f	t	4	1	t
 3	Basic Training	3	f	f	t	f	t	f	t	t	f	f	f	5	2	t

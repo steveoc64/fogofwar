@@ -52,7 +52,7 @@ func (g *GlobalSessionData) GetRank() string {
 var Session GlobalSessionData
 
 func (s *GlobalSessionData) Navigate(url string) {
-	print("Navigate to", url)
+	// print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
 	s.Subscriptions = make(map[string]MessageFunction)
 	s.Context = nil

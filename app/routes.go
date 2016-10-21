@@ -67,6 +67,7 @@ func enableRoutes(Rank int) {
 		"game-edit-red":       gameEditRed,
 		"game-edit-blue":      gameEditBlue,
 		"game-edit-table":     gameEditTable,
+		"game-edit-players":   gameEditPlayers,
 	}
 	switch Rank {
 	case 10:
@@ -142,6 +143,7 @@ func loadRoutes(Rank int, Routes []shared.UserRoute) {
 	enableRoutes(Rank)
 
 	for _, v := range Routes {
+		// print("processing ", v.Route, v)
 		if f, ok := Session.AppFn[v.Func]; ok {
 			// print("found a function called", v.Func)
 			// print("adding route", v.Route, v.Func)

@@ -90,6 +90,24 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 			DB.SQL(`select * from game_cmd where game_id=$1 and blue_team order by name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
 
+		// If the GetUnits flag was set, then get all the units for each of the commands as well
+		if data.GetUnits {
+			if data.Red {
+				for _, v := range retval.RedCmd {
+					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
+					println("red", v.ID, data.ID, v.Units)
+				}
+			}
+			if data.Blue {
+				for _, v := range retval.BlueCmd {
+					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
+					println("blue", v.ID, data.ID, v.Units)
+				}
+			}
+		}
+
 		// calculate the x and y km
 		retval.CalcKm()
 		retval.CalcGrid()

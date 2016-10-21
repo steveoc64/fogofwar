@@ -39,9 +39,9 @@ func gameEditTable(context *router.Context) {
 		game.InMode = "Table"
 
 		if len(game.Tiles) == 0 {
-			print("No tiles - create a new set")
+			// print("No tiles - create a new set")
 			game.InitTiles()
-			print("but after inittiles its", game)
+			// print("but after inittiles its", game)
 			// } else {
 			// game.XYTiles()
 		}
@@ -147,7 +147,7 @@ func gameEditTable(context *router.Context) {
 				// add objective tiles on top !!
 				if modeSet == "Objective" {
 					for i, v := range game.Objectives {
-						print("gen svg for obj", v)
+						// print("gen svg for obj", v)
 						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
 							v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
 							game.GridSize, game.GridSize, // width and height in inches
@@ -245,16 +245,16 @@ func gameEditTable(context *router.Context) {
 						})
 
 						abar.AddEventListener("change", false, func(evt dom.Event) {
-							print("one of the objective properties has changed !!")
-							print("X Y of the objective is", currentObjX, currentObjY)
+							// print("one of the objective properties has changed !!")
+							// print("X Y of the objective is", currentObjX, currentObjY)
 							o := game.GetObjective(currentObjX, currentObjY)
 							if o != nil {
 								o.Name = abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value
 								o.VPPerTurn, _ = strconv.Atoi(abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value)
 								o.RedVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value)
 								o.BlueVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value)
-								print("set into o", o)
-								print("and in the game object, its now", game)
+								// print("set into o", o)
+								// print("and in the game object, its now", game)
 
 							}
 						})
@@ -277,7 +277,7 @@ func gameEditTable(context *router.Context) {
 			btn.SetAttribute("name", "save-button")
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
-				print("clicked on the save button")
+				// print("clicked on the save button")
 				go func() {
 					err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
 						Channel: Session.Channel,
@@ -305,7 +305,7 @@ func gameEditTable(context *router.Context) {
 			btn.SetAttribute("name", "restore-button")
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
-				print("clicked on the restore button")
+				// print("clicked on the restore button")
 				if dom.GetWindow().Confirm("Restore the Map from file ?") {
 					Session.Reload(context)
 				}
@@ -323,7 +323,7 @@ func gameEditTable(context *router.Context) {
 		// Add a reset all button
 
 		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
-			print("clicked on", url)
+			// print("clicked on", url)
 			Session.Navigate(url)
 		})
 
@@ -361,7 +361,7 @@ func gameEditTable(context *router.Context) {
 		scaleImages := func() {
 			gridInches := fmt.Sprintf("%d", game.GridSize)
 			for _, v := range []string{"rough", "woods", "building", "fort", "water", "water1", "water2"} {
-				print("rescale", v)
+				// print("rescale", v)
 				el := doc.QuerySelector("#tile-" + v)
 				el.SetAttribute("height", gridInches)
 				el.SetAttribute("width", gridInches)
@@ -420,7 +420,7 @@ func gameEditTable(context *router.Context) {
 			if t.TagName() == "rect" {
 				i, _ := strconv.Atoi(t.GetAttribute("data-index"))
 				theTile := game.GetTile(i)
-				print("Clicked on tile", *theTile, i)
+				// print("Clicked on tile", *theTile, i)
 				tClass := t.Class()
 				changed := false
 
@@ -431,7 +431,7 @@ func gameEditTable(context *router.Context) {
 					tClass.Add(theTile.GetCSS())
 					changed = true
 				case "Objective":
-					print("click on tile in objective mode")
+					// print("click on tile in objective mode")
 					doc.QuerySelector("#objective-fields").Class().Remove("hidden")
 					tName := t.GetAttribute("name")
 					if strings.HasPrefix(tName, "objective-") {
@@ -440,16 +440,16 @@ func gameEditTable(context *router.Context) {
 						if i >= len(game.Objectives) {
 							print("something went a bit wrong there - index out of range", i, len(game.Objectives))
 						} else {
-							print("looks like a valid objective", i)
+							// print("looks like a valid objective", i)
 							theObj := game.Objectives[i]
 							print("which gives", theObj)
 							setObjectiveFields(theObj)
 						}
 					} else {
 						// Clicked on terrain tile with no existing objective
-						print("the tile is", theTile)
+						// print("the tile is", theTile)
 						theObj := game.AddObjective(theTile.X, theTile.Y)
-						print("got", theObj)
+						// print("got", theObj)
 						setObjectiveFields(theObj)
 					}
 					changed = true

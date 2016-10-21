@@ -1050,7 +1050,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 						bayonets,small_arms,elite_arms,lt_coy,jg_coy,rating,sabres,cav_type,cav_rating,
 						guns,gunnery_type,gun_condition,horse_guns
 					from force_unit 
-					where force_id=$1`, oldForce.ID, newCmdID, data.ID).Exec()
+					where force_id=$1`, oldForce.ID, newCmdID, *newID).Exec()
 
 				if err != nil {
 					println(err.Error())

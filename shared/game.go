@@ -131,11 +131,12 @@ type Game struct {
 }
 
 type GameRPCData struct {
-	Channel int
-	ID      int
-	Red     bool
-	Blue    bool
-	Game    *Game
+	Channel  int
+	ID       int
+	Red      bool
+	Blue     bool
+	GetUnits bool
+	Game     *Game
 }
 
 func (g *Game) GetObjective(x, y int) *GameObjective {
@@ -345,27 +346,40 @@ func (g *Game) GetPlayers() string {
 	return fmt.Sprintf("%d vs %d", g.NumRedPlayers, g.NumBluePlayers)
 }
 
+func (g *Game) GetCmd(team string, id int) *GameCmd {
+	cmds := g.RedCmd
+	if team == "Blue" {
+		cmds = g.BlueCmd
+	}
+	for _, v := range cmds {
+		if v.ID == id {
+			return v
+		}
+	}
+	return nil
+}
+
 type GameCmd struct {
-	ID            int    `db:"id"`
-	GameID        int    `db:"game_id"`
-	GameName      string `db:"game_name"` // derived data
-	RedTeam       bool   `db:"red_team"`
-	BlueTeam      bool   `db:"blue_team"`
-	Nation        string `db:"nation"`
-	Name          string `db:"name"`
-	CommanderName string `db:"commander_name"`
-	Level         int    `db:"level"`
-	LevelName     string `db:"level_name"`
-	Descr         string `db:"descr"`
-	Rating        int    `db:"rating"`
-	Inspiration   int    `db:"inspiration"`
-	Condition     int    `db:"condition"`
-	PlayerID      *int   `db:"player_id"`
-	Units         []Unit `db:"units"`
-	VP            int    `db:"vp"`
-	Bayonets      *int   `db:"bayonets"` // derived data
-	Sabres        *int   `db:"sabres"`   // derived data
-	Guns          *int   `db:"guns"`     // derived data
+	ID            int     `db:"id"`
+	GameID        int     `db:"game_id"`
+	GameName      string  `db:"game_name"` // derived data
+	RedTeam       bool    `db:"red_team"`
+	BlueTeam      bool    `db:"blue_team"`
+	Nation        string  `db:"nation"`
+	Name          string  `db:"name"`
+	CommanderName string  `db:"commander_name"`
+	Level         int     `db:"level"`
+	LevelName     string  `db:"level_name"`
+	Descr         string  `db:"descr"`
+	Rating        int     `db:"rating"`
+	Inspiration   int     `db:"inspiration"`
+	Condition     int     `db:"condition"`
+	PlayerID      *int    `db:"player_id"`
+	Units         []*Unit `db:"units"`
+	VP            int     `db:"vp"`
+	Bayonets      *int    `db:"bayonets"` // derived data
+	Sabres        *int    `db:"sabres"`   // derived data
+	Guns          *int    `db:"guns"`     // derived data
 }
 
 func (f *GameCmd) Summarize() string {
@@ -387,6 +401,7 @@ func (f *GameCmd) Summarize() string {
 
 type Unit struct {
 	ID               int    `db:"id"`
+	GameID           int    `db:"game_id"`
 	CmdID            int    `db:"cmd_id"`
 	Path             string `db:"path"`
 	Name             string `db:"name"`
@@ -403,6 +418,7 @@ type Unit struct {
 	EliteArms        int    `db:"elite_arms"`
 	LtCoy            int    `db:"lt_coy"`
 	JgCoy            int    `db:"jg_coy"`
+	Rifles           bool   `db:"rifles"`
 	Rating           int    `db:"rating"`
 	Sabres           int    `db:"sabres"`
 	CavType          int    `db:"cav_type"`
@@ -418,23 +434,28 @@ type Unit struct {
 	Woods            bool   `db:"woods"`
 	Rough            bool   `db:"rough"`
 	Cover            bool   `db:"cover"`
-	RFlank           bool   `db:""`
-	LFlank           bool   `db:""`
-	HasSupport       bool   `db:""`
-	BayonetsLost     int    `db:""`
-	BayonetsMState   int    `db:""`
-	BayonetsMoved    bool   `db:""`
-	BayonetsFired    bool   `db:""`
+	RFlank           bool   `db:"rflank"`
+	LFlank           bool   `db:"lflank"`
+	HasSupport       bool   `db:"has_support"`
+	BayonetsLost     int    `db:"bayonets_lost"`
+	BayonetsMState   int    `db:"bayonets_mstate"`
+	BayonetsMoved    bool   `db:"bayonets_moved"`
+	BayonetsFired    bool   `db:"bayonets_fired"`
 	LTLost           int    `db:"lt_lost"`
 	LTMState         int    `db:"lt_mstate"`
 	SabresLost       int    `db:"sabres_lost"`
 	SabresMState     int    `db:"sabres_mstate"`
+	SabresCharged    int    `db:"sabres_charged"`
 	GunsLost         int    `db:"guns_lost"`
 	GunsFired        bool   `db:"guns_fired"`
 	GunsMoved        bool   `db:"guns_moved"`
 	GunsLimbered     bool   `db:"guns_limbered"`
 	GunsMState       int    `db:"guns_mstate"`
 	GunMaxCondition  int    `db:"gun_max_condition"`
+}
+
+func (u *Unit) GetSitrep() string {
+	return "todo - add some long winded write up on the individual unit "
 }
 
 func (u *Unit) GetBases() string {

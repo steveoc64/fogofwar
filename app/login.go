@@ -89,15 +89,15 @@ func Login(username string, passwd string) {
 		})
 		doc.QuerySelector("#menu-game").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("TODO - Games")
+			Session.Navigate("/")
 		})
 		doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
 			print("TODO - Invite")
 		})
-		doc.QuerySelector("#menu-tutorial").AddEventListener("click", false, func(evt dom.Event) {
+		doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate("/manual")
+			dom.GetWindow().Open("/manual", "actionfront-manual", "")
 		})
 		doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()

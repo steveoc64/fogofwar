@@ -92,7 +92,9 @@ func mainPage(context *router.Context) {
 
 		// print("add action grid")
 		form.ActionGrid("main-actions", "#action-grid", Session, func(url string) {
-			// print("clicked on", url)
+			if url == "manual" {
+				dom.GetWindow().Open("/manual", "actionfront-manual", "")
+			}
 			Session.Navigate(url)
 		})
 

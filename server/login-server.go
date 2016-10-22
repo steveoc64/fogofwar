@@ -185,7 +185,7 @@ func (l *LoginRPC) Logout(channel int, retval *shared.Login) error {
 
 	conn := Connections.Get(channel)
 
-	DB.SQL(`update user set channel=0 where id=$1`, conn.UserID).Exec()
+	DB.SQL(`update users set channel=0 where id=$1`, conn.UserID).Exec()
 	DB.SQL(`update login set up='f',channel=0 where channel=$1`, conn.ID).Exec()
 
 	logger(start, "Login.Logout", conn,

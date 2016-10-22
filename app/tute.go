@@ -18,13 +18,10 @@ func faq(context *router.Context) {
 	doc := w.Document()
 
 	loadTemplate("faq", "#faq", nil)
+	doc.QuerySelector(".pricing").Class().Toggle("hidden")
 	doc.QuerySelector("#faq").Class().Toggle("hidden")
 }
 
 func manual(context *router.Context) {
-	w := dom.GetWindow()
-	doc := w.Document()
-
-	loadTemplate("manual", "#faq", nil)
-	doc.QuerySelector("#faq").Class().Toggle("hidden")
+	dom.GetWindow().Open("/manual", "actionfront-manual", "")
 }

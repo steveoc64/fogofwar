@@ -12,6 +12,8 @@ import (
 	// "github.com/steveoc64/godev/mail"
 )
 
+const CodeVersion = "Jena 2210.5"
+
 type LoginRPC struct{}
 
 type dbLoginResponse struct {
@@ -79,6 +81,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 
 		if err != nil {
 			log.Println("Login Failed:", err.Error())
+			lr.Version = CodeVersion
 			lr.Result = "Failed"
 			lr.Token = ""
 			// lr.Menu = []shared.UserMenu{}
@@ -93,6 +96,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			// log.Println("Login OK")
 			lr.Result = "OK"
 			lr.Token = fmt.Sprintf("%d", lc.Channel)
+			lr.Version = CodeVersion
 
 			//lr.Menu = []string{"RPC Dashboard", "Events", "Sites", "Machines", "Tools", "Parts", "Vendors", "Users", "Skills", "Reports"}
 			// lr.Menu = getMenu(res.Role)

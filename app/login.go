@@ -42,6 +42,8 @@ func Login(username string, passwd string) {
 		Session.MaxGames = lr.MaxGames
 		Session.MaxScenarios = lr.MaxScenarios
 		Session.MaxPlayers = lr.MaxPlayers
+		Session.Version = lr.Version
+		print("Code Version -", lr.Version)
 
 		loadRoutes(lr.Rank, lr.Routes)
 

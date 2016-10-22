@@ -27,15 +27,7 @@ func gameEditTable(context *router.Context) {
 	}
 
 	go func() {
-		game := shared.Game{}
-		err := RPC("GameRPC.Get", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &game)
-		if err != nil {
-			dom.GetWindow().Alert(err.Error())
-			return
-		}
+		game := Session.EditGame
 		game.InMode = "Table"
 
 		if len(game.Tiles) == 0 {
@@ -84,8 +76,8 @@ func gameEditTable(context *router.Context) {
 		})
 
 		// All done, so render the form
-		form.Render("edit-form", "main", &game)
-		loadTemplate("game-table-svg", "[name=Map]", &game)
+		form.Render("edit-form", "main", game)
+		loadTemplate("game-table-svg", "[name=Map]", game)
 		form.Get("TableX").SetAttribute("max", "16")
 		form.Get("TableY").SetAttribute("max", "8")
 
@@ -282,7 +274,7 @@ func gameEditTable(context *router.Context) {
 					err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
 						Channel: Session.Channel,
 						ID:      id,
-						Game:    &game,
+						Game:    game,
 					}, &game.CheckTable)
 					if err != nil {
 						dom.GetWindow().Alert(err.Error())
@@ -322,13 +314,13 @@ func gameEditTable(context *router.Context) {
 
 		// Add a reset all button
 
-		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
+		form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
 			// print("clicked on", url)
 			Session.Navigate(url)
 		})
 
 		resizeMap := func() {
-			form.Bind(&game)
+			form.Bind(game)
 			if game.TableX < 1 {
 				game.TableX = 1
 			}

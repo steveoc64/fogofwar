@@ -23,16 +23,8 @@ func gameEditTeam(context *router.Context) {
 		w := dom.GetWindow()
 		doc := w.Document()
 
-		game := shared.Game{}
-		RPC("GameRPC.Get", shared.GameRPCData{
-			Channel:  Session.Channel,
-			ID:       id,
-			Red:      team == "Red",
-			Blue:     team == "Blue",
-			GetUnits: true,
-		}, &game)
-		// print("game red", game)
-
+		game := Session.EditGame
+		game.InMode = "Team"
 		form := formulate.EditForm{}
 
 		// Layout the fields
@@ -60,13 +52,13 @@ func gameEditTeam(context *router.Context) {
 
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			form.Bind(&game)
+			form.Bind(game)
 			go func() {
 				RPC("GameRPC.Update"+team, shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
-					Game:    &game,
-				}, &game)
+					Game:    game,
+				}, game)
 				// Session.Navigate("/games")
 			}()
 		})
@@ -76,8 +68,8 @@ func gameEditTeam(context *router.Context) {
 		})
 
 		// All done, so render the form
-		form.Render("edit-form", "main", &game)
-		form.ActionGrid("game-actions", "#action-grid", &game, func(url string) {
+		form.Render("edit-form", "main", game)
+		form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
 			// print("clicked on", url)
 			Session.Navigate(url)
 		})
@@ -225,7 +217,7 @@ func gameEditTeam(context *router.Context) {
 										if v.BayonetsLost >= v.Bayonets-150 {
 											v.BayonetsLost = v.Bayonets - 150
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:\n%s", v.Bayonets-v.BayonetsLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:<br>\n%s", v.Bayonets-v.BayonetsLost, v.Descr))
 									case 3:
 										r = x * (rand.Intn(3) + 1)
 										v.SabresLost += ((r * v.Sabres) / 100)
@@ -235,7 +227,7 @@ func gameEditTeam(context *router.Context) {
 										if v.SabresLost >= (v.Sabres - 50) {
 											v.SabresLost = v.Sabres - 50
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:\n%s", v.Sabres-v.SabresLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:<br>\n%s", v.Sabres-v.SabresLost, v.Descr))
 									case 4:
 										v.GunsLost += x
 										if v.GunsLost < 0 {
@@ -244,7 +236,7 @@ func gameEditTeam(context *router.Context) {
 										if v.GunsLost >= v.Guns {
 											v.GunsLost = v.Guns - 1
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Guns:\n%s", v.Guns-v.GunsLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Guns:<br>\n%s", v.Guns-v.GunsLost, v.Descr))
 									}
 									theCell = doc.QuerySelector(fmt.Sprintf("[name=bases-%d]", v.ID))
 									theCell.SetInnerHTML(v.GetBases())
@@ -294,11 +286,11 @@ func gameEditTeam(context *router.Context) {
 					addMe := ""
 					switch v.UType {
 					case 2:
-						addMe = fmt.Sprintf("%d Bayonets:\n", v.Bayonets-v.BayonetsLost)
+						addMe = fmt.Sprintf("%d Bayonets:<br>\n", v.Bayonets-v.BayonetsLost)
 					case 3:
-						addMe = fmt.Sprintf("%d Sabres:\n", v.Sabres-v.SabresLost)
+						addMe = fmt.Sprintf("%d Sabres:<br>\n", v.Sabres-v.SabresLost)
 					case 4:
-						addMe = fmt.Sprintf("%d Guns:\n", v.Guns-v.GunsLost)
+						addMe = fmt.Sprintf("%d Guns:<br>\n", v.Guns-v.GunsLost)
 					}
 					cell.SetInnerHTML(addMe + v.Descr)
 				}

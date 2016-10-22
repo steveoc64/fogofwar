@@ -11,6 +11,7 @@ import (
 type MessageFunction func(string, int, *router.Context)
 
 type GlobalSessionData struct {
+	Version       string
 	Username      string
 	Passwd        string
 	Rank          int
@@ -28,6 +29,7 @@ type GlobalSessionData struct {
 	MaxGames      int
 	MaxScenarios  int
 	MaxPlayers    int
+	EditGame      *shared.Game
 }
 
 func (g *GlobalSessionData) GetRank() string {

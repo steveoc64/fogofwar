@@ -11,6 +11,7 @@ type LoginCredentials struct {
 
 type LoginReply struct {
 	Result       string
+	Version      string
 	Token        string
 	Rank         int
 	ID           int

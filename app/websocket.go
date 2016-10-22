@@ -270,6 +270,16 @@ func ReConnect() error {
 			return errors.New(err.Error())
 		}
 		if lr.Result == "OK" {
+
+			if lr.Version != Session.Version {
+				if dom.GetWindow().Confirm(`A New Version of the software has been released.
+
+Please finish up what you are working on ASAP, and then REFRESH the page when you are ready to restart.
+
+Shall I restart the app for your now (OK) ?`) {
+					js.Global.Get("location").Call("replace", "/")
+				}
+			}
 			// createMenu(lr.Menu)
 			Session.Rank = lr.Rank
 			Session.UserID = lr.ID

@@ -18,8 +18,8 @@ SET search_path = public, pg_catalog;
 COPY condition (id, name, effect) FROM stdin;
 1	Parade Order	2
 2	Battle Ready	1
-3	Ready	0
 4	Tattered	-1
+3	Ready	0
 5	Wrecked	-3
 \.
 

@@ -35,10 +35,11 @@ create unlogged table login (
 	user_id int not null,
 	date timestamptz not null default localtimestamp,
 	ip_address text not null default '',
-	channel int not null default 0
+	channel int not null default 0,
+	up bool default true
 );
 create index login_date_idx on login(date);
-create index login_user_idx on login(user_id);
+create index login_user_idx on login(user_id,up);
 
 drop table if exists vcode;
 create unlogged table vcode (

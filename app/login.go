@@ -133,6 +133,7 @@ func Login(username string, passwd string) {
 		// 	})
 		// }
 		Session.Navigate("/")
+		// doc.QuerySelector(".embedly-card").Class().Remove("hidden")
 	} else {
 		print("login failed")
 		dom.GetWindow().Alert("Login Failed")
@@ -231,6 +232,8 @@ func loginForm() {
 		evt.PreventDefault()
 		grid1()
 	})
+
+	doc.QuerySelector(".embedly-card").Class().Add("hidden")
 }
 
 func grid1() {

@@ -6,9 +6,11 @@ import (
 )
 
 func showDisqus(id string, title string) {
+	print("showdisqus", id, title)
 	if Session.Disqus {
 		w := dom.GetWindow()
 		doc := w.Document()
+		doc.QuerySelector(".embedly-card").Class().Remove("hidden")
 		el := doc.QuerySelector("#disqus_thread")
 		el.Class().Remove("hidden")
 
@@ -41,6 +43,7 @@ func hideDisqus() {
 	if Session.Disqus {
 		w := dom.GetWindow()
 		doc := w.Document()
+		doc.QuerySelector(".embedly-card").Class().Remove("hidden")
 		el := doc.QuerySelector("#disqus_thread")
 		if el != nil {
 			el.Class().Add("hidden")

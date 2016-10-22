@@ -72,6 +72,7 @@ func _userList(action string, id int, context *router.Context) {
 		// Define the layout
 		lList.DateColumn("Date", "Date")
 		lList.Column("Username", "Username")
+		lList.BoolColumn("Up", "Up")
 		lList.Column("Email", "Email")
 		lList.Column("IP Address", "IPAddress")
 		lList.Column("Country", "Country")

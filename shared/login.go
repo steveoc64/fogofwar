@@ -47,6 +47,7 @@ type Login struct {
 	Username  string     `db:"username"`
 	Email     string     `db:"email"`
 	Country   string     `db:"country"`
+	Up        bool       `db:"up"`
 }
 
 type LoginRPCData struct {

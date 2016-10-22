@@ -12,8 +12,6 @@ import (
 	// "github.com/steveoc64/godev/mail"
 )
 
-const CodeVersion = "Jena 2210.5"
-
 type LoginRPC struct{}
 
 type dbLoginResponse struct {
@@ -37,6 +35,8 @@ func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
 
 func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) error {
 	start := time.Now()
+
+	retval := error(nil)
 
 	// do some authentication here
 
@@ -72,6 +72,11 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			or (lower(email) = lower($1) and lower(passwd) = lower($2)))`, lc.Username, lc.Password).
 			QueryStruct(res)
 		println("attempt login with", lc.Username, lc.Password)
+		if err != nil {
+			println(err.Error())
+		} else {
+			println("here with no error so far")
+		}
 
 		// println(`select
 		// 	id,username,name,rank
@@ -79,80 +84,112 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		// 	where (lower(username) = lower($1) and lower(passwd) = lower($2))
 		// 	or (lower(email) = lower($1) and lower(passwd) = lower($2))`, lc.Username, lc.Password)
 
-		if err != nil {
-			log.Println("Login Failed:", err.Error())
-			lr.Version = CodeVersion
-			lr.Result = "Failed"
-			lr.Token = ""
-			// lr.Menu = []shared.UserMenu{}
-			lr.Routes = []shared.UserRoute{}
-			lr.Rank = 0
-			lr.Disqus = false
-			lr.MaxGames = 0
-			lr.MaxScenarios = 0
-			lr.MaxPlayers = 0
+		// Init to blank, and then proceed from there
+		lr.Version = CodeVersion
+		lr.Result = "Failed"
+		lr.Token = ""
+		// lr.Menu = []shared.UserMenu{}
+		lr.Routes = []shared.UserRoute{}
+		lr.Rank = 0
+		lr.Disqus = false
+		lr.MaxGames = 0
+		lr.MaxScenarios = 0
+		lr.MaxPlayers = 0
 
-		} else {
-			// log.Println("Login OK")
-			lr.Result = "OK"
-			lr.Token = fmt.Sprintf("%d", lc.Channel)
-			lr.Version = CodeVersion
+		if err == nil {
+			println("lets chck the login table")
+			// So far so good - now, check that the user isn't already logged in somewhere else !!
+			count := 0
+			ipa := ""
+			DB.SQL(`select
+				ip_address,count(*)
+				from login
+				where user_id=$1 and up
+				group by ip_address limit 1`, res.ID).QueryScalar(&ipa, &count)
+			if count > 0 {
+				retval = errors.New(`Sorry, but you are already logged in on another machine with this account:
 
-			//lr.Menu = []string{"RPC Dashboard", "Events", "Sites", "Machines", "Tools", "Parts", "Vendors", "Users", "Skills", "Reports"}
-			// lr.Menu = getMenu(res.Role)
-			lr.Routes = getRoutes(res.ID, res.Rank)
-			lr.LookupTable = getLookupTable()
-			lr.Rank = res.Rank
+IP Address: ` + ipa + `
 
-			switch res.Rank {
-			case 1:
-				lr.MaxGames = 1
-				lr.MaxScenarios = 2
-				lr.MaxPlayers = 2
-			case 2:
-				lr.MaxGames = 2
-				lr.MaxScenarios = 8
-				lr.MaxPlayers = 4
-			case 3:
-				lr.MaxGames = 4
-				lr.MaxScenarios = 16
-				lr.MaxPlayers = 8
-			case 4:
-				lr.MaxGames = 8
-				lr.MaxScenarios = 32
-				lr.MaxPlayers = 16
-			case 10:
-				lr.MaxGames = 8
-				lr.MaxScenarios = 64
-				lr.MaxPlayers = 16
-			}
+Please logout from the other machine if you want to use this one instead.`)
+			} else {
 
-			lr.ID = res.ID
-			lr.Disqus = Config.Disqus && res.Disqus
-			conn.Login(lc.Username, res.ID, res.Rank)
-			Connections.Show("connections after new login")
-			conn.BroadcastAdmin("Login", "Login", lr.ID)
+				// log.Println("Login OK")
+				lr.Result = "OK"
+				lr.Token = fmt.Sprintf("%d", lc.Channel)
+				lr.Version = CodeVersion
 
-			// Create a login record
-			req := conn.Socket.Request()
-			theIP := ""
-			if theIP = req.Header.Get("X-Real-Ip"); theIP == "" {
-				theIP = req.RemoteAddr
-			}
+				//lr.Menu = []string{"RPC Dashboard", "Events", "Sites", "Machines", "Tools", "Parts", "Vendors", "Users", "Skills", "Reports"}
+				// lr.Menu = getMenu(res.Role)
+				lr.Routes = getRoutes(res.ID, res.Rank)
+				lr.LookupTable = getLookupTable()
+				lr.Rank = res.Rank
 
-			// Update the user
-			DB.SQL(`update users set channel=$2,ip_address=$3 where id=$1`, res.ID, conn.ID, theIP).Exec()
+				switch res.Rank {
+				case 1:
+					lr.MaxGames = 1
+					lr.MaxScenarios = 2
+					lr.MaxPlayers = 2
+				case 2:
+					lr.MaxGames = 2
+					lr.MaxScenarios = 8
+					lr.MaxPlayers = 4
+				case 3:
+					lr.MaxGames = 4
+					lr.MaxScenarios = 16
+					lr.MaxPlayers = 8
+				case 4:
+					lr.MaxGames = 8
+					lr.MaxScenarios = 32
+					lr.MaxPlayers = 16
+				case 10:
+					lr.MaxGames = 8
+					lr.MaxScenarios = 64
+					lr.MaxPlayers = 16
+				}
 
-			// Create a login record
-			DB.SQL(`insert into login (user_id,ip_address,channel) values ($1,$2,$3)`,
-				res.ID, theIP, conn.ID).Exec()
+				lr.ID = res.ID
+				lr.Disqus = Config.Disqus && res.Disqus
+				conn.Login(lc.Username, res.ID, res.Rank)
+				Connections.Show("connections after new login")
+				conn.BroadcastAdmin("Login", "Login", lr.ID)
+
+				// Create a login record
+				req := conn.Socket.Request()
+				theIP := ""
+				if theIP = req.Header.Get("X-Real-Ip"); theIP == "" {
+					theIP = req.RemoteAddr
+				}
+
+				// Update the user
+				DB.SQL(`update users set channel=$2,ip_address=$3 where id=$1`, res.ID, conn.ID, theIP).Exec()
+
+				// Create a login record
+				DB.SQL(`insert into login (user_id,ip_address,channel,up) values ($1,$2,$3,'t')`,
+					res.ID, theIP, conn.ID).Exec()
+			} // didnt find an existing login
+
 		}
-	}
+	} // if con != nil
 
 	logger(start, "Login.Login", conn,
 		fmt.Sprintf("%v", lc),
 		lr.Result)
 	// fmt.Sprintf("%v", lr.))
+
+	return retval
+}
+
+func (l *LoginRPC) Logout(channel int, retval *shared.Login) error {
+	start := time.Now()
+
+	conn := Connections.Get(channel)
+
+	DB.SQL(`update user set channel=0 where id=$1`, conn.UserID).Exec()
+	DB.SQL(`update login set up='f',channel=0 where channel=$1`, conn.ID).Exec()
+
+	logger(start, "Login.Logout", conn,
+		fmt.Sprintf("ID %d", channel), "")
 
 	return nil
 }

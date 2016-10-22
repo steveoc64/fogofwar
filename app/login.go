@@ -17,6 +17,7 @@ func Login(username string, passwd string) {
 	Session.Username = ""
 	Session.Passwd = ""
 	Session.Rank = 0
+	Session.UserID = 0
 
 	lc := &shared.LoginCredentials{
 		Username: username,
@@ -28,7 +29,8 @@ func Login(username string, passwd string) {
 	lr := &shared.LoginReply{}
 	err := RPC("LoginRPC.Login", lc, lr)
 	if err != nil {
-		print("RPC error", err.Error())
+		dom.GetWindow().Alert(err.Error())
+		return
 	}
 	if lr.Result == "OK" {
 		// createMenu(lr.Menu)
@@ -139,6 +141,11 @@ func Login(username string, passwd string) {
 
 func Logout() {
 	print("log out")
+
+	go func() {
+		RPC("LoginRPC.Logout", Session.Channel, nil)
+	}()
+
 	// showLoginForm()
 	initRouter() // reset all the routes to nothing
 	// js.Global.Get("location").Set("hash", "")

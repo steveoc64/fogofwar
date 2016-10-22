@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os/exec"
+	"time"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/engine/standard"
@@ -28,6 +29,8 @@ var DB *runner.DB
 // var MailChannel chan *gomail.Message
 
 func main() {
+
+	start := time.Now()
 
 	initVCode()
 	Config = LoadConfig()
@@ -98,6 +101,7 @@ func main() {
 
 	// Clear all channel data in the database
 	DB.SQL(`update users set channel=0`).Exec()
+	DB.SQL(`update login set channel=0, up='f'`).Exec()
 
 	// Add the all important Websocket handler
 	Connections = new(ConnectionsList)
@@ -118,6 +122,8 @@ func main() {
 	std := standard.New(fmt.Sprintf(":%d", Config.WebPort))
 	// std := standard.WithTLS(fmt.Sprintf(":%d", Config.WebPort), "actionfront.pem", "actionfront.key")
 	// func WithTLS(addr, certFile, keyFile string) *Server
+
+	logger(start, "System.Boot", nil, "", "")
 
 	errRun := e.Run(std)
 	println("done", errRun.Error())

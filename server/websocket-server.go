@@ -245,6 +245,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 
 	// Unlogin all users on that channel, but leave their last IP Address open
 	DB.SQL(`update users set channel=0 where channel=$1`, conn.ID).Exec()
+	DB.SQL(`update login set up='f' where channel=$1 and up`, conn.ID).Exec()
 	return c
 }
 

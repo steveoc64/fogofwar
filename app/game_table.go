@@ -146,6 +146,17 @@ func gameEditTable(context *router.Context) {
 							game.GridSize, game.GridSize, // width and height in inches
 							v.GetCSS(), // self-computed CSS content type
 							v.X, v.Y, i)
+						ycoord := v.Y + 1
+						if ycoord >= game.GridY {
+							ycoord -= 2
+						}
+						if ycoord < 0 {
+							ycoord = 0
+						}
+						xcoord := v.X*game.GridSize + (game.GridSize / 2)
+						ycoord = ycoord*game.GridSize + (game.GridSize / 2)
+						newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="objective-name">%s</text>`,
+							xcoord, ycoord, v.Name)
 					}
 				}
 				// add unit tiles on top

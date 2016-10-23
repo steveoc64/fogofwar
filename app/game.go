@@ -190,11 +190,12 @@ func gameEditOverview(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(game)
 			go func() {
+				done := false
 				err := RPC("GameRPC.Update", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 					Game:    game,
-				}, game)
+				}, &done)
 				if err != nil {
 					dom.GetWindow().Alert(err.Error())
 				}

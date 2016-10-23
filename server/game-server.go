@@ -293,8 +293,8 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if v.PlayerID == 0 {
 			unassignedCmd = true
 		}
-		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4 where id=$1`,
-			v.ID, v.Cull, v.StartTurn, v.PlayerID).Exec()
+		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
+			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
 		if err != nil {
 			unassignedCmd = true
 			println(err.Error())
@@ -328,8 +328,8 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if v.PlayerID == 0 {
 			unassignedCmd = true
 		}
-		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4 where id=$1`,
-			v.ID, v.Cull, v.StartTurn, v.PlayerID).Exec()
+		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
+			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
 		if err != nil {
 			println(err.Error())
 			unassignedCmd = true
@@ -440,6 +440,42 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 	if err == nil {
 		*done = true
 		tx.Commit()
+	}
+
+	return err
+}
+
+func (g *GameRPC) Update(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	*done = false
+
+	// check that we own the game first
+	oldGame := shared.Game{}
+	DB.SQL(`select * from game where id=$1`, data.ID).QueryStruct(&oldGame)
+	if conn.Rank < 9 && oldGame.HostedBy != conn.UserID {
+		return errors.New("You are not the owner of this game - cannot delete")
+	}
+
+	_, err := DB.Update("game").
+		SetWhitelist(data.Game, "start_date", "expires", "turn", "turn_limit", "name", "descr", "notes", "year").
+		Where("id = $1", data.ID).
+		Exec()
+
+	logger(start, "Game.Update", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	if err == nil {
+		*done = true
+		// For any players on this game list, let them know its changed
+		players := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
+		fmt.Printf("players who need to know about this update %v\n", players)
+		for _, v := range players {
+			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+		}
 	}
 
 	return err

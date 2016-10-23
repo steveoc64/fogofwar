@@ -17,12 +17,35 @@ func mainPage(context *router.Context) {
 func _mainPage(action string, id int, context *router.Context) {
 
 	switch action {
-	case "Main", "Invite":
+	case "Main", "Invite", "Update":
 		break
 	default:
 		return
 	}
 	go func() {
+
+		invites := []shared.Game{}
+		RPC("GameRPC.ListInvites", shared.GameRPCData{
+			Channel: Session.Channel,
+		}, &invites)
+		formInvite := formulate.ListForm{}
+		formInvite.New("fa-bookmark-o", "Game Invites")
+
+		// Define the layout
+		formInvite.Column("Hosted By", "HostName")
+		formInvite.AvatarColumn("Host", "HostEmail")
+		formInvite.Column("Game", "Name")
+		formInvite.Column("Year", "Year")
+		formInvite.Column("Players", "GetPlayers")
+		formInvite.Column("Turn", "Turn")
+		formInvite.Column("Turn Limit", "TurnLimit")
+		formInvite.DateColumn("Start Date", "StartDate")
+		formInvite.DateColumn("End Date", "Expires")
+
+		// formulate.MainContainer("wide-container")
+		// formInvite.Render("game-invites-list", "#main-container", &invites)
+		formInvite.Render("game-invites-list", "main", &invites)
+
 		games := []shared.Game{}
 		err := RPC("GameRPC.List", shared.GameRPCData{
 			Channel: Session.Channel,
@@ -78,28 +101,8 @@ func _mainPage(action string, id int, context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/game/%s", key))
 		})
 
-		formulate.MainContainer("wide-container")
-		form.Render("game-list", "#main-container", games)
-
-		invites := []shared.Game{}
-		RPC("GameRPC.ListInvites", shared.GameRPCData{
-			Channel: Session.Channel,
-		}, &invites)
-		formInvite := formulate.ListForm{}
-		formInvite.New("fa-bookmark-o", "Game Invites")
-
-		// Define the layout
-		formInvite.Column("Hosted By", "HostName")
-		formInvite.AvatarColumn("Host", "HostEmail")
-		formInvite.Column("Game", "Name")
-		formInvite.Column("Players", "GetPlayers")
-		formInvite.Column("Turn", "Turn")
-		formInvite.Column("Turn Limit", "TurnLimit")
-		formInvite.DateColumn("Start Date", "StartDate")
-		formInvite.DateColumn("End Date", "Expires")
-
-		formulate.AppendDiv("game-invites").Class().SetString("wide-container")
-		formInvite.Render("game-invites-list", "#game-invites", &invites)
+		formulate.AppendDiv("hosted-games").Class().SetString("wide-container")
+		form.Render("game-list", "#hosted-games", games)
 
 		// print("add action grid")
 		form.ActionGrid("main-actions", "#action-grid", Session, func(url string) {

@@ -64,7 +64,7 @@ cert:
 	openssl genrsa -out cert/actionfront.key 2048
 	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650
 
-dist/assets.log: assets/index.html assets/img/*  assets/fonts/* assets/css/*
+dist/assets.log: assets/index.html assets/img/*  assets/fonts/* assets/css/* assets/manual/*
 	@mplayer -quiet audio/attention.oga 2> /dev/null > /dev/null
 	@mkdir -p dist/public/css dist/public/font dist/public/js
 	cp assets/index.html dist/public
@@ -72,6 +72,7 @@ dist/assets.log: assets/index.html assets/img/*  assets/fonts/* assets/css/*
 	cp -R assets/css dist/public
 	cp -R assets/fonts dist/public
 	cp -R assets/js dist/public
+	cp -R assets/manual dist/public
 	#cp bower_components/normalize.css/normalize.css dist/public/css
 	@date > dist/assets.log
 
@@ -126,4 +127,27 @@ data:
 	pg_dump actionfront -a -t scenario > database/data/scenario.sql
 	pg_dump actionfront -a -t force > database/data/force.sql
 	pg_dump actionfront -a -t force_unit > database/data/force_unit.sql
+	pg_dump actionfront -a -t game > database/data/game.sql
+	pg_dump actionfront -a -t game_players > database/data/game_players.sql
+	pg_dump actionfront -a -t game_cmd > database/data/game_cmd.sql
+	pg_dump actionfront -a -t game_cmd_order > database/data/game_cmd_order.sql
+	pg_dump actionfront -a -t game_objective > database/data/game_objective.sql
+	pg_dump actionfront -a -t unit > database/data/unit.sql
+	pg_dump actionfront -a -t tiles > database/data/tiles.sql
+	pg_dump actionfront -a -t users > database/data/users.sql
+	pg_dump actionfront -a -t stdimg > database/data/stdimg.sql
+	pg_dump actionfront -a -t cmd_level > database/data/cmd_level.sql
+	pg_dump actionfront -a -t cmd_rating > database/data/cmd_rating.sql
+	pg_dump actionfront -a -t inspiration > database/data/inspiration.sql
+	pg_dump actionfront -a -t condition > database/data/condition.sql
+	pg_dump actionfront -a -t gt_formation > database/data/gt_formation.sql
+	pg_dump actionfront -a -t utype > database/data/utype.sql
+	pg_dump actionfront -a -t rating > database/data/rating.sql
+	pg_dump actionfront -a -t drill > database/data/drill.sql
+	pg_dump actionfront -a -t small_arms > database/data/small_arms.sql
+	pg_dump actionfront -a -t gunnery > database/data/gunnery.sql
+	pg_dump actionfront -a -t cav_type > database/data/cav_type.sql
+	pg_dump actionfront -a -t cmd_action > database/data/cmd_action.sql
+	pg_dump actionfront -a -t orders > database/data/orders.sql
+	pg_dump actionfront -a -t migration > database/data/migration.sql
 	ls -l database/data

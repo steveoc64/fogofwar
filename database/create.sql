@@ -382,9 +382,9 @@ create table game (
 	grid_size int not null default 6,
 	check_table bool default false,
 	check_objectives bool default false,
-	check_zones bool default false,
 	check_forces bool default false,
-	check_players bool default false
+	check_players bool default false,
+	check_connected bool default false
 );
 \i data/game.sql
 create index game_scenario_idx on game (scenario_id);

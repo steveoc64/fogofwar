@@ -33,7 +33,7 @@ func _mainPage(action string, id int, context *router.Context) {
 
 		// Define the layout
 		formInvite.Column("Hosted By", "HostName")
-		formInvite.AvatarColumn("Host", "HostEmail")
+		formInvite.AvatarColumn("", "HostEmail")
 		formInvite.Column("Game", "Name")
 		formInvite.Column("Year", "Year")
 		formInvite.Column("Players", "GetPlayers")
@@ -85,6 +85,7 @@ func _mainPage(action string, id int, context *router.Context) {
 		}
 		form.DateColumn("Start Date", "StartDate")
 		form.DateColumn("Game Ends", "Expires")
+		form.IconColumn("Status", "GetStatusIcon")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

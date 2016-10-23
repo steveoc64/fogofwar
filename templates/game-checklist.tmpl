@@ -57,34 +57,12 @@
 	</div>
 	{{end}}
 
-<!-- 
-	// Take Zones out for now
-	{{if .CheckZones}}
-	<div class="action__item" url="/game/{{.ID}}/table">
-		<div class="action__title">Zones</div>
-		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
-		<div class="action__text">
-			Zones have been set !!
-		</div>
-	</div>
-	{{else}}
-	<div class="action__item" url="/game/{{.ID}}/table">
-		<div class="action__title">Zones</div>
-		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
-		<div class="action__text">
-			<p>Use the <b>TABLE-ZONES</b> Tool to set zones of control for each Team</p>
-			<p>Each Team needs at least 1 zone under control to be able to deploy to</p>
-		</div>
-	</div>
-	{{end}}
-
- -->
 	{{if .CheckPlayers}}
 	<div class="action__item" url="/game/{{.ID}}/players">
 		<div class="action__title">Players</div>
 		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
 		<div class="action__text">
-			Players are Ready to Go!!
+			Players have been Assiged!!
 		</div>
 	</div>
 	{{else}}
@@ -92,7 +70,7 @@
 		<div class="action__title">Players</div>
 		<div class="action__icon"><i class="fa fa-user fa-lg"></i></div>
 		<div class="action__text">
-			<p>Waiting for all Players to connect.</p>
+			<p>Assign Players to All Commands</p>
 		</div>
 	</div>
 	{{end}}

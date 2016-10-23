@@ -148,7 +148,8 @@
 		}
 		.action__icon {
 			transition: 0.4s;
-			color: $light-mud;
+			// color: $light-mud;
+			color: rgba(49, 46, 70, 0.86);
 			width: 100%;
 		}
 		.action__text {

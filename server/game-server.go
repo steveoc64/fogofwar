@@ -171,6 +171,7 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	defer tx.AutoRollback()
 
 	checkObjectives := (len(data.Game.Objectives) > 0)
+	println("objectives", checkObjectives)
 
 	// Update the game header with the table geometry
 	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5,check_objectives=$6 where id=$1`,
@@ -289,8 +290,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if err != nil {
 			break
 		}
-		if v.PlayerID == 0 {
+		if !v.Cull && v.PlayerID == 0 {
 			unassignedCmd = true
+			println("cmd is unassigned", v.ID)
 		}
 		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
 			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
@@ -324,8 +326,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if err != nil {
 			break
 		}
-		if v.PlayerID == 0 {
+		if !v.Cull && v.PlayerID == 0 {
 			unassignedCmd = true
+			println("blue cmd is unassigned", v.ID)
 		}
 		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
 			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
@@ -381,9 +384,15 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if err == nil {
 			for _, v := range BlueList {
 				println("blue", v)
-				_, err = DB.SQL(`insert into game_players
+				// If they are already in RedList, then just update the record
+				if IntSliceContains(RedList, v) {
+					_, err = DB.SQL(`update game_players set blue_team=true where game_id=$1 and player_id=$2 and red_team`,
+						data.ID, v).Exec()
+				} else {
+					_, err = DB.SQL(`insert into game_players
 				(game_id,player_id,blue_team)
 				values ($1,$2,true)`, data.ID, v).Exec()
+				}
 				if err != nil {
 					println(err.Error())
 					break
@@ -392,8 +401,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			}
 		}
 
-		if err != nil {
-			DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, unassignedCmd).Exec()
+		if err == nil {
+			println("unassigned", unassignedCmd)
+			DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, !unassignedCmd).Exec()
 			*done = true
 			tx.Commit()
 		}
@@ -423,6 +433,10 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 	tx, _ := DB.Begin()
 	defer tx.AutoRollback()
 
+	// Get a list of the players who need to be informed of this tragic news
+	DList := []int{}
+	DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&DList)
+
 	_, err := DB.SQL(`delete from game where id=$1`, data.ID).Exec()
 	if err == nil {
 		DB.SQL(`delete from tiles where game_id=$1`, data.ID).Exec()
@@ -431,6 +445,10 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`delete from game_cmd_order where game_id=$1`, data.ID).Exec()
 		DB.SQL(`delete from game_objective where game_id=$1`, data.ID).Exec()
 		DB.SQL(`delete from unit where game_id=$1`, data.ID).Exec()
+
+		for _, v := range DList {
+			conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+		}
 	}
 
 	logger(start, "Game.Delete", conn,

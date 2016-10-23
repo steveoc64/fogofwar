@@ -125,9 +125,9 @@ type Game struct {
 	InMode          string           `db:"in_mode"`
 	CheckTable      bool             `db:"check_table"`
 	CheckObjectives bool             `db:"check_objectives"`
-	CheckZones      bool             `db:"check_zones"`
 	CheckForces     bool             `db:"check_forces"`
 	CheckPlayers    bool             `db:"check_players"`
+	CheckConnected  bool             `db:"check_connected"`
 }
 
 type GameRPCData struct {
@@ -137,6 +137,30 @@ type GameRPCData struct {
 	Blue     bool
 	GetUnits bool
 	Game     *Game
+}
+
+func (g *Game) GoodToGo() bool {
+	return g.CheckTable && g.CheckObjectives && g.CheckPlayers && g.CheckForces && g.CheckConnected
+}
+
+func (g *Game) GetStatusIcon() string {
+	print("getting status icon")
+	if !g.CheckTable {
+		return "fa fa-table fa-lg"
+	}
+	if !g.CheckObjectives {
+		return "fa fa-star fa-lg"
+	}
+	if !g.CheckForces {
+		return "fa fa-flag fa-lg"
+	}
+	if !g.CheckPlayers {
+		return "fa fa-user fa-lg"
+	}
+	if !g.CheckConnected {
+		return "fa fa-circle-o-notch fa-spin fa-lg"
+	}
+	return "fa fa-check-square fa-lg"
 }
 
 func (g *Game) GetObjective(x, y int) *GameObjective {
@@ -180,10 +204,6 @@ func (g *Game) AddObjective(x, y int) *GameObjective {
 	g.Objectives = append(g.Objectives, newObj)
 	print("added new obj", g.Objectives)
 	return newObj
-}
-
-func (g *Game) GoodToGo() bool {
-	return g.CheckTable && g.CheckObjectives && g.CheckZones && g.CheckPlayers && g.CheckForces
 }
 
 func (g *Game) CalcKm() {

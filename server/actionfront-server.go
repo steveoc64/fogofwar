@@ -131,6 +131,9 @@ func main() {
 
 	logger(start, "System.Boot", nil, "", "")
 
+	// kick off a database backup every 24hrs
+	go autoBackup()
+
 	errRun := e.Run(std)
 	println("done", errRun.Error())
 

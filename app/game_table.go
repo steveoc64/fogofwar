@@ -163,7 +163,7 @@ func gameEditTable(context *router.Context) {
 				if modeSet == "RedTeam" || modeSet == "BlueTeam" {
 					team := "red"
 					for i, v := range game.RedCmd {
-						if v.StartX != -1 {
+						if v.StartX != -1 && !v.Cull {
 							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
 								v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
 								game.GridSize, game.GridSize, // width and height in inches
@@ -179,7 +179,7 @@ func gameEditTable(context *router.Context) {
 					}
 					team = "blue"
 					for i, v := range game.BlueCmd {
-						if v.StartX != -1 {
+						if v.StartX != -1 && !v.Cull {
 							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="blue-%d" data-id="%d"/>`,
 								v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
 								game.GridSize, game.GridSize, // width and height in inches
@@ -286,12 +286,16 @@ func gameEditTable(context *router.Context) {
 				case "RedTeam":
 					TheCmd = &shared.GameCmd{}
 					for _, v := range game.RedCmd {
-						unitBtn(v)
+						if !v.Cull {
+							unitBtn(v)
+						}
 					}
 				case "BlueTeam":
 					TheCmd = &shared.GameCmd{}
 					for _, v := range game.BlueCmd {
-						unitBtn(v)
+						if !v.Cull {
+							unitBtn(v)
+						}
 					}
 				case "Objective":
 					// Create a set of fields for the objective details

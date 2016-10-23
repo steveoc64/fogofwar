@@ -221,6 +221,15 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	return err
 }
 
+func IntSliceContains(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	start := time.Now()
 	*done = false
@@ -237,8 +246,10 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	unassignedCmd := false
 
 	// Clear out the invites
-	de_invites := []int{}
-	DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&de_invites)
+	DList := []int{}
+	RedList := []int{}
+	BlueList := []int{}
+	DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&DList)
 	_, err = DB.SQL(`delete from game_players where game_id=$1`, data.ID).Exec()
 
 	// For each command Red and Blue
@@ -257,10 +268,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		// Create the game invite
 		if v.PlayerID != 0 {
-			_, err = DB.SQL(`insert into game_players 
-			(game_id,player_id,red_team)
-			values ($1,$2,true)`, data.ID, v.PlayerID).Exec()
-			conn.BroadcastPlayer(v.PlayerID, "Game", "Invite", data.ID)
+			if !IntSliceContains(RedList, v.PlayerID) {
+				RedList = append(RedList, v.PlayerID)
+			}
 		}
 
 		// For each unit, stamp the unit details
@@ -293,11 +303,10 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		// Create the game invite
 		if v.PlayerID != 0 {
-			_, err = DB.SQL(`insert into game_players 
-			(game_id,player_id,blue_team)
-			values ($1,$2,true)`, data.ID, v.PlayerID).Exec()
+			if !IntSliceContains(BlueList, v.PlayerID) {
+				BlueList = append(BlueList, v.PlayerID)
+			}
 
-			conn.BroadcastPlayer(v.PlayerID, "Game", "Invite", data.ID)
 		}
 
 		// For each unit, stamp the unit details
@@ -315,34 +324,54 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 	}
 
+	if err == nil {
+		// De-Invite those not invited
+		AList := append(RedList, BlueList...)
+		fmt.Printf("AList is now %v\nRedList %v\nBlueList %v\nDList %v\n", AList, RedList, BlueList, DList)
+		for _, v := range DList {
+			if IntSliceContains(AList, v) {
+				println("player is in the AList", v)
+			} else {
+				println("player is in the DList", v)
+				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+			}
+		}
+		for _, v := range RedList {
+			_, err = DB.SQL(`insert into game_players
+				(game_id,player_id,red_team)
+				values ($1,$2,true)`, data.ID, v).Exec()
+			if err != nil {
+				println(err.Error())
+				break
+			}
+			conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+		}
+		if err == nil {
+			for _, v := range BlueList {
+				println("blue", v)
+				_, err = DB.SQL(`insert into game_players
+				(game_id,player_id,blue_team)
+				values ($1,$2,true)`, data.ID, v).Exec()
+				if err != nil {
+					println(err.Error())
+					break
+				}
+				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+			}
+		}
+
+		if err != nil {
+			DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, unassignedCmd).Exec()
+			*done = true
+			tx.Commit()
+		}
+	}
+
 	logger(start, "Game.UpdateTeams", conn,
 		fmt.Sprintf("Game ID %d", data.ID),
 		fmt.Sprintf("%d Updated Units, %d Red Cmds, %d Blue Cmds",
 			count, len(data.Game.RedCmd), len(data.Game.BlueCmd)))
 
-	if err == nil {
-		// De-Invite those not invited
-		AList := []int{}
-		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&AList)
-		// fmt.Printf("my alist is %v\n", AList)
-		// fmt.Printf("my dlist is %v\n", de_invites)
-		for _, v := range de_invites {
-			doIt := true
-			for _, a := range AList {
-				if v == a {
-					doIt = false
-					break
-				}
-			}
-			if doIt {
-				println("doit", v)
-				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
-			}
-		}
-		DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, unassignedCmd).Exec()
-		*done = true
-		tx.Commit()
-	}
 	return err
 }
 

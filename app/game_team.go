@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 
 	"./shared"
 	"github.com/go-humble/router"
@@ -42,6 +43,9 @@ func gameEditTeam(context *router.Context) {
 			AddCustom(1, "Commands", "Commands", "")
 
 		form.Row(1).
+			AddCustom(1, "", "ToggleCmd", "hidden")
+
+		form.Row(1).
 			AddCustom(1, "", "ViewUnits", "")
 
 		// Add event handlers
@@ -54,11 +58,17 @@ func gameEditTeam(context *router.Context) {
 			evt.PreventDefault()
 			form.Bind(game)
 			go func() {
-				RPC("GameRPC.Update"+team, shared.GameRPCData{
+				done := false
+				err := RPC("GameRPC.UpdateTeams", shared.GameRPCData{
 					Channel: Session.Channel,
 					ID:      id,
 					Game:    game,
-				}, game)
+				}, &done)
+				if err != nil {
+					dom.GetWindow().Alert(err.Error())
+				} else {
+					game.CheckForces = true
+				}
 				// Session.Navigate("/games")
 			}()
 		})
@@ -81,23 +91,44 @@ func gameEditTeam(context *router.Context) {
 
 		TheCmd := &shared.GameCmd{}
 
-		drawUnitList := func() {
-			viewUnits.Class().Remove("hidden")
-			tbody := form.Get("UnitList").(*dom.HTMLTableSectionElement)
-			tbody.SetInnerHTML("")
+		breakLine := func(s string) string {
+			r := strings.Replace(s, ") ", ")<br>\n", -1)
+			r = strings.Replace(r, " and ", "<br>\nand ", -1)
+			// r = strings.Replace(r, ", ", "<br>\n", -1)
+			return r
+		}
 
+		showSummary := func(cmd *shared.GameCmd) {
 			totalBayonets := 0
 			totalSabres := 0
 			totalGuns := 0
 			totalCmdrs := 0
 
-			for unitIndex, v := range TheCmd.Units {
+			for _, v := range cmd.Units {
 				totalBayonets += v.Bayonets - v.BayonetsLost
 				totalSabres += v.Sabres - v.SabresLost
 				totalGuns += v.Guns - v.GunsLost
 				if v.UType == 1 {
 					totalCmdrs += 1
 				}
+			}
+
+			cmdsummary := fmt.Sprintf("<h3>%s ~ %s</h3><h4>Commander: %s</h4>", cmd.Name, cmd.Nation, cmd.CommanderName)
+			totals := fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
+				totalCmdrs,
+				totalBayonets,
+				totalSabres,
+				totalGuns)
+
+			form.Get("Summary").SetInnerHTML(cmdsummary + "<br>" + cmd.Descr + "<br>" + totals)
+		}
+
+		drawUnitList := func() {
+			viewUnits.Class().Remove("hidden")
+			tbody := form.Get("UnitList").(*dom.HTMLTableSectionElement)
+			tbody.SetInnerHTML("")
+
+			for unitIndex, v := range TheCmd.Units {
 				row := tbody.InsertRow(-1)
 				row.SetClass("data-row")
 				row.SetAttribute("key", fmt.Sprintf("%d", v.ID))
@@ -128,10 +159,10 @@ func gameEditTeam(context *router.Context) {
 					cell.Class().Add("highlight")
 					cell.Class().Add("commander")
 					cell.SetInnerHTML(v.Nation)
-					cell.SetInnerHTML(fmt.Sprintf(`
-<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down"></i> %s 
-<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up"></i>`,
-						unitIndex, v.Nation, unitIndex))
+					cell.SetInnerHTML(fmt.Sprintf(`%s<br>
+<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down fa-lg"></i>&nbsp;&nbsp;&nbsp;
+<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up fa-lg"></i>`,
+						v.Nation, unitIndex, unitIndex))
 					cell.AddEventListener("click", false, func(evt dom.Event) {
 						t := evt.Target()
 						if t.TagName() == "I" {
@@ -172,8 +203,8 @@ func gameEditTeam(context *router.Context) {
 					cell.SetClass("compressed")
 					cell.Class().Add("highlight")
 					cell.SetInnerHTML(fmt.Sprintf(`
-<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down"></i> Adjust 
-<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up"></i>`,
+<i data-unit=%d data-dir="down" class="fa fa-chevron-circle-down fa-lg"></i> Adjust 
+<i data-unit=%d data-dir="up" class="fa fa-chevron-circle-up fa-lg"></i>`,
 						unitIndex, unitIndex))
 					cell.AddEventListener("click", false, func(evt dom.Event) {
 						t := evt.Target()
@@ -185,16 +216,8 @@ func gameEditTeam(context *router.Context) {
 							// Get the command associated with this ID
 							u, _ := strconv.Atoi(t.GetAttribute("data-unit"))
 							doIt := false
-							totalBayonets := 0
-							totalSabres := 0
-							totalGuns := 0
-							totalCmdrs := 0
 
 							for i, v := range TheCmd.Units {
-								if v.UType == 1 {
-									totalCmdrs += 1
-								}
-
 								if i == u { // Got the Division, so next set are all childs of this
 									doIt = true
 									continue
@@ -217,7 +240,9 @@ func gameEditTeam(context *router.Context) {
 										if v.BayonetsLost >= v.Bayonets-150 {
 											v.BayonetsLost = v.Bayonets - 150
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:<br>\n%s", v.Bayonets-v.BayonetsLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:<br>\n%s",
+											v.Bayonets-v.BayonetsLost,
+											breakLine(v.Descr)))
 									case 3:
 										r = x * (rand.Intn(3) + 1)
 										v.SabresLost += ((r * v.Sabres) / 100)
@@ -227,7 +252,9 @@ func gameEditTeam(context *router.Context) {
 										if v.SabresLost >= (v.Sabres - 50) {
 											v.SabresLost = v.Sabres - 50
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:<br>\n%s", v.Sabres-v.SabresLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:<br>\n%s",
+											v.Sabres-v.SabresLost,
+											breakLine(v.Descr)))
 									case 4:
 										v.GunsLost += x
 										if v.GunsLost < 0 {
@@ -236,22 +263,16 @@ func gameEditTeam(context *router.Context) {
 										if v.GunsLost >= v.Guns {
 											v.GunsLost = v.Guns - 1
 										}
-										theCell.SetInnerHTML(fmt.Sprintf("%d Guns:<br>\n%s", v.Guns-v.GunsLost, v.Descr))
+										theCell.SetInnerHTML(fmt.Sprintf("%d Guns:<br>\n%s",
+											v.Guns-v.GunsLost,
+											breakLine(v.Descr)))
 									}
 									theCell = doc.QuerySelector(fmt.Sprintf("[name=bases-%d]", v.ID))
 									theCell.SetInnerHTML(v.GetBases())
 								}
-								totalBayonets += v.Bayonets - v.BayonetsLost
-								totalSabres += v.Sabres - v.SabresLost
-								totalGuns += v.Guns - v.GunsLost
 							}
 
-							form.Get("Summary").
-								SetInnerHTML(fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
-									totalCmdrs,
-									totalBayonets,
-									totalSabres,
-									totalGuns))
+							showSummary(TheCmd)
 						} // on click - if I
 					}) // on click event handler
 
@@ -292,32 +313,31 @@ func gameEditTeam(context *router.Context) {
 					case 4:
 						addMe = fmt.Sprintf("%d Guns:<br>\n", v.Guns-v.GunsLost)
 					}
-					cell.SetInnerHTML(addMe + v.Descr)
+					cell.SetInnerHTML(addMe + breakLine(v.Descr))
 				}
 
 			}
-
-			form.Get("Summary").
-				SetInnerHTML(fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
-					totalCmdrs,
-					totalBayonets,
-					totalSabres,
-					totalGuns))
+			showSummary(TheCmd)
 		}
-
 		// Add a button bar for all the commands in this team
 
 		div := form.Get("Commands")
 		div.SetInnerHTML("")
+
 		bbar := doc.CreateElement("DIV")
-		bbar.Class().Add("button-bar")
+		bbar.Class().Add("button-bar-left")
+
 		theCmds := game.RedCmd
 		if team == "Blue" {
 			theCmds = game.BlueCmd
 		}
 		for _, v := range theCmds {
 			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
-			btn.Class().SetString("button button-outline")
+			if v.Cull {
+				btn.Class().SetString("button button-clear")
+			} else {
+				btn.Class().SetString("button button-outline")
+			}
 			btn.Value = v.Name
 			btn.SetAttribute("data-cmd-id", fmt.Sprintf("%d", v.ID))
 			btn.SetAttribute("type", "button")
@@ -327,17 +347,69 @@ func gameEditTeam(context *router.Context) {
 				b := evt.Target()
 				// reset all bbar buttons to outline mode
 				for _, v := range bbar.QuerySelectorAll(".button") {
-					v.Class().SetString("button button-outline")
+					if !v.Class().Contains("button-clear") {
+						v.Class().SetString("button button-outline")
+					}
 				}
-				b.Class().SetString("button button-primary")
+				if !b.Class().Contains("button-clear") {
+					b.Class().SetString("button button-primary")
+				}
 				k, _ := strconv.Atoi(b.GetAttribute("data-cmd-id"))
 				if k > 0 {
 					TheCmd = game.GetCmd(team, k)
 					drawUnitList()
+					form.Get("ToggleCmd").Class().Remove("hidden")
+					checkIcon := form.Get("cmd-include")
+					if TheCmd.Cull {
+						checkIcon.Class().Remove("fa-check-square-o")
+						checkIcon.Class().Add("fa-square-o")
+						checkIcon.SetInnerHTML(" Excluded from this Game")
+					} else {
+						checkIcon.Class().Add("fa-check-square-o")
+						checkIcon.Class().Remove("fa-square-o")
+						checkIcon.SetInnerHTML(" Included in this Game")
+					}
 				}
 			})
 		}
 		div.AppendChild(bbar)
+
+		div = form.Get("ToggleCmd")
+		div.SetInnerHTML("")
+		div.SetInnerHTML(`<i name="cmd-include" class="fa fa-check-square-o fa-lg"> Included in this Game</i>`)
+		div.AddEventListener("click", false, func(evt dom.Event) {
+			if TheCmd != nil {
+				checkIcon := form.Get("cmd-include")
+				cmdBtn := evt.Target()
+				for _, v := range form.Get("Commands").QuerySelectorAll(".button") {
+					theID, _ := strconv.Atoi(v.GetAttribute("data-cmd-id"))
+					if theID == TheCmd.ID {
+						cmdBtn = v
+						break
+					}
+				}
+				switch TheCmd.Cull {
+				case true:
+					TheCmd.Cull = false
+					checkIcon.Class().Add("fa-check-square-o")
+					checkIcon.Class().Remove("fa-square-o")
+					checkIcon.SetInnerHTML(" Included in this Game")
+					if cmdBtn != evt.Target() {
+						cmdBtn.Class().Add("button-primary")
+						cmdBtn.Class().Remove("button-clear")
+					}
+				case false:
+					TheCmd.Cull = true
+					checkIcon.Class().Remove("fa-check-square-o")
+					checkIcon.Class().Add("fa-square-o")
+					checkIcon.SetInnerHTML(" Excluded from this Game")
+					if cmdBtn != evt.Target() {
+						cmdBtn.Class().Remove("button-primary")
+						cmdBtn.Class().Add("button-clear")
+					}
+				}
+			}
+		})
 
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()

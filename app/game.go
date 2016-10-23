@@ -32,7 +32,7 @@ func gameChecklist(context *router.Context) {
 		}
 		game := Session.EditGame
 		game.InMode = "Checklist"
-		print("using existing game", game)
+		// print("using existing game", game)
 
 		w := dom.GetWindow()
 		doc := w.Document()

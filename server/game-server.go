@@ -213,6 +213,80 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	return err
 }
 
+func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+	*done = false
+	conn := Connections.Get(data.Channel)
+	if conn.UserID != data.Game.HostedBy {
+		return errors.New("Incorrect owner of game")
+	}
+
+	err := error(nil)
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	count := 0
+
+	// For each command Red and Blue
+	for _, v := range data.Game.RedCmd {
+		if err != nil {
+			break
+		}
+		_, err = DB.SQL(`update game_cmd set cull=$2 where id=$1`, v.ID, v.Cull).Exec()
+		if err != nil {
+			println(err.Error())
+		}
+		// For each unit, stamp the unit details
+		for _, u := range v.Units {
+			_, err := DB.SQL(`update unit
+				set condition=$2,bayonets_lost=$3,sabres_lost=$4,guns_lost=$5
+				where id=$1`, u.ID, u.Condition, u.BayonetsLost, u.SabresLost, u.GunsLost).
+				Exec()
+			if err != nil {
+				println(err.Error())
+				break
+			} else {
+				count++
+			}
+		}
+	}
+
+	for _, v := range data.Game.BlueCmd {
+		if err != nil {
+			break
+		}
+		_, err = DB.SQL(`update game_cmd set cull=$2 where id=$1`, v.ID, v.Cull).Exec()
+		if err != nil {
+			println(err.Error())
+		}
+		// For each unit, stamp the unit details
+		for _, u := range v.Units {
+			_, err := DB.SQL(`update unit
+				set condition=$2,bayonets_lost=$3,sabres_lost=$4,guns_lost=$5
+				where id=$1`, u.ID, u.Condition, u.BayonetsLost, u.SabresLost, u.GunsLost).
+				Exec()
+			if err != nil {
+				println(err.Error())
+				break
+			} else {
+				count++
+			}
+		}
+	}
+
+	logger(start, "Game.UpdateTeams", conn,
+		fmt.Sprintf("Game ID %d", data.ID),
+		fmt.Sprintf("%d Updated Units, %d Red Cmds, %d Blue Cmds",
+			count, len(data.Game.RedCmd), len(data.Game.BlueCmd)))
+
+	if err == nil {
+		DB.SQL(`update game set check_forces='t' where id=$1`, data.ID).Exec()
+		*done = true
+		tx.Commit()
+	}
+	return err
+}
+
 func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 	start := time.Now()
 

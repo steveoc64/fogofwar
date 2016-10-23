@@ -259,10 +259,10 @@ func (g *Game) GetTile(i int) *Tile {
 	// print("I can see", g.Tiles[i])
 	if g.TileX > 0 {
 		row := i / g.TileX
-		print("that looks to be on row", row)
+		// print("that looks to be on row", row)
 		g.Tiles[i].Y = row
 		col := i - (row * g.TileX)
-		print("col looks like", col)
+		// print("col looks like", col)
 		g.Tiles[i].X = col
 	}
 	return g.Tiles[i]
@@ -321,7 +321,7 @@ func (g *Game) ResizeTiles() {
 	g.TileX = g.GridX
 	g.TileY = g.GridY
 	g.Tiles = newTiles
-	print("is complete", g.Tiles)
+	// print("is complete", g.Tiles)
 }
 
 func (g *Game) ShowKmX() string {
@@ -380,6 +380,7 @@ type GameCmd struct {
 	Bayonets      *int    `db:"bayonets"` // derived data
 	Sabres        *int    `db:"sabres"`   // derived data
 	Guns          *int    `db:"guns"`     // derived data
+	Cull          bool    `db:"cull"`     // Dont use in game
 }
 
 func (f *GameCmd) Summarize() string {

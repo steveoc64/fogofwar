@@ -363,6 +363,9 @@ type GameCmd struct {
 	ID            int     `db:"id"`
 	GameID        int     `db:"game_id"`
 	GameName      string  `db:"game_name"` // derived data
+	StartTurn     int     `db:"start_turn"`
+	StartX        int     `db:"start_x"`
+	StartY        int     `db:"start_y"`
 	RedTeam       bool    `db:"red_team"`
 	BlueTeam      bool    `db:"blue_team"`
 	Nation        string  `db:"nation"`
@@ -374,7 +377,8 @@ type GameCmd struct {
 	Rating        int     `db:"rating"`
 	Inspiration   int     `db:"inspiration"`
 	Condition     int     `db:"condition"`
-	PlayerID      *int    `db:"player_id"`
+	PlayerID      int     `db:"player_id"`
+	PlayerName    string  `db:"player_name"` // derived data
 	Units         []*Unit `db:"units"`
 	VP            int     `db:"vp"`
 	Bayonets      *int    `db:"bayonets"` // derived data

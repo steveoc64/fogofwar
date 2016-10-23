@@ -84,10 +84,18 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 
 		// Fill in the cmd arrays
 		if data.Red {
-			DB.SQL(`select * from game_cmd where game_id=$1 and red_team order by name`, data.ID).QueryStructs(&retval.RedCmd)
+			DB.SQL(`select
+				g.*,coalesce(u.username,'') as player_name
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
 		if data.Blue {
-			DB.SQL(`select * from game_cmd where game_id=$1 and blue_team order by name`, data.ID).QueryStructs(&retval.BlueCmd)
+			DB.SQL(`select
+				g.*,coalesce(u.username,'') as player_name
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
 
 		// If the GetUnits flag was set, then get all the units for each of the commands as well
@@ -232,7 +240,8 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if err != nil {
 			break
 		}
-		_, err = DB.SQL(`update game_cmd set cull=$2 where id=$1`, v.ID, v.Cull).Exec()
+		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4 where id=$1`,
+			v.ID, v.Cull, v.StartTurn, v.PlayerID).Exec()
 		if err != nil {
 			println(err.Error())
 		}

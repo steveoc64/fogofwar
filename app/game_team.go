@@ -114,13 +114,15 @@ func gameEditTeam(context *router.Context) {
 			}
 
 			cmdsummary := fmt.Sprintf("<h3>%s ~ %s</h3><h4>Commander: %s</h4>", cmd.Name, cmd.Nation, cmd.CommanderName)
+
 			totals := fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
 				totalCmdrs,
 				totalBayonets,
 				totalSabres,
 				totalGuns)
 
-			form.Get("Summary").SetInnerHTML(cmdsummary + "<br>" + cmd.Descr + "<br>" + totals)
+			// form.Get("Summary").SetInnerHTML(cmdsummary + cmd.Descr + player + turn + totals)
+			form.Get("Summary").SetInnerHTML(cmdsummary + cmd.Descr + totals)
 		}
 
 		drawUnitList := func() {
@@ -357,6 +359,15 @@ func gameEditTeam(context *router.Context) {
 				k, _ := strconv.Atoi(b.GetAttribute("data-cmd-id"))
 				if k > 0 {
 					TheCmd = game.GetCmd(team, k)
+
+					// Fill in the start turn
+					form.Get("cmd-turn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", TheCmd.StartTurn)
+
+					// Fill in the username
+					form.Get("cmd-player").(*dom.HTMLInputElement).Value = TheCmd.PlayerName
+
+					// Draw up the units
+
 					drawUnitList()
 					form.Get("ToggleCmd").Class().Remove("hidden")
 					checkIcon := form.Get("cmd-include")
@@ -376,8 +387,39 @@ func gameEditTeam(context *router.Context) {
 
 		div = form.Get("ToggleCmd")
 		div.SetInnerHTML("")
-		div.SetInnerHTML(`<i name="cmd-include" class="fa fa-check-square-o fa-lg"> Included in this Game</i>`)
-		div.AddEventListener("click", false, func(evt dom.Event) {
+
+		player := fmt.Sprintf(`<label for="cmd-player">Assign to Player</label><input name="cmd-player" placeholder="PlayerID">  `)
+		turn := fmt.Sprintf(`<label for="cmd-turn">Arrives on Turn</label><input name="cmd-turn" value="1" type="number" step="1" min="1"><br>`)
+		div.SetInnerHTML(`<i name="cmd-include" class="fa fa-check-square-o fa-lg"> Included in this Game</i><br>` + player + turn)
+
+		form.OnEvent("cmd-player", "change", func(evt dom.Event) {
+			print("player changed")
+			go func() {
+				thePlayer := evt.Target().(*dom.HTMLInputElement).Value
+				err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
+					Channel:  Session.Channel,
+					Username: thePlayer,
+				}, &TheCmd.PlayerID)
+				if err != nil {
+					dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
+					TheCmd.PlayerName = ""
+					TheCmd.PlayerID = 0
+				} else {
+					if TheCmd.PlayerID == 0 {
+						TheCmd.PlayerName = ""
+					} else {
+						TheCmd.PlayerName = thePlayer
+					}
+				}
+			}()
+		})
+
+		form.OnEvent("cmd-turn", "change", func(evt dom.Event) {
+			print("turn changed")
+			TheCmd.StartTurn, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+		})
+
+		form.OnEvent("cmd-include", "click", func(evt dom.Event) {
 			if TheCmd != nil {
 				checkIcon := form.Get("cmd-include")
 				cmdBtn := evt.Target()

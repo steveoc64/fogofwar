@@ -98,9 +98,10 @@ type UserSignup struct {
 }
 
 type UserRPCData struct {
-	Channel int
-	ID      int
-	User    *User
+	Channel  int
+	ID       int
+	Username string
+	User     *User
 }
 
 type UserUpdate struct {

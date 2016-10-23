@@ -207,6 +207,39 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 					}
 				}
 			}
+
+			// Stamp the XY coords for all Red commands
+			if err == nil {
+				for _, v := range data.Game.RedCmd {
+					if v.StartX != -1 && v.StartY != -1 {
+						_, err = DB.SQL(`update game_cmd
+							set start_x=$3,start_y=$4
+							where game_id=$1 and id=$2 and red_team`, data.ID, v.ID, v.StartX, v.StartY).Exec()
+					}
+					if err != nil {
+						println(err.Error())
+						break
+					}
+
+				}
+			}
+
+			// Stamp the XY coords for all Blue commands
+			if err == nil {
+				for _, v := range data.Game.BlueCmd {
+					if v.StartX != -1 && v.StartY != -1 {
+						_, err = DB.SQL(`update game_cmd
+							set start_x=$3,start_y=$4
+							where game_id=$1 and id=$2 and blue_team`, data.ID, v.ID, v.StartX, v.StartY).Exec()
+					}
+					if err != nil {
+						println(err.Error())
+						break
+					}
+
+				}
+			}
+
 		}
 	}
 

@@ -447,6 +447,7 @@ create  table game_cmd (
 	inspiration int not null default 0,
 	condition int not null default 2,
 	player_id int not null default 0,
+	player_ready bool not null default 'f',
 	vp int not null default 0,
 	cull bool not null default 'f'
 );

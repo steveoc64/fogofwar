@@ -44,11 +44,13 @@
 		</div>
 	</div>
 
+	{{if ne .InMode "Players"}}
 	<div class="action__item" url="/game/{{.ID}}/players">
 		<div class="action__title">Players</div>
 		<div class="action__icon"><i class="fa fa-user fa-lg"></i></div>
 		<div class="action__text">
-			Assign players to Teams.
+			Check Status of Game Players
 		</div>
 	</div>
+	{{end}}
 </div>

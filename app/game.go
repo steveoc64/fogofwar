@@ -41,10 +41,7 @@ func gameChecklist(context *router.Context) {
 
 		// Layout the fields
 
-		form.New("fa-check-square-o", "Game Checklist - "+game.Name)
-
-		form.Row(1).
-			AddInput(1, "Name", "Name")
+		form.New("fa-check-square-o", "Game Hosting Checklist - "+game.Name)
 
 		form.Row(1).
 			AddCustom(1, "", "TODO", "game-checklist")
@@ -225,7 +222,38 @@ func gameEditBlue(context *router.Context) {
 	context.Params["team"] = "Blue"
 	gameEditTeam(context)
 }
+
 func gameEditPlayers(context *router.Context) {
-	print("TODO - gameEditPlayers")
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	game := Session.EditGame
+	game.InMode = "Players"
+	form := formulate.EditForm{}
+
+	// Layout the fields
+	form.New("fa-user", "Players for Game - "+game.Name)
+
+	form.Row(1).
+		AddCustom(1, "", "PlayerList", "")
+
+	// Add event handlers
+	form.CancelEvent(func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate(fmt.Sprintf("/game/%d", id))
+	})
+
+	form.Render("edit-form", "main", game)
+	loadTemplate("game-edit-player", "[name=PlayerList]", game)
+
+	form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
+		print("clicked on", url)
+		Session.Navigate(url)
+	})
+
+	showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 
 }

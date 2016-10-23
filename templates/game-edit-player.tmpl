@@ -1,0 +1,45 @@
+<table class="data-table" id="red-player-list">
+  <tbody>
+    <tr>
+      <th>Red Team</th>
+      <th>Player</th>
+      <th></th>
+    </tr>
+    {{range .RedCmd}}
+    <tr class="data-row">
+      {{if not .Cull}}
+      <td>{{.Name}}</td>
+      <td>{{.PlayerName}}</td>
+      <td>
+      {{if .PlayerReady}}
+        <i class="fa fa-check-square fa-2x"></i> Ready
+      {{else}}
+        <i class="fa fa-circle-o-notch fa-spin fa-2x"></i> ... Waiting
+      {{end}}
+      </td>
+      {{end}}
+    </tr>
+    {{end}}
+    <tr>
+      <th>Red Team</th>
+      <th></th>
+      <th></th>
+    </tr>
+    {{range .BlueCmd}}
+    <tr class="data-row">
+      {{if not .Cull}}
+      <td>{{.Name}}</td>
+      <td>{{.PlayerName}}</td>
+      <td>
+      {{if .PlayerReady}}
+        <i class="fa fa-check-square fa-2x"></i> Ready
+      {{else}}
+        <i class="fa fa-circle-o-notch fa-spin fa-2x"></i> ... Waiting
+      {{end}}
+      </td>
+      {{end}}
+    </tr>
+    {{end}}
+  <tbody>
+  </tbody>
+</table>

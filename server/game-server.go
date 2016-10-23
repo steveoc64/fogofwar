@@ -234,17 +234,35 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	defer tx.AutoRollback()
 
 	count := 0
+	unassignedCmd := false
+
+	// Clear out the invites
+	de_invites := []int{}
+	DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&de_invites)
+	_, err = DB.SQL(`delete from game_players where game_id=$1`, data.ID).Exec()
 
 	// For each command Red and Blue
 	for _, v := range data.Game.RedCmd {
 		if err != nil {
 			break
 		}
+		if v.PlayerID == 0 {
+			unassignedCmd = true
+		}
 		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4 where id=$1`,
 			v.ID, v.Cull, v.StartTurn, v.PlayerID).Exec()
 		if err != nil {
+			unassignedCmd = true
 			println(err.Error())
 		}
+		// Create the game invite
+		if v.PlayerID != 0 {
+			_, err = DB.SQL(`insert into game_players 
+			(game_id,player_id,red_team)
+			values ($1,$2,true)`, data.ID, v.PlayerID).Exec()
+			conn.BroadcastPlayer(v.PlayerID, "Game", "Invite", data.ID)
+		}
+
 		// For each unit, stamp the unit details
 		for _, u := range v.Units {
 			_, err := DB.SQL(`update unit
@@ -264,10 +282,24 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		if err != nil {
 			break
 		}
-		_, err = DB.SQL(`update game_cmd set cull=$2 where id=$1`, v.ID, v.Cull).Exec()
+		if v.PlayerID == 0 {
+			unassignedCmd = true
+		}
+		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4 where id=$1`,
+			v.ID, v.Cull, v.StartTurn, v.PlayerID).Exec()
 		if err != nil {
 			println(err.Error())
+			unassignedCmd = true
 		}
+		// Create the game invite
+		if v.PlayerID != 0 {
+			_, err = DB.SQL(`insert into game_players 
+			(game_id,player_id,blue_team)
+			values ($1,$2,true)`, data.ID, v.PlayerID).Exec()
+
+			conn.BroadcastPlayer(v.PlayerID, "Game", "Invite", data.ID)
+		}
+
 		// For each unit, stamp the unit details
 		for _, u := range v.Units {
 			_, err := DB.SQL(`update unit
@@ -289,7 +321,25 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			count, len(data.Game.RedCmd), len(data.Game.BlueCmd)))
 
 	if err == nil {
-		DB.SQL(`update game set check_forces='t' where id=$1`, data.ID).Exec()
+		// De-Invite those not invited
+		AList := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&AList)
+		// fmt.Printf("my alist is %v\n", AList)
+		// fmt.Printf("my dlist is %v\n", de_invites)
+		for _, v := range de_invites {
+			doIt := true
+			for _, a := range AList {
+				if v == a {
+					doIt = false
+					break
+				}
+			}
+			if doIt {
+				println("doit", v)
+				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+			}
+		}
+		DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, unassignedCmd).Exec()
 		*done = true
 		tx.Commit()
 	}

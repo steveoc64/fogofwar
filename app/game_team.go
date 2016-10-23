@@ -396,19 +396,25 @@ func gameEditTeam(context *router.Context) {
 			print("player changed")
 			go func() {
 				thePlayer := evt.Target().(*dom.HTMLInputElement).Value
-				err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
-					Channel:  Session.Channel,
-					Username: thePlayer,
-				}, &TheCmd.PlayerID)
-				if err != nil {
-					dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
-					TheCmd.PlayerName = ""
+				if thePlayer == "" {
 					TheCmd.PlayerID = 0
+					TheCmd.PlayerName = ""
 				} else {
-					if TheCmd.PlayerID == 0 {
+					err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
+						Channel:  Session.Channel,
+						Username: thePlayer,
+					}, &TheCmd.PlayerID)
+					if err != nil {
+						dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
 						TheCmd.PlayerName = ""
+						TheCmd.PlayerID = 0
 					} else {
-						TheCmd.PlayerName = thePlayer
+						if TheCmd.PlayerID == 0 {
+							TheCmd.PlayerName = ""
+						} else {
+							TheCmd.PlayerName = thePlayer
+						}
+						print("assign cmd to player", TheCmd, thePlayer)
 					}
 				}
 			}()

@@ -387,6 +387,13 @@ type GameCmd struct {
 	Cull          bool    `db:"cull"`     // Dont use in game
 }
 
+func (g *GameCmd) GetCSS() string {
+	if g.RedTeam {
+		return "tile-red"
+	}
+	return "tile-blue"
+}
+
 func (f *GameCmd) Summarize() string {
 	retval := "( "
 	if f.Bayonets != nil {

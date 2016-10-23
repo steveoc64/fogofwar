@@ -10,7 +10,18 @@ import (
 )
 
 func mainPage(context *router.Context) {
+	Session.Subscribe("Game", _mainPage, context)
+	go _mainPage("Main", 0, context)
+}
 
+func _mainPage(action string, id int, context *router.Context) {
+
+	switch action {
+	case "Main", "Invite":
+		break
+	default:
+		return
+	}
 	go func() {
 		games := []shared.Game{}
 		err := RPC("GameRPC.List", shared.GameRPCData{

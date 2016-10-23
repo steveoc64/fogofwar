@@ -129,7 +129,24 @@ func (c *Connection) BroadcastAdmin(name string, action string, id int) {
 
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID != 0 && v.Rank > 9 {
-			log.Println("broadcastAllAdmin", name, action, id, "»", v.ID)
+			log.Println("broadcastAdmin", name, action, id, "»", v.ID)
+			go v.Send(name, data)
+		}
+	}
+}
+
+// Send an async message to a specific player on all connections but this one
+func (c *Connection) BroadcastPlayer(playerID int, name string, action string, id int) {
+
+	data := shared.AsyncMessage{
+		Action: action,
+		ID:     id,
+	}
+
+	println("broadcastPlayer", playerID, name, action)
+	for _, v := range Connections.cmap {
+		if v != c && v.UserID == playerID {
+			log.Println("broadcastPlayer", name, action, id, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}

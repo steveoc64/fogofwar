@@ -89,6 +89,7 @@ func gameEditTable(context *router.Context) {
 		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.`)
 		editMode := ""
 		modeSet := ""
+		TheCmd := &shared.GameCmd{}
 		currentObjX := -1
 		currentObjY := -1
 
@@ -147,6 +148,42 @@ func gameEditTable(context *router.Context) {
 							v.X, v.Y, i)
 					}
 				}
+				// add unit tiles on top
+				if modeSet == "RedTeam" || modeSet == "BlueTeam" {
+					team := "red"
+					for i, v := range game.RedCmd {
+						if v.StartX != -1 {
+							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
+								v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+								game.GridSize, game.GridSize, // width and height in inches
+								v.GetCSS(), // self-computed CSS content type
+								v.StartX, v.StartY, i, v.ID)
+							if modeSet == "RedTeam" {
+								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
+									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
+									team,
+									v.Name)
+							}
+						}
+					}
+					team = "blue"
+					for i, v := range game.BlueCmd {
+						if v.StartX != -1 {
+							newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="blue-%d" data-id="%d"/>`,
+								v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+								game.GridSize, game.GridSize, // width and height in inches
+								v.GetCSS(), // self-computed CSS content type
+								v.StartX, v.StartY, i, v.ID)
+							if modeSet == "BlueTeam" {
+								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
+									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
+									team,
+									v.Name)
+							}
+						}
+					}
+
+				}
 				// print("setting newHTML", newHTML)
 				tileSet.SetInnerHTML(newHTML)
 			}
@@ -162,6 +199,35 @@ func gameEditTable(context *router.Context) {
 				// print("editmode now set to", editMode)
 				editMode = evt.Target().(*dom.HTMLInputElement).Value
 				drawActionBtns()
+			})
+			abar.AppendChild(btn)
+		}
+
+		// Create a unit button
+		unitBtn := func(cmd *shared.GameCmd) {
+			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
+			if cmd.StartX == -1 {
+				btn.Class().SetString("button button-clear")
+			} else {
+				btn.Class().SetString("button button-outline")
+			}
+			btn.SetAttribute("type", "button")
+			team := "Red"
+			if cmd.BlueTeam {
+				team = "Blue"
+			}
+			btn.SetAttribute("data-team", team)
+			btn.SetAttribute("data-id", fmt.Sprintf("%d", cmd.ID))
+			btn.Value = cmd.Name
+			btn.AddEventListener("click", false, func(evt dom.Event) {
+				// print("editmode now set to", editMode)
+				btn := evt.Target().(*dom.HTMLInputElement)
+				editMode = btn.Value
+				team := btn.GetAttribute("data-team")
+				id, _ := strconv.Atoi(btn.GetAttribute("data-id"))
+				TheCmd = game.GetCmd(team, id)
+				print("selected Cmd", team, id, TheCmd)
+				btn.Class().SetString("button button-primary")
 			})
 			abar.AppendChild(btn)
 		}
@@ -206,6 +272,16 @@ func gameEditTable(context *router.Context) {
 					actionBtn(`Water \`)
 					actionBtn("Higher")
 					actionBtn("Lower")
+				case "RedTeam":
+					TheCmd = &shared.GameCmd{}
+					for _, v := range game.RedCmd {
+						unitBtn(v)
+					}
+				case "BlueTeam":
+					TheCmd = &shared.GameCmd{}
+					for _, v := range game.BlueCmd {
+						unitBtn(v)
+					}
 				case "Objective":
 					// Create a set of fields for the objective details
 					if oldModeSet != modeSet {
@@ -308,6 +384,8 @@ func gameEditTable(context *router.Context) {
 		// Create the mode buttons
 		modeButton("Terrain")
 		modeButton("Objective")
+		modeButton("RedTeam")
+		modeButton("BlueTeam")
 		// modeButton("Zones")
 		saveButton("Save Map")
 		restoreButton("Restore Map")
@@ -422,6 +500,13 @@ func gameEditTable(context *router.Context) {
 					theTile.ApplyTerrain(editMode)
 					tClass.Add(theTile.GetCSS())
 					changed = true
+				case "RedTeam", "BlueTeam":
+					print("clicked on unit tile", i, TheCmd)
+					tName := t.GetAttribute("name")
+					print("tile name", tName)
+					TheCmd.StartX = theTile.X
+					TheCmd.StartY = theTile.Y
+					drawTiles()
 				case "Objective":
 					// print("click on tile in objective mode")
 					doc.QuerySelector("#objective-fields").Class().Remove("hidden")

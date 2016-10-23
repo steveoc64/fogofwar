@@ -9,44 +9,44 @@ create table migration (
 );
 
 
-drop table if exists users;
-create table users (
-	id serial not null primary key,
-	username text not null unique,
-	passwd text not null,
-	name text not null,
-	email text not null unique,
-	rank int not null default 1,
-	created timestamptz not null default localtimestamp,
-	expires timestamptz not null default localtimestamp,
-	channel int not null default 0,
-	ip_address text not null default '',
-	country text not null default '',
-	bloglink text not null default '',
-	notes text not null default '',
-	banned bool not null default false,
-	disqus bool not null default true,
-	newsletter bool not null default true
-);
-\i data/users.sql
+-- drop table if exists users;
+-- create table users (
+-- 	id serial not null primary key,
+-- 	username text not null unique,
+-- 	passwd text not null,
+-- 	name text not null,
+-- 	email text not null unique,
+-- 	rank int not null default 1,
+-- 	created timestamptz not null default localtimestamp,
+-- 	expires timestamptz not null default localtimestamp,
+-- 	channel int not null default 0,
+-- 	ip_address text not null default '',
+-- 	country text not null default '',
+-- 	bloglink text not null default '',
+-- 	notes text not null default '',
+-- 	banned bool not null default false,
+-- 	disqus bool not null default true,
+-- 	newsletter bool not null default true
+-- );
+-- \i data/users.sql
 
-drop table if exists login;
-create unlogged table login (
-	user_id int not null,
-	date timestamptz not null default localtimestamp,
-	ip_address text not null default '',
-	channel int not null default 0,
-	up bool default true
-);
-create index login_date_idx on login(date);
-create index login_user_idx on login(user_id,up);
+-- drop table if exists login;
+-- create unlogged table login (
+-- 	user_id int not null,
+-- 	date timestamptz not null default localtimestamp,
+-- 	ip_address text not null default '',
+-- 	channel int not null default 0,
+-- 	up bool default true
+-- );
+-- create index login_date_idx on login(date);
+-- create index login_user_idx on login(user_id,up);
 
-drop table if exists vcode;
-create unlogged table vcode (
-	uid int not null primary key,
-	code text not null default '',
-	expires timestamp default now() + interval '2 hour'
-);
+-- drop table if exists vcode;
+-- create unlogged table vcode (
+-- 	uid int not null primary key,
+-- 	code text not null default '',
+-- 	expires timestamp default now() + interval '2 hour'
+-- );
 
 drop table if exists user_rego;
 create table user_rego (
@@ -433,8 +433,11 @@ drop table if exists game_cmd;
 create  table game_cmd (
 	id serial not null primary key,
 	game_id int not null default 0,
-	red_team bool,
-	blue_team bool,
+	start_turn int not null default 1,
+	start_x int not null default 0,
+	start_y int not null default 0,
+	red_team bool not null default false,
+	blue_team bool not null default false,
 	nation text not null default '',
 	name text not null default '',
 	commander_name text not null default '',
@@ -443,7 +446,7 @@ create  table game_cmd (
 	rating int not null default 0,
 	inspiration int not null default 0,
 	condition int not null default 2,
-	player_id int,
+	player_id int not null default 0,
 	vp int not null default 0,
 	cull bool not null default 'f'
 );

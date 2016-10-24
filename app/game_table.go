@@ -26,6 +26,9 @@ func gameEditTable(context *router.Context) {
 		return
 	}
 
+	defaultMode := context.Params["mode"]
+	print("defaultMode", defaultMode)
+
 	go func() {
 		game := Session.EditGame
 		game.InMode = "Table"
@@ -87,15 +90,16 @@ func gameEditTable(context *router.Context) {
 		abar := form.Get("ActionButtons")
 		bbar.SetInnerHTML("")
 		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.`)
-		editMode := ""
-		modeSet := ""
+		editMode := "" // This is the sub-thing within the mode, ie in mode terrain, editmode = rough, woods, etc
+		modeSet := defaultMode
+		oldModeSet := ""
 		TheCmd := &shared.GameCmd{}
 		currentObjX := -1
 		currentObjY := -1
 
 		// Redraw the mode buttons
 		drawActionBtns := func() {
-			// print("draw action btns and editmode is", editMode)
+			print("draw action btns and editmode is", editMode)
 			btns := abar.QuerySelectorAll(".button")
 			for _, v := range btns {
 				f := v.(*dom.HTMLInputElement).Value
@@ -112,7 +116,7 @@ func gameEditTable(context *router.Context) {
 
 		tileSet := form.Get("map-tileset")
 		drawTiles := func() {
-			// print("call to draw tiles", game.Tiles)
+			print("call to draw tiles", modeSet, editMode, game.Tiles)
 			tileSet.SetInnerHTML("")
 			if game.GridSize > 0 {
 				newHTML := ""
@@ -138,7 +142,7 @@ func gameEditTable(context *router.Context) {
 					}
 				}
 				// add objective tiles on top !!
-				if modeSet == "Objective" {
+				if modeSet == "objective" {
 					for i, v := range game.Objectives {
 						// print("gen svg for obj", v)
 						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
@@ -160,7 +164,7 @@ func gameEditTable(context *router.Context) {
 					}
 				}
 				// add unit tiles on top
-				if modeSet == "RedTeam" || modeSet == "BlueTeam" {
+				if modeSet == "red" || modeSet == "blue" {
 					team := "red"
 					for i, v := range game.RedCmd {
 						if v.StartX != -1 && !v.Cull {
@@ -169,7 +173,7 @@ func gameEditTable(context *router.Context) {
 								game.GridSize, game.GridSize, // width and height in inches
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
-							if modeSet == "RedTeam" {
+							if modeSet == "red" {
 								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
 									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
 									team,
@@ -185,7 +189,7 @@ func gameEditTable(context *router.Context) {
 								game.GridSize, game.GridSize, // width and height in inches
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
-							if modeSet == "BlueTeam" {
+							if modeSet == "blue" {
 								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
 									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
 									team,
@@ -261,92 +265,104 @@ func gameEditTable(context *router.Context) {
 			div.AppendChild(col)
 		}
 
+		setMode := func() {
+			print("doing a setmode of", modeSet)
+			switch modeSet {
+			case "terrain":
+				actionBtn("Clear")
+				actionBtn("Rough")
+				actionBtn("Woods")
+				actionBtn("Built")
+				actionBtn("Fort")
+				actionBtn("Water -")
+				actionBtn("Water /")
+				actionBtn(`Water \`)
+				actionBtn("Higher")
+				actionBtn("Lower")
+			case "red":
+				TheCmd = &shared.GameCmd{}
+				for _, v := range game.RedCmd {
+					if !v.Cull {
+						unitBtn(v)
+					}
+				}
+			case "blue":
+				TheCmd = &shared.GameCmd{}
+				for _, v := range game.BlueCmd {
+					if !v.Cull {
+						unitBtn(v)
+					}
+				}
+			case "objective":
+				// Create a set of fields for the objective details
+				print("oms vs ms", oldModeSet, modeSet)
+				if oldModeSet != modeSet {
+					abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
+					dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					dd.Class().Add("row")
+					dd.Class().Add("hidden")
+					dd.SetID("objective-fields")
+					dd.SetAttribute("data-row-span", "12")
+					editField(6, dd, "Name", "obj-name", "text")
+					labelField(3, dd, "VP Per Turn / Red / Blue")
+					editField(1, dd, "VP Per Turn", "obj-vpperturn", "number")
+					editField(1, dd, "Red VP", "obj-redvp", "number")
+					editField(1, dd, "Blue VP", "obj-bluevp", "number")
+					col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					col.SetAttribute("data-field-span", "1")
+					col.SetInnerHTML(`<i class="fa fa-close">`)
+					col.SetID("delete-obj")
+					dd.AppendChild(col)
+					abar.AppendChild(dd)
+					col.AddEventListener("click", false, func(evt dom.Event) {
+						if dom.GetWindow().Confirm("Remove this Objective ?") {
+							game.RemoveObjective(currentObjX, currentObjY)
+							doc.QuerySelector("#objective-fields").Class().Add("hidden")
+							currentObjX = -1
+							currentObjY = -1
+							drawTiles()
+						}
+					})
+
+					abar.AddEventListener("change", false, func(evt dom.Event) {
+						// print("one of the objective properties has changed !!")
+						// print("X Y of the objective is", currentObjX, currentObjY)
+						o := game.GetObjective(currentObjX, currentObjY)
+						if o != nil {
+							o.Name = abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value
+							o.VPPerTurn, _ = strconv.Atoi(abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value)
+							o.RedVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value)
+							o.BlueVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value)
+							// print("set into o", o)
+							// print("and in the game object, its now", game)
+
+						}
+					})
+					print("drawing the tiles again !!")
+					drawTiles() // do it again, to ensure that the objective tiles are displayed correctly
+				}
+				// case "Zones":
+				// 	actionBtn("Neutral")
+				// 	actionBtn("Red")
+				// 	actionBtn("Blue")
+			}
+		}
+
 		// Add a button to the buttonbar, with event handlers
 		modeButton := func(name string) {
 			btn := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
-			btn.Class().SetString("button button-outline")
+			if strings.ToLower(name) == strings.ToLower(modeSet) {
+				btn.Class().SetString("button button-primary")
+			} else {
+				btn.Class().SetString("button button-outline")
+			}
 			btn.SetAttribute("type", "button")
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				abar.SetInnerHTML("")
-				oldModeSet := modeSet
+				oldModeSet = modeSet
 				modeSet = evt.Target().(*dom.HTMLInputElement).Value
-				switch modeSet {
-				case "Terrain":
-					actionBtn("Clear")
-					actionBtn("Rough")
-					actionBtn("Woods")
-					actionBtn("Built")
-					actionBtn("Fort")
-					actionBtn("Water -")
-					actionBtn("Water /")
-					actionBtn(`Water \`)
-					actionBtn("Higher")
-					actionBtn("Lower")
-				case "RedTeam":
-					TheCmd = &shared.GameCmd{}
-					for _, v := range game.RedCmd {
-						if !v.Cull {
-							unitBtn(v)
-						}
-					}
-				case "BlueTeam":
-					TheCmd = &shared.GameCmd{}
-					for _, v := range game.BlueCmd {
-						if !v.Cull {
-							unitBtn(v)
-						}
-					}
-				case "Objective":
-					// Create a set of fields for the objective details
-					if oldModeSet != modeSet {
-						abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
-						dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-						dd.Class().Add("row")
-						dd.Class().Add("hidden")
-						dd.SetID("objective-fields")
-						dd.SetAttribute("data-row-span", "12")
-						editField(6, dd, "Name", "obj-name", "text")
-						labelField(3, dd, "VP Per Turn / Red / Blue")
-						editField(1, dd, "VP Per Turn", "obj-vpperturn", "number")
-						editField(1, dd, "Red VP", "obj-redvp", "number")
-						editField(1, dd, "Blue VP", "obj-bluevp", "number")
-						col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-						col.SetAttribute("data-field-span", "1")
-						col.SetInnerHTML(`<i class="fa fa-close">`)
-						col.SetID("delete-obj")
-						dd.AppendChild(col)
-						abar.AppendChild(dd)
-						col.AddEventListener("click", false, func(evt dom.Event) {
-							if dom.GetWindow().Confirm("Remove this Objective ?") {
-								game.RemoveObjective(currentObjX, currentObjY)
-								doc.QuerySelector("#objective-fields").Class().Add("hidden")
-								currentObjX = -1
-								currentObjY = -1
-								drawTiles()
-							}
-						})
-
-						abar.AddEventListener("change", false, func(evt dom.Event) {
-							// print("one of the objective properties has changed !!")
-							// print("X Y of the objective is", currentObjX, currentObjY)
-							o := game.GetObjective(currentObjX, currentObjY)
-							if o != nil {
-								o.Name = abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value
-								o.VPPerTurn, _ = strconv.Atoi(abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value)
-								o.RedVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value)
-								o.BlueVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value)
-								// print("set into o", o)
-								// print("and in the game object, its now", game)
-
-							}
-						})
-					}
-					// case "Zones":
-					// 	actionBtn("Neutral")
-					// 	actionBtn("Red")
-					// 	actionBtn("Blue")
-				}
+				setMode()
 				abar.Class().Remove("hidden")
 			})
 			bbar.AppendChild(btn)
@@ -397,13 +413,14 @@ func gameEditTable(context *router.Context) {
 		}
 
 		// Create the mode buttons
-		modeButton("Terrain")
-		modeButton("Objective")
-		modeButton("RedTeam")
-		modeButton("BlueTeam")
+		modeButton("terrain")
+		modeButton("objective")
+		modeButton("red")
+		modeButton("blue")
 		// modeButton("Zones")
 		saveButton("Save Map")
 		restoreButton("Restore Map")
+		setMode()
 
 		// Add a reset all button
 
@@ -510,19 +527,19 @@ func gameEditTable(context *router.Context) {
 				changed := false
 
 				switch modeSet {
-				case "Terrain":
+				case "terrain":
 					tClass.Remove(theTile.GetCSS())
 					theTile.ApplyTerrain(editMode)
 					tClass.Add(theTile.GetCSS())
 					changed = true
-				case "RedTeam", "BlueTeam":
+				case "red", "blue":
 					print("clicked on unit tile", i, TheCmd)
 					tName := t.GetAttribute("name")
 					print("tile name", tName)
 					TheCmd.StartX = theTile.X
 					TheCmd.StartY = theTile.Y
 					drawTiles()
-				case "Objective":
+				case "objective":
 					// print("click on tile in objective mode")
 					doc.QuerySelector("#objective-fields").Class().Remove("hidden")
 					tName := t.GetAttribute("name")

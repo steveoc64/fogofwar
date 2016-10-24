@@ -1,7 +1,7 @@
 <p>Once all the checkboxes are ticked, the Game can begin !</p>
 <div class="action-grid todo-list">
 	{{if .CheckTable}}
-	<div class="action__item" url="/game/{{.ID}}/table">
+	<div class="action__item" url="/game/{{.ID}}/table/terrain">
 		<div class="action__title">Table</div>
 		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
 		<div class="action__text">
@@ -9,7 +9,7 @@
 		</div>
 	</div>
 	{{else}}
-	<div class="action__item" url="/game/{{.ID}}/table">
+	<div class="action__item" url="/game/{{.ID}}/table/terrain">
 		<div class="action__title">Table</div>
 		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
 		<div class="action__text">
@@ -20,7 +20,7 @@
 	{{end}}
 
 	{{if .CheckObjectives}}
-	<div class="action__item" url="/game/{{.ID}}/table">
+	<div class="action__item" url="/game/{{.ID}}/table/objective">
 		<div class="action__title">Objectives</div>
 		<div class="action__icon"><i class="fa fa-check-square fa-lg"></i></div>
 		<div class="action__text">
@@ -28,7 +28,7 @@
 		</div>
 	</div>
 	{{else}}
-	<div class="action__item" url="/game/{{.ID}}/table">
+	<div class="action__item" url="/game/{{.ID}}/table/objective">
 		<div class="action__title">Objectives</div>
 		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
 		<div class="action__text">

@@ -144,7 +144,7 @@ func (g *Game) GoodToGo() bool {
 }
 
 func (g *Game) GetStatusIcon() string {
-	print("getting status icon")
+	// print("getting status icon")
 	if !g.CheckTable {
 		return "fa fa-table fa-lg"
 	}

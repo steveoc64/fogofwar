@@ -24,6 +24,8 @@ func _mainPage(action string, id int, context *router.Context) {
 	}
 	go func() {
 
+		Session.RedrawOnResize = true
+
 		invites := []shared.Game{}
 		RPC("GameRPC.ListInvites", shared.GameRPCData{
 			Channel: Session.Channel,

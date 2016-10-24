@@ -5,6 +5,7 @@ import (
 
 	"./shared"
 	"github.com/go-humble/router"
+	"github.com/gopherjs/gopherjs/js"
 	"github.com/steveoc64/formulate"
 	"honnef.co/go/js/dom"
 )
@@ -12,25 +13,26 @@ import (
 type MessageFunction func(string, int, *router.Context)
 
 type GlobalSessionData struct {
-	Version       string
-	Username      string
-	Passwd        string
-	Rank          int
-	UserID        int
-	CanAllocate   bool
-	Channel       int
-	Router        *router.Router
-	AppFn         map[string]router.Handler
-	Subscriptions map[string]MessageFunction
-	Context       *router.Context
-	ID            map[string]int
-	URL           string
-	Disqus        bool
-	Lookup        shared.LookupTable
-	MaxGames      int
-	MaxScenarios  int
-	MaxPlayers    int
-	EditGame      *shared.Game
+	Version        string
+	Username       string
+	Passwd         string
+	Rank           int
+	UserID         int
+	CanAllocate    bool
+	Channel        int
+	Router         *router.Router
+	AppFn          map[string]router.Handler
+	Subscriptions  map[string]MessageFunction
+	Context        *router.Context
+	ID             map[string]int
+	URL            string
+	Disqus         bool
+	Lookup         shared.LookupTable
+	MaxGames       int
+	MaxScenarios   int
+	MaxPlayers     int
+	EditGame       *shared.Game
+	RedrawOnResize bool
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -61,6 +63,7 @@ func (s *GlobalSessionData) Navigate(url string) {
 	s.Context = nil
 	s.Router.Navigate(url)
 	s.URL = url
+	s.RedrawOnResize = false
 	// go RPC("LoginRPC.Nav", shared.Nav{
 	// 	Channel: s.Channel,
 	// 	Route:   url,
@@ -83,7 +86,11 @@ func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *r
 }
 
 func (s *GlobalSessionData) Reload(context *router.Context) {
-	s.Router.Navigate(context.Path)
+	if context == nil {
+		s.Router.Navigate(s.Context.Path)
+	} else {
+		s.Router.Navigate(context.Path)
+	}
 }
 
 func (s *GlobalSessionData) Mobile() bool {
@@ -96,4 +103,12 @@ func main() {
 	websocketInit()
 	initForms()
 	grid1()
+	js.Global.Set("resize", func() {
+		print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
+		if Session.RedrawOnResize {
+			print("clearing the list templates and repainting the screen")
+			formulate.Templates(GetTemplate)
+			Session.Reload(Session.Context)
+		}
+	})
 }

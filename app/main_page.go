@@ -84,7 +84,9 @@ func _mainPage(action string, id int, context *router.Context) {
 			form.DateColumn("Created", "Created")
 		}
 		form.DateColumn("Start Date", "StartDate")
-		form.DateColumn("Game Ends", "Expires")
+		if !Session.Mobile() {
+			form.DateColumn("Game Ends", "Expires")
+		}
 		form.IconColumn("Status", "GetStatusIcon")
 
 		// Add event handlers
@@ -102,7 +104,8 @@ func _mainPage(action string, id int, context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/game/%s", key))
 		})
 
-		formulate.AppendDiv("hosted-games").Class().SetString("wide-container")
+		// formulate.AppendDiv("hosted-games").Class().SetString("wide-container")
+		formulate.AppendDiv("hosted-games")
 		form.Render("game-list", "#hosted-games", games)
 
 		// print("add action grid")

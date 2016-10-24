@@ -6,6 +6,7 @@ import (
 	"./shared"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
+	"honnef.co/go/js/dom"
 )
 
 type MessageFunction func(string, int, *router.Context)
@@ -83,6 +84,10 @@ func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *r
 
 func (s *GlobalSessionData) Reload(context *router.Context) {
 	s.Router.Navigate(context.Path)
+}
+
+func (s *GlobalSessionData) Mobile() bool {
+	return dom.GetWindow().InnerWidth() < 740
 }
 
 func main() {

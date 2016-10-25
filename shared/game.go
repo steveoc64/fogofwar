@@ -44,13 +44,13 @@ func (t *Tile) ApplyTerrain(mode string) {
 		t.Content = TileBuilding
 	case "Fort":
 		t.Content = TileFort
-	case "Water -":
+	case "River -":
 		t.Content = TileWater
 		t.Height = 0
-	case "Water /":
+	case "River /":
 		t.Content = TileWater1
 		t.Height = 0
-	case `Water \`:
+	case `River \`:
 		t.Content = TileWater2
 		t.Height = 0
 	case "Higher":

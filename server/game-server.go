@@ -126,6 +126,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		if err2 != nil {
 			print("hmmm ... ", err2.Error())
 		}
+		// fmt.Printf("tiles 0 %v\n", retval.Tiles[0])
 
 		// and fetch the objectives
 		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)

@@ -31,6 +31,7 @@ func gameEditTable(context *router.Context) {
 
 	go func() {
 		game := Session.EditGame
+		print("in here with tile 0", game.Tiles[0])
 		game.InMode = "Table"
 
 		if len(game.Tiles) == 0 {
@@ -89,7 +90,7 @@ func gameEditTable(context *router.Context) {
 		bbar := form.Get("ModeButtons")
 		abar := form.Get("ActionButtons")
 		bbar.SetInnerHTML("")
-		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.`)
+		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.<br>`)
 		editMode := "" // This is the sub-thing within the mode, ie in mode terrain, editmode = rough, woods, etc
 		modeSet := defaultMode
 		oldModeSet := ""
@@ -99,7 +100,7 @@ func gameEditTable(context *router.Context) {
 
 		// Redraw the mode buttons
 		drawActionBtns := func() {
-			print("draw action btns and editmode is", editMode)
+			// print("draw action btns and editmode is", editMode)
 			btns := abar.QuerySelectorAll(".button")
 			for _, v := range btns {
 				f := v.(*dom.HTMLInputElement).Value
@@ -116,7 +117,7 @@ func gameEditTable(context *router.Context) {
 
 		tileSet := form.Get("map-tileset")
 		drawTiles := func() {
-			print("call to draw tiles", modeSet, editMode, game.Tiles)
+			// print("call to draw tiles", modeSet, editMode, game.Tiles)
 			tileSet.SetInnerHTML("")
 			if game.GridSize > 0 {
 				newHTML := ""
@@ -274,9 +275,9 @@ func gameEditTable(context *router.Context) {
 				actionBtn("Woods")
 				actionBtn("Built")
 				actionBtn("Fort")
-				actionBtn("Water -")
-				actionBtn("Water /")
-				actionBtn(`Water \`)
+				actionBtn("River -")
+				actionBtn("River /")
+				actionBtn(`River \`)
 				actionBtn("Higher")
 				actionBtn("Lower")
 			case "red":
@@ -406,7 +407,24 @@ func gameEditTable(context *router.Context) {
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				// print("clicked on the restore button")
 				if dom.GetWindow().Confirm("Restore the Map from file ?") {
-					Session.Reload(context)
+					go func() {
+						Session.EditGame = &shared.Game{}
+						err := RPC("GameRPC.Get", shared.GameRPCData{
+							Channel:  Session.Channel,
+							ID:       id,
+							Red:      true,
+							Blue:     true,
+							GetUnits: true,
+						}, Session.EditGame)
+						if err != nil {
+							dom.GetWindow().Alert(err.Error())
+							return
+						} else {
+							print("reloaded game and tiles", Session.EditGame)
+							Session.Reload(context)
+						}
+					}()
+
 				}
 			})
 			bbar.AppendChild(btn)
@@ -462,7 +480,7 @@ func gameEditTable(context *router.Context) {
 
 		scaleImages := func() {
 			gridInches := fmt.Sprintf("%d", game.GridSize)
-			for _, v := range []string{"rough", "woods", "building", "fort", "water", "water1", "water2"} {
+			for _, v := range []string{"rough", "woods", "building", "fort", "river", "river1", "river2", "objective"} {
 				// print("rescale", v)
 				el := doc.QuerySelector("#tile-" + v)
 				el.SetAttribute("height", gridInches)

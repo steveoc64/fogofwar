@@ -24,7 +24,7 @@ func _mainPage(action string, id int, context *router.Context) {
 	}
 	go func() {
 
-		Session.RedrawOnResize = true
+		Session.MobileSensitive = true
 
 		invites := []shared.Game{}
 		RPC("GameRPC.ListInvites", shared.GameRPCData{

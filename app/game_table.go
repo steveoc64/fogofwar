@@ -297,7 +297,7 @@ func gameEditTable(context *router.Context) {
 		}
 
 		// Add an edit field to the abar
-		editField := func(span int, div *dom.HTMLDivElement, title, name, theType string) {
+		editField := func(span int, div *dom.HTMLDivElement, title, name, theType string) *dom.HTMLDivElement {
 			col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
 			col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
 			el := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
@@ -306,13 +306,15 @@ func gameEditTable(context *router.Context) {
 			el.Type = theType
 			col.AppendChild(el)
 			div.AppendChild(col)
+			return div
 		}
-		labelField := func(span int, div *dom.HTMLDivElement, lbl string) {
-			col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-			col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
-			col.SetInnerHTML(lbl)
-			div.AppendChild(col)
-		}
+		// labelField := func(span int, div *dom.HTMLDivElement, lbl string) *dom.HTMLDivElement {
+		// 	col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+		// 	col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
+		// 	col.SetInnerHTML(lbl)
+		// 	div.AppendChild(col)
+		// 	return div
+		// }
 
 		setMode := func() {
 			print("doing a setmode of", modeSet)
@@ -346,23 +348,36 @@ func gameEditTable(context *router.Context) {
 				// Create a set of fields for the objective details
 				print("oms vs ms", oldModeSet, modeSet)
 				if oldModeSet != modeSet {
-					abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
+					if Session.Mobile() {
+						abar.SetInnerHTML("")
+					} else {
+						abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
+					}
+					ddc := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					ddc.Class().Add("row")
+					ddc.Class().Add("hidden")
+					ddc.SetID("objective-fields")
+
 					dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
 					dd.Class().Add("row")
-					dd.Class().Add("hidden")
-					dd.SetID("objective-fields")
-					dd.SetAttribute("data-row-span", "12")
-					editField(6, dd, "Name", "obj-name", "text")
-					labelField(3, dd, "VP Per Turn / Red / Blue")
-					editField(1, dd, "VP Per Turn", "obj-vpperturn", "number")
-					editField(1, dd, "Red VP", "obj-redvp", "number")
-					editField(1, dd, "Blue VP", "obj-bluevp", "number")
+
+					if Session.Mobile() {
+						dd.SetAttribute("data-row-span", "6")
+					} else {
+						dd.SetAttribute("data-row-span", "12")
+					}
+					dd = editField(6, dd, "Name", "obj-name", "text")
+					// dd = labelField(3, dd, "VP Per Turn / Red / Blue")
+					dd = editField(2, dd, "VP Per Turn", "obj-vpperturn", "number")
+					dd = editField(2, dd, "Red VP", "obj-redvp", "number")
+					dd = editField(2, dd, "Blue VP", "obj-bluevp", "number")
 					col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
 					col.SetAttribute("data-field-span", "1")
 					col.SetInnerHTML(`<i class="fa fa-close">`)
 					col.SetID("delete-obj")
 					dd.AppendChild(col)
-					abar.AppendChild(dd)
+					ddc.AppendChild(dd)
+					abar.AppendChild(ddc)
 					col.AddEventListener("click", false, func(evt dom.Event) {
 						if dom.GetWindow().Confirm("Remove this Objective ?") {
 							game.RemoveObjective(currentObjX, currentObjY)

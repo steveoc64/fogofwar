@@ -13,26 +13,28 @@ import (
 type MessageFunction func(string, int, *router.Context)
 
 type GlobalSessionData struct {
-	Version        string
-	Username       string
-	Passwd         string
-	Rank           int
-	UserID         int
-	CanAllocate    bool
-	Channel        int
-	Router         *router.Router
-	AppFn          map[string]router.Handler
-	Subscriptions  map[string]MessageFunction
-	Context        *router.Context
-	ID             map[string]int
-	URL            string
-	Disqus         bool
-	Lookup         shared.LookupTable
-	MaxGames       int
-	MaxScenarios   int
-	MaxPlayers     int
-	EditGame       *shared.Game
-	RedrawOnResize bool
+	Version         string
+	Username        string
+	Passwd          string
+	Rank            int
+	UserID          int
+	CanAllocate     bool
+	Channel         int
+	Router          *router.Router
+	AppFn           map[string]router.Handler
+	Subscriptions   map[string]MessageFunction
+	Context         *router.Context
+	ID              map[string]int
+	URL             string
+	Disqus          bool
+	Lookup          shared.LookupTable
+	MaxGames        int
+	MaxScenarios    int
+	MaxPlayers      int
+	EditGame        *shared.Game
+	RedrawOnResize  bool
+	MobileSensitive bool
+	wasMobile       bool
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -97,18 +99,32 @@ func (s *GlobalSessionData) Mobile() bool {
 	return dom.GetWindow().InnerWidth() < 740
 }
 
+func (s *GlobalSessionData) Resize() {
+	// print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
+	doIt := false
+	if s.RedrawOnResize {
+		doIt = true
+		print("Redraw due to resize")
+	}
+	if !doIt && s.MobileSensitive && (s.Mobile() != s.wasMobile) {
+		doIt = true
+		print("Major Redraw due to change from mobile to non-mobile or vise versa")
+	}
+	s.wasMobile = s.Mobile()
+	if doIt {
+		formulate.Templates(GetTemplate)
+		s.Reload(s.Context)
+	}
+}
+
 func main() {
 	initRouter()
 	formulate.Templates(GetTemplate)
 	websocketInit()
 	initForms()
 	grid1()
+
 	js.Global.Set("resize", func() {
-		print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
-		if Session.RedrawOnResize {
-			print("clearing the list templates and repainting the screen")
-			formulate.Templates(GetTemplate)
-			Session.Reload(Session.Context)
-		}
+		Session.Resize()
 	})
 }

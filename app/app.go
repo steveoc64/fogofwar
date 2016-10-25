@@ -100,6 +100,10 @@ func (s *GlobalSessionData) Mobile() bool {
 	return dom.GetWindow().InnerWidth() < 740
 }
 
+func (s *GlobalSessionData) SubMobile() bool {
+	return dom.GetWindow().InnerWidth() < 700
+}
+
 func (s *GlobalSessionData) Resize() {
 	// print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
 	doIt := false

@@ -95,14 +95,15 @@ type GridSize struct {
 }
 
 type LookupTable struct {
-	CmdLevel    []CmdLevel
-	Condition   []Condition
-	Inspiration []Inspiration
-	CmdRating   []CmdRating
-	UnitRating  []UnitRating
-	CavType     []CavType
-	Gunnery     []Gunnery
-	DrillType   []DrillType
-	SmallArms   []SmallArms
-	GridSizes   []GridSize
+	CmdLevel        []CmdLevel
+	Condition       []Condition
+	Inspiration     []Inspiration
+	CmdRating       []CmdRating
+	UnitRating      []UnitRating
+	CavType         []CavType
+	Gunnery         []Gunnery
+	DrillType       []DrillType
+	SmallArms       []SmallArms
+	GridSizes       []GridSize
+	GridSizesMobile []GridSize
 }

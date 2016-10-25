@@ -19,6 +19,14 @@ var AllowedGridSizes = []shared.GridSize{
 	{12, `1' Grid : Le Grande Scale : 1"=33m : 40mm frontage Base = Company`},
 }
 
+var AllowedGridSizesMobile = []shared.GridSize{
+	{0, `No Grid : Custom Ground Scale`},
+	{4, `4" Grid : Micro scale : 1"=100m : 1" Bases`},
+	{6, `6" Grid : 15mm scale  : 1"=75m : 40mm Bases`},
+	{8, `8" Grid : 28mm scale :  1"=50m : 60mm Bases`},
+	{12, `1' Grid : Big Scale : 1"=33m : 80mm Bases`},
+}
+
 func gameEditTable(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
@@ -30,6 +38,7 @@ func gameEditTable(context *router.Context) {
 	print("defaultMode", defaultMode)
 
 	go func() {
+		Session.MobileSensitive = true
 		game := Session.EditGame
 		print("in here with tile 0", game.Tiles[0])
 		game.InMode = "Table"
@@ -48,12 +57,20 @@ func gameEditTable(context *router.Context) {
 
 		form.New("fa-bookmark", "Game Table Layout - "+game.Name)
 
-		form.Row(10).
-			AddNumber(1, "Width in Feet", "TableX", "1").
-			AddDisplay(1, "= Km Wide", "KmX").
-			AddNumber(1, "Depth in Feet", "TableY", "1").
-			AddDisplay(1, "= Km Deep", "KmY").
-			AddSelect(6, "Grid Size / Figure Basing Guide", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
+		if Session.Mobile() {
+			form.Row(2).
+				AddNumber(1, "Width in Feet", "TableX", "1").
+				AddNumber(1, "Depth in Feet", "TableY", "1")
+			form.Row(1).
+				AddSelect(1, "Grid", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
+		} else {
+			form.Row(10).
+				AddNumber(1, "Width in Feet", "TableX", "1").
+				AddDisplay(1, "= Km Wide", "KmX").
+				AddNumber(1, "Depth in Feet", "TableY", "1").
+				AddDisplay(1, "= Km Deep", "KmY").
+				AddSelect(6, "Grid Size / Figure Basing Guide", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
+		}
 
 		form.Row(1).
 			AddCustom(1, "", "Map", "satellite-bg")
@@ -468,8 +485,10 @@ func gameEditTable(context *router.Context) {
 			rect := form.Get("map-rect")
 			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
 			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
-			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
-			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			if !Session.Mobile() {
+				form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
+				form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			}
 			game.ResizeTiles()
 			drawTiles()
 			b := form.Get("save-button")
@@ -506,8 +525,10 @@ func gameEditTable(context *router.Context) {
 			rect := form.Get("map-rect")
 			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
 			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
-			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
-			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			if !Session.Mobile() {
+				form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
+				form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			}
 			drawTiles()
 		}
 

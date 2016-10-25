@@ -41,6 +41,7 @@ func Login(username string, passwd string) {
 		Session.Disqus = lr.Disqus
 		Session.Lookup = lr.LookupTable
 		Session.Lookup.GridSizes = AllowedGridSizes
+		Session.Lookup.GridSizesMobile = AllowedGridSizesMobile
 		Session.MaxGames = lr.MaxGames
 		Session.MaxScenarios = lr.MaxScenarios
 		Session.MaxPlayers = lr.MaxPlayers

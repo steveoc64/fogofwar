@@ -1,0 +1,73 @@
+<div class="grid-form inspection" name="unit-details">
+{{if eq .UType 1}}
+  <h3>Division Command Inspection</h3>
+  <img src="/img/div_inspection.png">
+  <div class="row">
+  <ul>
+    <li>{{.Name}} of {{.Nation}}</li>
+    <li><b>Commanded by</b> {{.CommanderName}} ({{.GetRating}})</li>
+    <li>.. in {{.GetCondition}} condition.</li>
+    {{if ne .Descr ""}}
+    <li>{{.Descr}}</li>
+    {{end}}
+  </ul>
+  </div>
+{{end}}
+{{if eq .UType 2}}
+  <h3>Infantry Brigade Inspection</h3>
+  <img src="/img/inspection.png">
+  <ul>
+    <li>{{.Name}} of {{.Nation}}</li>
+    <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
+    <li>Trained as {{.GetDrill}}</li>
+    <li>.. all in {{.GetCondition}} condition.</li>
+    <li>.. with {{.BayonetsLost}} men currently unfit for duty</li>
+    <li>{{.GetSupport}}</li>
+    {{if ne .Descr ""}}
+    <li>{{.Descr}}</li>
+    {{end}}
+  </ul>
+{{end}}
+{{if eq .UType 3}}
+  <h3>Cavalry Brigade Inspection</h3>
+  <img src="/img/cav_inspection.png">
+  <ul>
+    <li>{{.Name}} of {{.Nation}}</li>
+    <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
+    <li>.. all in {{.GetCondition}} condition.</li>
+    <li>.. with {{.SabresLost}} Sabres currently unfit for duty</li>
+    <li>{{.GetSupport}}</li>
+    {{if ne .Descr ""}}
+    <li>{{.Descr}}</li>
+    {{end}}
+  </ul>
+{{end}}
+{{if eq .UType 4}}
+  <h3>Artillery Battery Inspection</h3>
+  <img src="/img/gun_inspection.png">
+  <ul>
+    {{if ne "" .Name}}
+    <li>{{.Name}}
+    {{end}}
+    {{if ne "" .Nation}}
+     of {{.Nation}}
+    {{end}}
+    {{if .HorseGuns}}
+      (Horse Artillery)
+    {{end}}
+    </li>
+    <li>{{.Guns}} Guns of {{.GetGunType}} shot weight</li>
+    <li>.. all in {{.GetCondition}} condition.</li>
+    <li>.. with {{.GunsLost}} Guns currently under repair</li>
+    {{if ne .Descr ""}}
+    <li>{{.Descr}}</li>
+    {{end}}
+  </ul>
+{{end}}
+{{if eq .UType 5}}
+  <h3>Brigade Inspection</h3>
+  <img src="/img/inspection.png">
+{{end}}
+</div>
+
+

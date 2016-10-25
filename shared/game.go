@@ -532,11 +532,10 @@ func (u *Unit) GetSupport() string {
 	switch u.UType {
 	case 2:
 		if u.LtCoy > 0 {
-			// if u.EliteArms == 0 {
-			// retval += fmt.Sprintf("+ %d Elite Company\n", u.LtCoy)
-			// } else {
+			if u.EliteArms == 0 {
+				u.EliteArms = 1
+			}
 			retval += fmt.Sprintf("+ %d Elite Company %s\n", u.LtCoy, Lookups.SmallArms[u.EliteArms].Name)
-			// }
 		}
 		if u.JgCoy > 0 {
 			retval += fmt.Sprintf(" + %d Attached Jager/Rifle Coy\n", u.JgCoy)

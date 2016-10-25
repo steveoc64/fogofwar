@@ -532,24 +532,30 @@ func (u *Unit) GetSupport() string {
 	switch u.UType {
 	case 2:
 		if u.LtCoy > 0 {
-			retval += fmt.Sprintf("+ %d Elite Company %s<br>\n", u.LtCoy, Lookups.SmallArms[u.EliteArms-1].Name)
+			// if u.EliteArms == 0 {
+			// retval += fmt.Sprintf("+ %d Elite Company\n", u.LtCoy)
+			// } else {
+			retval += fmt.Sprintf("+ %d Elite Company %s\n", u.LtCoy, Lookups.SmallArms[u.EliteArms].Name)
+			// }
 		}
 		if u.JgCoy > 0 {
-			retval += fmt.Sprintf("+ %d Attached Jager/Rifle Coy<br>\n", u.JgCoy)
+			retval += fmt.Sprintf(" + %d Attached Jager/Rifle Coy\n", u.JgCoy)
 		}
 		if u.Sabres > 0 {
-			retval += fmt.Sprintf("+ %d Attached %s %s<br>\n",
+			retval += fmt.Sprintf(" + %d Attached %s %s\n",
 				u.Sabres, Lookups.UnitRating[u.CavRating-1], Lookups.CavType[u.CavType-1].Name)
 		}
 		if u.Guns > 0 {
-			retval += fmt.Sprintf("+ %d %s in %s Condition<br>\n",
+			print("gun unit", u)
+			retval += fmt.Sprintf(" + %d %s in %s Condition\n",
 				u.Guns, Lookups.Gunnery[u.GunneryType-1].Name, Lookups.Condition[u.GunCondition-1].Name)
 		}
 	}
-	if retval != "" {
-		return retval
-	}
-	return ".. and no additional support units."
+	return retval
+	// if retval != "" {
+	// 	return retval
+	// }
+	// return ".. and no additional support units."
 }
 
 func (u *Unit) GetCondition() string {

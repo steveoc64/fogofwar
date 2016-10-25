@@ -20,10 +20,14 @@
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
     <li>Trained as {{.GetDrill}}</li>
-    <li>.. all in {{.GetCondition}} condition.</li>
-    <li>.. with {{.BayonetsLost}} men currently unfit for duty</li>
+    <li>In {{.GetCondition}} condition.</li>
+    {{if ne 0 .BayonetsLost}}
+    <li>.. with {{.BayonetsLost}} men currently unfit for duty.</li>
+    {{end}}
+    {{if ne "" .GetSupport}}
     <li>{{.GetSupport}}</li>
-    {{if ne .Descr ""}}
+    {{end}}
+    {{if ne "" .Descr}}
     <li>{{.Descr}}</li>
     {{end}}
   </ul>
@@ -34,10 +38,14 @@
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
-    <li>.. all in {{.GetCondition}} condition.</li>
-    <li>.. with {{.SabresLost}} Sabres currently unfit for duty</li>
+    <li>In {{.GetCondition}} condition.</li>
+    {{if ne 0 .SabresLost}}
+    <li>.. with {{.SabresLost}} Sabres sadly unavailable for battle.</li>
+    {{end}}
+    {{if ne "" .GetSupport}}
     <li>{{.GetSupport}}</li>
-    {{if ne .Descr ""}}
+    {{end}}
+    {{if ne "" .Descr}}
     <li>{{.Descr}}</li>
     {{end}}
   </ul>
@@ -57,7 +65,7 @@
     {{end}}
     </li>
     <li>{{.Guns}} Guns of {{.GetGunType}} shot weight</li>
-    <li>.. all in {{.GetCondition}} condition.</li>
+    <li>In {{.GetCondition}} condition.</li>
     <li>.. with {{.GunsLost}} Guns currently under repair</li>
     {{if ne .Descr ""}}
     <li>{{.Descr}}</li>

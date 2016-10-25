@@ -2,6 +2,30 @@
 // Button
 // ––––––––––––––––––––––––––––––––––––––––––––––––––
 
+=_breakpoints($min, $max: false)
+	@if $max == false
+		@media only screen and (min-width: $min)
+			@content
+	@else
+		@media only screen and (min-width: $min) and (max-width: $max)
+			@content
+
+	
+.button-bar
+	padding-top: 1rem
+	float: right
+	+_breakpoints(0,700px)	
+		display: block
+		// background: red
+		// flex: 1
+
+.button-bar-left
+	padding-top: 0
+	float: left 
+	+_breakpoints(0,700px)	
+		display: flex
+		flex-wrap: wrap
+
 .button,
 button,
 input[type='button'],
@@ -23,6 +47,11 @@ input[type='submit']
 	text-decoration: none
 	text-transform: uppercase
 	white-space: nowrap
+
+	@media screen and (max-width: 700px)
+		font-size: 0.9rem
+		padding: 0 0.8rem
+	
 
 	&:hover,
 	&:focus

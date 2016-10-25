@@ -85,7 +85,7 @@ func _mainPage(action string, id int, context *router.Context) {
 		form.Column(pTitle, "GetPlayers")
 		form.Column("Turn", "Turn")
 		form.Column("Turn Limit", "TurnLimit")
-		if Session.Rank > 9 {
+		if Session.Rank > 9 && !Session.Mobile() {
 			form.DateColumn("Created", "Created")
 		}
 		form.DateColumn("Start Date", "StartDate")

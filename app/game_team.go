@@ -32,21 +32,39 @@ func gameEditTeam(context *router.Context) {
 
 		form.New("fa-flag-o", fmt.Sprintf("%s Team Details - %s ", team, game.Name))
 
-		form.Row(6).
-			AddInput(5, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
-			AddDisplay(1, "# Players", fmt.Sprintf("Num%sPlayers", team))
+		if Session.Mobile() {
+			form.Row(1).
+				AddInput(1, "", fmt.Sprintf("%sTeam", team))
 
-		form.Row(1).
-			AddTextarea(1, "Briefing", fmt.Sprintf("%sBrief", team))
+			form.Row(1).
+				AddDisplayArea(1, "", fmt.Sprintf("%sBrief", team))
+				// TODO - add btn to view briefing fullscreen
 
-		form.Row(1).
-			AddCustom(1, "Commands", "Commands", "")
+			form.Row(1).
+				AddCustom(1, "", "Commands", "")
 
-		form.Row(1).
-			AddCustom(1, "", "ToggleCmd", "hidden")
+			form.Row(1).
+				AddCustom(1, "", "ToggleCmd", "hidden")
 
-		form.Row(1).
-			AddCustom(1, "", "ViewUnits", "")
+			form.Row(1).
+				AddCustom(1, "", "ViewUnits", "")
+		} else {
+			form.Row(6).
+				AddInput(5, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
+				AddDisplay(1, "# Players", fmt.Sprintf("Num%sPlayers", team))
+
+			form.Row(1).
+				AddTextarea(1, "Briefing", fmt.Sprintf("%sBrief", team))
+
+			form.Row(1).
+				AddCustom(1, "Commands", "Commands", "")
+
+			form.Row(1).
+				AddCustom(1, "", "ToggleCmd", "hidden")
+
+			form.Row(1).
+				AddCustom(1, "", "ViewUnits", "")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

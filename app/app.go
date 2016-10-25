@@ -35,6 +35,7 @@ type GlobalSessionData struct {
 	RedrawOnResize  bool
 	MobileSensitive bool
 	wasMobile       bool
+	wasSubmobile    bool
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -111,11 +112,19 @@ func (s *GlobalSessionData) Resize() {
 		doIt = true
 		print("Redraw due to resize")
 	}
-	if !doIt && s.MobileSensitive && (s.Mobile() != s.wasMobile) {
-		doIt = true
-		print("Major Redraw due to change from mobile to non-mobile or vise versa")
+	if !doIt && s.MobileSensitive {
+		if s.Mobile() != s.wasMobile {
+			doIt = true
+			print("Major Redraw due to change from mobile to non-mobile or vise versa")
+		}
+		if s.SubMobile() != s.wasSubmobile {
+			doIt = true
+			print("redraw due to change of orientation only, inside mobile mode")
+		}
 	}
+
 	s.wasMobile = s.Mobile()
+	s.wasSubmobile = s.SubMobile()
 	if doIt {
 		formulate.Templates(GetTemplate)
 		s.Reload(s.Context)

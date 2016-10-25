@@ -41,7 +41,12 @@ func gameChecklist(context *router.Context) {
 
 		// Layout the fields
 
-		form.New("fa-check-square-o", "Game Hosting Checklist - "+game.Name)
+		title := "Game Hosting Checklist"
+		if !Session.Mobile() {
+			title += " - " + game.Name
+
+		}
+		form.New("fa-check-square-o", title)
 
 		form.Row(1).
 			AddCustom(1, "", "TODO", "game-checklist")

@@ -55,14 +55,32 @@ func gameEditTable(context *router.Context) {
 
 		// Layout the fields
 
-		form.New("fa-bookmark", "Game Table Layout - "+game.Name)
+		if Session.Mobile() {
+			if Session.SubMobile() {
+				form.New("fa-bookmark", "Table Layout")
+			} else {
+				form.New("fa-bookmark", "Table Layout - "+game.Name)
+			}
+		} else {
+			form.New("fa-bookmark", "Game Table Layout - "+game.Name)
+		}
 
 		if Session.Mobile() {
-			form.Row(2).
-				AddNumber(1, "Width in Feet", "TableX", "1").
-				AddNumber(1, "Depth in Feet", "TableY", "1")
-			form.Row(1).
-				AddSelect(1, "Grid", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
+			if Session.SubMobile() {
+				form.Row(1).
+					AddNumber(1, "Width in Feet", "TableX", "1")
+				form.Row(1).
+					AddNumber(1, "Depth in Feet", "TableY", "1")
+				form.Row(1).
+					AddSelect(1, "", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
+			} else {
+				form.Row(2).
+					AddNumber(1, "Width in Feet", "TableX", "1").
+					AddNumber(1, "Depth in Feet", "TableY", "1")
+				form.Row(1).
+					AddSelect(1, "Grid", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
+			}
+
 		} else {
 			form.Row(10).
 				AddNumber(1, "Width in Feet", "TableX", "1").
@@ -107,13 +125,24 @@ func gameEditTable(context *router.Context) {
 		bbar := form.Get("ModeButtons")
 		abar := form.Get("ActionButtons")
 		bbar.SetInnerHTML("")
-		abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.<br>`)
+		if Session.Mobile() {
+			abar.SetInnerHTML("")
+		} else {
+			abar.SetInnerHTML(`NOTE: The Satellite image above is presented as an approximate guide to how the real world should look at the 6" grid table scale. Each Grid Square is Quarter Mile.<br>`)
+		}
 		editMode := "" // This is the sub-thing within the mode, ie in mode terrain, editmode = rough, woods, etc
 		modeSet := defaultMode
 		oldModeSet := ""
 		TheCmd := &shared.GameCmd{}
 		currentObjX := -1
 		currentObjY := -1
+
+		// Scroll to the map
+		scrollToMap := func() {
+			mapLoc := form.Get("Map").GetBoundingClientRect()
+			print("maploc is", mapLoc)
+			w.Scroll(0, 220)
+		}
 
 		// Redraw the mode buttons
 		drawActionBtns := func() {
@@ -232,6 +261,7 @@ func gameEditTable(context *router.Context) {
 				// print("editmode now set to", editMode)
 				editMode = evt.Target().(*dom.HTMLInputElement).Value
 				drawActionBtns()
+				scrollToMap()
 			})
 			abar.AppendChild(btn)
 		}
@@ -261,6 +291,7 @@ func gameEditTable(context *router.Context) {
 				TheCmd = game.GetCmd(team, id)
 				print("selected Cmd", team, id, TheCmd)
 				btn.Class().SetString("button button-primary")
+				scrollToMap()
 			})
 			abar.AppendChild(btn)
 		}

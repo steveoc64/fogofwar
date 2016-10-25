@@ -7,6 +7,14 @@
   -khtml-user-drag: element
   -webkit-user-drag: element
 
+=_breakpoints($min, $max: false)
+	@if $max == false
+		@media only screen and (min-width: $min)
+			@content
+	@else
+		@media only screen and (min-width: $min) and (max-width: $max)
+			@content
+
 .data-table
 	.data-row
 		margin-left: 1rem
@@ -44,10 +52,18 @@ td.commander
 .button-bar
 	padding-top: 1rem
 	float: right
+	+_breakpoints(0,700px)	
+		display: block
+		// background: red
+		// flex: 1
 
 .button-bar-left
 	padding-top: 0
 	float: left 
+	+_breakpoints(0,700px)	
+		display: flex
+		// background: green
+		flex: 1
 
 .data-table-header
  border-bottom: 4px solid black

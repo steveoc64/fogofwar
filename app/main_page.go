@@ -57,21 +57,24 @@ func _mainPage(action string, id int, context *router.Context) {
 			return
 		}
 		form := formulate.ListForm{}
-		title := "My Hosted Games - "
-		if len(games) >= Session.MaxGames {
-			if Session.MaxGames == 1 {
-				title += "(1 Game Slot on Free Account)"
+		title := "My Hosted Games"
+		if !Session.Mobile() {
+			title += " - "
+			if len(games) >= Session.MaxGames {
+				if Session.MaxGames == 1 {
+					title += "(1 Game Slot on Free Account)"
+				} else {
+					title += fmt.Sprintf("(All %d Slots are Used)", Session.MaxGames)
+				}
+			} else if len(games) == 0 {
+				if Session.MaxGames == 1 {
+					title += "(1 Free Slot Only)"
+				} else {
+					title += fmt.Sprintf("(%d Free Slots)", Session.MaxGames)
+				}
 			} else {
-				title += fmt.Sprintf("(All %d Slots are Used)", Session.MaxGames)
+				title += fmt.Sprintf("(Using %d of %d Slots)", len(games), Session.MaxGames)
 			}
-		} else if len(games) == 0 {
-			if Session.MaxGames == 1 {
-				title += "(1 Free Slot Only)"
-			} else {
-				title += fmt.Sprintf("(%d Free Slots)", Session.MaxGames)
-			}
-		} else {
-			title += fmt.Sprintf("(Using %d of %d Slots)", len(games), Session.MaxGames)
 		}
 		pTitle := fmt.Sprintf("Players/(Max %d)", Session.MaxPlayers)
 

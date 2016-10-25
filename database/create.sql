@@ -1,12 +1,12 @@
-drop table if exists campaign;
-drop table if exists scenario_cmd;
-drop table if exists cmd;
+-- drop table if exists campaign;
+-- drop table if exists scenario_cmd;
+-- drop table if exists cmd;
 
-create table migration (
-	id serial not null primary key,
-	name text,
-	date timestamptz not null default localtimestamp
-);
+-- create table migration (
+-- 	id serial not null primary key,
+-- 	name text,
+-- 	date timestamptz not null default localtimestamp
+-- );
 
 
 -- drop table if exists users;
@@ -69,7 +69,7 @@ create table stdimg (
 );
 \i data/stdimg.sql
 
-create extension ltree;
+-- create extension ltree;
 -- create extension postgis;
 -- create extension cube;
 -- create extension earthdistance;

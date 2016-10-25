@@ -115,7 +115,7 @@ perspective effects (not including the modals and the overlay).
 	position: relative;
 	border-radius: 1rem;
 	margin: 0 auto;
-	overflow: scroll;
+	// overflow: scroll;
 
 	@media screen and (max-width: 700px) {
 		font-size: 1rem;

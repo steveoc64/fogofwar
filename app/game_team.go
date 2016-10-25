@@ -221,7 +221,7 @@ func gameEditTeam(context *router.Context) {
 									theCell.SetInnerHTML(Session.Lookup.Condition[v.Condition-1].Name)
 								}
 							}
-							print("clicked on ", t.TagName())
+							// print("clicked on ", t.TagName())
 						} // end of switch statement
 
 					})
@@ -493,12 +493,12 @@ func gameEditTeam(context *router.Context) {
 			if tag == "TD" {
 				tr := td.ParentElement()
 				key, _ := strconv.Atoi(tr.GetAttribute("key"))
-				print("clicked on row with key", key)
+				// print("clicked on row with key", key)
 				unit := game.GetUnit(team, key)
-				print("unit is", unit)
+				// print("unit is", unit)
 				loadTemplate("unit-details", "#unit-details", unit)
 				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
-					print("clicke on the unit details")
+					// print("clicke on the unit details")
 					doc.QuerySelector("#unit-details").Class().Remove("md-show")
 				})
 				doc.QuerySelector("#unit-details").Class().Add("md-show")

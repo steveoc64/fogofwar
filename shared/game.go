@@ -546,6 +546,9 @@ func (u *Unit) GetSupport() string {
 		}
 		if u.Guns > 0 {
 			print("gun unit", u)
+			if u.GunCondition == 0 {
+				u.GunCondition = 3
+			}
 			retval += fmt.Sprintf(" + %d %s in %s Condition\n",
 				u.Guns, Lookups.Gunnery[u.GunneryType-1].Name, Lookups.Condition[u.GunCondition-1].Name)
 		}

@@ -686,6 +686,14 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 		}
 	}
 
+	// sanity defaults
+	if data.ForceUnit.LtCoy > 0 && data.ForceUnit.EliteArms == 0 {
+		data.ForceUnit.EliteArms = 2 // skirmishers
+	}
+	if data.ForceUnit.Guns > 0 && data.ForceUnit.GunCondition == 0 {
+		data.ForceUnit.GunCondition = 3 // Ready
+	}
+
 	_, err := DB.Update("force_unit").
 		SetWhitelist(data.ForceUnit, "path", "name", "descr", "commander_name", "nation", "cmd_level",
 			"drill", "bayonets", "small_arms", "elite_arms", "lt_coy", "jg_coy", "rating",

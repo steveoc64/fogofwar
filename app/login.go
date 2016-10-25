@@ -99,7 +99,8 @@ func Login(username string, passwd string) {
 		})
 		doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			dom.GetWindow().Open("/manual", "actionfront-manual", "")
+			loc := dom.GetWindow().Location()
+			dom.GetWindow().Open(loc.Origin+"/manual", "actionfront-manual", "")
 		})
 		doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()

@@ -23,5 +23,6 @@ func faq(context *router.Context) {
 }
 
 func manual(context *router.Context) {
-	dom.GetWindow().Open("/manual", "actionfront-manual", "")
+	loc := dom.GetWindow().Location()
+	dom.GetWindow().Open(loc.Origin+"/manual", "actionfront-manual", "")
 }

@@ -379,6 +379,28 @@ func (g *Game) GetCmd(team string, id int) *GameCmd {
 	return nil
 }
 
+func (g *Game) GetUnit(team string, id int) *Unit {
+	// is it red ?
+	cmds := g.RedCmd
+	if team == "Blue" {
+		cmds = g.BlueCmd
+	} else if team == "" {
+		retval := g.GetUnit("Red", id)
+		if retval != nil {
+			return retval
+		}
+		return g.GetUnit("Blue", id)
+	}
+	for _, c := range cmds {
+		for _, v := range c.Units {
+			if v.ID == id {
+				return v
+			}
+		}
+	}
+	return nil
+}
+
 type GameCmd struct {
 	ID            int     `db:"id"`
 	GameID        int     `db:"game_id"`
@@ -489,6 +511,69 @@ type Unit struct {
 
 func (u *Unit) GetSitrep() string {
 	return "todo - add some long winded write up on the individual unit "
+}
+
+func (u *Unit) GetRating() string {
+	switch u.UType {
+	case 1:
+		return Lookups.CmdRating[u.Rating-1].Name
+	case 2, 3, 5:
+		return Lookups.UnitRating[u.Rating-1].Name
+	}
+	return ""
+}
+
+func (u *Unit) GetBayonets() string {
+	return fmt.Sprintf("%d", u.Bayonets-u.BayonetsLost)
+}
+
+func (u *Unit) GetSupport() string {
+	retval := ""
+	switch u.UType {
+	case 2:
+		if u.LtCoy > 0 {
+			retval += fmt.Sprintf("+ %d Elite Company %s<br>\n", u.LtCoy, Lookups.SmallArms[u.EliteArms-1].Name)
+		}
+		if u.JgCoy > 0 {
+			retval += fmt.Sprintf("+ %d Attached Jager/Rifle Coy<br>\n", u.JgCoy)
+		}
+		if u.Sabres > 0 {
+			retval += fmt.Sprintf("+ %d Attached %s %s<br>\n",
+				u.Sabres, Lookups.UnitRating[u.CavRating-1], Lookups.CavType[u.CavType-1].Name)
+		}
+		if u.Guns > 0 {
+			retval += fmt.Sprintf("+ %d %s in %s Condition<br>\n",
+				u.Guns, Lookups.Gunnery[u.GunneryType-1].Name, Lookups.Condition[u.GunCondition-1].Name)
+		}
+	}
+	if retval != "" {
+		return retval
+	}
+	return ".. and no additional support units."
+}
+
+func (u *Unit) GetCondition() string {
+	return Lookups.Condition[u.Condition-1].Name
+}
+
+func (u *Unit) GetCavType() string {
+	return Lookups.CavType[u.CavType-1].Name
+}
+
+func (u *Unit) GetCavRating() string {
+	return Lookups.UnitRating[u.CavRating-1].Name
+}
+
+func (u *Unit) GetDrill() string {
+	return Lookups.DrillType[u.Drill-1].Name
+}
+
+func (u *Unit) GetGunType() string {
+	return Lookups.Gunnery[u.GunneryType-1].Name
+}
+
+func (u *Unit) GetArms() string {
+	return Lookups.SmallArms[u.SmallArms-1].Name
 }
 
 func (u *Unit) GetBases() string {

@@ -107,3 +107,5 @@ type LookupTable struct {
 	GridSizes       []GridSize
 	GridSizesMobile []GridSize
 }
+
+var Lookups *LookupTable

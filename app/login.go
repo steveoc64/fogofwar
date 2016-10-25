@@ -40,6 +40,7 @@ func Login(username string, passwd string) {
 		Session.UserID = lr.ID
 		Session.Disqus = lr.Disqus
 		Session.Lookup = lr.LookupTable
+		shared.Lookups = &Session.Lookup
 		Session.Lookup.GridSizes = AllowedGridSizes
 		Session.Lookup.GridSizesMobile = AllowedGridSizesMobile
 		Session.MaxGames = lr.MaxGames

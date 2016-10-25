@@ -83,6 +83,9 @@ func gameEditTeam(context *router.Context) {
 			// print("clicked on", url)
 			Session.Navigate(url)
 		})
+		form.AppendDiv("unit-details", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("overlay", "md-overlay")
+		// loadTemplate("unit-details", "#unit-details", nil)
 
 		// Create the ViewUnits panel, and set to hidden
 		viewUnits := form.Get("ViewUnits")
@@ -169,7 +172,8 @@ func gameEditTeam(context *router.Context) {
 						v.Nation, unitIndex, unitIndex))
 					cell.AddEventListener("click", false, func(evt dom.Event) {
 						t := evt.Target()
-						if t.TagName() == "I" {
+						switch t.TagName() {
+						case "I":
 							x := 1
 							if t.GetAttribute("data-dir") == "up" {
 								x = -1
@@ -199,7 +203,9 @@ func gameEditTeam(context *router.Context) {
 									theCell.SetInnerHTML(Session.Lookup.Condition[v.Condition-1].Name)
 								}
 							}
-						}
+							print("clicked on ", t.TagName())
+						} // end of switch statement
+
 					})
 
 					// Add the Unit details column
@@ -458,6 +464,26 @@ func gameEditTeam(context *router.Context) {
 						cmdBtn.Class().Add("button-clear")
 					}
 				}
+			}
+		})
+
+		// Click handler on the unitlist
+		form.OnEvent("UnitList", "click", func(evt dom.Event) {
+			td := evt.Target()
+			tag := td.TagName()
+			print("clicked on", tag)
+			if tag == "TD" {
+				tr := td.ParentElement()
+				key, _ := strconv.Atoi(tr.GetAttribute("key"))
+				print("clicked on row with key", key)
+				unit := game.GetUnit(team, key)
+				print("unit is", unit)
+				loadTemplate("unit-details", "#unit-details", unit)
+				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
+					print("clicke on the unit details")
+					doc.QuerySelector("#unit-details").Class().Remove("md-show")
+				})
+				doc.QuerySelector("#unit-details").Class().Add("md-show")
 			}
 		})
 

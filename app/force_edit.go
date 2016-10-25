@@ -44,6 +44,8 @@ func forceEdit(context *router.Context) {
 			canEdit = true
 		}
 
+		Nation := ""
+
 		form := formulate.EditForm{}
 
 		// Layout the fields
@@ -370,6 +372,7 @@ func forceEdit(context *router.Context) {
 				swapper.Select(5)
 				form.FocusSelect("Other-Name")
 			}
+			Nation = TheUnit.Nation
 		}
 
 		initUnitList := func() {
@@ -499,7 +502,7 @@ func forceEdit(context *router.Context) {
 					// print("swapper.Selected", swapper.Selected, swapper)
 					panel := swapper.Current()
 					panel.Bind(&TheUnit)
-					print("did a bind into ", TheUnit)
+					// print("did a bind into ", TheUnit)
 					// swapper.Panels[swapper.Selected].Bind(&TheUnit)
 					TheUnit.UType = swapper.Selected
 					if TheUnit.Name == "" {
@@ -587,6 +590,7 @@ func forceEdit(context *router.Context) {
 						Channel: Session.Channel,
 						ID:      force.ID,
 					}, &newUnit)
+					newUnit.Nation = Nation
 					TheUnit = newUnit
 					force.Units = append(force.Units, TheUnit)
 					// print("theUnit now set to", TheUnit)
@@ -621,6 +625,7 @@ func forceEdit(context *router.Context) {
 						UType:      2,
 						ParentPath: TheUnit.Path,
 					}, &newUnit)
+					newUnit.Nation = Nation
 					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 						Channel: Session.Channel,
 						ID:      force.ID,
@@ -658,6 +663,7 @@ func forceEdit(context *router.Context) {
 						UType:      3,
 						ParentPath: TheUnit.Path,
 					}, &newUnit)
+					newUnit.Nation = Nation
 					// print("add unit returns ", newUnit)
 					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 						Channel: Session.Channel,
@@ -693,6 +699,7 @@ func forceEdit(context *router.Context) {
 						UType:      4,
 						ParentPath: TheUnit.Path,
 					}, &newUnit)
+					newUnit.Nation = Nation
 					// print("add unit returns ", newUnit)
 					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 						Channel: Session.Channel,
@@ -735,6 +742,7 @@ func forceEdit(context *router.Context) {
 						UType:      5,
 						ParentPath: TheUnit.Path,
 					}, &newUnit)
+					newUnit.Nation = Nation
 					// print("add unit returns ", newUnit)
 					RPC("ScenarioRPC.GetForceUnits", shared.ScenarioRPCData{
 						Channel: Session.Channel,
@@ -762,6 +770,18 @@ func forceEdit(context *router.Context) {
 				evt.PreventDefault()
 				cloneUnit()
 			})
+		}
+
+		// Store any Nationality fields for adding new records
+		if canEdit {
+			saveNation := func(evt dom.Event) {
+				Nation = evt.Target().(*dom.HTMLInputElement).Value
+				print("saved nation to", Nation)
+			}
+			form.OnEvent("Cmd-Nation", "change", saveNation)
+			form.OnEvent("Bde-Nation", "change", saveNation)
+			form.OnEvent("Cav-Nation", "change", saveNation)
+			form.OnEvent("Gun-Nation", "change", saveNation)
 		}
 
 	}()

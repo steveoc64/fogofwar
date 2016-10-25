@@ -93,6 +93,8 @@ func gameEditTeam(context *router.Context) {
 
 		breakLine := func(s string) string {
 			r := strings.Replace(s, ") ", ")<br>\n", -1)
+			r = strings.Replace(s, "] ", "]<br>\n", -1)
+			r = strings.Replace(s, " ~ ", "<br>\n", -1)
 			r = strings.Replace(r, " and ", "<br>\nand ", -1)
 			// r = strings.Replace(r, ", ", "<br>\n", -1)
 			return r

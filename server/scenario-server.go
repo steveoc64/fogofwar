@@ -993,7 +993,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 	}
 
 	if oldScen.Public || oldScen.AuthorID == conn.UserID {
-		println("OK to copy")
+		// println("OK to copy")
 	} else {
 		return errors.New("Scenario is not available for creating a game")
 	}
@@ -1009,7 +1009,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 		from scenario 
 		where id=$2
 		returning id`, conn.UserID, data.ID).QueryScalar(newID)
-	println("newid is ", *newID)
+	// println("newid is ", *newID)
 
 	if err == nil {
 		// now add the game_cmd records from the original force records
@@ -1039,7 +1039,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 				Record(newCmd).
 				Returning("id").
 				QueryScalar(&newCmdID)
-			println("added cmd", newCmdID, "from force", oldForce.ID)
+			// println("added cmd", newCmdID, "from force", oldForce.ID)
 
 			if err == nil {
 				// Now copy all the force units across

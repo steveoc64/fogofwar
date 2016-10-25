@@ -89,7 +89,8 @@ func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *r
 
 func (s *GlobalSessionData) Reload(context *router.Context) {
 	if context == nil {
-		s.Router.Navigate(s.Context.Path)
+		print("reload to ", s.URL)
+		s.Router.Navigate(s.URL)
 	} else {
 		s.Router.Navigate(context.Path)
 	}

@@ -530,7 +530,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 -- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('unit_id_seq', 1949, true);
+SELECT pg_catalog.setval('unit_id_seq', 2053, true);
 
 
 --

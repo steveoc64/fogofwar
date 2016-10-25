@@ -504,6 +504,9 @@ ALTER TABLE public.game OWNER TO steve;
 CREATE TABLE game_cmd (
     id integer NOT NULL,
     game_id integer DEFAULT 0 NOT NULL,
+    start_turn integer DEFAULT 1 NOT NULL,
+    start_x integer DEFAULT (-1) NOT NULL,
+    start_y integer DEFAULT (-1) NOT NULL,
     red_team boolean DEFAULT false NOT NULL,
     blue_team boolean DEFAULT false NOT NULL,
     nation text DEFAULT ''::text NOT NULL,
@@ -515,12 +518,9 @@ CREATE TABLE game_cmd (
     inspiration integer DEFAULT 0 NOT NULL,
     condition integer DEFAULT 2 NOT NULL,
     player_id integer DEFAULT 0 NOT NULL,
+    player_ready boolean DEFAULT false NOT NULL,
     vp integer DEFAULT 0 NOT NULL,
-    cull boolean DEFAULT false NOT NULL,
-    start_turn integer DEFAULT 1 NOT NULL,
-    start_x integer DEFAULT (-1) NOT NULL,
-    start_y integer DEFAULT (-1) NOT NULL,
-    player_ready boolean DEFAULT false NOT NULL
+    cull boolean DEFAULT false NOT NULL
 );
 
 
@@ -2172,27 +2172,55 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1213	91	1st_Div.1st_Regt	1st Regt				2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
 1214	91	1st_Div	1st Div				1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1281	94	Division_de_cavalerie_de_la_Garde.Mamelouks_de_la_Garde_imperiale	Mamelouks de la Garde impériale			Egypt	3	4	0	0	0	0	0	0	3	100	2	1	0	0	0	f
+1352	96	Div_Grouchy.10e_Rgt_de_Dragons	10° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	363	5	5	0	0	0	f
+1322	95	Bde_Colbert	Bde Colbert		Colbert	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1276	94	Infanterie_de_la_garde.Bde_Dorsenne	Bde Dorsenne	1°/2° Rgt. de Grenadiers à pied de la Garde impériale		France	2	4	5	1600	1	0	0	0	1	0	0	0	0	0	0	f
 1280	94	Division_de_cavalerie_de_la_Garde.Brigade_Dahlmann	Brigade Dahlmann	1° Rgt. de chasseurs à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	600	3	1	0	0	0	f
+1354	96	Div_DHautpoul.4e_Co_2e_dArt_a_cheval	4° Co. 2° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
 1282	94	Division_de_cavalerie_de_la_Garde.Brigade_Jacquin	Brigade Jacquin	1° Rgt. de la gendarmerie d’élite		France	3	4	0	0	0	0	0	0	3	200	8	1	0	0	0	f
+1323	95	Bde_Guyot	Bde Guyot		Guyot	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1278	94	Division_de_cavalerie_de_la_Garde	Division de cavalerie de la Garde		Walther		1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 1283	94	Artillerie	Artillerie			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1279	94	Division_de_cavalerie_de_la_Garde.Brigade_de_Vieille_Garde_Lepic	Brigade de Vieille Garde Lepic	Grenadiers à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	900	8	1	0	0	0	f
+1357	96	Div_DHautpoul.5e_Rgt_de_Cuirassiers	5° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
+1349	96	Div_Grouchy.2e_Co_2e_dArt_a_cheval	2° Co. 2° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
+1351	96	Div_Grouchy.6e_Rgt_de_Dragons	6° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	487	5	4	0	0	0	f
 1284	94	Artillerie.Horse_Bty_1.Horse_Bty_3	Horse Bty 3	1° Co. 6e d’Art. à cheval		France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 1289	94	Artillerie.Horse_Bty_2	Horse Bty 2	2° Co. d’Art. à cheval		France	4	1	0	0	0	0	0	0	4	0	0	0	9	3	2	t
 1288	94	Artillerie.Horse_Bty_1	Horse Bty 1	1° Co. d’Art. à cheval		France	4	4	0	0	0	0	0	0	4	0	0	0	9	3	2	t
 1290	94	Artillerie.Foot_Bty_1	Foot Bty 1	2° Co. 1° d’Art. de Pied		France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
+1350	96	Div_Grouchy.3e_Rgt_de_Dragons	3° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	463	5	3	0	0	0	f
+1353	96	Div_Grouchy.11e_Rgt_de_Dragons	11° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	445	5	4	0	0	0	f
+1356	96	Div_DHautpoul.11e_Rgt_de_Cuirassiers	11° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	3	0	0	0	f
+1355	96	Div_DHautpoul.10e_Rgt_de_Cuirassiers	10° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
+1358	96	Div_DHautpoul.1e_Rgt_de_Cuirassiers	1° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
 1291	94	Artillerie.Foot_Bty_2	Foot Bty 2	6° Co. 1° d’Art. de Pied		France	4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
+1359	97	Div_Leval	Div Leval		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1360	97	Div_Legrand	Div Legrand		Legrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1361	97	Div_Leval.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
+1362	97	Div_Leval.13e_Co_5e_dArt_de_Pied	13° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
+1363	97	Div_Leval.Bde_Ferey	Bde Férey	46° Rgt. d’infanterie de ligne [2 bat.]  57° Rgt. d’infanterie de ligne [2 bat.]		France	2	4	5	3900	1	0	0	0	4	0	0	0	0	0	0	f
 4	1	Infantry_Division	Infantry Division		Lefebvre	France	1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
+1326	95	Bde_Durosnel	Bde Durosnel		Durosnel	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1327	95	Bde_Bruyeres	Bde Bruyères		Bruyères	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1366	97	Div_Legrand.17e_Co_5e_dArt_de_Pied.3e_Co_5e_dArt_a_cheval	3° Co. 5° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
+1328	95	Bde_Bruyeres.1e_Hussards	1° Hussards			France	3	4	0	0	0	0	0	0	3	250	2	3	0	0	0	f
+1329	95	Bde_Bruyeres.13e_Chas_a_cheval	13° Chas. à cheval			France	3	4	0	0	0	0	0	0	3	350	3	4	0	0	0	f
+1364	97	Div_Leval.Bde_Schiner	Bde Schiner	4° Rgt. d’infanterie de ligne [2 bat.] 28° Rgt. d’infanterie de ligne [2 bat.]		France	2	4	5	3980	1	0	0	0	5	0	0	0	0	0	0	f
+1365	97	Div_Legrand.14e_Co_5e_dArt_de_Pied	14° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1297	102	1st_Div.Horse_Bty	Horse Bty	Cavalry battery armed with four 6-pounder guns and two howitzers		Austria	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	t
 1292	102	1st_Div	1st Div		von Loudon	Austria	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1293	102	2nd_Div	2nd Div		von Hessen-Homburg	Austria	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1300	102	2nd_Div.Reserve_Bde	Reserve Bde	Froon IR #54 (two additional fusilier battalions from this regiment that had not been at Haslach-Jungingen) Erzherzog Karl IR #3 (the grenadier battalion from this regiment) Auersperg IR #24 (the grenadier battalion from this regiment) Cuirassier Regt Erzherzog Franz #2 (two squadrons)		Austria	2	4	3	4000	1	0	0	0	5	300	1	2	0	0	0	f
 1298	102	2nd_Div.Avantgarde	Avantgarde	Erbach IR #42 (thee fusilier battalions and one grenadier battalion) Cuirassier Regt Erzherzog Franz #2 (two squadrons)		Austria	2	4	3	3000	1	0	0	0	5	0	0	0	0	0	0	f
+1330	95	Bde_Durosnel.7e_Rgt_de_chasseurs_a_cheval	7° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	413	3	4	0	0	0	f
 1295	102	1st_Div.Centre_Bde	Centre Bde	GM Genedegh Karl Riese IR #15 (four fusilier battalions, somewhat reduced from action at Haslach-Jungingen) Erzherzog Maximilien IR #35 (four fusilier battalions) Cuirassier Regt Hohenzollern #8 (two squadrons) Uhlanen-Regt Schwarzenberg #2 (one squadron of approx 150 men)		Austria	2	4	3	3600	1	0	0	0	5	400	1	3	0	0	0	f
 1294	102	1st_Div.Avantgarde	Avantgarde	Erzherzog Ludwig IR #8 (three fusilier and one grenadier battalions, reduced strength from casualties at Haslach-Jungingen) Hussar Regt Blankenstein #6 (two squadrons)		Austria	2	4	3	3400	1	0	0	0	5	300	2	3	0	0	0	f
 1296	102	1st_Div.Reserve_Bde	Reserve Bde	Froon IR #54 (two fusilier battalions that had suffered greatly at Haslach-Jungingen) Froon IR #54 (one grenadier battalion only lightly engaged at Haslach-Jungingen) Josef Colloredo IR #57 (one grenadier battalion) Cuirassier Regt Hohenzollern #8 (two squadrons)		Austria	2	4	3	3100	1	0	0	0	5	300	1	2	0	0	0	f
 1299	102	2nd_Div.Center_Bde	Center Bde	Erzherzog Karl IR #3 (four fusilier battalions) Erzherzog Auersperg #24 (four fusilier battalions) Cuirassier Regt Erzherzog Franz #2 (one-and-a-half squadrons)		Austria	2	4	3	6000	1	0	0	0	5	200	1	2	0	0	0	f
+1331	95	Bde_Durosnel.20e_Rgt_de_chasseurs_a_cheval	20° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	484	3	4	0	0	0	f
+1367	97	Div_Legrand.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
+1368	97	Div_Legrand.Bde_Ledru	Bde Ledru	26° Rgt. d’infanterie légère [2 à 3 bat.]		France	2	4	6	2052	1	0	0	0	4	0	0	0	0	0	0	f
 1310	101	Cav_Bde.10e_Chasseur	10e Chasseur			France	3	4	0	0	0	0	0	0	3	140	3	4	0	0	0	f
 1301	101	2eme_Division	2eme Division		Louis Henri Loison	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1307	101	4eme_Dragoon_Division.19e_Dragoon_Regt	19e Dragoon Regt			France	3	4	0	0	0	0	0	0	3	290	5	4	0	0	0	f
@@ -2204,10 +2232,12 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1304	101	Artillery_Reserve	Artillery Reserve		Colonel Jean Nicolas Seroux	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1305	101	4eme_Dragoon_Division	4eme Dragoon Division		Laplanche	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1308	101	4eme_Dragoon_Division.25e_Dragoon_Regt	25e Dragoon Regt			France	3	4	0	0	0	0	0	0	3	240	5	4	0	0	0	f
+1369	97	Div_Legrand.Tirailleurs_Corses	Tirailleurs Corses	Rgt. de Tirailleurs Corses [1 bat.]		Corsica	2	4	6	579	1	0	0	0	3	0	0	0	0	0	0	f
 1315	101	2eme_Division.Bde_Roguet	Bde Roguet	69th Line Infantry Regiment (two battalion, 1,698 men) 76th Line Infantry Regiment (three battalions, 1,789 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1314	101	2eme_Division.Bde_Villatte	Bde Villatte	6th Light Infantry Regiment (two battalions, 1,728 men) 39th Line Infantry Regiment (two battalions, 1,633 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1313	101	Artillery_Reserve.2e_Regt_Horse_Bty	2e Regt Horse Bty	2nd Regt of Horse Artillery (two sections of the 1st company armed with two 8-pound cannons and two howitzers, 65 men)		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	t
 1309	101	Cav_Bde.3e_Hussar	3e Hussar			France	3	4	0	0	0	0	0	0	3	150	2	3	0	0	0	f
+1332	95	Bde_Durosnel.5e_Co_6e_dArt_a_cheval	5° Co. 6e d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	t
 1215	12	Adv_Guard	Adv Guard	Blucher own	Blucher	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1218	12	3rd_Division	3rd Division		von Schmettau	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1217	12	2nd_Div	2nd Div		Wartensleben	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -2218,6 +2248,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1224	12	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			Prussia	3	4	0	0	0	0	0	0	3	600	5	4	0	0	0	f
 1222	12	Cav_Bde_Blucher.Wurttemberg_Hussars_Nr_4	Württemberg Hussars Nr 4	Württemberg Hussar Regiment # 4		Prussia	3	4	0	0	0	0	0	0	3	1500	2	3	0	0	0	f
 1259	93	Reserve_Cavalry	Reserve Cavalry			Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1371	97	Div_Legrand.Bde_Levasseur	Bde Levasseur	18° Rgt. d’infanterie de ligne ~ 75° Rgt. d’infanterie de ligne		France	2	4	5	3847	1	0	0	0	4	0	0	0	0	0	0	f
 1243	92	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1244	92	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1232	12	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		Prussia	3	4	0	0	0	0	0	0	3	1800	1	2	0	0	0	f
@@ -2255,20 +2286,35 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1318	101	3eme_Division.Bde_de_Marcognet	Bde de Marcognet	25th Light Infantry Regiment (three battalions, 1,540 men) 27th Line Infantry Regiment (two battalions, 1,347 men)		France	2	4	5	2900	1	0	0	0	4	0	0	0	0	0	0	f
 1271	93	Reserve_Cavalry.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, four squadrons Katte Dragoon Regiment # 10, four squadrons		Prussia	3	4	0	0	0	0	0	0	3	1200	5	4	0	0	0	f
 1260	93	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17			2	4	9	2700	1	0	0	-3	4	0	0	0	0	0	0	f
+1333	95	Bde_Guyot.8e_Rgt_de_hussards	8° Rgt. de hussards			France	3	4	0	0	0	0	0	0	3	391	2	3	0	0	0	f
 1317	101	2eme_Division.Foot_Bty	Foot Bty	One foot company armed with three 8-pound cannons and one howitzer		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	f
 1266	93	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		Prussia	2	4	1	5400	1	0	3	0	4	0	0	0	0	0	0	f
 1261	93	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		Prussia	3	4	0	0	0	0	0	0	3	300	5	4	0	0	0	f
 1269	93	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		Prussia	2	4	1	3600	1	0	2	0	4	0	0	0	0	0	0	f
 1267	93	1st_Div.Foot_Bti	Foot Bti			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
 1262	93	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	300	0	0	0	0	0	f
+1338	95	Bde_Guyot.4e_Co_5e_dArt_a_cheval	4° Co. 5° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
+1343	96	Div_DHautpoul	Div D’Hautpoul		D’Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1270	93	2nd_Div.Foot_Bty	Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
 1268	93	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		Prussia	2	4	1	1800	1	0	1	0	4	0	0	0	0	0	0	f
 1263	93	Adv_Guard.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	2	4	4	t
 1319	101	3eme_Division.Bde_Delabassee	Bde Delabassée	50th Line Infantry Regiment (two battalions, 1,547 men) 59th Line Infantry Regiment (two battalions, 1,621 men)		France	2	4	5	3200	1	0	0	0	4	0	0	0	0	0	0	f
 1272	93	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
 1316	101	2eme_Division.Foot_Bty.Horse_Bty	Horse Bty	One horse artillery section armed with one 4-pound cannon and one howitzer, total 89 men		France	4	4	0	0	0	0	0	0	4	0	0	0	2	4	3	t
+1340	95	Bde_Colbert.10e_Rgt_de_chasseurs_a_cheval	10° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	400	3	4	0	0	0	f
+1334	95	Bde_Guyot.16e_Rgt_de_chasseurs_a_cheval	16° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	364	3	4	0	0	0	f
 1321	101	3eme_Division.Mxed_Foot_Bty	Mxed Foot Bty	One foot company armed with one 12-pound, four 8-pound and one 4-pound cannons, 65 men			4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1273	93	Reserve_Cavalry.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	t
+1339	95	Bde_Colbert.3e_Rgt_de_hussards	3° Rgt. de hussards			France	3	4	0	0	0	0	0	0	3	350	2	3	0	0	0	f
+1347	96	Div_Klein.4e_Rgt_de_Dragons	4° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	305	5	4	0	0	0	f
+1335	95	Bde_Guyot.22e_Rgt_de_chasseurs_a_cheval	22° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	464	3	4	0	0	0	f
+1370	97	Div_Legrand.Tirailleurs_du_Po	Tirailleurs du Pô	Rgt. de Tirailleurs du Pô [1 bat.]		Italy	2	4	6	469	1	0	0	0	3	0	0	0	0	0	0	f
+1342	96	Div_Grouchy	Div Grouchy		Grouchy	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1341	96	Div_Klein	Div Klein		Klein	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1344	96	Div_Klein.2e_Co_dArt_a_cheval	2° Co. d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
+1345	96	Div_Klein.1e_Rgt_de_Dragons	1° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	250	5	5	0	0	0	f
+1346	96	Div_Klein.2e_Rgt_de_Dragons	2° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	400	5	5	0	0	0	f
+1348	96	Div_Klein.14e_Rgt_de_Dragons	14° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	350	5	4	0	0	0	f
 \.
 
 
@@ -2276,7 +2322,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 1321, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 1371, true);
 
 
 --
@@ -2292,39 +2338,39 @@ COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name,
 -- Data for Name: game_cmd; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_cmd (id, game_id, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition, player_id, vp, cull, start_turn, start_x, start_y, player_ready) FROM stdin;
-16	2	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	0	f	1	-1	-1	f
-17	2	t	f	France	IV Corps	Soult	2		3	3	3	0	0	f	1	-1	-1	f
-18	2	t	f	France	V Corps	Lannes	2		2	1	3	0	0	f	1	-1	-1	f
-19	2	t	f	France	VI Corps	Ney	2		2	3	2	0	0	f	1	-1	-1	f
-20	2	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	0	f	1	-1	-1	f
-21	2	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2	0	0	f	1	-1	-1	f
-22	2	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	0	f	1	-1	-1	f
-23	2	f	t	Prussia	Army Grp North	Duke of Brunswick	2		4	3	4	0	0	f	1	-1	-1	f
-24	2	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1	0	0	f	1	-1	-1	f
-25	2	t	f	France	III Corps	Davout	2		1	3	2	0	0	f	1	-1	-1	f
-26	2	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	0	f	1	-1	-1	f
-27	2	t	f	France	I Corps	General Bernadotte	2		3	3	2	0	0	f	1	-1	-1	f
-28	2	t	f	France	VII Corps	Augereau	2		2	2	2	0	0	f	1	-1	-1	f
-29	2	t	f	France	Supply	Supply Train	4		3	3	2	0	0	f	1	-1	-1	f
-30	2	t	f	France	Test		2		3	3	3	0	0	f	1	-1	-1	f
-33	4	t	f	France	IV Corps	Soult	2		3	3	3	0	0	t	1	-1	-1	f
-39	4	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	0	t	1	-1	-1	f
-34	4	t	f	France	V Corps	Lannes	2		2	1	3	0	0	t	4	-1	-1	f
-36	4	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	0	t	1	-1	-1	f
-43	4	t	f	France	Test		2		3	3	3	0	0	t	1	-1	-1	f
-35	4	t	f	France	VI Corps	Ney	2		2	3	2	0	0	t	1	-1	-1	f
-41	4	t	f	France	VII Corps	Augereau	2		2	2	2	0	0	t	1	-1	-1	f
-46	4	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	0	t	1	-1	-1	f
-45	4	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	0	0	t	1	-1	-1	f
-48	4	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	0	t	1	-1	-1	f
-40	4	t	f	France	I Corps	General Bernadotte	2		3	3	2	2	0	f	1	14	8	f
-38	4	t	f	France	III Corps	Davout	2		1	3	2	2	0	f	1	11	1	f
-42	4	t	f	France	Supply	Supply Train	4		3	3	2	2	0	f	1	14	0	f
-37	4	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	0	f	1	4	4	f
-44	4	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	1	0	f	1	2	6	f
-47	4	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	1	0	f	1	4	9	f
-32	4	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	1	0	f	1	1	8	f
+COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, nation, name, commander_name, level, descr, rating, inspiration, condition, player_id, player_ready, vp, cull) FROM stdin;
+16	2	1	-1	-1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	f	0	f
+17	2	1	-1	-1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	f
+18	2	1	-1	-1	t	f	France	V Corps	Lannes	2		2	1	3	0	f	0	f
+19	2	1	-1	-1	t	f	France	VI Corps	Ney	2		2	3	2	0	f	0	f
+20	2	1	-1	-1	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	f	0	f
+21	2	1	-1	-1	f	t	Prussia	Army Grp South	Hohenlohe	1		4	3	2	0	f	0	f
+22	2	1	-1	-1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	f	0	f
+23	2	1	-1	-1	f	t	Prussia	Army Grp North	Duke of Brunswick	2		4	3	4	0	f	0	f
+24	2	1	-1	-1	f	t	Prussia	Guard Reserve	Kalkreuth	3		3	4	1	0	f	0	f
+25	2	1	-1	-1	t	f	France	III Corps	Davout	2		1	3	2	0	f	0	f
+26	2	1	-1	-1	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	f	0	f
+27	2	1	-1	-1	t	f	France	I Corps	General Bernadotte	2		3	3	2	0	f	0	f
+28	2	1	-1	-1	t	f	France	VII Corps	Augereau	2		2	2	2	0	f	0	f
+29	2	1	-1	-1	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	f
+30	2	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	f
+33	4	1	-1	-1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	t
+39	4	1	-1	-1	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	f	0	t
+34	4	4	-1	-1	t	f	France	V Corps	Lannes	2		2	1	3	0	f	0	t
+36	4	1	-1	-1	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	f	0	t
+43	4	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	t
+35	4	1	-1	-1	t	f	France	VI Corps	Ney	2		2	3	2	0	f	0	t
+41	4	1	-1	-1	t	f	France	VII Corps	Augereau	2		2	2	2	0	f	0	t
+46	4	1	-1	-1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	f	0	t
+45	4	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	0	f	0	t
+48	4	1	-1	-1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	f	0	t
+40	4	1	14	8	t	f	France	I Corps	General Bernadotte	2		3	3	2	2	f	0	f
+38	4	1	11	1	t	f	France	III Corps	Davout	2		1	3	2	2	f	0	f
+42	4	1	14	0	t	f	France	Supply	Supply Train	4		3	3	2	2	f	0	f
+37	4	1	4	4	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	f	0	f
+44	4	1	2	6	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	1	f	0	f
+47	4	1	4	9	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	1	f	0	f
+32	4	1	1	8	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	1	f	0	f
 \.
 
 
@@ -2332,7 +2378,7 @@ COPY game_cmd (id, game_id, red_team, blue_team, nation, name, commander_name, l
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 16, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 69, true);
 
 
 --
@@ -2347,7 +2393,7 @@ COPY game_cmd_order (game_id, cmd_id, turns, new_order, objective, enemy, friend
 -- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_id_seq', 11, true);
+SELECT pg_catalog.setval('game_id_seq', 13, true);
 
 
 --
@@ -2431,6 +2477,35 @@ SELECT pg_catalog.setval('inspiration_id_seq', 1, false);
 --
 
 COPY login (user_id, date, ip_address, channel, up) FROM stdin;
+1	2016-10-25 13:53:26.413951+10:30	127.0.0.1:54664	0	f
+2	2016-10-25 13:44:48.914725+10:30	192.168.1.105:49866	0	f
+2	2016-10-25 11:47:23.835212+10:30	192.168.1.105:47620	0	f
+1	2016-10-25 11:47:45.626362+10:30	127.0.0.1:42750	0	f
+2	2016-10-25 14:01:25.211001+10:30	192.168.1.105:50492	0	f
+2	2016-10-25 11:56:37.831699+10:30	192.168.1.105:47969	0	f
+1	2016-10-25 11:56:38.005143+10:30	127.0.0.1:43740	0	f
+2	2016-10-25 11:15:19.88333+10:30	192.168.1.105:46396	0	f
+2	2016-10-25 12:08:46.824422+10:30	192.168.1.105:48433	0	f
+1	2016-10-25 14:18:17.619899+10:30	127.0.0.1:57014	0	f
+1	2016-10-25 12:08:44.678075+10:30	127.0.0.1:45012	0	f
+1	2016-10-25 11:23:24.126264+10:30	127.0.0.1:40394	0	f
+1	2016-10-25 10:44:37.474919+10:30	127.0.0.1:36826	0	f
+1	2016-10-25 10:21:22.700077+10:30	127.0.0.1:34764	0	f
+1	2016-10-25 10:44:44.961785+10:30	127.0.0.1:36866	0	f
+2	2016-10-25 10:44:45.846981+10:30	192.168.1.105:45247	0	f
+1	2016-10-25 11:12:07.082922+10:30	127.0.0.1:39288	0	f
+2	2016-10-25 11:12:07.841393+10:30	192.168.1.105:46278	0	f
+1	2016-10-25 09:31:22.294948+10:30	127.0.0.1:58410	0	f
+1	2016-10-25 10:05:34.194004+10:30	127.0.0.1:33150	0	f
+1	2016-10-25 10:05:49.58396+10:30	127.0.0.1:33186	0	f
+1	2016-10-25 09:11:27.827023+10:30	127.0.0.1:56428	0	f
+1	2016-10-25 09:18:45.107193+10:30	127.0.0.1:57108	0	f
+1	2016-10-25 09:29:47.573378+10:30	127.0.0.1:58176	0	f
+1	2016-10-25 09:29:56.110618+10:30	127.0.0.1:58208	0	f
+1	2016-10-25 09:10:58.796205+10:30	127.0.0.1:56318	0	f
+1	2016-10-25 09:11:04.960032+10:30	127.0.0.1:56350	0	f
+1	2016-10-25 08:46:38.159067+10:30	127.0.0.1:53730	0	f
+1	2016-10-25 08:46:44.227354+10:30	127.0.0.1:53782	0	f
 1	2016-10-24 03:43:51.061169+10:30	127.0.0.1:60774	0	f
 1	2016-10-24 03:19:52.076233+10:30	127.0.0.1:58662	0	f
 1	2016-10-23 16:17:31.832111+10:30	127.0.0.1:58950	0	f
@@ -2455,94 +2530,189 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 04:57:12.034141+10:30	127.0.0.1:60540	0	f
 1	2016-10-23 04:21:30.801577+10:30	127.0.0.1:57372	0	f
 1	2016-10-23 04:09:19.629059+10:30	127.0.0.1:56198	0	f
+1	2016-10-25 14:16:38.257809+10:30	127.0.0.1:56766	0	f
+1	2016-10-23 14:32:02.909488+10:30	127.0.0.1:47864	0	f
+1	2016-10-25 10:55:26.521434+10:30	127.0.0.1:37804	0	f
+2	2016-10-23 01:11:53.205714+10:30	192.168.1.105:51146	0	f
+1	2016-10-25 14:27:42.089149+10:30	127.0.0.1:57802	0	f
+2	2016-10-25 11:01:11.841246+10:30	192.168.1.105:45866	0	f
+1	2016-10-25 13:11:21.500159+10:30	127.0.0.1:50946	0	f
+1	2016-10-25 14:04:34.21795+10:30	127.0.0.1:55764	0	f
+2	2016-10-25 14:04:41.168594+10:30	192.168.1.105:50613	0	f
+1	2016-10-25 14:05:43.252183+10:30	127.0.0.1:55896	0	f
+1	2016-10-24 02:22:11.329415+10:30	127.0.0.1:53828	0	f
+2	2016-10-24 01:55:52.039052+10:30	192.168.1.105:39845	0	f
+1	2016-10-25 14:19:02.605406+10:30	127.0.0.1:57072	0	f
+1	2016-10-25 14:19:10.474445+10:30	127.0.0.1:57112	0	f
+1	2016-10-23 03:20:19.931681+10:30	127.0.0.1:51910	0	f
+1	2016-10-24 01:37:28.508071+10:30	127.0.0.1:49602	0	f
+2	2016-10-24 01:44:33.886593+10:30	192.168.1.105:39424	0	f
+1	2016-10-25 08:49:45.229831+10:30	127.0.0.1:54156	0	f
+2	2016-10-23 15:31:17.68405+10:30	192.168.1.105:54099	0	f
+1	2016-10-23 15:31:21.060071+10:30	127.0.0.1:53270	0	f
+1	2016-10-23 15:36:35.402936+10:30	127.0.0.1:54842	0	f
 1	2016-10-23 04:09:26.752802+10:30	127.0.0.1:56246	0	f
 1	2016-10-23 04:17:51.209781+10:30	127.0.0.1:56984	0	f
+1	2016-10-23 04:32:10.983057+10:30	127.0.0.1:58346	0	f
+1	2016-10-25 11:07:55.152241+10:30	127.0.0.1:38900	0	f
+2	2016-10-25 10:35:55.850343+10:30	192.168.1.105:44910	0	f
+1	2016-10-24 00:20:32.489369+10:30	127.0.0.1:42860	0	f
+1	2016-10-25 10:41:39.067937+10:30	127.0.0.1:36538	0	f
+2	2016-10-25 10:41:46.841903+10:30	192.168.1.105:45132	0	f
+1	2016-10-25 10:41:49.321325+10:30	127.0.0.1:36588	0	f
+1	2016-10-25 12:10:05.96211+10:30	192.168.1.101:43670	0	f
+1	2016-10-25 12:36:21.8697+10:30	127.0.0.1:45012	0	f
+2	2016-10-25 12:06:31.837519+10:30	192.168.1.105:48345	0	f
+1	2016-10-25 12:06:35.491388+10:30	127.0.0.1:44750	0	f
+1	2016-10-25 10:29:52.351285+10:30	127.0.0.1:35520	0	f
+1	2016-10-23 02:06:23.635788+10:30	127.0.0.1:45520	0	f
+1	2016-10-23 16:07:54.400295+10:30	127.0.0.1:57990	0	f
+1	2016-10-24 03:53:45.484431+10:30	127.0.0.1:33404	0	f
+1	2016-10-24 03:41:54.141627+10:30	127.0.0.1:60566	0	f
+2	2016-10-24 00:45:10.70617+10:30	192.168.1.105:37159	0	f
+1	2016-10-25 11:33:44.461648+10:30	127.0.0.1:41316	0	f
+2	2016-10-25 11:33:49.835482+10:30	192.168.1.105:47099	0	f
+2	2016-10-23 14:32:34.903328+10:30	192.168.1.105:51821	0	f
+1	2016-10-23 04:30:42.981162+10:30	127.0.0.1:58156	0	f
+1	2016-10-22 18:41:59.479442+10:30	127.0.0.1:37868	0	f
+1	2016-10-23 01:03:06.400493+10:30	127.0.0.1:39860	0	f
+2	2016-10-23 15:10:24.194805+10:30	192.168.1.105:53308	0	f
+2	2016-10-24 01:55:47.776977+10:30	192.168.1.105:39841	0	f
+1	2016-10-25 11:22:42.42342+10:30	127.0.0.1:40342	0	f
+1	2016-10-23 02:07:34.738048+10:30	127.0.0.1:45648	0	f
+1	2016-10-23 02:08:59.396485+10:30	127.0.0.1:45772	0	f
+1	2016-10-23 01:52:34.279869+10:30	127.0.0.1:44244	0	f
+1	2016-10-23 14:21:56.754469+10:30	127.0.0.1:47024	0	f
+1	2016-10-24 03:21:44.461543+10:30	127.0.0.1:58848	0	f
+1	2016-10-24 02:02:59.676527+10:30	127.0.0.1:52070	0	f
+1	2016-10-23 15:42:53.425446+10:30	127.0.0.1:55438	0	f
+2	2016-10-23 14:25:02.988179+10:30	192.168.1.105:51535	0	f
+1	2016-10-24 01:55:32.338474+10:30	127.0.0.1:51418	0	f
+1	2016-10-25 14:28:58.139022+10:30	127.0.0.1:57970	0	f
+1	2016-10-23 14:32:08.978912+10:30	127.0.0.1:47892	0	f
+1	2016-10-22 15:16:03.152259+10:30	127.0.0.1:47550	0	f
+2	2016-10-23 14:46:21.400166+10:30	192.168.1.105:52396	0	f
+1	2016-10-23 12:55:36.354939+10:30	127.0.0.1:39852	0	f
+1	2016-10-23 04:27:31.383+10:30	127.0.0.1:57874	0	f
+1	2016-10-24 02:13:22.797687+10:30	127.0.0.1:53110	0	f
+1	2016-10-24 02:29:00.224282+10:30	127.0.0.1:54592	0	f
+1	2016-10-25 10:19:19.273721+10:30	127.0.0.1:34562	0	f
+1	2016-10-22 19:04:55.407058+10:30	127.0.0.1:39716	0	f
+1	2016-10-23 15:46:31.869312+10:30	127.0.0.1:55766	0	f
+1	2016-10-25 10:05:09.535687+10:30	127.0.0.1:33114	0	f
+1	2016-10-23 15:46:36.168328+10:30	127.0.0.1:55806	0	f
+1	2016-10-23 13:11:54.558822+10:30	127.0.0.1:41150	0	f
+1	2016-10-22 18:09:09.399274+10:30	127.0.0.1:34852	0	f
+2	2016-10-23 18:38:40.622124+10:30	192.168.1.105:54513	0	f
+1	2016-10-23 18:39:10.921535+10:30	127.0.0.1:44306	0	f
+1	2016-10-24 00:08:52.569231+10:30	127.0.0.1:41912	0	f
+1	2016-10-24 00:46:25.671395+10:30	127.0.0.1:45314	0	f
+2	2016-10-24 00:40:59.638256+10:30	192.168.1.105:36951	0	f
+2	2016-10-24 03:16:00.128264+10:30	192.168.1.105:41978	0	f
+2	2016-10-23 14:41:06.567995+10:30	192.168.1.105:52162	0	f
+2	2016-10-23 14:56:45.742943+10:30	192.168.1.105:52790	0	f
+1	2016-10-24 00:38:11.026171+10:30	127.0.0.1:44486	0	f
+2	2016-10-24 03:19:10.96895+10:30	192.168.1.105:42113	0	f
+1	2016-10-23 15:57:23.406238+10:30	127.0.0.1:56872	0	f
+1	2016-10-25 09:24:39.790823+10:30	127.0.0.1:57734	0	f
+1	2016-10-25 09:30:35.636642+10:30	127.0.0.1:58296	0	f
+1	2016-10-25 09:30:39.989258+10:30	127.0.0.1:58334	0	f
+1	2016-10-25 13:57:00.538734+10:30	127.0.0.1:55070	0	f
+1	2016-10-25 09:32:54.923802+10:30	127.0.0.1:58528	0	f
+1	2016-10-25 09:33:05.985601+10:30	127.0.0.1:58578	0	f
+1	2016-10-25 10:24:02.755051+10:30	127.0.0.1:35004	0	f
+1	2016-10-22 15:33:15.490333+10:30	127.0.0.1:49150	0	f
+1	2016-10-22 15:34:59.226163+10:30	127.0.0.1:49272	0	f
 1	2016-10-23 04:17:45.222442+10:30	127.0.0.1:56942	0	f
 1	2016-10-23 03:31:54.401551+10:30	127.0.0.1:52962	0	f
 1	2016-10-23 03:32:26.549608+10:30	127.0.0.1:53024	0	f
 1	2016-10-23 03:18:50.708985+10:30	127.0.0.1:51726	0	f
 1	2016-10-23 02:04:45.932282+10:30	127.0.0.1:45302	0	f
 1	2016-10-23 02:05:15.535154+10:30	127.0.0.1:45398	0	f
-1	2016-10-23 02:06:23.635788+10:30	127.0.0.1:45520	0	f
-2	2016-10-23 14:32:34.903328+10:30	192.168.1.105:51821	0	f
-1	2016-10-23 04:30:42.981162+10:30	127.0.0.1:58156	0	f
-1	2016-10-23 02:07:34.738048+10:30	127.0.0.1:45648	0	f
-1	2016-10-23 02:08:59.396485+10:30	127.0.0.1:45772	0	f
-1	2016-10-23 01:52:34.279869+10:30	127.0.0.1:44244	0	f
-1	2016-10-23 01:53:34.527987+10:30	127.0.0.1:44352	0	f
-2	2016-10-23 01:11:53.205714+10:30	192.168.1.105:51146	0	f
-1	2016-10-23 14:32:02.909488+10:30	127.0.0.1:47864	0	f
-2	2016-10-23 14:32:02.98731+10:30	192.168.1.105:51796	0	f
-1	2016-10-23 14:32:08.978912+10:30	127.0.0.1:47892	0	f
-1	2016-10-23 01:11:58.635553+10:30	127.0.0.1:40796	0	f
-1	2016-10-22 19:04:55.407058+10:30	127.0.0.1:39716	0	f
-1	2016-10-23 15:46:31.869312+10:30	127.0.0.1:55766	0	f
-1	2016-10-23 15:46:36.168328+10:30	127.0.0.1:55806	0	f
-1	2016-10-23 13:11:54.558822+10:30	127.0.0.1:41150	0	f
-1	2016-10-22 18:09:09.399274+10:30	127.0.0.1:34852	0	f
-2	2016-10-23 14:41:06.567995+10:30	192.168.1.105:52162	0	f
-2	2016-10-23 14:56:45.742943+10:30	192.168.1.105:52790	0	f
-1	2016-10-23 15:53:42.735599+10:30	127.0.0.1:56496	0	f
-1	2016-10-23 14:56:47.971412+10:30	127.0.0.1:50278	0	f
-1	2016-10-23 14:41:06.544107+10:30	127.0.0.1:48702	0	f
+1	2016-10-25 10:29:34.509049+10:30	127.0.0.1:35472	0	f
+1	2016-10-25 08:45:33.488441+10:30	127.0.0.1:53634	0	f
+2	2016-10-24 01:50:24.522717+10:30	192.168.1.105:39637	0	f
+2	2016-10-23 18:41:27.057504+10:30	192.168.1.105:54609	0	f
+1	2016-10-22 17:07:50.401156+10:30	127.0.0.1:57112	0	f
+1	2016-10-24 00:40:59.62181+10:30	127.0.0.1:44784	0	f
 1	2016-10-23 14:41:13.78405+10:30	127.0.0.1:48738	0	f
+1	2016-10-23 18:17:15.19843+10:30	127.0.0.1:42294	0	f
+1	2016-10-23 01:19:00.405369+10:30	127.0.0.1:41458	0	f
+1	2016-10-25 08:17:14.753021+10:30	127.0.0.1:50896	0	f
+1	2016-10-25 08:23:02.091575+10:30	127.0.0.1:51490	0	f
+1	2016-10-25 08:23:35.831105+10:30	127.0.0.1:51556	0	f
+1	2016-10-25 08:24:52.860304+10:30	127.0.0.1:51736	0	f
 1	2016-10-23 15:53:49.467614+10:30	127.0.0.1:56528	0	f
-2	2016-10-23 01:06:36.02952+10:30	192.168.1.105:50954	0	f
+1	2016-10-25 08:14:25.027025+10:30	127.0.0.1:50218	0	f
+1	2016-10-25 08:14:10.435086+10:30	127.0.0.1:50192	0	f
 1	2016-10-23 01:51:11.859849+10:30	127.0.0.1:44072	0	f
-1	2016-10-24 01:50:27.125973+10:30	127.0.0.1:50882	0	f
+2	2016-10-24 02:02:55.10967+10:30	192.168.1.105:40100	0	f
+2	2016-10-25 11:22:49.839273+10:30	192.168.1.105:46682	0	f
+2	2016-10-23 01:06:36.02952+10:30	192.168.1.105:50954	0	f
+2	2016-10-25 10:55:30.852664+10:30	192.168.1.105:45657	0	f
 1	2016-10-24 02:28:28.781179+10:30	127.0.0.1:54524	0	f
+1	2016-10-24 01:57:11.229031+10:30	127.0.0.1:51628	0	f
+1	2016-10-23 18:38:40.614318+10:30	127.0.0.1:44262	0	f
 2	2016-10-23 01:02:59.582781+10:30	192.168.1.105:50826	0	f
 2	2016-10-24 03:17:00.400157+10:30	192.168.1.105:42022	0	f
 1	2016-10-24 02:24:39.495971+10:30	127.0.0.1:54092	0	f
 2	2016-10-24 02:24:33.95364+10:30	192.168.1.105:40905	0	f
 1	2016-10-24 01:55:52.015605+10:30	127.0.0.1:51452	0	f
-1	2016-10-23 14:21:56.754469+10:30	127.0.0.1:47024	0	f
-1	2016-10-23 15:42:53.425446+10:30	127.0.0.1:55438	0	f
-2	2016-10-23 14:25:02.988179+10:30	192.168.1.105:51535	0	f
-1	2016-10-24 01:55:32.338474+10:30	127.0.0.1:51418	0	f
+2	2016-10-23 14:38:26.5438+10:30	192.168.1.105:52062	0	f
 2	2016-10-24 01:55:32.346263+10:30	192.168.1.105:39828	0	f
 1	2016-10-22 15:10:34.393572+10:30	127.0.0.1:47128	0	f
+1	2016-10-25 10:37:33.908978+10:30	127.0.0.1:36210	0	f
+2	2016-10-25 10:37:35.849427+10:30	192.168.1.105:44982	0	f
+2	2016-10-25 10:30:55.851364+10:30	192.168.1.105:44710	0	f
 1	2016-10-23 12:55:41.80708+10:30	127.0.0.1:39900	0	f
 1	2016-10-24 01:53:32.846095+10:30	127.0.0.1:51218	0	f
+2	2016-10-23 14:55:26.275058+10:30	192.168.1.105:52742	0	f
+2	2016-10-23 14:32:02.98731+10:30	192.168.1.105:51796	0	f
+1	2016-10-23 01:11:58.635553+10:30	127.0.0.1:40796	0	f
 2	2016-10-24 01:52:59.204586+10:30	192.168.1.105:39743	0	f
 1	2016-10-23 14:46:21.346391+10:30	127.0.0.1:49252	0	f
 1	2016-10-23 04:34:51.100146+10:30	127.0.0.1:58604	0	f
 1	2016-10-22 15:13:59.926114+10:30	127.0.0.1:47392	0	f
 2	2016-10-24 03:06:52.640338+10:30	192.168.1.105:41634	0	f
-1	2016-10-23 04:27:31.383+10:30	127.0.0.1:57874	0	f
 1	2016-10-23 12:38:27.73051+10:30	127.0.0.1:38258	0	f
 1	2016-10-23 04:30:48.218331+10:30	127.0.0.1:58198	0	f
 2	2016-10-24 01:39:42.227246+10:30	192.168.1.105:39247	0	f
-1	2016-10-24 01:39:45.343734+10:30	127.0.0.1:49874	0	f
 1	2016-10-24 01:25:42.832521+10:30	127.0.0.1:48368	0	f
 1	2016-10-24 01:26:05.221673+10:30	127.0.0.1:48408	0	f
 2	2016-10-24 00:08:52.576287+10:30	192.168.1.105:35773	0	f
 1	2016-10-24 00:09:08.080337+10:30	127.0.0.1:41976	0	f
 2	2016-10-24 01:25:42.928127+10:30	192.168.1.105:38729	0	f
 2	2016-10-24 00:46:22.080964+10:30	192.168.1.105:37209	0	f
-1	2016-10-24 00:46:25.671395+10:30	127.0.0.1:45314	0	f
 2	2016-10-24 00:38:06.718412+10:30	192.168.1.105:36842	0	f
-1	2016-10-24 00:38:11.026171+10:30	127.0.0.1:44486	0	f
 1	2016-10-22 18:23:48.40532+10:30	127.0.0.1:36354	0	f
-2	2016-10-23 15:21:50.577367+10:30	192.168.1.105:53742	0	f
 2	2016-10-23 20:39:46.97518+10:30	192.168.1.105:56303	0	f
-2	2016-10-23 18:44:34.26378+10:30	192.168.1.105:54726	0	f
-1	2016-10-23 18:44:34.287039+10:30	127.0.0.1:44812	0	f
+2	2016-10-25 12:01:53.836343+10:30	192.168.1.105:48166	0	f
+1	2016-10-25 12:07:06.855618+10:30	127.0.0.1:44840	0	f
+2	2016-10-25 12:07:11.832485+10:30	192.168.1.105:48371	0	f
+2	2016-10-24 03:57:32.170409+10:30	192.168.1.105:43520	0	f
+1	2016-10-24 00:41:09.09622+10:30	127.0.0.1:44822	0	f
+2	2016-10-24 02:31:44.384281+10:30	192.168.1.105:41180	0	f
+1	2016-10-24 00:44:53.840882+10:30	127.0.0.1:45160	0	f
+2	2016-10-24 00:44:52.652354+10:30	192.168.1.105:37133	0	f
+2	2016-10-25 11:38:37.858874+10:30	192.168.1.105:47282	0	f
+1	2016-10-25 11:44:35.639851+10:30	127.0.0.1:42430	0	f
+2	2016-10-25 11:44:36.833246+10:30	192.168.1.105:47513	0	f
 1	2016-10-23 18:44:58.590204+10:30	127.0.0.1:44882	0	f
-1	2016-10-23 15:57:23.406238+10:30	127.0.0.1:56872	0	f
-2	2016-10-23 18:41:27.057504+10:30	192.168.1.105:54609	0	f
 2	2016-10-23 14:43:08.662974+10:30	192.168.1.105:52233	0	f
-1	2016-10-23 18:41:27.081086+10:30	127.0.0.1:44514	0	f
-2	2016-10-24 00:06:50.996476+10:30	192.168.1.105:35698	0	f
+1	2016-10-25 14:30:41.294934+10:30	127.0.0.1:58110	0	f
+1	2016-10-25 14:30:46.187784+10:30	127.0.0.1:58160	0	f
+1	2016-10-25 11:45:50.605168+10:30	127.0.0.1:42536	0	f
+1	2016-10-25 11:45:55.249048+10:30	127.0.0.1:42580	0	f
+2	2016-10-25 11:45:58.831416+10:30	192.168.1.105:47564	0	f
+1	2016-10-25 15:16:42.802593+10:30	127.0.0.1:33688	0	f
 1	2016-10-24 00:06:50.958753+10:30	127.0.0.1:41684	0	f
+2	2016-10-24 00:06:50.996476+10:30	192.168.1.105:35698	0	f
 1	2016-10-23 18:41:54.770662+10:30	127.0.0.1:44598	0	f
 1	2016-10-23 18:33:57.65007+10:30	127.0.0.1:43768	0	f
 2	2016-10-23 18:34:09.423132+10:30	192.168.1.105:54329	0	f
 1	2016-10-23 18:17:10.874909+10:30	127.0.0.1:42262	0	f
-1	2016-10-23 18:17:15.19843+10:30	127.0.0.1:42294	0	f
 1	2016-10-23 16:15:01.319791+10:30	127.0.0.1:58676	0	f
 1	2016-10-23 17:18:40.411551+10:30	127.0.0.1:36178	0	f
-1	2016-10-22 17:19:28.250641+10:30	127.0.0.1:58422	0	f
 1	2016-10-23 15:57:29.695002+10:30	127.0.0.1:56928	0	f
 1	2016-10-23 01:19:08.563189+10:30	127.0.0.1:41494	0	f
 2	2016-10-24 03:28:43.893169+10:30	192.168.1.105:42471	0	f
@@ -2552,214 +2722,151 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 03:17:03.286907+10:30	127.0.0.1:58436	0	f
 1	2016-10-24 02:33:33.765297+10:30	127.0.0.1:55058	0	f
 1	2016-10-22 15:32:08.422231+10:30	127.0.0.1:49024	0	f
-1	2016-10-22 17:49:45.402296+10:30	127.0.0.1:32838	0	f
+1	2016-10-25 11:01:43.465296+10:30	127.0.0.1:38398	0	f
+2	2016-10-25 11:01:43.8463+10:30	192.168.1.105:45890	0	f
 1	2016-10-22 17:17:24.748776+10:30	127.0.0.1:58164	0	f
-1	2016-10-22 14:50:29.400067+10:30	127.0.0.1:45316	0	f
 1	2016-10-23 14:33:41.399118+10:30	127.0.0.1:48114	0	f
 1	2016-10-23 02:16:36.830686+10:30	127.0.0.1:46474	0	f
 1	2016-10-22 15:07:17.729362+10:30	127.0.0.1:46724	0	f
 1	2016-10-22 15:07:44.964557+10:30	127.0.0.1:46876	0	f
+2	2016-10-25 13:57:03.179731+10:30	192.168.1.105:50326	0	f
+1	2016-10-25 14:01:20.321924+10:30	127.0.0.1:55438	0	f
 1	2016-10-22 15:08:40.836605+10:30	127.0.0.1:46964	0	f
-1	2016-10-22 15:08:44.701011+10:30	127.0.0.1:46974	0	f
-2	2016-10-23 01:05:00.419376+10:30	192.168.1.105:50894	0	f
+2	2016-10-23 15:18:17.212264+10:30	192.168.1.105:53613	0	f
+1	2016-10-23 15:18:19.950349+10:30	127.0.0.1:51950	0	f
 1	2016-10-23 15:43:01.099272+10:30	127.0.0.1:55492	0	f
 1	2016-10-22 15:10:26.156566+10:30	127.0.0.1:47116	0	f
 1	2016-10-23 02:18:33.88833+10:30	127.0.0.1:46658	0	f
-1	2016-10-22 15:12:43.62931+10:30	127.0.0.1:47286	0	f
-1	2016-10-23 15:10:24.167786+10:30	127.0.0.1:51274	0	f
+1	2016-10-22 18:23:02.400867+10:30	127.0.0.1:36238	0	f
+1	2016-10-22 17:14:31.262484+10:30	127.0.0.1:57714	0	f
 1	2016-10-22 15:12:50.397206+10:30	127.0.0.1:47300	0	f
-1	2016-10-22 15:16:03.152259+10:30	127.0.0.1:47550	0	f
-2	2016-10-23 14:46:21.400166+10:30	192.168.1.105:52396	0	f
 1	2016-10-23 14:46:30.006277+10:30	127.0.0.1:49310	0	f
 1	2016-10-23 04:34:43.848129+10:30	127.0.0.1:58556	0	f
 1	2016-10-22 15:17:54.25725+10:30	127.0.0.1:47702	0	f
 2	2016-10-22 15:20:18.306518+10:30	127.0.0.1:47834	0	f
 1	2016-10-22 15:32:04.202302+10:30	127.0.0.1:49014	0	f
 1	2016-10-24 02:13:17.475938+10:30	127.0.0.1:53064	0	f
-1	2016-10-24 02:13:22.797687+10:30	127.0.0.1:53110	0	f
 1	2016-10-23 03:54:03.288115+10:30	127.0.0.1:54834	0	f
 1	2016-10-24 00:07:46.818311+10:30	127.0.0.1:41768	0	f
-1	2016-10-23 03:57:48.796421+10:30	127.0.0.1:55214	0	f
-1	2016-10-24 02:22:15.98244+10:30	127.0.0.1:53872	0	f
-1	2016-10-23 03:57:53.57408+10:30	127.0.0.1:55254	0	f
 1	2016-10-22 15:37:20.429059+10:30	127.0.0.1:49484	0	f
 1	2016-10-24 00:29:52.508147+10:30	127.0.0.1:43748	0	f
 1	2016-10-22 15:46:48.005051+10:30	127.0.0.1:50276	0	f
 1	2016-10-23 03:12:46.042596+10:30	127.0.0.1:51174	0	f
 1	2016-10-23 03:13:08.131079+10:30	127.0.0.1:51220	0	f
+1	2016-10-25 09:12:41.224035+10:30	127.0.0.1:56556	0	f
 1	2016-10-23 02:51:55.672397+10:30	127.0.0.1:49422	0	f
+1	2016-10-23 01:53:34.527987+10:30	127.0.0.1:44352	0	f
+1	2016-10-23 18:41:27.081086+10:30	127.0.0.1:44514	0	f
 1	2016-10-23 02:52:00.115204+10:30	127.0.0.1:49440	0	f
-1	2016-10-22 15:50:02.438229+10:30	127.0.0.1:50532	0	f
-1	2016-10-22 17:07:50.401156+10:30	127.0.0.1:57112	0	f
 1	2016-10-23 01:10:13.499331+10:30	127.0.0.1:40294	0	f
 1	2016-10-22 17:07:59.930005+10:30	127.0.0.1:57138	0	f
+1	2016-10-25 14:29:33.942605+10:30	127.0.0.1:58022	0	f
 1	2016-10-22 17:15:12.135243+10:30	127.0.0.1:57774	0	f
 1	2016-10-22 17:15:20.85852+10:30	127.0.0.1:57792	0	f
-1	2016-10-23 14:43:15.217365+10:30	127.0.0.1:48970	0	f
-1	2016-10-22 17:18:34.306657+10:30	127.0.0.1:58344	0	f
-1	2016-10-22 17:25:24.778276+10:30	127.0.0.1:58908	0	f
-1	2016-10-23 01:19:00.405369+10:30	127.0.0.1:41458	0	f
-1	2016-10-23 16:07:54.400295+10:30	127.0.0.1:57990	0	f
-1	2016-10-23 01:46:01.904716+10:30	127.0.0.1:43602	0	f
-1	2016-10-24 03:53:45.484431+10:30	127.0.0.1:33404	0	f
-1	2016-10-24 03:41:54.141627+10:30	127.0.0.1:60566	0	f
 1	2016-10-23 01:52:26.283101+10:30	127.0.0.1:44200	0	f
 1	2016-10-24 03:28:47.065943+10:30	127.0.0.1:59542	0	f
 2	2016-10-23 14:33:36.236028+10:30	192.168.1.105:51878	0	f
-1	2016-10-24 03:21:52.276879+10:30	127.0.0.1:58908	0	f
-1	2016-10-23 15:50:40.408871+10:30	127.0.0.1:56258	0	f
-1	2016-10-22 17:26:51.910597+10:30	127.0.0.1:59070	0	f
-1	2016-10-22 18:41:59.479442+10:30	127.0.0.1:37868	0	f
-1	2016-10-23 01:03:06.400493+10:30	127.0.0.1:39860	0	f
-2	2016-10-23 15:10:24.194805+10:30	192.168.1.105:53308	0	f
+1	2016-10-24 00:51:29.619164+10:30	127.0.0.1:45754	0	f
+2	2016-10-24 00:51:29.68531+10:30	192.168.1.105:37423	0	f
 1	2016-10-23 15:10:29.45972+10:30	127.0.0.1:51306	0	f
+1	2016-10-25 11:15:14.122899+10:30	127.0.0.1:39536	0	f
+1	2016-10-22 14:50:29.400067+10:30	127.0.0.1:45316	0	f
+1	2016-10-23 03:35:07.382657+10:30	127.0.0.1:53348	0	f
+1	2016-10-24 02:06:59.670076+10:30	127.0.0.1:52486	0	f
+1	2016-10-22 17:49:45.402296+10:30	127.0.0.1:32838	0	f
 2	2016-10-24 02:28:56.230469+10:30	192.168.1.105:41069	0	f
 2	2016-10-24 02:22:11.353053+10:30	192.168.1.105:40822	0	f
-1	2016-10-24 02:22:11.329415+10:30	127.0.0.1:53828	0	f
-2	2016-10-24 01:55:52.039052+10:30	192.168.1.105:39845	0	f
-1	2016-10-23 03:20:19.931681+10:30	127.0.0.1:51910	0	f
-1	2016-10-23 03:35:07.382657+10:30	127.0.0.1:53348	0	f
 2	2016-10-24 02:13:17.448251+10:30	192.168.1.105:40492	0	f
 1	2016-10-23 04:06:15.901374+10:30	127.0.0.1:55892	0	f
 1	2016-10-23 04:16:36.987139+10:30	127.0.0.1:56790	0	f
 1	2016-10-23 04:16:41.873063+10:30	127.0.0.1:56816	0	f
-1	2016-10-24 03:57:32.149446+10:30	127.0.0.1:33734	2	f
-1	2016-10-24 03:57:36.49193+10:30	127.0.0.1:33778	3	t
-1	2016-10-23 13:16:29.411152+10:30	127.0.0.1:41550	0	f
+1	2016-10-25 11:43:01.894939+10:30	127.0.0.1:42240	0	f
+2	2016-10-25 11:43:09.837664+10:30	192.168.1.105:47459	0	f
+1	2016-10-24 03:57:32.149446+10:30	127.0.0.1:33734	0	f
+1	2016-10-24 03:57:36.49193+10:30	127.0.0.1:33778	0	f
+2	2016-10-24 00:31:08.626724+10:30	192.168.1.105:36580	0	f
 1	2016-10-23 14:21:42.66513+10:30	127.0.0.1:46980	0	f
 1	2016-10-23 14:24:47.449795+10:30	127.0.0.1:47294	0	f
 2	2016-10-23 14:24:47.53806+10:30	192.168.1.105:51516	0	f
 1	2016-10-23 14:24:54.193303+10:30	127.0.0.1:47332	0	f
 1	2016-10-23 18:37:10.931959+10:30	127.0.0.1:44082	0	f
-1	2016-10-23 12:55:36.354939+10:30	127.0.0.1:39852	0	f
 1	2016-10-23 04:18:59.071536+10:30	127.0.0.1:57120	0	f
-1	2016-10-23 04:27:07.486206+10:30	127.0.0.1:57816	0	f
-1	2016-10-23 05:00:03.64962+10:30	127.0.0.1:60818	0	f
-1	2016-10-23 12:45:27.872243+10:30	127.0.0.1:38898	0	f
-1	2016-10-22 17:13:48.661825+10:30	127.0.0.1:57662	0	f
-1	2016-10-24 02:29:00.224282+10:30	127.0.0.1:54592	0	f
-2	2016-10-24 02:29:34.318441+10:30	192.168.1.105:41094	0	f
-1	2016-10-24 02:29:37.751696+10:30	127.0.0.1:54674	0	f
-1	2016-10-24 02:31:44.442305+10:30	127.0.0.1:54836	0	f
-2	2016-10-24 02:32:50.627943+10:30	192.168.1.105:41223	0	f
+1	2016-10-22 18:11:46.585937+10:30	127.0.0.1:35214	0	f
+1	2016-10-23 03:03:46.785958+10:30	127.0.0.1:50408	0	f
+2	2016-10-24 02:21:13.255721+10:30	192.168.1.105:40782	0	f
+1	2016-10-24 02:21:13.284802+10:30	127.0.0.1:53696	0	f
+2	2016-10-25 13:52:31.180233+10:30	192.168.1.105:50156	0	f
+1	2016-10-25 13:05:11.318535+10:30	192.168.1.101:44107	0	f
 1	2016-10-24 02:32:50.655408+10:30	127.0.0.1:54966	0	f
-2	2016-10-24 00:40:59.638256+10:30	192.168.1.105:36951	0	f
-2	2016-10-24 03:16:00.128264+10:30	192.168.1.105:41978	0	f
-1	2016-10-24 03:16:03.351118+10:30	127.0.0.1:58298	0	f
-2	2016-10-24 03:19:10.96895+10:30	192.168.1.105:42113	0	f
-1	2016-10-24 03:19:10.941045+10:30	127.0.0.1:58606	0	f
-2	2016-10-24 03:21:44.447217+10:30	192.168.1.105:42207	0	f
-1	2016-10-24 00:40:59.62181+10:30	127.0.0.1:44784	0	f
-2	2016-10-24 03:23:11.724462+10:30	192.168.1.105:42260	0	f
 1	2016-10-24 03:23:11.741403+10:30	127.0.0.1:59004	0	f
 2	2016-10-24 03:25:12.418048+10:30	192.168.1.105:42341	0	f
 1	2016-10-24 03:25:14.664563+10:30	127.0.0.1:59230	0	f
 2	2016-10-24 03:45:03.479384+10:30	192.168.1.105:43053	0	f
 1	2016-10-24 03:45:06.124751+10:30	127.0.0.1:60918	0	f
-2	2016-10-24 03:53:45.497475+10:30	192.168.1.105:43377	0	f
-2	2016-10-24 03:57:32.170409+10:30	192.168.1.105:43520	1	t
-1	2016-10-24 00:41:09.09622+10:30	127.0.0.1:44822	0	f
-2	2016-10-24 02:31:44.384281+10:30	192.168.1.105:41180	0	f
-1	2016-10-24 00:44:53.840882+10:30	127.0.0.1:45160	0	f
-2	2016-10-24 00:44:52.652354+10:30	192.168.1.105:37133	0	f
-2	2016-10-24 00:45:10.70617+10:30	192.168.1.105:37159	0	f
 1	2016-10-24 00:51:36.906137+10:30	127.0.0.1:45774	0	f
 2	2016-10-24 00:51:36.919552+10:30	192.168.1.105:37427	0	f
 1	2016-10-24 00:51:58.223268+10:30	127.0.0.1:45814	0	f
 2	2016-10-24 00:52:03.441027+10:30	192.168.1.105:37450	0	f
-2	2016-10-24 01:55:47.776977+10:30	192.168.1.105:39841	0	f
-2	2016-10-24 02:02:55.10967+10:30	192.168.1.105:40100	0	f
-1	2016-10-24 03:21:44.461543+10:30	127.0.0.1:58848	0	f
-1	2016-10-24 02:02:59.676527+10:30	127.0.0.1:52070	0	f
 1	2016-10-24 02:03:07.95668+10:30	127.0.0.1:52106	0	f
 2	2016-10-24 02:06:46.391945+10:30	192.168.1.105:40243	0	f
 2	2016-10-24 01:57:06.371877+10:30	192.168.1.105:39892	0	f
-2	2016-10-24 02:07:35.40255+10:30	192.168.1.105:40277	0	f
-1	2016-10-24 02:07:35.430016+10:30	127.0.0.1:52534	0	f
 1	2016-10-24 02:07:41.728212+10:30	127.0.0.1:52572	0	f
 1	2016-10-24 02:06:46.400485+10:30	127.0.0.1:52428	0	f
-1	2016-10-24 02:06:59.670076+10:30	127.0.0.1:52486	0	f
-1	2016-10-24 01:57:11.229031+10:30	127.0.0.1:51628	0	f
 1	2016-10-23 18:36:25.311843+10:30	127.0.0.1:44040	0	f
 1	2016-10-23 12:50:49.277078+10:30	127.0.0.1:39430	0	f
 1	2016-10-22 15:51:31.173139+10:30	127.0.0.1:50646	0	f
 2	2016-10-23 00:38:08.739616+10:30	192.168.1.105:49901	0	f
 2	2016-10-23 01:06:09.109025+10:30	192.168.1.105:50937	0	f
-2	2016-10-23 01:10:57.211439+10:30	192.168.1.105:51110	0	f
-1	2016-10-23 01:10:57.251183+10:30	127.0.0.1:40636	0	f
+1	2016-10-24 00:31:11.698593+10:30	127.0.0.1:43938	0	f
+1	2016-10-24 00:47:47.898455+10:30	127.0.0.1:45418	0	f
 1	2016-10-23 01:11:02.715465+10:30	127.0.0.1:40668	0	f
 1	2016-10-23 01:55:07.593345+10:30	127.0.0.1:44508	0	f
-1	2016-10-23 01:17:32.952064+10:30	127.0.0.1:41310	0	f
-2	2016-10-23 14:55:26.275058+10:30	192.168.1.105:52742	0	f
-1	2016-10-23 14:55:29.208763+10:30	127.0.0.1:50096	0	f
+1	2016-10-24 01:55:47.759139+10:30	127.0.0.1:51440	0	f
+1	2016-10-24 01:56:08.239915+10:30	127.0.0.1:51516	0	f
 1	2016-10-22 18:06:57.729234+10:30	127.0.0.1:34644	0	f
 1	2016-10-22 18:10:33.984249+10:30	127.0.0.1:35076	0	f
-1	2016-10-22 18:11:41.331171+10:30	127.0.0.1:35174	0	f
-1	2016-10-23 03:55:57.718384+10:30	127.0.0.1:55020	0	f
-1	2016-10-23 01:55:01.599632+10:30	127.0.0.1:44466	0	f
+1	2016-10-25 10:07:42.986888+10:30	127.0.0.1:33342	0	f
+1	2016-10-25 10:21:16.80795+10:30	127.0.0.1:34714	0	f
+1	2016-10-25 11:47:17.254384+10:30	127.0.0.1:42682	0	f
 2	2016-10-24 00:47:47.887061+10:30	192.168.1.105:37264	0	f
-1	2016-10-24 01:37:28.508071+10:30	127.0.0.1:49602	0	f
-2	2016-10-24 01:44:33.886593+10:30	192.168.1.105:39424	0	f
 2	2016-10-24 01:45:33.075228+10:30	192.168.1.105:39458	0	f
+2	2016-10-23 15:21:50.577367+10:30	192.168.1.105:53742	0	f
+2	2016-10-24 03:21:44.447217+10:30	192.168.1.105:42207	0	f
+1	2016-10-25 08:47:32.321566+10:30	127.0.0.1:53900	0	f
 1	2016-10-24 01:45:35.86976+10:30	127.0.0.1:50416	0	f
 2	2016-10-24 01:47:30.206682+10:30	192.168.1.105:39529	0	f
 1	2016-10-24 01:47:30.23396+10:30	127.0.0.1:50584	0	f
 1	2016-10-24 01:47:54.896498+10:30	127.0.0.1:50646	0	f
-2	2016-10-24 01:50:24.522717+10:30	192.168.1.105:39637	0	f
-2	2016-10-24 01:51:43.852722+10:30	192.168.1.105:39691	0	f
-1	2016-10-24 01:51:43.865758+10:30	127.0.0.1:50998	0	f
-1	2016-10-24 01:51:50.758481+10:30	127.0.0.1:51044	0	f
-1	2016-10-24 01:52:59.231736+10:30	127.0.0.1:51144	0	f
-2	2016-10-24 01:54:37.17775+10:30	192.168.1.105:39796	0	f
-1	2016-10-24 01:54:37.201027+10:30	127.0.0.1:51304	0	f
-2	2016-10-24 03:41:54.151975+10:30	192.168.1.105:42933	0	f
-1	2016-10-24 02:33:23.096613+10:30	127.0.0.1:55010	0	f
-2	2016-10-24 02:33:23.110315+10:30	192.168.1.105:41242	0	f
-2	2016-10-24 02:22:31.828404+10:30	192.168.1.105:40835	0	f
-1	2016-10-24 02:22:31.872396+10:30	127.0.0.1:53896	0	f
-1	2016-10-22 15:33:15.490333+10:30	127.0.0.1:49150	0	f
-1	2016-10-22 15:34:59.226163+10:30	127.0.0.1:49272	0	f
-1	2016-10-22 18:23:02.400867+10:30	127.0.0.1:36238	0	f
-1	2016-10-22 17:14:31.262484+10:30	127.0.0.1:57714	0	f
-1	2016-10-22 18:11:46.585937+10:30	127.0.0.1:35214	0	f
-1	2016-10-23 03:03:46.785958+10:30	127.0.0.1:50408	0	f
-1	2016-10-23 03:04:24.391087+10:30	127.0.0.1:50480	0	f
-1	2016-10-23 03:18:22.462966+10:30	127.0.0.1:51660	0	f
-1	2016-10-23 03:20:13.189528+10:30	127.0.0.1:51862	0	f
-1	2016-10-23 03:33:02.433517+10:30	127.0.0.1:53130	0	f
-1	2016-10-23 03:33:07.674618+10:30	127.0.0.1:53170	0	f
-1	2016-10-23 04:06:27.602716+10:30	127.0.0.1:55914	0	f
-1	2016-10-23 04:06:37.246034+10:30	127.0.0.1:55954	0	f
-2	2016-10-23 18:46:37.976142+10:30	192.168.1.105:54804	0	f
-1	2016-10-23 13:21:38.8351+10:30	127.0.0.1:42088	0	f
-1	2016-10-23 04:19:39.119373+10:30	127.0.0.1:57200	0	f
-1	2016-10-23 04:32:10.983057+10:30	127.0.0.1:58346	0	f
-1	2016-10-23 04:54:16.620893+10:30	127.0.0.1:60070	0	f
-1	2016-10-23 12:34:28.753216+10:30	127.0.0.1:37880	0	f
-1	2016-10-23 15:55:01.604594+10:30	127.0.0.1:56662	0	f
-1	2016-10-23 15:55:07.378269+10:30	127.0.0.1:56706	0	f
-1	2016-10-23 18:38:40.614318+10:30	127.0.0.1:44262	0	f
-2	2016-10-24 01:37:28.515398+10:30	192.168.1.105:39160	0	f
-1	2016-10-24 01:37:37.625698+10:30	127.0.0.1:49638	0	f
-1	2016-10-24 01:44:33.894288+10:30	127.0.0.1:50254	0	f
-2	2016-10-24 02:31:57.194662+10:30	192.168.1.105:41189	0	f
-1	2016-10-24 02:32:01.086712+10:30	127.0.0.1:54886	0	f
-1	2016-10-24 02:08:47.565875+10:30	127.0.0.1:52718	0	f
-2	2016-10-24 02:21:13.255721+10:30	192.168.1.105:40782	0	f
-1	2016-10-24 02:21:13.284802+10:30	127.0.0.1:53696	0	f
-1	2016-10-24 02:21:26.656763+10:30	127.0.0.1:53740	0	f
-2	2016-10-23 14:35:56.551577+10:30	192.168.1.105:51967	0	f
-1	2016-10-23 14:38:26.526704+10:30	127.0.0.1:48494	0	f
-2	2016-10-23 14:38:26.5438+10:30	192.168.1.105:52062	0	f
-2	2016-10-23 15:18:17.212264+10:30	192.168.1.105:53613	0	f
-1	2016-10-23 15:18:19.950349+10:30	127.0.0.1:51950	0	f
-2	2016-10-24 00:31:08.626724+10:30	192.168.1.105:36580	0	f
-1	2016-10-24 00:31:11.698593+10:30	127.0.0.1:43938	0	f
-1	2016-10-24 00:47:47.898455+10:30	127.0.0.1:45418	0	f
+2	2016-10-25 11:07:58.837267+10:30	192.168.1.105:46120	0	f
+1	2016-10-25 11:17:15.651632+10:30	127.0.0.1:39888	0	f
+2	2016-10-25 11:17:17.853494+10:30	192.168.1.105:46471	0	f
+1	2016-10-25 11:32:53.956181+10:30	127.0.0.1:41172	0	f
+2	2016-10-25 11:32:57.835451+10:30	192.168.1.105:47063	0	f
+1	2016-10-23 15:53:42.735599+10:30	127.0.0.1:56496	0	f
+1	2016-10-23 14:56:47.971412+10:30	127.0.0.1:50278	0	f
+1	2016-10-23 14:41:06.544107+10:30	127.0.0.1:48702	0	f
+1	2016-10-22 17:18:34.306657+10:30	127.0.0.1:58344	0	f
+1	2016-10-22 17:25:24.778276+10:30	127.0.0.1:58908	0	f
+1	2016-10-25 11:38:31.860138+10:30	127.0.0.1:41916	0	f
+2	2016-10-24 03:53:45.497475+10:30	192.168.1.105:43377	0	f
 1	2016-10-24 00:48:01.800017+10:30	127.0.0.1:45482	0	f
 2	2016-10-24 00:48:22.465385+10:30	192.168.1.105:37302	0	f
 2	2016-10-23 15:28:26.256617+10:30	192.168.1.105:53990	0	f
 1	2016-10-23 15:28:35.398646+10:30	127.0.0.1:52970	0	f
+1	2016-10-25 08:42:14.060521+10:30	127.0.0.1:53178	0	f
+1	2016-10-25 08:44:03.805354+10:30	127.0.0.1:53392	0	f
+1	2016-10-25 08:44:12.404759+10:30	127.0.0.1:53442	0	f
+1	2016-10-25 08:54:21.273375+10:30	127.0.0.1:54540	0	f
+1	2016-10-24 01:39:45.343734+10:30	127.0.0.1:49874	0	f
+2	2016-10-24 02:29:34.318441+10:30	192.168.1.105:41094	0	f
+1	2016-10-22 18:11:41.331171+10:30	127.0.0.1:35174	0	f
+1	2016-10-23 03:55:57.718384+10:30	127.0.0.1:55020	0	f
+1	2016-10-23 01:55:01.599632+10:30	127.0.0.1:44466	0	f
+1	2016-10-24 02:33:23.096613+10:30	127.0.0.1:55010	0	f
+2	2016-10-24 02:33:23.110315+10:30	192.168.1.105:41242	0	f
+2	2016-10-24 02:22:31.828404+10:30	192.168.1.105:40835	0	f
+1	2016-10-24 02:22:31.872396+10:30	127.0.0.1:53896	0	f
+1	2016-10-25 13:07:34.13417+10:30	127.0.0.1:50498	0	f
 1	2016-10-23 03:56:07.650736+10:30	127.0.0.1:55064	0	f
 1	2016-10-24 02:08:41.221515+10:30	127.0.0.1:52680	0	f
 1	2016-10-24 00:39:10.496413+10:30	127.0.0.1:44592	0	f
@@ -2769,8 +2876,89 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 17:07:24.70899+10:30	127.0.0.1:35050	0	f
 1	2016-10-23 18:10:54.539913+10:30	127.0.0.1:41704	0	f
 1	2016-10-23 18:11:02.535976+10:30	127.0.0.1:41722	0	f
-2	2016-10-23 18:36:25.397988+10:30	192.168.1.105:54428	0	f
 1	2016-10-24 01:57:06.344424+10:30	127.0.0.1:51584	0	f
+1	2016-10-23 02:33:12.994819+10:30	127.0.0.1:48070	0	f
+2	2016-10-24 00:29:52.532071+10:30	192.168.1.105:36532	0	f
+1	2016-10-23 02:11:37.151265+10:30	127.0.0.1:46034	0	f
+1	2016-10-24 00:30:02.113829+10:30	127.0.0.1:43794	0	f
+2	2016-10-24 00:40:49.342808+10:30	192.168.1.105:36943	0	f
+2	2016-10-24 02:26:48.185651+10:30	192.168.1.105:40986	0	f
+1	2016-10-24 02:26:55.286728+10:30	127.0.0.1:54286	0	f
+2	2016-10-24 02:27:33.089149+10:30	192.168.1.105:41019	0	f
+1	2016-10-24 02:27:33.152646+10:30	127.0.0.1:54356	0	f
+1	2016-10-24 02:27:39.400144+10:30	127.0.0.1:54394	0	f
+2	2016-10-24 02:28:03.212394+10:30	192.168.1.105:41038	0	f
+1	2016-10-24 02:28:03.236103+10:30	127.0.0.1:54426	0	f
+1	2016-10-24 02:28:08.582033+10:30	127.0.0.1:54464	0	f
+2	2016-10-24 02:28:23.731054+10:30	192.168.1.105:41052	0	f
+1	2016-10-24 02:28:23.706966+10:30	127.0.0.1:54492	0	f
+1	2016-10-25 10:25:35.356075+10:30	127.0.0.1:35160	0	f
+1	2016-10-25 10:35:49.027929+10:30	127.0.0.1:35984	0	f
+1	2016-10-25 10:35:57.018204+10:30	127.0.0.1:36046	0	f
+1	2016-10-25 10:43:18.889477+10:30	127.0.0.1:36694	0	f
+2	2016-10-25 10:43:27.851181+10:30	192.168.1.105:45196	0	f
+1	2016-10-25 10:43:34.112272+10:30	127.0.0.1:36748	0	f
+1	2016-10-25 10:51:58.636878+10:30	127.0.0.1:37434	0	f
+2	2016-10-25 10:52:01.85697+10:30	192.168.1.105:45522	0	f
+1	2016-10-22 15:08:44.701011+10:30	127.0.0.1:46974	0	f
+1	2016-10-22 15:12:43.62931+10:30	127.0.0.1:47286	0	f
+1	2016-10-23 15:10:24.167786+10:30	127.0.0.1:51274	0	f
+1	2016-10-25 11:43:11.818327+10:30	127.0.0.1:42276	0	f
+1	2016-10-23 04:27:07.486206+10:30	127.0.0.1:57816	0	f
+1	2016-10-23 05:00:03.64962+10:30	127.0.0.1:60818	0	f
+1	2016-10-23 12:45:27.872243+10:30	127.0.0.1:38898	0	f
+1	2016-10-22 17:13:48.661825+10:30	127.0.0.1:57662	0	f
+1	2016-10-24 02:29:37.751696+10:30	127.0.0.1:54674	0	f
+1	2016-10-24 02:31:44.442305+10:30	127.0.0.1:54836	0	f
+2	2016-10-24 02:32:50.627943+10:30	192.168.1.105:41223	0	f
+1	2016-10-23 14:43:15.217365+10:30	127.0.0.1:48970	0	f
+2	2016-10-23 01:05:00.419376+10:30	192.168.1.105:50894	0	f
+1	2016-10-25 11:59:42.055226+10:30	127.0.0.1:44016	0	f
+1	2016-10-25 11:59:47.850896+10:30	127.0.0.1:44056	0	f
+2	2016-10-25 11:59:50.822461+10:30	192.168.1.105:48087	0	f
+1	2016-10-25 11:48:38.394189+10:30	127.0.0.1:42858	0	f
+2	2016-10-25 11:48:39.835559+10:30	192.168.1.105:47666	0	f
+1	2016-10-23 13:16:29.411152+10:30	127.0.0.1:41550	0	f
+2	2016-10-23 01:10:57.211439+10:30	192.168.1.105:51110	0	f
+1	2016-10-23 01:10:57.251183+10:30	127.0.0.1:40636	0	f
+1	2016-10-24 01:52:59.231736+10:30	127.0.0.1:51144	0	f
+2	2016-10-24 01:54:37.17775+10:30	192.168.1.105:39796	0	f
+1	2016-10-22 17:19:28.250641+10:30	127.0.0.1:58422	0	f
+1	2016-10-23 01:46:01.904716+10:30	127.0.0.1:43602	0	f
+1	2016-10-24 01:54:37.201027+10:30	127.0.0.1:51304	0	f
+2	2016-10-24 03:41:54.151975+10:30	192.168.1.105:42933	0	f
+1	2016-10-23 03:33:07.674618+10:30	127.0.0.1:53170	0	f
+1	2016-10-23 04:06:27.602716+10:30	127.0.0.1:55914	0	f
+1	2016-10-23 04:06:37.246034+10:30	127.0.0.1:55954	0	f
+1	2016-10-23 13:21:38.8351+10:30	127.0.0.1:42088	0	f
+1	2016-10-25 10:57:04.482571+10:30	127.0.0.1:37936	0	f
+1	2016-10-25 10:57:09.867367+10:30	127.0.0.1:37978	0	f
+2	2016-10-25 10:57:11.842381+10:30	192.168.1.105:45720	0	f
+1	2016-10-25 11:01:07.189378+10:30	127.0.0.1:38316	0	f
+1	2016-10-24 01:50:27.125973+10:30	127.0.0.1:50882	0	f
+1	2016-10-24 03:21:52.276879+10:30	127.0.0.1:58908	0	f
+1	2016-10-23 15:50:40.408871+10:30	127.0.0.1:56258	0	f
+1	2016-10-22 17:26:51.910597+10:30	127.0.0.1:59070	0	f
+1	2016-10-23 01:17:32.952064+10:30	127.0.0.1:41310	0	f
+1	2016-10-23 14:55:29.208763+10:30	127.0.0.1:50096	0	f
+2	2016-10-23 18:46:37.976142+10:30	192.168.1.105:54804	0	f
+1	2016-10-25 08:42:54.21724+10:30	127.0.0.1:53272	0	f
+1	2016-10-25 08:43:07.812055+10:30	127.0.0.1:53322	0	f
+1	2016-10-25 08:49:38.647368+10:30	127.0.0.1:54112	0	f
+1	2016-10-25 14:05:33.101485+10:30	127.0.0.1:55844	0	f
+2	2016-10-24 00:20:29.24297+10:30	192.168.1.105:36209	0	f
+1	2016-10-25 14:02:26.841083+10:30	127.0.0.1:55568	0	f
+1	2016-10-23 03:04:24.391087+10:30	127.0.0.1:50480	0	f
+1	2016-10-23 03:18:22.462966+10:30	127.0.0.1:51660	0	f
+1	2016-10-23 03:20:13.189528+10:30	127.0.0.1:51862	0	f
+1	2016-10-25 08:32:50.856069+10:30	127.0.0.1:52382	0	f
+1	2016-10-25 08:32:58.132612+10:30	127.0.0.1:52416	0	f
+1	2016-10-24 02:21:26.656763+10:30	127.0.0.1:53740	0	f
+2	2016-10-23 14:35:56.551577+10:30	192.168.1.105:51967	0	f
+1	2016-10-23 14:38:26.526704+10:30	127.0.0.1:48494	0	f
+1	2016-10-25 10:53:07.071234+10:30	127.0.0.1:37588	0	f
+2	2016-10-25 10:53:12.83641+10:30	192.168.1.105:45573	0	f
+2	2016-10-23 18:36:25.397988+10:30	192.168.1.105:54428	0	f
 1	2016-10-24 00:40:49.351571+10:30	127.0.0.1:44764	0	f
 1	2016-10-23 15:21:53.889479+10:30	127.0.0.1:52348	0	f
 2	2016-10-24 00:21:04.787372+10:30	192.168.1.105:36231	0	f
@@ -2786,36 +2974,54 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 01:17:19.910667+10:30	127.0.0.1:41274	0	f
 1	2016-10-23 12:34:33.612024+10:30	127.0.0.1:37906	0	f
 1	2016-10-23 12:46:17.19613+10:30	127.0.0.1:39038	0	f
+1	2016-10-25 11:49:38.882736+10:30	127.0.0.1:42954	0	f
+1	2016-10-23 03:33:02.433517+10:30	127.0.0.1:53130	0	f
+2	2016-10-23 18:44:34.26378+10:30	192.168.1.105:54726	0	f
+1	2016-10-23 18:44:34.287039+10:30	127.0.0.1:44812	0	f
+1	2016-10-22 15:50:02.438229+10:30	127.0.0.1:50532	0	f
+1	2016-10-23 04:19:39.119373+10:30	127.0.0.1:57200	0	f
+1	2016-10-23 04:54:16.620893+10:30	127.0.0.1:60070	0	f
+1	2016-10-23 12:34:28.753216+10:30	127.0.0.1:37880	0	f
+2	2016-10-25 11:49:47.832671+10:30	192.168.1.105:47710	0	f
+1	2016-10-23 03:57:48.796421+10:30	127.0.0.1:55214	0	f
+1	2016-10-24 02:22:15.98244+10:30	127.0.0.1:53872	0	f
+1	2016-10-23 03:57:53.57408+10:30	127.0.0.1:55254	0	f
+1	2016-10-24 03:16:03.351118+10:30	127.0.0.1:58298	0	f
+1	2016-10-25 09:16:49.691356+10:30	127.0.0.1:56884	0	f
+1	2016-10-25 09:16:55.257311+10:30	127.0.0.1:56936	0	f
+1	2016-10-24 03:19:10.941045+10:30	127.0.0.1:58606	0	f
+1	2016-10-25 08:48:41.078384+10:30	127.0.0.1:54004	0	f
+1	2016-10-25 08:48:46.950912+10:30	127.0.0.1:54052	0	f
+2	2016-10-24 03:23:11.724462+10:30	192.168.1.105:42260	0	f
+1	2016-10-23 15:55:01.604594+10:30	127.0.0.1:56662	0	f
+1	2016-10-23 15:55:07.378269+10:30	127.0.0.1:56706	0	f
+2	2016-10-24 01:37:28.515398+10:30	192.168.1.105:39160	0	f
+1	2016-10-25 15:23:50.235188+10:30	127.0.0.1:34278	1	t
+2	2016-10-24 02:07:35.40255+10:30	192.168.1.105:40277	0	f
+1	2016-10-24 02:07:35.430016+10:30	127.0.0.1:52534	0	f
+2	2016-10-24 01:51:43.852722+10:30	192.168.1.105:39691	0	f
+1	2016-10-24 01:51:43.865758+10:30	127.0.0.1:50998	0	f
+1	2016-10-24 01:51:50.758481+10:30	127.0.0.1:51044	0	f
+1	2016-10-24 01:37:37.625698+10:30	127.0.0.1:49638	0	f
+1	2016-10-24 01:44:33.894288+10:30	127.0.0.1:50254	0	f
+2	2016-10-24 02:31:57.194662+10:30	192.168.1.105:41189	0	f
+1	2016-10-24 02:32:01.086712+10:30	127.0.0.1:54886	0	f
+1	2016-10-25 07:50:46.397133+10:30	127.0.0.1:47754	0	f
+1	2016-10-25 07:50:52.293392+10:30	127.0.0.1:47778	0	f
+1	2016-10-25 08:26:52.685956+10:30	127.0.0.1:51886	0	f
+1	2016-10-24 02:08:47.565875+10:30	127.0.0.1:52718	0	f
+2	2016-10-25 14:02:31.173146+10:30	192.168.1.105:50536	0	f
+1	2016-10-25 12:01:53.037337+10:30	127.0.0.1:44246	0	f
 1	2016-10-23 14:35:56.536757+10:30	127.0.0.1:48312	0	f
 2	2016-10-24 02:08:41.234658+10:30	192.168.1.105:40322	0	f
-2	2016-10-23 15:31:17.68405+10:30	192.168.1.105:54099	0	f
-1	2016-10-23 15:31:21.060071+10:30	127.0.0.1:53270	0	f
-1	2016-10-23 15:36:35.402936+10:30	127.0.0.1:54842	0	f
-2	2016-10-23 18:38:40.622124+10:30	192.168.1.105:54513	0	f
-1	2016-10-23 18:39:10.921535+10:30	127.0.0.1:44306	0	f
-1	2016-10-24 00:08:52.569231+10:30	127.0.0.1:41912	0	f
-2	2016-10-24 00:20:29.24297+10:30	192.168.1.105:36209	0	f
-1	2016-10-24 00:20:32.489369+10:30	127.0.0.1:42860	0	f
 2	2016-10-24 00:41:26.651185+10:30	192.168.1.105:36997	0	f
-1	2016-10-24 00:51:29.619164+10:30	127.0.0.1:45754	0	f
-2	2016-10-24 00:51:29.68531+10:30	192.168.1.105:37423	0	f
-1	2016-10-24 01:55:47.759139+10:30	127.0.0.1:51440	0	f
-1	2016-10-24 01:56:08.239915+10:30	127.0.0.1:51516	0	f
-1	2016-10-23 02:11:37.151265+10:30	127.0.0.1:46034	0	f
-1	2016-10-23 02:33:12.994819+10:30	127.0.0.1:48070	0	f
-2	2016-10-24 00:29:52.532071+10:30	192.168.1.105:36532	0	f
-1	2016-10-24 00:30:02.113829+10:30	127.0.0.1:43794	0	f
-2	2016-10-24 00:40:49.342808+10:30	192.168.1.105:36943	0	f
-2	2016-10-24 02:26:48.185651+10:30	192.168.1.105:40986	0	f
-1	2016-10-24 02:26:55.286728+10:30	127.0.0.1:54286	0	f
-2	2016-10-24 02:27:33.089149+10:30	192.168.1.105:41019	0	f
-1	2016-10-24 02:27:33.152646+10:30	127.0.0.1:54356	0	f
-1	2016-10-24 02:27:39.400144+10:30	127.0.0.1:54394	0	f
-2	2016-10-24 02:28:03.212394+10:30	192.168.1.105:41038	0	f
-1	2016-10-24 02:28:03.236103+10:30	127.0.0.1:54426	0	f
-1	2016-10-24 02:28:08.582033+10:30	127.0.0.1:54464	0	f
-2	2016-10-24 02:28:23.731054+10:30	192.168.1.105:41052	0	f
-1	2016-10-24 02:28:23.706966+10:30	127.0.0.1:54492	0	f
+1	2016-10-25 14:27:09.38286+10:30	127.0.0.1:57738	0	f
+1	2016-10-25 14:51:04.575773+10:30	127.0.0.1:59808	0	f
+1	2016-10-25 14:51:16.303247+10:30	127.0.0.1:59842	0	f
+2	2016-10-25 14:05:52.175623+10:30	192.168.1.105:50657	0	f
+1	2016-10-25 14:22:51.289787+10:30	127.0.0.1:57428	0	f
+1	2016-10-25 15:14:52.436066+10:30	127.0.0.1:33424	0	f
+1	2016-10-25 15:14:57.533573+10:30	127.0.0.1:33452	0	f
 \.
 
 
@@ -3927,7 +4133,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 -- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('unit_id_seq', 1949, true);
+SELECT pg_catalog.setval('unit_id_seq', 2053, true);
 
 
 --
@@ -3943,8 +4149,8 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 --
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
-2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	1	192.168.1.105:43520	Australia	http://witchwoodstudio.com		f	f	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	3	127.0.0.1:33778	Australia	15mm-madness.blogspot.com		f	f	t
+2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:50657	Australia	http://witchwoodstudio.com		f	f	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:34278	Australia	15mm-madness.blogspot.com		f	f	t
 \.
 
 

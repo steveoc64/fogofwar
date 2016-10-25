@@ -24,7 +24,7 @@ COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name,
 -- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_id_seq', 11, true);
+SELECT pg_catalog.setval('game_id_seq', 13, true);
 
 
 --

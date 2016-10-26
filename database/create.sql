@@ -543,5 +543,22 @@ create table contact_message (
 );
 create index contact_user_idx on contact_message (user_id, date);
 
-
+drop table if exists paypal;
+create table paypal (
+	id serial not null primary key,
+	payment_id text not null default '',
+	payer_id text not null default '',
+	token text not null default '',
+	amount numeric(8,2) not null default 0,
+	created timestamptz not null default localtimestamp,
+	user_id int not null default 0,
+	channel int not null default 0,
+	sale_id text not null default '',
+	approved bool not null default false,
+	descr text not null default '',
+	rank int not null default 1,
+	months int not null default 1,
+	end_date date not null
+);
+create unique index paypal_payment_idx on paypal (payment_id);
 

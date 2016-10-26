@@ -39,4 +39,9 @@ func registerRPC() {
 	}
 	log.Println("» Game")
 
+	if err := rpc.Register(new(PaypalRPC)); err != nil {
+		log.Fatal(err)
+	}
+	log.Println("» Paypal")
+
 }

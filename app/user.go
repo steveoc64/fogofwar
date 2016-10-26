@@ -386,31 +386,7 @@ func userSettings(context *router.Context) {
 		RPC("UserRPC.Me", Session.Channel, &user)
 		form := formulate.EditForm{}
 
-		// Layout the fields
-
-		// title := fmt.Sprintf("Account Settings - %s <img src=https://www.gravatar.com/avatar/%s>",
-		// 	user.Username, "205e460b479e2e5b48aec07710c08d50")
-
 		form.New("fa-cog", "Account Settings - "+user.Username)
-
-		// 	Username     string     `db:"username"`
-		// 	Name         string     `db:"name"`
-		// 	Passwd       string     `db:"passwd"`
-		// 	Email        string     `db:"email"`
-		// 	Rank         int        `db:"rank"`
-		// 	Notes        string     `db:"notes"`
-		// 	Country      string     `db:"country"`
-		// 	Bloglink     string     `db:"bloglink"`
-		// 	Channel      int        `db:"channel"`
-		// 	IPAddress    string     `db:"ip_address"`
-		// 	Created      *time.Time `db:"created"`
-		// 	Expires      *time.Time `db:"expires"`
-		// 	Banned       bool       `db:"banned"`
-		// 	Disqus       bool       `db:"disqus"`
-		// 	Newsletter   bool       `db:"newsletter"`
-		// 	NumScenarios int        `db:"num_scenarios"`
-		// 	NumGames     int        `db:"num_games"`
-		// }
 
 		form.Row(4).
 			AddInput(2, "Full Name", "Name").
@@ -496,6 +472,39 @@ func userSettings(context *router.Context) {
 		formulate.AppendDiv("pricing-table")
 		loadTemplate("pricing-table", "#pricing-table", true)
 
+		doc.QuerySelector("[name=buy-commission-2]").AddEventListener("click", false, func(evt dom.Event) {
+			print("buy commission 2")
+			pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
+			if pp != nil {
+				pp.Class().Remove("hidden")
+				go func() {
+					url := ""
+					err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
+						Channel: Session.Channel,
+						Months:  1,
+						Rank:    2,
+						Descr:   "ActionFront Colonels Commission (1 Month)",
+					}, &url)
+					if err != nil {
+						dom.GetWindow().Alert("ERROR: " + err.Error())
+						pp.Class().Add("hidden")
+					} else {
+						pp.Class().Remove("hidden")
+						print("set url to ", url)
+						pp.Src = url
+					}
+				}()
+			}
+		})
+
+		doc.QuerySelector("[name=buy-commission-3]").AddEventListener("click", false, func(evt dom.Event) {
+			print("buy commission 3")
+		})
+
+		doc.QuerySelector("[name=buy-commission-4]").AddEventListener("click", false, func(evt dom.Event) {
+			print("buy commission 4")
+		})
+
 	}()
 }
 
@@ -551,51 +560,4 @@ func contactForm(context *router.Context) {
 
 func inviteFriend(context *router.Context) {
 	print("TODO - inviteFriend, not so straight fwd")
-
-	// go func() {
-	// 	data := shared.ContactMessage{}
-
-	// 	form := formulate.EditForm{}
-
-	// 	// Layout the fields
-
-	// 	form.New("fa-gift", "Invite Friends to Join ActionFront")
-
-	// 	form.Row(1).
-	// 		AddInput(1, "Email", "EmailTo")
-
-	// 	form.Row(1).
-	// 		AddBigTextarea(1, "Message", "Message")
-
-	// 	// Add event handlers
-	// 	form.CancelEvent(func(evt dom.Event) {
-	// 		evt.PreventDefault()
-	// 		Session.Back()
-	// 	})
-
-	// 	form.SaveEvent(func(evt dom.Event) {
-	// 		evt.PreventDefault()
-
-	// 		go func() {
-	// 			form.Bind(&data)
-	// 			newID := 0
-	// 			err := RPC("UserRPC.Contact", shared.ContactMessageRPCData{
-	// 				Channel:        Session.Channel,
-	// 				ContactMessage: &data,
-	// 			}, &newID)
-	// 			if err != nil {
-	// 				dom.GetWindow().Alert(err.Error())
-	// 			} else {
-	// 				dom.GetWindow().Alert("Thanks .. Your message has been sent, will get back to you ASAP.")
-	// 				Session.Back()
-	// 			}
-	// 		}()
-	// 	})
-
-	// 	// All done, so render the form
-	// 	form.Render("edit-form", "main", &data)
-	// 	form.Focus("Subject")
-
-	// }()
-
 }

@@ -282,6 +282,25 @@ func grid1() {
 		Session.Navigate("/signin")
 	})
 
+	doc.QuerySelector("[name=account_1]").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signup")
+	})
+	doc.QuerySelector("[name=buy-commission-2]").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signup")
+	})
+	doc.QuerySelector("[name=buy-commission-3]").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signup")
+	})
+	doc.QuerySelector("[name=buy-commission-4]").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/signup")
+	})
+
+	w.ScrollTo(0, 0)
+
 }
 
 func signUp(context *router.Context) {

@@ -71,11 +71,11 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 			and ((lower(username) = lower($1) and lower(passwd) = lower($2))
 			or (lower(email) = lower($1) and lower(passwd) = lower($2)))`, lc.Username, lc.Password).
 			QueryStruct(res)
-		println("attempt login with", lc.Username, lc.Password)
+		// println("attempt login with", lc.Username, lc.Password)
 		if err != nil {
 			println(err.Error())
 		} else {
-			println("here with no error so far")
+			// println("here with no error so far")
 		}
 
 		// println(`select
@@ -97,7 +97,7 @@ func (l *LoginRPC) Login(lc *shared.LoginCredentials, lr *shared.LoginReply) err
 		lr.MaxPlayers = 0
 
 		if err == nil {
-			println("lets chck the login table")
+			// println("lets chck the login table")
 			// So far so good - now, check that the user isn't already logged in somewhere else !!
 			count := 0
 			ipa := ""

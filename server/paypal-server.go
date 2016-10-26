@@ -1,23 +1,25 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
+	"time"
 
-	_ "github.com/lib/pq"
-	// "github.com/steveoc64/godev/config"
-
-	// _ "github.com/steveoc64/godev/sms"
-	// "github.com/steveoc64/godev/mail"
-
+	"../shared"
 	"github.com/labstack/echo"
-	// "github.com/facebookgo/grace/gracehttp"
+	_ "github.com/lib/pq"
 	paypalsdk "github.com/logpacker/PayPal-Go-SDK"
 )
 
 var PaypalLog *os.File
 var PaypalClient *paypalsdk.Client
+
+type PaypalRPC struct{}
+
+// var PaypalChannel = make(chan *PaypalTrans, 64)
 
 func ppgood(c echo.Context) error {
 	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Paypal Payer Auth")
@@ -43,79 +45,121 @@ func ppbad(c echo.Context) error {
 	return c.String(http.StatusOK, "Allrighty, that didnt seem to work")
 }
 
-func initPaypal(e *echo.Echo) {
+func InitPaypal(e *echo.Echo) error {
 
+	err := error(nil)
+
+	PaypalLog, err = os.OpenFile("../paypal/paypal.log", os.O_RDWR|os.O_APPEND, os.FileMode(0666))
+	if err != nil {
+		fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())
+		println(err.Error())
+		return err
+	}
+
+	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Payments List")
+
+	// Backend hooks to get authorization calls from Paypal
 	e.Get("/ppgood", ppgood)
 	e.Get("/ppbad", ppbad)
 
 	println("start paypal on", paypalsdk.APIBaseSandBox)
-	// signature := "AFcWxV21C7fd0v3bYYYRCpSSRl31AqlCascQRSNTHZUg6EPMCm0.AmVB"
-	// passwd := "84RAA33ZG6HQQJAV"
-	// username := "steveoc64-facilitator_api1.gmail.com"
+	fmt.Fprintf(PaypalLog, "Using API %s\n", paypalsdk.APIBaseSandBox)
 
-	// actionfront
-	err := error(nil)
+	// actionfront-test
 	clientID := "AX3Vgalci6rBVtX8T4FjtHup5OhTajVSczmH8G0nJr3v8vxoQusA1lxDzhnddYjHBclom61vUucmEbZT"
 	secret := "EGtqUYvZh4A85FF0pC_Rl82yJg7xVb6_115k0dDrEaGSayJHgLfw1U7vzKZxw49PeRXWbqGebVaFsi45"
-	PaypalClient, err = paypalsdk.NewClient(clientID, secret, paypalsdk.APIBaseSandBox)
 
-	println("got paypal connection", PaypalClient)
-	// PaypalLog, pperr := os.OpenFile("../paypal/paypal.log", os.O_RDWR|os.O_APPEND, os.FileMode(0666))
-	PaypalLog, err = os.Create("../paypal/paypal.log")
-	if err != nil {
-		print(err.Error())
-	}
-	PaypalClient.SetLog(PaypalLog) // Set log to terminal stdout
-	fmt.Fprintf(PaypalLog, "Getting access token for %v\n", PaypalClient)
-	accessToken, err := PaypalClient.GetAccessToken()
-	fmt.Fprintf(PaypalLog, "accesstoken is %v\n", accessToken)
+	PaypalClient, err = paypalsdk.NewClient(clientID, secret, paypalsdk.APIBaseSandBox)
 	if err != nil {
 		println(err.Error())
+		return err
+	}
+	PaypalClient.SetLog(PaypalLog) // Set log to terminal stdout
+
+	accessToken, err := PaypalClient.GetAccessToken()
+	fmt.Fprintf(PaypalLog, "AccessToken is %v\n", accessToken)
+	if err != nil {
+		println(err.Error())
+		return err
 	}
 
-	// payment, err := c.GetPayment("PAY-TEST-123")
-	// fmt.Fprintln(PaypalLog, "DEBUG: PaymentID="+payment.ID)
-
-	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Payments List")
-	payments, err := PaypalClient.GetPayments()
-	if err == nil {
-		fmt.Fprintf(PaypalLog, "DEBUG: PaymentsCount=%d\n", len(payments))
-	} else {
-		fmt.Fprintln(PaypalLog, "ERROR: "+err.Error())
-	}
-
+	return nil
 }
 
-func PaypalPayment(value int, descr string) {
+func (p *PaypalRPC) CreatePayment(data shared.PaypalRPCData, url *string) error {
+	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Direct Payment")
 
-	go func() {
-		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Direct Payment")
+	start := time.Now()
 
-		vstring := fmt.Sprintf("%0.2f", float64(value)/100.0)
-		fmt.Fprintf(PaypalLog, "Value from %d to %s\n", value, vstring)
+	conn := Connections.Get(data.Channel)
 
-		amount := paypalsdk.Amount{
-			Total:    vstring,
-			Currency: "USD",
-		}
+	value := "5.90"
+	switch data.Rank {
+	case 1:
+		return errors.New("Free Account - dont need to pay")
+	case 2:
+		value = "5.90"
+	case 3:
+		value = "9.90"
+	case 4:
+		value = "24.90"
+	}
 
-		redirectURI := "https://wargaming.io/ppgood"
-		cancelURI := "https://wargaming.io/ppbad"
-		paymentResult, err := PaypalClient.CreateDirectPaypalPayment(amount, redirectURI, cancelURI, descr)
-		if err != nil {
-			fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())
-			fmt.Printf("ERROR: %s\n", err.Error())
-		} else {
-			fmt.Printf("SUCCESS: ID %s\nLink to : %s\n%s\n",
-				paymentResult.ID,
-				paymentResult.Links[1].Rel,
-				paymentResult.Links[1].Href)
-			fmt.Fprintf(PaypalLog, "SUCCESS: ID %s\nLink to : %s\n%s\n",
-				paymentResult.ID,
-				paymentResult.Links[1].Rel,
-				paymentResult.Links[1].Href)
-		}
+	// vstring := fmt.Sprintf("%0.2f", float64(data.Value)/100.0)
+	// fmt.Fprintf(PaypalLog, "Value from %d to %s\n", value, vstring)
 
-	}()
+	amount := paypalsdk.Amount{
+		Total:    value,
+		Currency: "USD",
+	}
 
+	theAmount, err := strconv.ParseFloat(value, 64)
+	if err != nil {
+		println("OOPS - cant convert", value, "to float ???", err.Error())
+	}
+
+	redirectURI := "https://wargaming.io/ppgood"
+	cancelURI := "https://wargaming.io/ppbad"
+	// redirectURI := "http://localhost:8844/ppgood"
+	// cancelURI := "http://localhost:8844/ppbad"
+	paymentResult, err := PaypalClient.CreateDirectPaypalPayment(amount, redirectURI, cancelURI, data.Descr)
+
+	if err != nil {
+		fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())
+		fmt.Printf("ERROR: %s\n", err.Error())
+	} else {
+		fmt.Printf("SUCCESS: ID %s\nLink to : %s\n%s\n",
+			paymentResult.ID,
+			paymentResult.Links[1].Rel,
+			paymentResult.Links[1].Href)
+		fmt.Fprintf(PaypalLog, "SUCCESS: ID %s\nLink to : %s\n%s\n",
+			paymentResult.ID,
+			paymentResult.Links[1].Rel,
+			paymentResult.Links[1].Href)
+		*url = paymentResult.Links[1].Href
+
+		// Save it into the database
+		newID := 0
+		interval := fmt.Sprintf("%d months", data.Months)
+
+		err = DB.SQL(`insert into paypal
+			(payment_id,amount,user_id,channel,descr,rank,months,end_date)
+			values
+			($1,$2,$3,$4,$5,$6,$7,current_date + interval $8)
+			returning id`,
+			paymentResult.ID,
+			theAmount,
+			conn.UserID,
+			data.Channel,
+			data.Descr,
+			data.Rank,
+			data.Months,
+			interval).QueryScalar(&newID)
+	}
+
+	logger(start, "Paypal.CreatePayment", conn,
+		fmt.Sprintf("%s Rank %d USD %s", data.Descr, data.Rank, value),
+		fmt.Sprintf("Redirect to %s", *url))
+
+	return err
 }

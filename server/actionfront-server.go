@@ -135,11 +135,11 @@ func main() {
 	// kick off a database backup every 24hrs
 	go autoBackup()
 
-	initPaypal(e)
-	PaypalPayment(590, "1 Month Colonels Commission")
+	InitPaypal(e)
+	// PaypalPayment(590, "1 Month Colonels Commission")
 
 	errRun := e.Run(std)
-	println("done", errRun.Error())
+	println("ActionFront Server All Done", errRun.Error())
 
 	// std.SetHandler(e)
 	// gracehttp.Serve(std.Server)

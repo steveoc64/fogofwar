@@ -20,13 +20,14 @@ var PaypalLog *os.File
 var PaypalClient *paypalsdk.Client
 
 func ppgood(c echo.Context) error {
-	fmt.Fprintf(PaypalLog, "Got PPGOOD\n")
+	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Paypal Payer Auth")
 	// /ppgood?paymentId=PAY-7873106948388592NLAIH3QQ&token=EC-9CT45881F61289818&PayerID=ZUN5TQSFBBM46 HTTP/1.1" 200 35 "https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=EC-9CT45881F61289818"
 
 	id := c.QueryParam("paymentId")
 	token := c.QueryParam("token")
 	payerID := c.QueryParam("PayerID")
 	fmt.Fprintf(PaypalLog, "PaymentID %s\nToken %s\nPayerID %s\n", id, token, payerID)
+	fmt.Printf("PaymentID %s\nToken %s\nPayerID %s\n", id, token, payerID)
 	return c.String(http.StatusOK, "Thanks, that seemed to work")
 }
 
@@ -52,9 +53,9 @@ func initPaypal(e *echo.Echo) {
 
 	println("got paypal connection", PaypalClient)
 	// PaypalLog, pperr := os.OpenFile("../paypal/paypal.log", os.O_RDWR|os.O_APPEND, os.FileMode(0666))
-	PaypalLog, pperr := os.Create("../paypal/paypal.log")
-	if pperr != nil {
-		print(pperr.Error())
+	PaypalLog, err = os.Create("../paypal/paypal.log")
+	if err != nil {
+		print(err.Error())
 	}
 	PaypalClient.SetLog(PaypalLog) // Set log to terminal stdout
 	fmt.Fprintf(PaypalLog, "Getting access token for %v\n", PaypalClient)
@@ -97,12 +98,14 @@ func PaypalPayment(value int, descr string) {
 			fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())
 			fmt.Printf("ERROR: %s\n", err.Error())
 		} else {
-			fmt.Printf("SUCCESS: ID %d\nLink to : %s\n",
+			fmt.Printf("SUCCESS: ID %s\nLink to : %s\n%s\n",
 				paymentResult.ID,
-				paymentResult.Links[1])
-			fmt.Fprintf(PaypalLog, "SUCCESS: ID %d\nLink to : %s\n",
+				paymentResult.Links[1].Rel,
+				paymentResult.Links[1].Href)
+			fmt.Fprintf(PaypalLog, "SUCCESS: ID %s\nLink to : %s\n%s\n",
 				paymentResult.ID,
-				paymentResult.Links[1])
+				paymentResult.Links[1].Rel,
+				paymentResult.Links[1].Href)
 		}
 
 	}()

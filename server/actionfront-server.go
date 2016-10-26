@@ -135,7 +135,9 @@ func main() {
 	// kick off a database backup every 24hrs
 	go autoBackup()
 
-	go initPaypal()
+	initPaypal(e)
+	PaypalPayment(590, "1 Month Colonels Commission")
+
 	errRun := e.Run(std)
 	println("done", errRun.Error())
 
@@ -144,6 +146,6 @@ func main() {
 
 }
 
-func initPaypal_stub() {
-	print("this is a stub ... replace with the real one, but Im not putting the code for that in the github repo for now")
-}
+// func initPaypal_stub() {
+// 	print("this is a stub ... replace with the real one, but Im not putting the code for that in the github repo for now")
+// }

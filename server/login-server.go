@@ -324,7 +324,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 	if Config.MailServer != "" {
 
 		m := NewMail()
-		m.SetHeader("From", "ActionFront <welcome@wargaming.io>")
+		m.SetHeader("From", "ActionFront <actionfront@wargaming.io>")
 		m.SetHeader("To", u.Email)
 		m.SetHeader("Bcc", "steveoc64@gmail.com")
 		m.SetHeader("Subject", "Welcome to ActionFront")

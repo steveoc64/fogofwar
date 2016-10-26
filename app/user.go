@@ -498,3 +498,104 @@ func userSettings(context *router.Context) {
 
 	}()
 }
+
+func contactForm(context *router.Context) {
+
+	go func() {
+		data := shared.ContactMessage{}
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-envelope", "Contact Form - Contact Site Admin")
+
+		form.Row(1).
+			AddInput(1, "Subject", "Subject")
+
+		form.Row(1).
+			AddBigTextarea(1, "Message", "Message")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Back()
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+
+			go func() {
+				form.Bind(&data)
+				newID := 0
+				err := RPC("UserRPC.Contact", shared.ContactMessageRPCData{
+					Channel:        Session.Channel,
+					ContactMessage: &data,
+				}, &newID)
+				if err != nil {
+					dom.GetWindow().Alert(err.Error())
+				} else {
+					dom.GetWindow().Alert("Thanks .. Your message has been sent, will get back to you ASAP.")
+					Session.Back()
+				}
+			}()
+		})
+
+		// All done, so render the form
+		form.Render("edit-form", "main", &data)
+		form.Focus("Subject")
+
+	}()
+
+}
+
+func inviteFriend(context *router.Context) {
+	print("TODO - inviteFriend, not so straight fwd")
+
+	// go func() {
+	// 	data := shared.ContactMessage{}
+
+	// 	form := formulate.EditForm{}
+
+	// 	// Layout the fields
+
+	// 	form.New("fa-gift", "Invite Friends to Join ActionFront")
+
+	// 	form.Row(1).
+	// 		AddInput(1, "Email", "EmailTo")
+
+	// 	form.Row(1).
+	// 		AddBigTextarea(1, "Message", "Message")
+
+	// 	// Add event handlers
+	// 	form.CancelEvent(func(evt dom.Event) {
+	// 		evt.PreventDefault()
+	// 		Session.Back()
+	// 	})
+
+	// 	form.SaveEvent(func(evt dom.Event) {
+	// 		evt.PreventDefault()
+
+	// 		go func() {
+	// 			form.Bind(&data)
+	// 			newID := 0
+	// 			err := RPC("UserRPC.Contact", shared.ContactMessageRPCData{
+	// 				Channel:        Session.Channel,
+	// 				ContactMessage: &data,
+	// 			}, &newID)
+	// 			if err != nil {
+	// 				dom.GetWindow().Alert(err.Error())
+	// 			} else {
+	// 				dom.GetWindow().Alert("Thanks .. Your message has been sent, will get back to you ASAP.")
+	// 				Session.Back()
+	// 			}
+	// 		}()
+	// 	})
+
+	// 	// All done, so render the form
+	// 	form.Render("edit-form", "main", &data)
+	// 	form.Focus("Subject")
+
+	// }()
+
+}

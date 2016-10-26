@@ -202,3 +202,45 @@ func (u *UserRPC) GetIDByName(data shared.UserRPCData, retval *int) error {
 
 	return err
 }
+
+func (u *UserRPC) Contact(data shared.ContactMessageRPCData, retval *int) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	// Lookup the user
+	user := shared.User{}
+	DB.SQL(`select email from users where id=$1`, conn.UserID).QueryStruct(&user)
+
+	*retval = 0
+
+	err := DB.SQL(`insert into contact_message
+		(user_id, subject, message) 
+		values ($1, $2, $3)
+		returning id`, conn.UserID, data.ContactMessage.Subject, data.ContactMessage.Message).
+		QueryScalar(retval)
+
+	if Config.MailServer != "" {
+
+		m := NewMail()
+		m.SetHeader("From", "ActionFront <actionfront@wargaming.io>")
+		m.SetHeader("To", "steveoc64@gmail.com")
+		m.SetHeader("Subject", "ActionFront ContactForm Msg")
+		m.SetBody("text/html", fmt.Sprintf(`From: User %d<br>
+Username: %s<br>
+Email: %s<br>
+Subject: %s <br>
+Message: <br>
+
+%s<br>
+`, conn.UserID, conn.Username, user.Email, data.ContactMessage.Subject, data.ContactMessage.Message))
+
+		MailChannel <- m
+	}
+
+	logger(start, "User.Contact", conn,
+		fmt.Sprintf("%s", data.ContactMessage.Subject),
+		fmt.Sprintf("MsgID: %d", *retval))
+
+	return err
+}

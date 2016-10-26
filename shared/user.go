@@ -126,3 +126,17 @@ type UserOnline struct {
 	Duration string   `db:"duration"`
 	Channel  int      `db:"channel"`
 }
+
+type ContactMessage struct {
+	ID      int    `db:"id"`
+	RefID   int    `db:"ref_id"`
+	UserID  int    `db:"user_id"`
+	Subject string `db:"subject"`
+	Message string `db:"message"`
+}
+
+type ContactMessageRPCData struct {
+	Channel        int
+	ID             int
+	ContactMessage *ContactMessage
+}

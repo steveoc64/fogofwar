@@ -52,6 +52,8 @@ func enableRoutes(Rank int) {
 		"settings":            userSettings,
 		"usersonline":         usersOnline,
 		"manual":              manual,
+		"contact":             contactForm,
+		"invite":              inviteFriend,
 		"scenarios":           scenarioList,
 		"scenario-add":        scenarioAdd,
 		"scenario-fork":       scenarioFork,
@@ -68,6 +70,7 @@ func enableRoutes(Rank int) {
 		"game-edit-blue":      gameEditBlue,
 		"game-edit-table":     gameEditTable,
 		"game-edit-players":   gameEditPlayers,
+		"unit-inspection":     unitInspection,
 	}
 	switch Rank {
 	case 10:

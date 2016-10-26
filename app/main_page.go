@@ -41,8 +41,10 @@ func _mainPage(action string, id int, context *router.Context) {
 		formInvite.Column("Players", "GetPlayers")
 		formInvite.Column("Turn", "Turn")
 		formInvite.Column("Turn Limit", "TurnLimit")
-		formInvite.DateColumn("Start Date", "StartDate")
-		formInvite.DateColumn("End Date", "Expires")
+		if !Session.Mobile() {
+			formInvite.DateColumn("Start Date", "StartDate")
+			formInvite.DateColumn("End Date", "Expires")
+		}
 
 		// formulate.MainContainer("wide-container")
 		// formInvite.Render("game-invites-list", "#main-container", &invites)

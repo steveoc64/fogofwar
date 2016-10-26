@@ -94,10 +94,10 @@ func Login(username string, passwd string) {
 			evt.PreventDefault()
 			Session.Navigate("/")
 		})
-		doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			print("TODO - Invite")
-		})
+		// doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
+		// 	evt.PreventDefault()
+		// 	Session.Navigate("/invite")
+		// })
 		doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
 			loc := dom.GetWindow().Location()
@@ -105,7 +105,7 @@ func Login(username string, passwd string) {
 		})
 		doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
-			print("TODO - Contact")
+			Session.Navigate("/contact")
 		})
 
 		doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
@@ -237,7 +237,7 @@ func loginForm() {
 		grid1()
 	})
 
-	doc.QuerySelector(".embedly-card").Class().Add("hidden")
+	// doc.QuerySelector(".embedly-card").Class().Add("hidden")
 }
 
 func grid1() {

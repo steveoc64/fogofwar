@@ -20,6 +20,7 @@ import (
 	runner "gopkg.in/mgutz/dat.v1/sqlx-runner"
 
 	// "github.com/facebookgo/grace/gracehttp"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -134,10 +135,15 @@ func main() {
 	// kick off a database backup every 24hrs
 	go autoBackup()
 
+	go initPaypal()
 	errRun := e.Run(std)
 	println("done", errRun.Error())
 
 	// std.SetHandler(e)
 	// gracehttp.Serve(std.Server)
 
+}
+
+func initPaypal_stub() {
+	print("this is a stub ... replace with the real one, but Im not putting the code for that in the github repo for now")
 }

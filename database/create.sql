@@ -531,7 +531,17 @@ create unlogged table unit (
 create index unit_cmd_idx on unit (cmd_id);
 create index unit_game_idx on unit (game_id);
 
-
+drop table if exists contact_message;
+create table contact_message (
+	id serial not null primary key,
+	user_id int,
+	date timestamptz not null default localtimestamp,
+	ref_id int,
+	email_to text not null default '',
+	subject text not null default '',
+	message text not null default ''
+);
+create index contact_user_idx on contact_message (user_id, date);
 
 
 

@@ -508,3 +508,7 @@ func gameEditTeam(context *router.Context) {
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 	}()
 }
+
+func unitInspection(context *router.Context) {
+	print("TODO - unitInspection")
+}

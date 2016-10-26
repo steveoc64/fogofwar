@@ -37,10 +37,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 253	13	2nd_Div	2nd Div		von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 261	14	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
 232	10	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
-237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
-236	10	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f
 240	10	3rd_Div.Lt_Bty	Lt Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f
-222	10	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f
 248	13	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			Prussia	2	4	1	2400	1	0	0	1	2	0	0	0	2	4	1	f
 262	14	Supply_Train.Guard_Detachment	Guard Detachment				5	6	8	300	1	2	4	0	10	60	12	7	0	0	0	f
 990	77	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
@@ -63,6 +60,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 38	1	Guard_Artillery	Guard Artillery		de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 47	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 1275	94	Infanterie_de_la_garde.Bde_Soules	Bde Soulès	1°/2° Rgt. de chasseurs à pied de la Garde impériale		France	2	4	6	1800	1	0	0	0	1	0	0	0	0	0	0	f
+237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	2	1	0	5	0	0	0	2	4	4	f
 46	1	Infantry_Division.Foot_Dragoons	Foot Dragoons			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 53	3	1eme_Division.13e_Legere	13e Legere			France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f
 52	3	1eme_Division	1eme Division		Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -86,7 +84,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 11	2	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
 12	2	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 6	2	1eme_Division	1eme Division		de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-10	2	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
 7	2	2eme_Division	2eme Division		Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 91	4	2eme_Division.28e_Ligne	28e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
 79	4	1eme_Division.35e_Ligne	35e Ligne			France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
@@ -111,6 +108,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 95	4	3eme_Division.26e_Legere	26e Legere			France	2	4	6	1600	1	0	0	0	3	0	0	0	0	0	0	f
 78	4	1eme_Division.10e_Legere	10e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
 92	4	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
+10	2	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	2	1	0	5	0	0	0	0	0	0	f
 5	1	Cavalry_Division	Cavalry Division		Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
 106	5	Cav_Bde	Cav Bde		Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1002	78	2eme_Division.4e_Ligne	4e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
@@ -206,7 +204,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 161	8	Corps_Artillery.2e_Horse	2e Horse				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 216	11	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f
 265	11	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f
-217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f
 1010	78	Corps_Cavaly	Corps Cavaly		Guyot	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1011	78	3eme_Division	3eme Division		LeGrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 179	8	4e_Dragoon_Div.Bde_Margaron	Bde Margaron	17th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 27th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		France	3	4	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
@@ -217,7 +214,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1015	78	Corps_Artillery	Corps Artillery			France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1016	78	Corps_Cavaly.11e_Chasseur	11e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
 246	10	Reserve_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f
-223	10	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f
 243	10	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f
 242	10	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f
 227	10	1st_Div.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
@@ -232,19 +228,16 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1024	79	1eme_Division	1eme Division		Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1025	79	1eme_Division.17e_Legere	17e Legere			France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f
 255	13	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-230	10	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f
 256	13	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 257	13	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 258	13	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 252	13	1st_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
 259	13	2nd_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
 254	13	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-229	10	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f
 234	10	2nd_Div.Horse_Bty	Horse Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 37	2	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 50	1	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery				4	1	0	0	0	0	0	0	4	0	0	0	24	3	1	f
 58	3	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-16	2	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f
 32	2	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 100	4	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 73	3	Corps_Artillery.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
@@ -328,27 +321,20 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1073	81	Corps_Artillery.1e_Horse	1e Horse				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 1074	81	Corps_Artillery.2e_Horse	2e Horse				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 1075	82	2nd_Div.Horse_Bty	Horse Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-1076	82	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f
-1077	82	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f
 1078	82	1st_Div.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1079	82	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f
 1080	82	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f
-1081	82	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f
 1082	82	Reserve_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f
 1083	82	3rd_Div	3rd Div		Tauentzein	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1084	82	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			Prussia	3	4	0	0	0	0	0	0	3	700	2	4	0	0	0	f
 1085	82	3rd_Div.Rosen_Fusilers	Rosen Fusilers			Prussia	2	4	9	400	1	0	0	2	5	0	0	0	0	0	0	f
-1086	82	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
-1087	82	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f
 1088	82	1st_Div	1st Div		Grawert	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1089	82	3rd_Div.Lt_Bty	Lt Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f
 1090	82	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f
-1091	82	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f
 1092	82	Reserve_Div	Reserve Div		Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1093	82	Reserve_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
 1094	82	1st_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f
 1095	82	1st_Div.Bde_Henkel	Bde Henkel			Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f
-1096	82	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	0	2	0	5	0	0	0	0	0	0	f
 1097	82	2nd_Div	2nd Div		Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1098	82	1st_Div.Erichsen_Fusilers	Erichsen Fusilers				2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f
 1099	82	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
@@ -356,7 +342,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1101	83	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		Saxony	3	1	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
 1102	83	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f
 1103	83	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f
-1104	83	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f
+1076	82	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	2	1	0	4	0	0	0	1	4	3	f
+1077	82	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	2	1	0	4	0	0	0	2	4	3	f
+1081	82	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
 1105	83	Adv_Guard_Div	Adv Guard Div		Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1106	85	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 1107	85	2nd_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
@@ -410,7 +398,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1155	87	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	4	1	t
 1156	88	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy				4	1	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 1157	88	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-1158	88	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f
 1159	88	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 1160	88	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 1161	88	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
@@ -421,7 +408,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1166	88	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
 1167	88	1eme_Division	1eme Division		de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1168	88	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-1169	88	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
 1170	88	Cav_Reserve	Cav Reserve		Tilley	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1171	88	Cav_Reserve.2e_Hussar	2e Hussar			France	3	4	0	0	0	0	0	0	3	300	2	3	0	0	0	f
 1172	88	Cav_Reserve.4e_Hussar	4e Hussar			France	3	1	0	0	0	0	0	0	3	422	2	4	0	0	0	f
@@ -478,6 +464,8 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1278	94	Division_de_cavalerie_de_la_Garde	Division de cavalerie de la Garde		Walther		1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 1283	94	Artillerie	Artillerie			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1279	94	Division_de_cavalerie_de_la_Garde.Brigade_de_Vieille_Garde_Lepic	Brigade de Vieille Garde Lepic	Grenadiers à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	900	8	1	0	0	0	f
+1236	12	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		Prussia	3	4	0	0	0	0	0	0	3	1500	5	4	6	4	3	f
+222	10	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	2	1	0	4	0	0	0	2	4	3	f
 1357	96	Div_DHautpoul.5e_Rgt_de_Cuirassiers	5° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
 1349	96	Div_Grouchy.2e_Co_2e_dArt_a_cheval	2° Co. 2° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
 1351	96	Div_Grouchy.6e_Rgt_de_Dragons	6° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	487	5	4	0	0	0	f
@@ -490,12 +478,25 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1356	96	Div_DHautpoul.11e_Rgt_de_Cuirassiers	11° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	3	0	0	0	f
 1355	96	Div_DHautpoul.10e_Rgt_de_Cuirassiers	10° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
 1358	96	Div_DHautpoul.1e_Rgt_de_Cuirassiers	1° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
+236	10	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+223	10	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+230	10	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	2	1	0	4	0	0	0	2	4	3	f
+229	10	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	2	1	0	4	0	0	0	1	4	3	f
+16	2	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	2	2	0	5	0	0	0	0	4	0	f
 1291	94	Artillerie.Foot_Bty_2	Foot Bty 2	6° Co. 1° d’Art. de Pied		France	4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 1359	97	Div_Leval	Div Leval		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1360	97	Div_Legrand	Div Legrand		Legrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1361	97	Div_Leval.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
 1362	97	Div_Leval.13e_Co_5e_dArt_de_Pied	13° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1363	97	Div_Leval.Bde_Ferey	Bde Férey	46° Rgt. d’infanterie de ligne [2 bat.]  57° Rgt. d’infanterie de ligne [2 bat.]		France	2	4	5	3900	1	0	0	0	4	0	0	0	0	0	0	f
+1086	82	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	2	1	0	5	0	0	0	2	4	4	f
+1091	82	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	2	1	0	4	0	0	0	2	4	3	f
+1096	82	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	2	2	0	5	0	0	0	0	0	0	f
+1158	88	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	2	2	0	5	0	0	0	0	4	0	f
+1169	88	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	2	1	0	5	0	0	0	0	0	0	f
+217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	2	1	0	5	0	0	0	6	4	3	f
+1087	82	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+1104	83	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	2	1	0	5	0	0	0	6	4	3	f
 4	1	Infantry_Division	Infantry Division		Lefebvre	France	1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 1326	95	Bde_Durosnel	Bde Durosnel		Durosnel	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1327	95	Bde_Bruyeres	Bde Bruyères		Bruyères	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -548,7 +549,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1243	92	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1244	92	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1232	12	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		Prussia	3	4	0	0	0	0	0	0	3	1800	1	2	0	0	0	f
-1236	12	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		Prussia	3	4	0	0	0	0	0	0	3	1500	5	4	6	4	0	f
+231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	2	2	2	5	0	0	0	0	0	0	f
 1225	12	Cav_Bde_Blucher.Schorlemmer	Schorlemmer	Schorlemmer Horse Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	t
 180	8	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche	18th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 19th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		France	3	1	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
 1229	12	1st_Div.Willmann	Willmann	Willmann Horse Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	2	t
@@ -564,7 +565,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1238	92	Adv_Guard.Bde_von_Winning	Bde von Winning	Kaiserlingk Fusilier Battalion # 1 Bila Fusilier Battalion # 2 Tschammer Infantry Regiment # 27, two battalions Two Foot Jäger companies		Prussia	2	4	9	3600	1	3	0	2	4	0	0	0	8	3	3	f
 1227	12	1st_Div.Bde_von_Lutzow	Bde von Lützow	Knebel Grenadier Battalion Möllendorf Infantry Regiment # 25, two battalions Wartensleben Infantry Regiment # 59, two battalions		Prussia	2	4	1	4500	1	2	2	0	4	0	0	0	6	3	3	f
 1239	92	Adv_Guard.Bty_Nr_19	Bty Nr 19			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	0	2	2	5	0	0	0	0	0	0	f
 1242	92	Corps_de_Bataille	Corps de Bataille		General Karl August, Grand Duke of Saxe-Weimar-Eisenach	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1226	12	1st_Div.Bde_Prinz_Henry	Bde Prinz Henry	Rheinbaben Grenadier Battalion Prince Ferdinand Infantry Regiment # 34, two battalions Puttkammer Infantry Regiment # 36, two battalions		Prussia	2	4	1	4500	1	2	2	0	4	0	0	0	6	3	3	f
 1248	92	Corps_de_Bataille.Bailliodz_Cuirassier_Nr_5	Bailliodz Cuirassier Nr 5			Prussia	3	4	0	0	0	0	0	0	3	800	1	2	0	0	0	f
@@ -584,15 +584,12 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1260	93	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17			2	4	9	2700	1	0	0	-3	4	0	0	0	0	0	0	f
 1333	95	Bde_Guyot.8e_Rgt_de_hussards	8° Rgt. de hussards			France	3	4	0	0	0	0	0	0	3	391	2	3	0	0	0	f
 1317	101	2eme_Division.Foot_Bty	Foot Bty	One foot company armed with three 8-pound cannons and one howitzer		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	f
-1266	93	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		Prussia	2	4	1	5400	1	0	3	0	4	0	0	0	0	0	0	f
 1261	93	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		Prussia	3	4	0	0	0	0	0	0	3	300	5	4	0	0	0	f
-1269	93	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		Prussia	2	4	1	3600	1	0	2	0	4	0	0	0	0	0	0	f
 1267	93	1st_Div.Foot_Bti	Foot Bti			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
 1262	93	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	300	0	0	0	0	0	f
 1338	95	Bde_Guyot.4e_Co_5e_dArt_a_cheval	4° Co. 5° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
 1343	96	Div_DHautpoul	Div D’Hautpoul		D’Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1270	93	2nd_Div.Foot_Bty	Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
-1268	93	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		Prussia	2	4	1	1800	1	0	1	0	4	0	0	0	0	0	0	f
 1263	93	Adv_Guard.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	2	4	4	t
 1319	101	3eme_Division.Bde_Delabassee	Bde Delabassée	50th Line Infantry Regiment (two battalions, 1,547 men) 59th Line Infantry Regiment (two battalions, 1,621 men)		France	2	4	5	3200	1	0	0	0	4	0	0	0	0	0	0	f
 1272	93	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
@@ -611,6 +608,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1345	96	Div_Klein.1e_Rgt_de_Dragons	1° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	250	5	5	0	0	0	f
 1346	96	Div_Klein.2e_Rgt_de_Dragons	2° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	400	5	5	0	0	0	f
 1348	96	Div_Klein.14e_Rgt_de_Dragons	14° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	350	5	4	0	0	0	f
+1266	93	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		Prussia	2	4	1	5400	1	2	3	0	4	0	0	0	0	0	0	f
+1269	93	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		Prussia	2	4	1	3600	1	2	2	0	4	0	0	0	0	0	0	f
+1268	93	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		Prussia	2	4	1	1800	1	2	1	0	4	0	0	0	0	0	0	f
 \.
 
 

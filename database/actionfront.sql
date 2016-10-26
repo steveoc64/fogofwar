@@ -1741,10 +1741,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 253	13	2nd_Div	2nd Div		von Arnim	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 261	14	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
 232	10	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
-237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
-236	10	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f
 240	10	3rd_Div.Lt_Bty	Lt Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f
-222	10	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f
 248	13	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			Prussia	2	4	1	2400	1	0	0	1	2	0	0	0	2	4	1	f
 262	14	Supply_Train.Guard_Detachment	Guard Detachment				5	6	8	300	1	2	4	0	10	60	12	7	0	0	0	f
 990	77	Supply_Train	Supply Train		von Schulze	Prussia	1	6	1	0	0	0	0	0	5	0	0	0	0	0	2	f
@@ -1767,6 +1764,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 38	1	Guard_Artillery	Guard Artillery		de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 47	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 1275	94	Infanterie_de_la_garde.Bde_Soules	Bde Soulès	1°/2° Rgt. de chasseurs à pied de la Garde impériale		France	2	4	6	1800	1	0	0	0	1	0	0	0	0	0	0	f
+237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	2	1	0	5	0	0	0	2	4	4	f
 46	1	Infantry_Division.Foot_Dragoons	Foot Dragoons			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 53	3	1eme_Division.13e_Legere	13e Legere			France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f
 52	3	1eme_Division	1eme Division		Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -1790,7 +1788,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 11	2	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
 12	2	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
 6	2	1eme_Division	1eme Division		de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-10	2	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
 7	2	2eme_Division	2eme Division		Rivaud	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 91	4	2eme_Division.28e_Ligne	28e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
 79	4	1eme_Division.35e_Ligne	35e Ligne			France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
@@ -1815,6 +1812,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 95	4	3eme_Division.26e_Legere	26e Legere			France	2	4	6	1600	1	0	0	0	3	0	0	0	0	0	0	f
 78	4	1eme_Division.10e_Legere	10e Legere			France	2	4	6	1800	1	0	0	0	4	0	0	0	0	0	0	f
 92	4	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
+10	2	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	2	1	0	5	0	0	0	0	0	0	f
 5	1	Cavalry_Division	Cavalry Division		Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
 106	5	Cav_Bde	Cav Bde		Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1002	78	2eme_Division.4e_Ligne	4e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
@@ -1910,7 +1908,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 161	8	Corps_Artillery.2e_Horse	2e Horse				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 216	11	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f
 265	11	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f
-217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f
 1010	78	Corps_Cavaly	Corps Cavaly		Guyot	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1011	78	3eme_Division	3eme Division		LeGrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 179	8	4e_Dragoon_Div.Bde_Margaron	Bde Margaron	17th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 27th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		France	3	4	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
@@ -1921,7 +1918,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1015	78	Corps_Artillery	Corps Artillery			France	1	5	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1016	78	Corps_Cavaly.11e_Chasseur	11e Chasseur			France	3	4	0	0	0	0	0	0	3	600	3	4	0	0	0	f
 246	10	Reserve_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f
-223	10	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f
 243	10	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f
 242	10	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f
 227	10	1st_Div.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
@@ -1936,19 +1932,16 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1024	79	1eme_Division	1eme Division		Suchet	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1025	79	1eme_Division.17e_Legere	17e Legere			France	2	4	6	2100	1	0	0	0	3	0	0	0	0	0	0	f
 255	13	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-230	10	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f
 256	13	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 257	13	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 258	13	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			Prussia	2	1	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 252	13	1st_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
 259	13	2nd_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
 254	13	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
-229	10	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f
 234	10	2nd_Div.Horse_Bty	Horse Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 37	2	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 50	1	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery				4	1	0	0	0	0	0	0	4	0	0	0	24	3	1	f
 58	3	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
-16	2	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f
 32	2	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 100	4	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 73	3	Corps_Artillery.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
@@ -2032,27 +2025,20 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1073	81	Corps_Artillery.1e_Horse	1e Horse				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 1074	81	Corps_Artillery.2e_Horse	2e Horse				4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	t
 1075	82	2nd_Div.Horse_Bty	Horse Bty			Saxony	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-1076	82	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	0	1	0	4	0	0	0	1	4	3	f
-1077	82	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	0	1	0	4	0	0	0	2	4	3	f
 1078	82	1st_Div.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1079	82	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			Prussia	2	4	1	3300	1	0	0	2	4	0	0	0	2	4	3	f
 1080	82	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			Prussia	2	4	1	4200	1	0	0	2	4	0	0	0	2	4	3	f
-1081	82	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	3	f
 1082	82	Reserve_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	4	f
 1083	82	3rd_Div	3rd Div		Tauentzein	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1084	82	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			Prussia	3	4	0	0	0	0	0	0	3	700	2	4	0	0	0	f
 1085	82	3rd_Div.Rosen_Fusilers	Rosen Fusilers			Prussia	2	4	9	400	1	0	0	2	5	0	0	0	0	0	0	f
-1086	82	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	0	1	0	5	0	0	0	2	4	4	f
-1087	82	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	0	1	0	4	0	0	0	2	4	0	f
 1088	82	1st_Div	1st Div		Grawert	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1089	82	3rd_Div.Lt_Bty	Lt Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	f
 1090	82	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			Prussia	3	4	0	0	0	0	0	0	3	900	12	3	0	0	0	f
-1091	82	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	0	1	0	4	0	0	0	2	4	3	f
 1092	82	Reserve_Div	Reserve Div		Prittwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1093	82	Reserve_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	3	f
 1094	82	1st_Div.Heavy_Bty	Heavy Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	1	4	f
 1095	82	1st_Div.Bde_Henkel	Bde Henkel			Prussia	3	4	0	0	0	0	0	0	3	900	5	3	0	0	0	f
-1096	82	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	0	2	0	5	0	0	0	0	0	0	f
 1097	82	2nd_Div	2nd Div		Zechwitz	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1098	82	1st_Div.Erichsen_Fusilers	Erichsen Fusilers				2	4	9	700	1	0	0	1	5	0	0	0	0	0	0	f
 1099	82	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			Saxony	3	4	0	0	0	0	0	0	3	200	1	3	0	0	0	f
@@ -2060,7 +2046,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1101	83	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		Saxony	3	1	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
 1102	83	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		Prussia	3	4	0	0	0	0	0	0	3	1500	2	4	6	3	3	f
 1103	83	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		Prussia	2	4	9	2400	1	0	0	2	4	0	0	0	6	3	3	f
-1104	83	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	0	1	0	5	0	0	0	6	4	0	f
+1076	82	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	2	1	0	4	0	0	0	1	4	3	f
+1077	82	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	2	1	0	4	0	0	0	2	4	3	f
+1081	82	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
 1105	83	Adv_Guard_Div	Adv Guard Div		Ferdinand	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1106	85	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			Prussia	2	4	1	1800	1	0	0	1	4	0	0	0	2	4	1	f
 1107	85	2nd_Div.Md_Foot_Bty	Md Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	1	f
@@ -2114,7 +2102,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1155	87	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	4	1	t
 1156	88	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy				4	1	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 1157	88	3eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
-1158	88	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	0	2	0	5	0	0	0	0	4	0	f
 1159	88	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 1160	88	2eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
 1161	88	1eme_Division.Md_Foot_Bty	Md Foot Bty				4	4	0	0	0	0	0	0	0	0	0	0	8	3	3	f
@@ -2125,7 +2112,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1166	88	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	4	0	0	0	0	0	0	f
 1167	88	1eme_Division	1eme Division		de l'Eltang	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1168	88	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
-1169	88	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	0	1	0	5	0	0	0	0	0	0	f
 1170	88	Cav_Reserve	Cav Reserve		Tilley	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1171	88	Cav_Reserve.2e_Hussar	2e Hussar			France	3	4	0	0	0	0	0	0	3	300	2	3	0	0	0	f
 1172	88	Cav_Reserve.4e_Hussar	4e Hussar			France	3	1	0	0	0	0	0	0	3	422	2	4	0	0	0	f
@@ -2182,6 +2168,8 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1278	94	Division_de_cavalerie_de_la_Garde	Division de cavalerie de la Garde		Walther		1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 1283	94	Artillerie	Artillerie			France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1279	94	Division_de_cavalerie_de_la_Garde.Brigade_de_Vieille_Garde_Lepic	Brigade de Vieille Garde Lepic	Grenadiers à cheval de la Garde impériale		France	3	4	0	0	0	0	0	0	3	900	8	1	0	0	0	f
+1236	12	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		Prussia	3	4	0	0	0	0	0	0	3	1500	5	4	6	4	3	f
+222	10	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	2	1	0	4	0	0	0	2	4	3	f
 1357	96	Div_DHautpoul.5e_Rgt_de_Cuirassiers	5° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
 1349	96	Div_Grouchy.2e_Co_2e_dArt_a_cheval	2° Co. 2° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
 1351	96	Div_Grouchy.6e_Rgt_de_Dragons	6° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	487	5	4	0	0	0	f
@@ -2194,12 +2182,25 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1356	96	Div_DHautpoul.11e_Rgt_de_Cuirassiers	11° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	3	0	0	0	f
 1355	96	Div_DHautpoul.10e_Rgt_de_Cuirassiers	10° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
 1358	96	Div_DHautpoul.1e_Rgt_de_Cuirassiers	1° Rgt. de Cuirassiers			France	3	4	0	0	0	0	0	0	3	350	1	2	0	0	0	f
+236	10	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+223	10	1st_Div.von_Schimonsky	von Schimonsky			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+230	10	2nd_Div.von_Dyherrn	von Dyherrn			Saxony	2	4	3	4200	1	2	1	0	4	0	0	0	2	4	3	f
+229	10	2nd_Div.von_Burgsdorf	von Burgsdorf			Saxony	2	4	1	3400	1	2	1	0	4	0	0	0	1	4	3	f
+16	2	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	2	2	0	5	0	0	0	0	4	0	f
 1291	94	Artillerie.Foot_Bty_2	Foot Bty 2	6° Co. 1° d’Art. de Pied		France	4	1	0	0	0	0	0	0	4	0	0	0	8	3	2	f
 1359	97	Div_Leval	Div Leval		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1360	97	Div_Legrand	Div Legrand		Legrand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1361	97	Div_Leval.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
 1362	97	Div_Leval.13e_Co_5e_dArt_de_Pied	13° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1363	97	Div_Leval.Bde_Ferey	Bde Férey	46° Rgt. d’infanterie de ligne [2 bat.]  57° Rgt. d’infanterie de ligne [2 bat.]		France	2	4	5	3900	1	0	0	0	4	0	0	0	0	0	0	f
+1086	82	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	2	1	0	5	0	0	0	2	4	4	f
+1091	82	1st_Div.von_Mueffling	von Müffling			Prussia	2	4	1	3600	1	2	1	0	4	0	0	0	2	4	3	f
+1096	82	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	2	2	0	5	0	0	0	0	0	0	f
+1158	88	3eme_Division.27e_Legere	27e Legere		Drouet	France	2	4	6	1500	1	2	2	0	5	0	0	0	0	4	0	f
+1169	88	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	2	1	0	5	0	0	0	0	0	0	f
+217	11	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	2	1	0	5	0	0	0	6	4	3	f
+1087	82	3rd_Div.von_Zweiffel	von Zweiffel			Prussia	2	4	1	3400	1	2	1	0	4	0	0	0	2	4	3	f
+1104	83	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		Prussia/Saxony	2	4	1	5100	1	2	1	0	5	0	0	0	6	4	3	f
 4	1	Infantry_Division	Infantry Division		Lefebvre	France	1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
 1326	95	Bde_Durosnel	Bde Durosnel		Durosnel	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1327	95	Bde_Bruyeres	Bde Bruyères		Bruyères	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -2252,7 +2253,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1243	92	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1244	92	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1232	12	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		Prussia	3	4	0	0	0	0	0	0	3	1800	1	2	0	0	0	f
-1236	12	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		Prussia	3	4	0	0	0	0	0	0	3	1500	5	4	6	4	0	f
+231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	2	2	2	5	0	0	0	0	0	0	f
 1225	12	Cav_Bde_Blucher.Schorlemmer	Schorlemmer	Schorlemmer Horse Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	t
 180	8	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche	18th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 19th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		France	3	1	0	0	0	0	0	0	3	1200	5	5	0	0	0	f
 1229	12	1st_Div.Willmann	Willmann	Willmann Horse Bty		Prussia	4	4	0	0	0	0	0	0	4	0	0	0	6	4	2	t
@@ -2268,7 +2269,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1238	92	Adv_Guard.Bde_von_Winning	Bde von Winning	Kaiserlingk Fusilier Battalion # 1 Bila Fusilier Battalion # 2 Tschammer Infantry Regiment # 27, two battalions Two Foot Jäger companies		Prussia	2	4	9	3600	1	3	0	2	4	0	0	0	8	3	3	f
 1227	12	1st_Div.Bde_von_Lutzow	Bde von Lützow	Knebel Grenadier Battalion Möllendorf Infantry Regiment # 25, two battalions Wartensleben Infantry Regiment # 59, two battalions		Prussia	2	4	1	4500	1	2	2	0	4	0	0	0	6	3	3	f
 1239	92	Adv_Guard.Bty_Nr_19	Bty Nr 19			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
-231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	0	2	2	5	0	0	0	0	0	0	f
 1242	92	Corps_de_Bataille	Corps de Bataille		General Karl August, Grand Duke of Saxe-Weimar-Eisenach	Prussia	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1226	12	1st_Div.Bde_Prinz_Henry	Bde Prinz Henry	Rheinbaben Grenadier Battalion Prince Ferdinand Infantry Regiment # 34, two battalions Puttkammer Infantry Regiment # 36, two battalions		Prussia	2	4	1	4500	1	2	2	0	4	0	0	0	6	3	3	f
 1248	92	Corps_de_Bataille.Bailliodz_Cuirassier_Nr_5	Bailliodz Cuirassier Nr 5			Prussia	3	4	0	0	0	0	0	0	3	800	1	2	0	0	0	f
@@ -2288,15 +2288,12 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1260	93	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17			2	4	9	2700	1	0	0	-3	4	0	0	0	0	0	0	f
 1333	95	Bde_Guyot.8e_Rgt_de_hussards	8° Rgt. de hussards			France	3	4	0	0	0	0	0	0	3	391	2	3	0	0	0	f
 1317	101	2eme_Division.Foot_Bty	Foot Bty	One foot company armed with three 8-pound cannons and one howitzer		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	f
-1266	93	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		Prussia	2	4	1	5400	1	0	3	0	4	0	0	0	0	0	0	f
 1261	93	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		Prussia	3	4	0	0	0	0	0	0	3	300	5	4	0	0	0	f
-1269	93	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		Prussia	2	4	1	3600	1	0	2	0	4	0	0	0	0	0	0	f
 1267	93	1st_Div.Foot_Bti	Foot Bti			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
 1262	93	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	300	0	0	0	0	0	f
 1338	95	Bde_Guyot.4e_Co_5e_dArt_a_cheval	4° Co. 5° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
 1343	96	Div_DHautpoul	Div D’Hautpoul		D’Hautpoul	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1270	93	2nd_Div.Foot_Bty	Foot Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
-1268	93	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		Prussia	2	4	1	1800	1	0	1	0	4	0	0	0	0	0	0	f
 1263	93	Adv_Guard.Horse_Bty	Horse Bty			Prussia	4	4	0	0	0	0	0	0	4	0	0	0	2	4	4	t
 1319	101	3eme_Division.Bde_Delabassee	Bde Delabassée	50th Line Infantry Regiment (two battalions, 1,547 men) 59th Line Infantry Regiment (two battalions, 1,621 men)		France	2	4	5	3200	1	0	0	0	4	0	0	0	0	0	0	f
 1272	93	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			Prussia	3	4	0	0	0	0	0	0	3	1200	2	4	0	0	0	f
@@ -2315,6 +2312,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1345	96	Div_Klein.1e_Rgt_de_Dragons	1° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	250	5	5	0	0	0	f
 1346	96	Div_Klein.2e_Rgt_de_Dragons	2° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	400	5	5	0	0	0	f
 1348	96	Div_Klein.14e_Rgt_de_Dragons	14° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	350	5	4	0	0	0	f
+1266	93	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		Prussia	2	4	1	5400	1	2	3	0	4	0	0	0	0	0	0	f
+1269	93	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		Prussia	2	4	1	3600	1	2	2	0	4	0	0	0	0	0	0	f
+1268	93	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		Prussia	2	4	1	1800	1	2	1	0	4	0	0	0	0	0	0	f
 \.
 
 
@@ -2331,6 +2331,7 @@ SELECT pg_catalog.setval('force_unit_id_seq', 1371, true);
 
 COPY game (id, scenario_id, hosted_by, created, expires, turn, turn_limit, name, descr, notes, year, latlon, red_team, red_brief, blue_team, blue_brief, table_x, table_y, grid_size, check_table, check_objectives, check_forces, check_players, start_date, check_connected) FROM stdin;
 4	1	1	2016-10-20 23:03:08.180909+10:30	2016-10-24 10:30:00+10:30	1	14	Battle of Auerstadt	Northern sector only - Brunswick vs Davout	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	8	5	6	t	t	t	t	2016-10-24 10:30:00+10:30	f
+14	1	2	2016-10-26 01:04:56.994337+10:30	2016-10-26 01:04:56.994337+10:30	1	12	Jena Auerstadt	Napoleon's drives deep into Prussia.	The twin battles of Jena and Auerstedt (older name: Auerstädt) were fought on 14 October 1806 on the plateau west of the river Saale in today's Germany, between the forces of Napoleon I of France and Frederick William III of Prussia. The decisive defeat suffered by the Prussian Army subjugated the Kingdom of Prussia to the French Empire until the Sixth Coalition was formed in 1812.\n\nBoth armies were split into separate parts. The Prussian Army was in a very poor state. Brunswick was 71 years old while his field commanders were in their 60s. The Prussian army was still using tactics and training of Frederick The Great. Its greatest weakness was its staff organization. Most of the divisions were poorly organized and did not communicate well with each other. The Prussians had three forces:\n\n49,800 under Karl Wilhelm Ferdinand, Duke of Brunswick\n38,000 under Friedrich Ludwig, Fürst zu Hohenlohe-Ingelfingen\n15,000 under Ernst von Rüchel\n\nThe Grand Armée loved their Emperor and their generals. The army was very experienced and was very well led, with a good mix of older, more experienced Marshals, and younger, upcoming Marshals. Napoleon's main force at Jena consisted of about 53,000 men in total:\n\nNicolas Jean de Dieu Soult's IV Corps\nJean Lannes' V Corps\nMichel Ney's VI Corps\nPierre Augereau's VII Corps\nThe cavalry of Joachim Murat\nFurther north, in the vicinity of Auerstedt, the French forces were Jean-Baptiste Bernadotte's I Corps (20,000 strong) and Louis Nicolas Davout's III Corps (27,000)	1806	\N	France - Napoleon	Advance on a wide front with dispersed Corps.\n\nLocate the part of the Prussian Army, then converge Corps to attain local superiority.	Prussia - Frederick William III	Marche in goode order to meet the French, where upon the Army shall give battle, and put an ende to the ambitions of that so-called  "Great"  amateur soldier.	6	4	6	f	f	f	f	2016-10-26 01:04:56.994337+10:30	f
 \.
 
 
@@ -2371,6 +2372,23 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 44	4	1	2	6	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	1	f	0	f
 47	4	1	4	9	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	1	f	0	f
 32	4	1	1	8	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	1	f	0	f
+70	14	1	-1	-1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	f	0	f
+71	14	1	-1	-1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	f
+72	14	1	-1	-1	t	f	France	V Corps	Lannes	2		2	1	3	0	f	0	f
+73	14	1	-1	-1	t	f	France	VI Corps	Ney	2		2	3	2	0	f	0	f
+74	14	1	-1	-1	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	f	0	f
+75	14	1	-1	-1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	f	0	f
+76	14	1	-1	-1	t	f	France	III Corps	Davout	2		1	3	2	0	f	0	f
+77	14	1	-1	-1	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	f	0	f
+78	14	1	-1	-1	t	f	France	I Corps	General Bernadotte	2		3	3	2	0	f	0	f
+79	14	1	-1	-1	t	f	France	VII Corps	Augereau	2		2	2	2	0	f	0	f
+80	14	1	-1	-1	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	f
+81	14	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	f
+82	14	1	-1	-1	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	0	f	0	f
+83	14	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	0	f	0	f
+84	14	1	-1	-1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	f	0	f
+85	14	1	-1	-1	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	0	f	0	f
+86	14	1	-1	-1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	f	0	f
 \.
 
 
@@ -2378,7 +2396,7 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 69, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 86, true);
 
 
 --
@@ -2393,7 +2411,7 @@ COPY game_cmd_order (game_id, cmd_id, turns, new_order, objective, enemy, friend
 -- Name: game_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_id_seq', 13, true);
+SELECT pg_catalog.setval('game_id_seq', 14, true);
 
 
 --
@@ -2477,6 +2495,23 @@ SELECT pg_catalog.setval('inspiration_id_seq', 1, false);
 --
 
 COPY login (user_id, date, ip_address, channel, up) FROM stdin;
+1	2016-10-25 23:34:36.157913+10:30	127.0.0.1:45924	0	f
+1	2016-10-25 18:10:01.966589+10:30	127.0.0.1:49166	0	f
+1	2016-10-25 17:53:16.850845+10:30	127.0.0.1:47678	0	f
+2	2016-10-26 01:04:41.237171+10:30	192.168.1.101:46511	0	f
+1	2016-10-26 00:20:27.778701+10:30	127.0.0.1:50094	0	f
+1	2016-10-25 23:33:10.773971+10:30	127.0.0.1:45726	0	f
+1	2016-10-25 23:33:18.757774+10:30	127.0.0.1:45782	0	f
+1	2016-10-25 17:53:21.889173+10:30	127.0.0.1:47716	0	f
+1	2016-10-25 15:44:28.54583+10:30	127.0.0.1:36194	0	f
+1	2016-10-25 15:47:31.17966+10:30	127.0.0.1:36452	0	f
+1	2016-10-25 16:18:25.200993+10:30	127.0.0.1:39074	0	f
+1	2016-10-25 16:55:42.547223+10:30	127.0.0.1:42774	0	f
+1	2016-10-25 16:55:48.29585+10:30	127.0.0.1:42814	0	f
+1	2016-10-25 16:28:53.839341+10:30	127.0.0.1:40166	0	f
+1	2016-10-25 16:29:00.132422+10:30	127.0.0.1:40204	0	f
+1	2016-10-25 16:18:19.295693+10:30	127.0.0.1:39020	0	f
+1	2016-10-25 15:47:38.912828+10:30	127.0.0.1:36492	0	f
 1	2016-10-25 13:53:26.413951+10:30	127.0.0.1:54664	0	f
 2	2016-10-25 13:44:48.914725+10:30	192.168.1.105:49866	0	f
 2	2016-10-25 11:47:23.835212+10:30	192.168.1.105:47620	0	f
@@ -2486,7 +2521,10 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 11:56:38.005143+10:30	127.0.0.1:43740	0	f
 2	2016-10-25 11:15:19.88333+10:30	192.168.1.105:46396	0	f
 2	2016-10-25 12:08:46.824422+10:30	192.168.1.105:48433	0	f
+1	2016-10-25 15:33:17.415989+10:30	127.0.0.1:35196	0	f
 1	2016-10-25 14:18:17.619899+10:30	127.0.0.1:57014	0	f
+1	2016-10-25 15:33:39.670461+10:30	127.0.0.1:35228	0	f
+1	2016-10-25 15:42:28.941069+10:30	127.0.0.1:35932	0	f
 1	2016-10-25 12:08:44.678075+10:30	127.0.0.1:45012	0	f
 1	2016-10-25 11:23:24.126264+10:30	127.0.0.1:40394	0	f
 1	2016-10-25 10:44:37.474919+10:30	127.0.0.1:36826	0	f
@@ -2511,24 +2549,48 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 16:17:31.832111+10:30	127.0.0.1:58950	0	f
 1	2016-10-23 16:14:05.844322+10:30	127.0.0.1:58598	0	f
 2	2016-10-23 14:43:31.4916+10:30	192.168.1.105:52271	0	f
+1	2016-10-25 15:43:18.039322+10:30	127.0.0.1:35998	0	f
 2	2016-10-23 15:20:57.66396+10:30	192.168.1.105:53708	0	f
+1	2016-10-25 08:49:45.229831+10:30	127.0.0.1:54156	0	f
 1	2016-10-23 15:20:57.640623+10:30	127.0.0.1:52198	0	f
+1	2016-10-26 00:31:51.053756+10:30	127.0.0.1:51184	0	f
+1	2016-10-26 00:37:26.172226+10:30	127.0.0.1:51592	0	f
+1	2016-10-26 00:19:14.957028+10:30	127.0.0.1:49990	0	f
+1	2016-10-24 00:29:52.508147+10:30	127.0.0.1:43748	0	f
+1	2016-10-25 08:32:50.856069+10:30	127.0.0.1:52382	0	f
+1	2016-10-22 18:23:02.400867+10:30	127.0.0.1:36238	0	f
+1	2016-10-25 07:50:46.397133+10:30	127.0.0.1:47754	0	f
+1	2016-10-25 16:55:18.358491+10:30	127.0.0.1:42736	0	f
+1	2016-10-25 16:56:49.340794+10:30	127.0.0.1:42896	0	f
 2	2016-10-23 14:22:22.139672+10:30	192.168.1.105:51396	0	f
 1	2016-10-23 15:39:26.401272+10:30	127.0.0.1:55116	0	f
 1	2016-10-23 15:39:46.081753+10:30	127.0.0.1:55204	0	f
 1	2016-10-23 13:20:01.110183+10:30	127.0.0.1:41914	0	f
+1	2016-10-25 10:24:02.755051+10:30	127.0.0.1:35004	0	f
+1	2016-10-25 18:03:33.332824+10:30	127.0.0.1:48578	0	f
 1	2016-10-23 15:21:03.827118+10:30	127.0.0.1:52244	0	f
 1	2016-10-23 13:22:50.908473+10:30	127.0.0.1:42188	0	f
+1	2016-10-22 17:13:48.661825+10:30	127.0.0.1:57662	0	f
+1	2016-10-24 02:29:37.751696+10:30	127.0.0.1:54674	0	f
+1	2016-10-23 12:34:28.753216+10:30	127.0.0.1:37880	0	f
+1	2016-10-23 03:57:53.57408+10:30	127.0.0.1:55254	0	f
+1	2016-10-24 03:16:03.351118+10:30	127.0.0.1:58298	0	f
+1	2016-10-25 09:16:49.691356+10:30	127.0.0.1:56884	0	f
 1	2016-10-23 13:22:57.744824+10:30	127.0.0.1:42234	0	f
 1	2016-10-23 13:19:05.518074+10:30	127.0.0.1:41804	0	f
 1	2016-10-23 12:48:02.40156+10:30	127.0.0.1:39178	0	f
 1	2016-10-23 13:11:47.898562+10:30	127.0.0.1:41108	0	f
 1	2016-10-23 12:48:09.295952+10:30	127.0.0.1:39226	0	f
 1	2016-10-23 13:06:41.494258+10:30	127.0.0.1:40722	0	f
+1	2016-10-25 16:15:57.449126+10:30	127.0.0.1:38834	0	f
 1	2016-10-23 12:54:05.274867+10:30	127.0.0.1:39670	0	f
 1	2016-10-23 12:54:12.542655+10:30	127.0.0.1:39702	0	f
 1	2016-10-23 04:57:12.034141+10:30	127.0.0.1:60540	0	f
 1	2016-10-23 04:21:30.801577+10:30	127.0.0.1:57372	0	f
+1	2016-10-23 15:42:53.425446+10:30	127.0.0.1:55438	0	f
+1	2016-10-23 18:44:58.590204+10:30	127.0.0.1:44882	0	f
+1	2016-10-23 02:51:55.672397+10:30	127.0.0.1:49422	0	f
+1	2016-10-25 15:41:26.472601+10:30	127.0.0.1:35862	0	f
 1	2016-10-23 04:09:19.629059+10:30	127.0.0.1:56198	0	f
 1	2016-10-25 14:16:38.257809+10:30	127.0.0.1:56766	0	f
 1	2016-10-23 14:32:02.909488+10:30	127.0.0.1:47864	0	f
@@ -2547,13 +2609,13 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 03:20:19.931681+10:30	127.0.0.1:51910	0	f
 1	2016-10-24 01:37:28.508071+10:30	127.0.0.1:49602	0	f
 2	2016-10-24 01:44:33.886593+10:30	192.168.1.105:39424	0	f
-1	2016-10-25 08:49:45.229831+10:30	127.0.0.1:54156	0	f
 2	2016-10-23 15:31:17.68405+10:30	192.168.1.105:54099	0	f
 1	2016-10-23 15:31:21.060071+10:30	127.0.0.1:53270	0	f
-1	2016-10-23 15:36:35.402936+10:30	127.0.0.1:54842	0	f
 1	2016-10-23 04:09:26.752802+10:30	127.0.0.1:56246	0	f
 1	2016-10-23 04:17:51.209781+10:30	127.0.0.1:56984	0	f
 1	2016-10-23 04:32:10.983057+10:30	127.0.0.1:58346	0	f
+1	2016-10-26 00:10:39.332963+10:30	127.0.0.1:49200	0	f
+1	2016-10-26 00:00:54.726907+10:30	127.0.0.1:48228	0	f
 1	2016-10-25 11:07:55.152241+10:30	127.0.0.1:38900	0	f
 2	2016-10-25 10:35:55.850343+10:30	192.168.1.105:44910	0	f
 1	2016-10-24 00:20:32.489369+10:30	127.0.0.1:42860	0	f
@@ -2572,11 +2634,10 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 2	2016-10-24 00:45:10.70617+10:30	192.168.1.105:37159	0	f
 1	2016-10-25 11:33:44.461648+10:30	127.0.0.1:41316	0	f
 2	2016-10-25 11:33:49.835482+10:30	192.168.1.105:47099	0	f
-2	2016-10-23 14:32:34.903328+10:30	192.168.1.105:51821	0	f
 1	2016-10-23 04:30:42.981162+10:30	127.0.0.1:58156	0	f
-1	2016-10-22 18:41:59.479442+10:30	127.0.0.1:37868	0	f
 1	2016-10-23 01:03:06.400493+10:30	127.0.0.1:39860	0	f
 2	2016-10-23 15:10:24.194805+10:30	192.168.1.105:53308	0	f
+1	2016-10-25 15:59:53.370522+10:30	127.0.0.1:37412	0	f
 2	2016-10-24 01:55:47.776977+10:30	192.168.1.105:39841	0	f
 1	2016-10-25 11:22:42.42342+10:30	127.0.0.1:40342	0	f
 1	2016-10-23 02:07:34.738048+10:30	127.0.0.1:45648	0	f
@@ -2585,7 +2646,6 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 14:21:56.754469+10:30	127.0.0.1:47024	0	f
 1	2016-10-24 03:21:44.461543+10:30	127.0.0.1:58848	0	f
 1	2016-10-24 02:02:59.676527+10:30	127.0.0.1:52070	0	f
-1	2016-10-23 15:42:53.425446+10:30	127.0.0.1:55438	0	f
 2	2016-10-23 14:25:02.988179+10:30	192.168.1.105:51535	0	f
 1	2016-10-24 01:55:32.338474+10:30	127.0.0.1:51418	0	f
 1	2016-10-25 14:28:58.139022+10:30	127.0.0.1:57970	0	f
@@ -2595,45 +2655,55 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 12:55:36.354939+10:30	127.0.0.1:39852	0	f
 1	2016-10-23 04:27:31.383+10:30	127.0.0.1:57874	0	f
 1	2016-10-24 02:13:22.797687+10:30	127.0.0.1:53110	0	f
+1	2016-10-26 00:20:44.198184+10:30	127.0.0.1:50152	0	f
 1	2016-10-24 02:29:00.224282+10:30	127.0.0.1:54592	0	f
 1	2016-10-25 10:19:19.273721+10:30	127.0.0.1:34562	0	f
 1	2016-10-22 19:04:55.407058+10:30	127.0.0.1:39716	0	f
+1	2016-10-26 00:21:07.044034+10:30	127.0.0.1:50214	0	f
 1	2016-10-23 15:46:31.869312+10:30	127.0.0.1:55766	0	f
+1	2016-10-26 00:37:58.128848+10:30	127.0.0.1:51656	0	f
 1	2016-10-25 10:05:09.535687+10:30	127.0.0.1:33114	0	f
 1	2016-10-23 15:46:36.168328+10:30	127.0.0.1:55806	0	f
+2	2016-10-23 01:02:59.582781+10:30	192.168.1.105:50826	0	f
+1	2016-10-25 16:31:29.639236+10:30	127.0.0.1:40424	0	f
+1	2016-10-22 18:41:59.479442+10:30	127.0.0.1:37868	0	f
 1	2016-10-23 13:11:54.558822+10:30	127.0.0.1:41150	0	f
 1	2016-10-22 18:09:09.399274+10:30	127.0.0.1:34852	0	f
 2	2016-10-23 18:38:40.622124+10:30	192.168.1.105:54513	0	f
+1	2016-10-23 15:36:35.402936+10:30	127.0.0.1:54842	0	f
 1	2016-10-23 18:39:10.921535+10:30	127.0.0.1:44306	0	f
 1	2016-10-24 00:08:52.569231+10:30	127.0.0.1:41912	0	f
-1	2016-10-24 00:46:25.671395+10:30	127.0.0.1:45314	0	f
-2	2016-10-24 00:40:59.638256+10:30	192.168.1.105:36951	0	f
-2	2016-10-24 03:16:00.128264+10:30	192.168.1.105:41978	0	f
+1	2016-10-24 01:44:33.894288+10:30	127.0.0.1:50254	0	f
+1	2016-10-23 04:54:16.620893+10:30	127.0.0.1:60070	0	f
+1	2016-10-25 16:32:02.889816+10:30	127.0.0.1:40492	0	f
+1	2016-10-25 16:54:01.399534+10:30	127.0.0.1:42578	0	f
+1	2016-10-25 16:54:10.49697+10:30	127.0.0.1:42626	0	f
 2	2016-10-23 14:41:06.567995+10:30	192.168.1.105:52162	0	f
 2	2016-10-23 14:56:45.742943+10:30	192.168.1.105:52790	0	f
 1	2016-10-24 00:38:11.026171+10:30	127.0.0.1:44486	0	f
 2	2016-10-24 03:19:10.96895+10:30	192.168.1.105:42113	0	f
 1	2016-10-23 15:57:23.406238+10:30	127.0.0.1:56872	0	f
+1	2016-10-25 16:56:53.687817+10:30	127.0.0.1:42932	0	f
+1	2016-10-25 23:44:01.264713+10:30	127.0.0.1:46718	0	f
 1	2016-10-25 09:24:39.790823+10:30	127.0.0.1:57734	0	f
 1	2016-10-25 09:30:35.636642+10:30	127.0.0.1:58296	0	f
 1	2016-10-25 09:30:39.989258+10:30	127.0.0.1:58334	0	f
 1	2016-10-25 13:57:00.538734+10:30	127.0.0.1:55070	0	f
 1	2016-10-25 09:32:54.923802+10:30	127.0.0.1:58528	0	f
-1	2016-10-25 09:33:05.985601+10:30	127.0.0.1:58578	0	f
-1	2016-10-25 10:24:02.755051+10:30	127.0.0.1:35004	0	f
-1	2016-10-22 15:33:15.490333+10:30	127.0.0.1:49150	0	f
 1	2016-10-22 15:34:59.226163+10:30	127.0.0.1:49272	0	f
 1	2016-10-23 04:17:45.222442+10:30	127.0.0.1:56942	0	f
 1	2016-10-23 03:31:54.401551+10:30	127.0.0.1:52962	0	f
 1	2016-10-23 03:32:26.549608+10:30	127.0.0.1:53024	0	f
+2	2016-10-25 11:49:47.832671+10:30	192.168.1.105:47710	0	f
 1	2016-10-23 03:18:50.708985+10:30	127.0.0.1:51726	0	f
 1	2016-10-23 02:04:45.932282+10:30	127.0.0.1:45302	0	f
 1	2016-10-23 02:05:15.535154+10:30	127.0.0.1:45398	0	f
-1	2016-10-25 10:29:34.509049+10:30	127.0.0.1:35472	0	f
-1	2016-10-25 08:45:33.488441+10:30	127.0.0.1:53634	0	f
-2	2016-10-24 01:50:24.522717+10:30	192.168.1.105:39637	0	f
+1	2016-10-25 09:16:55.257311+10:30	127.0.0.1:56936	0	f
+1	2016-10-25 16:34:57.758887+10:30	127.0.0.1:40720	0	f
+1	2016-10-25 16:35:03.689361+10:30	127.0.0.1:40770	0	f
+1	2016-10-25 16:20:31.091284+10:30	127.0.0.1:39260	0	f
+1	2016-10-25 16:20:41.780706+10:30	127.0.0.1:39310	0	f
 2	2016-10-23 18:41:27.057504+10:30	192.168.1.105:54609	0	f
-1	2016-10-22 17:07:50.401156+10:30	127.0.0.1:57112	0	f
 1	2016-10-24 00:40:59.62181+10:30	127.0.0.1:44784	0	f
 1	2016-10-23 14:41:13.78405+10:30	127.0.0.1:48738	0	f
 1	2016-10-23 18:17:15.19843+10:30	127.0.0.1:42294	0	f
@@ -2653,14 +2723,12 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 02:28:28.781179+10:30	127.0.0.1:54524	0	f
 1	2016-10-24 01:57:11.229031+10:30	127.0.0.1:51628	0	f
 1	2016-10-23 18:38:40.614318+10:30	127.0.0.1:44262	0	f
-2	2016-10-23 01:02:59.582781+10:30	192.168.1.105:50826	0	f
+1	2016-10-25 16:19:40.618241+10:30	127.0.0.1:39188	0	f
 2	2016-10-24 03:17:00.400157+10:30	192.168.1.105:42022	0	f
 1	2016-10-24 02:24:39.495971+10:30	127.0.0.1:54092	0	f
-2	2016-10-24 02:24:33.95364+10:30	192.168.1.105:40905	0	f
 1	2016-10-24 01:55:52.015605+10:30	127.0.0.1:51452	0	f
 2	2016-10-23 14:38:26.5438+10:30	192.168.1.105:52062	0	f
 2	2016-10-24 01:55:32.346263+10:30	192.168.1.105:39828	0	f
-1	2016-10-22 15:10:34.393572+10:30	127.0.0.1:47128	0	f
 1	2016-10-25 10:37:33.908978+10:30	127.0.0.1:36210	0	f
 2	2016-10-25 10:37:35.849427+10:30	192.168.1.105:44982	0	f
 2	2016-10-25 10:30:55.851364+10:30	192.168.1.105:44710	0	f
@@ -2668,43 +2736,65 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 01:53:32.846095+10:30	127.0.0.1:51218	0	f
 2	2016-10-23 14:55:26.275058+10:30	192.168.1.105:52742	0	f
 2	2016-10-23 14:32:02.98731+10:30	192.168.1.105:51796	0	f
-1	2016-10-23 01:11:58.635553+10:30	127.0.0.1:40796	0	f
 2	2016-10-24 01:52:59.204586+10:30	192.168.1.105:39743	0	f
 1	2016-10-23 14:46:21.346391+10:30	127.0.0.1:49252	0	f
 1	2016-10-23 04:34:51.100146+10:30	127.0.0.1:58604	0	f
 1	2016-10-22 15:13:59.926114+10:30	127.0.0.1:47392	0	f
 2	2016-10-24 03:06:52.640338+10:30	192.168.1.105:41634	0	f
 1	2016-10-23 12:38:27.73051+10:30	127.0.0.1:38258	0	f
+1	2016-10-25 17:55:30.64064+10:30	127.0.0.1:47922	0	f
+1	2016-10-25 18:19:06.927538+10:30	127.0.0.1:49972	0	f
+1	2016-10-22 15:33:15.490333+10:30	127.0.0.1:49150	0	f
 1	2016-10-23 04:30:48.218331+10:30	127.0.0.1:58198	0	f
 2	2016-10-24 01:39:42.227246+10:30	192.168.1.105:39247	0	f
 1	2016-10-24 01:25:42.832521+10:30	127.0.0.1:48368	0	f
 1	2016-10-24 01:26:05.221673+10:30	127.0.0.1:48408	0	f
+1	2016-10-23 03:57:48.796421+10:30	127.0.0.1:55214	0	f
+1	2016-10-24 02:22:15.98244+10:30	127.0.0.1:53872	0	f
+1	2016-10-25 17:30:16.01325+10:30	127.0.0.1:45800	0	f
+1	2016-10-25 17:30:49.724022+10:30	127.0.0.1:45846	0	f
 2	2016-10-24 00:08:52.576287+10:30	192.168.1.105:35773	0	f
 1	2016-10-24 00:09:08.080337+10:30	127.0.0.1:41976	0	f
 2	2016-10-24 01:25:42.928127+10:30	192.168.1.105:38729	0	f
+1	2016-10-24 03:19:10.941045+10:30	127.0.0.1:58606	0	f
+1	2016-10-25 12:01:53.037337+10:30	127.0.0.1:44246	0	f
+1	2016-10-23 14:35:56.536757+10:30	127.0.0.1:48312	0	f
+2	2016-10-24 02:08:41.234658+10:30	192.168.1.105:40322	0	f
+2	2016-10-24 00:41:26.651185+10:30	192.168.1.105:36997	0	f
+2	2016-10-25 13:57:03.179731+10:30	192.168.1.105:50326	0	f
+1	2016-10-25 14:01:20.321924+10:30	127.0.0.1:55438	0	f
+1	2016-10-23 04:18:59.071536+10:30	127.0.0.1:57120	0	f
+1	2016-10-22 18:11:46.585937+10:30	127.0.0.1:35214	0	f
+1	2016-10-23 15:10:24.167786+10:30	127.0.0.1:51274	0	f
+1	2016-10-25 11:43:11.818327+10:30	127.0.0.1:42276	0	f
 2	2016-10-24 00:46:22.080964+10:30	192.168.1.105:37209	0	f
 2	2016-10-24 00:38:06.718412+10:30	192.168.1.105:36842	0	f
-1	2016-10-22 18:23:48.40532+10:30	127.0.0.1:36354	0	f
-2	2016-10-23 20:39:46.97518+10:30	192.168.1.105:56303	0	f
-2	2016-10-25 12:01:53.836343+10:30	192.168.1.105:48166	0	f
+1	2016-10-23 04:27:07.486206+10:30	127.0.0.1:57816	0	f
+1	2016-10-23 14:38:26.526704+10:30	127.0.0.1:48494	0	f
+2	2016-10-23 14:32:34.903328+10:30	192.168.1.105:51821	0	f
+1	2016-10-25 08:45:33.488441+10:30	127.0.0.1:53634	0	f
+1	2016-10-25 07:50:52.293392+10:30	127.0.0.1:47778	0	f
+1	2016-10-25 08:26:52.685956+10:30	127.0.0.1:51886	0	f
+1	2016-10-24 02:08:47.565875+10:30	127.0.0.1:52718	0	f
+2	2016-10-25 14:02:31.173146+10:30	192.168.1.105:50536	0	f
+1	2016-10-25 16:15:02.793353+10:30	127.0.0.1:38688	0	f
+1	2016-10-26 00:13:37.063216+10:30	127.0.0.1:49456	0	f
 1	2016-10-25 12:07:06.855618+10:30	127.0.0.1:44840	0	f
 2	2016-10-25 12:07:11.832485+10:30	192.168.1.105:48371	0	f
 2	2016-10-24 03:57:32.170409+10:30	192.168.1.105:43520	0	f
 1	2016-10-24 00:41:09.09622+10:30	127.0.0.1:44822	0	f
-2	2016-10-24 02:31:44.384281+10:30	192.168.1.105:41180	0	f
 1	2016-10-24 00:44:53.840882+10:30	127.0.0.1:45160	0	f
 2	2016-10-24 00:44:52.652354+10:30	192.168.1.105:37133	0	f
+1	2016-10-25 23:48:45.678569+10:30	127.0.0.1:47150	0	f
 2	2016-10-25 11:38:37.858874+10:30	192.168.1.105:47282	0	f
 1	2016-10-25 11:44:35.639851+10:30	127.0.0.1:42430	0	f
 2	2016-10-25 11:44:36.833246+10:30	192.168.1.105:47513	0	f
-1	2016-10-23 18:44:58.590204+10:30	127.0.0.1:44882	0	f
 2	2016-10-23 14:43:08.662974+10:30	192.168.1.105:52233	0	f
 1	2016-10-25 14:30:41.294934+10:30	127.0.0.1:58110	0	f
+1	2016-10-25 23:34:29.0478+10:30	127.0.0.1:45874	0	f
+1	2016-10-25 23:25:19.993517+10:30	127.0.0.1:44934	0	f
 1	2016-10-25 14:30:46.187784+10:30	127.0.0.1:58160	0	f
-1	2016-10-25 11:45:50.605168+10:30	127.0.0.1:42536	0	f
-1	2016-10-25 11:45:55.249048+10:30	127.0.0.1:42580	0	f
-2	2016-10-25 11:45:58.831416+10:30	192.168.1.105:47564	0	f
-1	2016-10-25 15:16:42.802593+10:30	127.0.0.1:33688	0	f
+1	2016-10-25 18:17:09.715124+10:30	127.0.0.1:49764	0	f
 1	2016-10-24 00:06:50.958753+10:30	127.0.0.1:41684	0	f
 2	2016-10-24 00:06:50.996476+10:30	192.168.1.105:35698	0	f
 1	2016-10-23 18:41:54.770662+10:30	127.0.0.1:44598	0	f
@@ -2718,9 +2808,9 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 2	2016-10-24 03:28:43.893169+10:30	192.168.1.105:42471	0	f
 1	2016-10-24 01:54:44.930961+10:30	127.0.0.1:51352	0	f
 1	2016-10-23 16:09:08.416789+10:30	127.0.0.1:58176	0	f
-1	2016-10-22 18:06:15.599484+10:30	127.0.0.1:34572	0	f
-1	2016-10-24 03:17:03.286907+10:30	127.0.0.1:58436	0	f
-1	2016-10-24 02:33:33.765297+10:30	127.0.0.1:55058	0	f
+1	2016-10-25 14:27:09.38286+10:30	127.0.0.1:57738	0	f
+1	2016-10-25 17:07:31.651464+10:30	127.0.0.1:43874	0	f
+1	2016-10-25 17:20:25.88318+10:30	127.0.0.1:44906	0	f
 1	2016-10-22 15:32:08.422231+10:30	127.0.0.1:49024	0	f
 1	2016-10-25 11:01:43.465296+10:30	127.0.0.1:38398	0	f
 2	2016-10-25 11:01:43.8463+10:30	192.168.1.105:45890	0	f
@@ -2729,16 +2819,12 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 02:16:36.830686+10:30	127.0.0.1:46474	0	f
 1	2016-10-22 15:07:17.729362+10:30	127.0.0.1:46724	0	f
 1	2016-10-22 15:07:44.964557+10:30	127.0.0.1:46876	0	f
-2	2016-10-25 13:57:03.179731+10:30	192.168.1.105:50326	0	f
-1	2016-10-25 14:01:20.321924+10:30	127.0.0.1:55438	0	f
 1	2016-10-22 15:08:40.836605+10:30	127.0.0.1:46964	0	f
 2	2016-10-23 15:18:17.212264+10:30	192.168.1.105:53613	0	f
 1	2016-10-23 15:18:19.950349+10:30	127.0.0.1:51950	0	f
 1	2016-10-23 15:43:01.099272+10:30	127.0.0.1:55492	0	f
 1	2016-10-22 15:10:26.156566+10:30	127.0.0.1:47116	0	f
 1	2016-10-23 02:18:33.88833+10:30	127.0.0.1:46658	0	f
-1	2016-10-22 18:23:02.400867+10:30	127.0.0.1:36238	0	f
-1	2016-10-22 17:14:31.262484+10:30	127.0.0.1:57714	0	f
 1	2016-10-22 15:12:50.397206+10:30	127.0.0.1:47300	0	f
 1	2016-10-23 14:46:30.006277+10:30	127.0.0.1:49310	0	f
 1	2016-10-23 04:34:43.848129+10:30	127.0.0.1:58556	0	f
@@ -2748,13 +2834,12 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 02:13:17.475938+10:30	127.0.0.1:53064	0	f
 1	2016-10-23 03:54:03.288115+10:30	127.0.0.1:54834	0	f
 1	2016-10-24 00:07:46.818311+10:30	127.0.0.1:41768	0	f
-1	2016-10-22 15:37:20.429059+10:30	127.0.0.1:49484	0	f
-1	2016-10-24 00:29:52.508147+10:30	127.0.0.1:43748	0	f
+1	2016-10-26 00:17:02.823993+10:30	127.0.0.1:49730	0	f
+1	2016-10-26 00:39:01.384876+10:30	127.0.0.1:51816	0	f
 1	2016-10-22 15:46:48.005051+10:30	127.0.0.1:50276	0	f
 1	2016-10-23 03:12:46.042596+10:30	127.0.0.1:51174	0	f
 1	2016-10-23 03:13:08.131079+10:30	127.0.0.1:51220	0	f
 1	2016-10-25 09:12:41.224035+10:30	127.0.0.1:56556	0	f
-1	2016-10-23 02:51:55.672397+10:30	127.0.0.1:49422	0	f
 1	2016-10-23 01:53:34.527987+10:30	127.0.0.1:44352	0	f
 1	2016-10-23 18:41:27.081086+10:30	127.0.0.1:44514	0	f
 1	2016-10-23 02:52:00.115204+10:30	127.0.0.1:49440	0	f
@@ -2763,17 +2848,12 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 14:29:33.942605+10:30	127.0.0.1:58022	0	f
 1	2016-10-22 17:15:12.135243+10:30	127.0.0.1:57774	0	f
 1	2016-10-22 17:15:20.85852+10:30	127.0.0.1:57792	0	f
+1	2016-10-25 09:33:05.985601+10:30	127.0.0.1:58578	0	f
 1	2016-10-23 01:52:26.283101+10:30	127.0.0.1:44200	0	f
 1	2016-10-24 03:28:47.065943+10:30	127.0.0.1:59542	0	f
 2	2016-10-23 14:33:36.236028+10:30	192.168.1.105:51878	0	f
-1	2016-10-24 00:51:29.619164+10:30	127.0.0.1:45754	0	f
-2	2016-10-24 00:51:29.68531+10:30	192.168.1.105:37423	0	f
-1	2016-10-23 15:10:29.45972+10:30	127.0.0.1:51306	0	f
 1	2016-10-25 11:15:14.122899+10:30	127.0.0.1:39536	0	f
 1	2016-10-22 14:50:29.400067+10:30	127.0.0.1:45316	0	f
-1	2016-10-23 03:35:07.382657+10:30	127.0.0.1:53348	0	f
-1	2016-10-24 02:06:59.670076+10:30	127.0.0.1:52486	0	f
-1	2016-10-22 17:49:45.402296+10:30	127.0.0.1:32838	0	f
 2	2016-10-24 02:28:56.230469+10:30	192.168.1.105:41069	0	f
 2	2016-10-24 02:22:11.353053+10:30	192.168.1.105:40822	0	f
 2	2016-10-24 02:13:17.448251+10:30	192.168.1.105:40492	0	f
@@ -2782,22 +2862,16 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 04:16:41.873063+10:30	127.0.0.1:56816	0	f
 1	2016-10-25 11:43:01.894939+10:30	127.0.0.1:42240	0	f
 2	2016-10-25 11:43:09.837664+10:30	192.168.1.105:47459	0	f
-1	2016-10-24 03:57:32.149446+10:30	127.0.0.1:33734	0	f
-1	2016-10-24 03:57:36.49193+10:30	127.0.0.1:33778	0	f
 2	2016-10-24 00:31:08.626724+10:30	192.168.1.105:36580	0	f
 1	2016-10-23 14:21:42.66513+10:30	127.0.0.1:46980	0	f
 1	2016-10-23 14:24:47.449795+10:30	127.0.0.1:47294	0	f
 2	2016-10-23 14:24:47.53806+10:30	192.168.1.105:51516	0	f
 1	2016-10-23 14:24:54.193303+10:30	127.0.0.1:47332	0	f
 1	2016-10-23 18:37:10.931959+10:30	127.0.0.1:44082	0	f
-1	2016-10-23 04:18:59.071536+10:30	127.0.0.1:57120	0	f
-1	2016-10-22 18:11:46.585937+10:30	127.0.0.1:35214	0	f
 1	2016-10-23 03:03:46.785958+10:30	127.0.0.1:50408	0	f
 2	2016-10-24 02:21:13.255721+10:30	192.168.1.105:40782	0	f
 1	2016-10-24 02:21:13.284802+10:30	127.0.0.1:53696	0	f
 2	2016-10-25 13:52:31.180233+10:30	192.168.1.105:50156	0	f
-1	2016-10-25 13:05:11.318535+10:30	192.168.1.101:44107	0	f
-1	2016-10-24 02:32:50.655408+10:30	127.0.0.1:54966	0	f
 1	2016-10-24 03:23:11.741403+10:30	127.0.0.1:59004	0	f
 2	2016-10-24 03:25:12.418048+10:30	192.168.1.105:42341	0	f
 1	2016-10-24 03:25:14.664563+10:30	127.0.0.1:59230	0	f
@@ -2822,6 +2896,7 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-23 01:11:02.715465+10:30	127.0.0.1:40668	0	f
 1	2016-10-23 01:55:07.593345+10:30	127.0.0.1:44508	0	f
 1	2016-10-24 01:55:47.759139+10:30	127.0.0.1:51440	0	f
+1	2016-10-25 23:53:22.618986+10:30	127.0.0.1:47562	0	f
 1	2016-10-24 01:56:08.239915+10:30	127.0.0.1:51516	0	f
 1	2016-10-22 18:06:57.729234+10:30	127.0.0.1:34644	0	f
 1	2016-10-22 18:10:33.984249+10:30	127.0.0.1:35076	0	f
@@ -2830,12 +2905,15 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 11:47:17.254384+10:30	127.0.0.1:42682	0	f
 2	2016-10-24 00:47:47.887061+10:30	192.168.1.105:37264	0	f
 2	2016-10-24 01:45:33.075228+10:30	192.168.1.105:39458	0	f
+1	2016-10-25 23:43:07.088127+10:30	127.0.0.1:46590	0	f
+1	2016-10-25 23:28:53.549074+10:30	127.0.0.1:45220	0	f
+1	2016-10-25 23:28:58.368633+10:30	127.0.0.1:45266	0	f
 2	2016-10-23 15:21:50.577367+10:30	192.168.1.105:53742	0	f
 2	2016-10-24 03:21:44.447217+10:30	192.168.1.105:42207	0	f
 1	2016-10-25 08:47:32.321566+10:30	127.0.0.1:53900	0	f
-1	2016-10-24 01:45:35.86976+10:30	127.0.0.1:50416	0	f
+1	2016-10-25 17:44:06.011537+10:30	127.0.0.1:46848	0	f
+1	2016-10-25 17:44:20.120082+10:30	127.0.0.1:46892	0	f
 2	2016-10-24 01:47:30.206682+10:30	192.168.1.105:39529	0	f
-1	2016-10-24 01:47:30.23396+10:30	127.0.0.1:50584	0	f
 1	2016-10-24 01:47:54.896498+10:30	127.0.0.1:50646	0	f
 2	2016-10-25 11:07:58.837267+10:30	192.168.1.105:46120	0	f
 1	2016-10-25 11:17:15.651632+10:30	127.0.0.1:39888	0	f
@@ -2858,6 +2936,8 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 08:44:12.404759+10:30	127.0.0.1:53442	0	f
 1	2016-10-25 08:54:21.273375+10:30	127.0.0.1:54540	0	f
 1	2016-10-24 01:39:45.343734+10:30	127.0.0.1:49874	0	f
+1	2016-10-25 16:00:07.870997+10:30	127.0.0.1:37440	0	f
+1	2016-10-25 16:00:13.95669+10:30	127.0.0.1:37472	0	f
 2	2016-10-24 02:29:34.318441+10:30	192.168.1.105:41094	0	f
 1	2016-10-22 18:11:41.331171+10:30	127.0.0.1:35174	0	f
 1	2016-10-23 03:55:57.718384+10:30	127.0.0.1:55020	0	f
@@ -2865,11 +2945,17 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 02:33:23.096613+10:30	127.0.0.1:55010	0	f
 2	2016-10-24 02:33:23.110315+10:30	192.168.1.105:41242	0	f
 2	2016-10-24 02:22:31.828404+10:30	192.168.1.105:40835	0	f
+1	2016-10-25 15:44:22.169237+10:30	127.0.0.1:36154	0	f
 1	2016-10-24 02:22:31.872396+10:30	127.0.0.1:53896	0	f
-1	2016-10-25 13:07:34.13417+10:30	127.0.0.1:50498	0	f
-1	2016-10-23 03:56:07.650736+10:30	127.0.0.1:55064	0	f
-1	2016-10-24 02:08:41.221515+10:30	127.0.0.1:52680	0	f
+1	2016-10-23 03:18:22.462966+10:30	127.0.0.1:51660	0	f
+1	2016-10-24 00:46:25.671395+10:30	127.0.0.1:45314	0	f
+2	2016-10-24 00:40:59.638256+10:30	192.168.1.105:36951	0	f
+2	2016-10-24 03:16:00.128264+10:30	192.168.1.105:41978	0	f
+2	2016-10-23 20:39:46.97518+10:30	192.168.1.105:56303	0	f
+1	2016-10-22 15:37:20.429059+10:30	127.0.0.1:49484	0	f
 1	2016-10-24 00:39:10.496413+10:30	127.0.0.1:44592	0	f
+1	2016-10-23 01:11:58.635553+10:30	127.0.0.1:40796	0	f
+2	2016-10-24 02:31:44.384281+10:30	192.168.1.105:41180	0	f
 1	2016-10-22 18:32:47.404947+10:30	127.0.0.1:37120	0	f
 1	2016-10-22 18:42:03.930037+10:30	127.0.0.1:37920	0	f
 1	2016-10-23 16:17:05.16334+10:30	127.0.0.1:58876	0	f
@@ -2884,33 +2970,37 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 2	2016-10-24 00:40:49.342808+10:30	192.168.1.105:36943	0	f
 2	2016-10-24 02:26:48.185651+10:30	192.168.1.105:40986	0	f
 1	2016-10-24 02:26:55.286728+10:30	127.0.0.1:54286	0	f
+1	2016-10-25 11:45:55.249048+10:30	127.0.0.1:42580	0	f
+2	2016-10-25 11:45:58.831416+10:30	192.168.1.105:47564	0	f
+1	2016-10-25 15:16:42.802593+10:30	127.0.0.1:33688	0	f
+1	2016-10-24 00:51:29.619164+10:30	127.0.0.1:45754	0	f
+2	2016-10-24 00:51:29.68531+10:30	192.168.1.105:37423	0	f
+1	2016-10-23 15:10:29.45972+10:30	127.0.0.1:51306	0	f
+1	2016-10-24 01:45:35.86976+10:30	127.0.0.1:50416	0	f
 2	2016-10-24 02:27:33.089149+10:30	192.168.1.105:41019	0	f
 1	2016-10-24 02:27:33.152646+10:30	127.0.0.1:54356	0	f
 1	2016-10-24 02:27:39.400144+10:30	127.0.0.1:54394	0	f
 2	2016-10-24 02:28:03.212394+10:30	192.168.1.105:41038	0	f
-1	2016-10-24 02:28:03.236103+10:30	127.0.0.1:54426	0	f
-1	2016-10-24 02:28:08.582033+10:30	127.0.0.1:54464	0	f
-2	2016-10-24 02:28:23.731054+10:30	192.168.1.105:41052	0	f
 1	2016-10-24 02:28:23.706966+10:30	127.0.0.1:54492	0	f
 1	2016-10-25 10:25:35.356075+10:30	127.0.0.1:35160	0	f
 1	2016-10-25 10:35:49.027929+10:30	127.0.0.1:35984	0	f
 1	2016-10-25 10:35:57.018204+10:30	127.0.0.1:36046	0	f
-1	2016-10-25 10:43:18.889477+10:30	127.0.0.1:36694	0	f
-2	2016-10-25 10:43:27.851181+10:30	192.168.1.105:45196	0	f
-1	2016-10-25 10:43:34.112272+10:30	127.0.0.1:36748	0	f
 1	2016-10-25 10:51:58.636878+10:30	127.0.0.1:37434	0	f
 2	2016-10-25 10:52:01.85697+10:30	192.168.1.105:45522	0	f
 1	2016-10-22 15:08:44.701011+10:30	127.0.0.1:46974	0	f
 1	2016-10-22 15:12:43.62931+10:30	127.0.0.1:47286	0	f
-1	2016-10-23 15:10:24.167786+10:30	127.0.0.1:51274	0	f
-1	2016-10-25 11:43:11.818327+10:30	127.0.0.1:42276	0	f
-1	2016-10-23 04:27:07.486206+10:30	127.0.0.1:57816	0	f
 1	2016-10-23 05:00:03.64962+10:30	127.0.0.1:60818	0	f
-1	2016-10-23 12:45:27.872243+10:30	127.0.0.1:38898	0	f
-1	2016-10-22 17:13:48.661825+10:30	127.0.0.1:57662	0	f
-1	2016-10-24 02:29:37.751696+10:30	127.0.0.1:54674	0	f
+1	2016-10-22 17:07:50.401156+10:30	127.0.0.1:57112	0	f
+1	2016-10-25 08:48:41.078384+10:30	127.0.0.1:54004	0	f
+1	2016-10-25 08:48:46.950912+10:30	127.0.0.1:54052	0	f
+2	2016-10-24 03:23:11.724462+10:30	192.168.1.105:42260	0	f
+1	2016-10-23 15:55:01.604594+10:30	127.0.0.1:56662	0	f
+1	2016-10-23 15:55:07.378269+10:30	127.0.0.1:56706	0	f
+2	2016-10-24 01:37:28.515398+10:30	192.168.1.105:39160	0	f
+1	2016-10-25 15:23:50.235188+10:30	127.0.0.1:34278	0	f
 1	2016-10-24 02:31:44.442305+10:30	127.0.0.1:54836	0	f
 2	2016-10-24 02:32:50.627943+10:30	192.168.1.105:41223	0	f
+1	2016-10-25 15:47:19.315839+10:30	127.0.0.1:36430	0	f
 1	2016-10-23 14:43:15.217365+10:30	127.0.0.1:48970	0	f
 2	2016-10-23 01:05:00.419376+10:30	192.168.1.105:50894	0	f
 1	2016-10-25 11:59:42.055226+10:30	127.0.0.1:44016	0	f
@@ -2919,6 +3009,7 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 11:48:38.394189+10:30	127.0.0.1:42858	0	f
 2	2016-10-25 11:48:39.835559+10:30	192.168.1.105:47666	0	f
 1	2016-10-23 13:16:29.411152+10:30	127.0.0.1:41550	0	f
+1	2016-10-26 00:01:38.193654+10:30	127.0.0.1:48376	0	f
 2	2016-10-23 01:10:57.211439+10:30	192.168.1.105:51110	0	f
 1	2016-10-23 01:10:57.251183+10:30	127.0.0.1:40636	0	f
 1	2016-10-24 01:52:59.231736+10:30	127.0.0.1:51144	0	f
@@ -2947,16 +3038,86 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-25 08:49:38.647368+10:30	127.0.0.1:54112	0	f
 1	2016-10-25 14:05:33.101485+10:30	127.0.0.1:55844	0	f
 2	2016-10-24 00:20:29.24297+10:30	192.168.1.105:36209	0	f
-1	2016-10-25 14:02:26.841083+10:30	127.0.0.1:55568	0	f
+1	2016-10-26 00:23:48.88607+10:30	127.0.0.1:50440	0	f
+1	2016-10-26 00:24:10.442156+10:30	127.0.0.1:50496	0	f
+1	2016-10-26 03:11:23.400428+10:30	127.0.0.1:35668	0	f
+1	2016-10-26 03:21:41.402603+10:30	127.0.0.1:36644	1	t
+2	2016-10-24 02:24:33.95364+10:30	192.168.1.105:40905	0	f
+2	2016-10-24 01:50:24.522717+10:30	192.168.1.105:39637	0	f
+1	2016-10-22 18:23:48.40532+10:30	127.0.0.1:36354	0	f
 1	2016-10-23 03:04:24.391087+10:30	127.0.0.1:50480	0	f
-1	2016-10-23 03:18:22.462966+10:30	127.0.0.1:51660	0	f
 1	2016-10-23 03:20:13.189528+10:30	127.0.0.1:51862	0	f
-1	2016-10-25 08:32:50.856069+10:30	127.0.0.1:52382	0	f
 1	2016-10-25 08:32:58.132612+10:30	127.0.0.1:52416	0	f
+1	2016-10-24 03:57:36.49193+10:30	127.0.0.1:33778	0	f
+1	2016-10-25 10:43:18.889477+10:30	127.0.0.1:36694	0	f
+2	2016-10-25 10:43:27.851181+10:30	192.168.1.105:45196	0	f
+1	2016-10-25 10:43:34.112272+10:30	127.0.0.1:36748	0	f
+1	2016-10-22 15:10:34.393572+10:30	127.0.0.1:47128	0	f
+2	2016-10-25 12:01:53.836343+10:30	192.168.1.105:48166	0	f
+1	2016-10-25 13:07:34.13417+10:30	127.0.0.1:50498	0	f
+1	2016-10-23 03:56:07.650736+10:30	127.0.0.1:55064	0	f
+1	2016-10-24 02:08:41.221515+10:30	127.0.0.1:52680	0	f
+1	2016-10-22 17:14:31.262484+10:30	127.0.0.1:57714	0	f
+1	2016-10-25 13:05:11.318535+10:30	192.168.1.101:44107	0	f
+1	2016-10-24 02:32:50.655408+10:30	127.0.0.1:54966	0	f
+1	2016-10-23 12:45:27.872243+10:30	127.0.0.1:38898	0	f
+1	2016-10-25 16:15:20.706828+10:30	127.0.0.1:38772	0	f
+1	2016-10-25 16:21:41.868596+10:30	127.0.0.1:39396	0	f
+1	2016-10-25 16:21:50.170138+10:30	127.0.0.1:39434	0	f
+1	2016-10-25 16:23:02.16086+10:30	127.0.0.1:39524	0	f
+1	2016-10-25 16:23:08.272208+10:30	127.0.0.1:39562	0	f
+1	2016-10-25 16:24:29.796014+10:30	127.0.0.1:39702	0	f
+1	2016-10-25 18:00:43.115308+10:30	127.0.0.1:48350	0	f
+2	2016-10-24 00:39:04.725943+10:30	192.168.1.105:36877	0	f
+1	2016-10-23 18:46:53.888858+10:30	127.0.0.1:45066	0	f
+1	2016-10-22 17:46:43.859824+10:30	127.0.0.1:60718	0	f
+1	2016-10-22 17:48:27.143068+10:30	127.0.0.1:60742	0	f
+1	2016-10-25 17:29:37.076277+10:30	127.0.0.1:45660	0	f
+1	2016-10-25 17:29:45.046169+10:30	127.0.0.1:45694	0	f
+1	2016-10-25 17:56:01.860346+10:30	127.0.0.1:47994	0	f
+1	2016-10-25 17:51:27.113627+10:30	127.0.0.1:47398	0	f
+1	2016-10-23 03:35:07.382657+10:30	127.0.0.1:53348	0	f
+1	2016-10-24 02:06:59.670076+10:30	127.0.0.1:52486	0	f
+1	2016-10-25 23:29:32.502978+10:30	127.0.0.1:45308	0	f
+1	2016-10-25 23:29:39.445019+10:30	127.0.0.1:45352	0	f
+1	2016-10-22 17:49:45.402296+10:30	127.0.0.1:32838	0	f
+1	2016-10-24 01:47:30.23396+10:30	127.0.0.1:50584	0	f
+1	2016-10-24 02:28:03.236103+10:30	127.0.0.1:54426	0	f
+1	2016-10-24 02:28:08.582033+10:30	127.0.0.1:54464	0	f
+2	2016-10-24 02:28:23.731054+10:30	192.168.1.105:41052	0	f
+1	2016-10-25 14:02:26.841083+10:30	127.0.0.1:55568	0	f
+1	2016-10-25 10:29:34.509049+10:30	127.0.0.1:35472	0	f
+1	2016-10-25 14:51:04.575773+10:30	127.0.0.1:59808	0	f
+1	2016-10-25 14:51:16.303247+10:30	127.0.0.1:59842	0	f
+2	2016-10-25 14:05:52.175623+10:30	192.168.1.105:50657	0	f
+1	2016-10-25 14:22:51.289787+10:30	127.0.0.1:57428	0	f
+1	2016-10-25 15:14:52.436066+10:30	127.0.0.1:33424	0	f
+1	2016-10-25 15:14:57.533573+10:30	127.0.0.1:33452	0	f
+1	2016-10-25 16:01:57.27268+10:30	127.0.0.1:37644	0	f
+1	2016-10-25 10:53:07.071234+10:30	127.0.0.1:37588	0	f
+1	2016-10-25 16:02:03.170824+10:30	127.0.0.1:37680	0	f
+2	2016-10-24 02:07:35.40255+10:30	192.168.1.105:40277	0	f
+1	2016-10-24 02:07:35.430016+10:30	127.0.0.1:52534	0	f
+2	2016-10-24 01:51:43.852722+10:30	192.168.1.105:39691	0	f
+1	2016-10-24 01:51:43.865758+10:30	127.0.0.1:50998	0	f
+1	2016-10-24 01:51:50.758481+10:30	127.0.0.1:51044	0	f
+1	2016-10-24 01:37:37.625698+10:30	127.0.0.1:49638	0	f
+1	2016-10-22 17:52:21.653873+10:30	127.0.0.1:33056	0	f
+1	2016-10-23 01:17:19.910667+10:30	127.0.0.1:41274	0	f
+1	2016-10-23 12:34:33.612024+10:30	127.0.0.1:37906	0	f
+1	2016-10-23 12:46:17.19613+10:30	127.0.0.1:39038	0	f
+1	2016-10-25 11:49:38.882736+10:30	127.0.0.1:42954	0	f
+1	2016-10-26 00:08:24.278711+10:30	127.0.0.1:48966	0	f
+1	2016-10-23 03:33:02.433517+10:30	127.0.0.1:53130	0	f
+2	2016-10-23 18:44:34.26378+10:30	192.168.1.105:54726	0	f
+1	2016-10-23 18:44:34.287039+10:30	127.0.0.1:44812	0	f
+1	2016-10-22 15:50:02.438229+10:30	127.0.0.1:50532	0	f
+1	2016-10-23 04:19:39.119373+10:30	127.0.0.1:57200	0	f
+2	2016-10-24 02:31:57.194662+10:30	192.168.1.105:41189	0	f
+1	2016-10-24 02:32:01.086712+10:30	127.0.0.1:54886	0	f
+1	2016-10-25 11:45:50.605168+10:30	127.0.0.1:42536	0	f
 1	2016-10-24 02:21:26.656763+10:30	127.0.0.1:53740	0	f
 2	2016-10-23 14:35:56.551577+10:30	192.168.1.105:51967	0	f
-1	2016-10-23 14:38:26.526704+10:30	127.0.0.1:48494	0	f
-1	2016-10-25 10:53:07.071234+10:30	127.0.0.1:37588	0	f
 2	2016-10-25 10:53:12.83641+10:30	192.168.1.105:45573	0	f
 2	2016-10-23 18:36:25.397988+10:30	192.168.1.105:54428	0	f
 1	2016-10-24 00:40:49.351571+10:30	127.0.0.1:44764	0	f
@@ -2966,62 +3127,16 @@ COPY login (user_id, date, ip_address, channel, up) FROM stdin;
 1	2016-10-24 00:21:16.880651+10:30	127.0.0.1:42992	0	f
 1	2016-10-24 01:44:43.161226+10:30	127.0.0.1:50312	0	f
 1	2016-10-22 15:28:12.127019+10:30	127.0.0.1:48618	0	f
-2	2016-10-24 00:39:04.725943+10:30	192.168.1.105:36877	0	f
-1	2016-10-23 18:46:53.888858+10:30	127.0.0.1:45066	0	f
-1	2016-10-22 17:46:43.859824+10:30	127.0.0.1:60718	0	f
-1	2016-10-22 17:48:27.143068+10:30	127.0.0.1:60742	0	f
-1	2016-10-22 17:52:21.653873+10:30	127.0.0.1:33056	0	f
-1	2016-10-23 01:17:19.910667+10:30	127.0.0.1:41274	0	f
-1	2016-10-23 12:34:33.612024+10:30	127.0.0.1:37906	0	f
-1	2016-10-23 12:46:17.19613+10:30	127.0.0.1:39038	0	f
-1	2016-10-25 11:49:38.882736+10:30	127.0.0.1:42954	0	f
-1	2016-10-23 03:33:02.433517+10:30	127.0.0.1:53130	0	f
-2	2016-10-23 18:44:34.26378+10:30	192.168.1.105:54726	0	f
-1	2016-10-23 18:44:34.287039+10:30	127.0.0.1:44812	0	f
-1	2016-10-22 15:50:02.438229+10:30	127.0.0.1:50532	0	f
-1	2016-10-23 04:19:39.119373+10:30	127.0.0.1:57200	0	f
-1	2016-10-23 04:54:16.620893+10:30	127.0.0.1:60070	0	f
-1	2016-10-23 12:34:28.753216+10:30	127.0.0.1:37880	0	f
-2	2016-10-25 11:49:47.832671+10:30	192.168.1.105:47710	0	f
-1	2016-10-23 03:57:48.796421+10:30	127.0.0.1:55214	0	f
-1	2016-10-24 02:22:15.98244+10:30	127.0.0.1:53872	0	f
-1	2016-10-23 03:57:53.57408+10:30	127.0.0.1:55254	0	f
-1	2016-10-24 03:16:03.351118+10:30	127.0.0.1:58298	0	f
-1	2016-10-25 09:16:49.691356+10:30	127.0.0.1:56884	0	f
-1	2016-10-25 09:16:55.257311+10:30	127.0.0.1:56936	0	f
-1	2016-10-24 03:19:10.941045+10:30	127.0.0.1:58606	0	f
-1	2016-10-25 08:48:41.078384+10:30	127.0.0.1:54004	0	f
-1	2016-10-25 08:48:46.950912+10:30	127.0.0.1:54052	0	f
-2	2016-10-24 03:23:11.724462+10:30	192.168.1.105:42260	0	f
-1	2016-10-23 15:55:01.604594+10:30	127.0.0.1:56662	0	f
-1	2016-10-23 15:55:07.378269+10:30	127.0.0.1:56706	0	f
-2	2016-10-24 01:37:28.515398+10:30	192.168.1.105:39160	0	f
-1	2016-10-25 15:23:50.235188+10:30	127.0.0.1:34278	1	t
-2	2016-10-24 02:07:35.40255+10:30	192.168.1.105:40277	0	f
-1	2016-10-24 02:07:35.430016+10:30	127.0.0.1:52534	0	f
-2	2016-10-24 01:51:43.852722+10:30	192.168.1.105:39691	0	f
-1	2016-10-24 01:51:43.865758+10:30	127.0.0.1:50998	0	f
-1	2016-10-24 01:51:50.758481+10:30	127.0.0.1:51044	0	f
-1	2016-10-24 01:37:37.625698+10:30	127.0.0.1:49638	0	f
-1	2016-10-24 01:44:33.894288+10:30	127.0.0.1:50254	0	f
-2	2016-10-24 02:31:57.194662+10:30	192.168.1.105:41189	0	f
-1	2016-10-24 02:32:01.086712+10:30	127.0.0.1:54886	0	f
-1	2016-10-25 07:50:46.397133+10:30	127.0.0.1:47754	0	f
-1	2016-10-25 07:50:52.293392+10:30	127.0.0.1:47778	0	f
-1	2016-10-25 08:26:52.685956+10:30	127.0.0.1:51886	0	f
-1	2016-10-24 02:08:47.565875+10:30	127.0.0.1:52718	0	f
-2	2016-10-25 14:02:31.173146+10:30	192.168.1.105:50536	0	f
-1	2016-10-25 12:01:53.037337+10:30	127.0.0.1:44246	0	f
-1	2016-10-23 14:35:56.536757+10:30	127.0.0.1:48312	0	f
-2	2016-10-24 02:08:41.234658+10:30	192.168.1.105:40322	0	f
-2	2016-10-24 00:41:26.651185+10:30	192.168.1.105:36997	0	f
-1	2016-10-25 14:27:09.38286+10:30	127.0.0.1:57738	0	f
-1	2016-10-25 14:51:04.575773+10:30	127.0.0.1:59808	0	f
-1	2016-10-25 14:51:16.303247+10:30	127.0.0.1:59842	0	f
-2	2016-10-25 14:05:52.175623+10:30	192.168.1.105:50657	0	f
-1	2016-10-25 14:22:51.289787+10:30	127.0.0.1:57428	0	f
-1	2016-10-25 15:14:52.436066+10:30	127.0.0.1:33424	0	f
-1	2016-10-25 15:14:57.533573+10:30	127.0.0.1:33452	0	f
+1	2016-10-22 18:06:15.599484+10:30	127.0.0.1:34572	0	f
+1	2016-10-24 03:17:03.286907+10:30	127.0.0.1:58436	0	f
+1	2016-10-24 02:33:33.765297+10:30	127.0.0.1:55058	0	f
+1	2016-10-24 03:57:32.149446+10:30	127.0.0.1:33734	0	f
+1	2016-10-25 23:55:59.332848+10:30	127.0.0.1:47856	0	f
+1	2016-10-26 00:02:50.358275+10:30	127.0.0.1:48478	0	f
+1	2016-10-26 00:02:58.345038+10:30	127.0.0.1:48532	0	f
+1	2016-10-26 00:17:37.18846+10:30	127.0.0.1:49810	0	f
+1	2016-10-26 00:22:05.438823+10:30	127.0.0.1:50310	0	f
+1	2016-10-26 00:29:06.526936+10:30	127.0.0.1:50938	0	f
 \.
 
 
@@ -3619,8 +3734,207 @@ COPY tiles2 (game_id, i, height, content, owner) FROM stdin;
 --
 
 COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_control, nation, utype, condition, cmd_level, drill, deploy_to, gt_formation, sk_out, woods, rough, cover, rflank, lflank, has_support, bayonets, bayonets_lost, bayonets_mstate, bayonets_moved, bayonets_fired, small_arms, elite_arms, lt_coy, jg_coy, rifles, lt_lost, lt_mstate, rating, sabres, sabres_lost, sabres_mstate, sabres_charged, cav_type, cav_rating, guns, guns_lost, guns_fired, guns_moved, guns_limbered, guns_mstate, gunnery_type, horse_guns, gun_max_condition, gun_condition) FROM stdin;
+2054	70	14	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2055	70	14	Supply_Train.Guard_Detachment	Guard Detachment			10		5	2	6	8	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	10	60	0	0	0	12	7	0	0	f	f	f	0	0	f	2	0
+2056	71	14	2eme_Division	2eme Division		Leval	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2057	71	14	2eme_Division.28e_Ligne	28e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2058	71	14	1eme_Division.35e_Ligne	35e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2059	71	14	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	2	0	1	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2060	71	14	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2061	71	14	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2062	71	14	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2063	71	14	2eme_Division.4e_Ligne	4e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2064	71	14	1eme_Division	1eme Division		St Hilaire	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2065	71	14	3eme_Division.26e_Legere	26e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2066	71	14	1eme_Division.10e_Legere	10e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2067	71	14	2eme_Division.57e_Ligne	57e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2068	71	14	3eme_Division.18e_Ligne	18e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2069	71	14	Corps_Cavaly.22e_Chasseur	22e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2070	71	14	1eme_Division.55e_Ligne	55e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2071	71	14	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2072	71	14	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2073	71	14	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2074	71	14	3eme_Division.Po_Legere	Po Legere			10	France/Italy	2	2	4	6	1	1	f	f	f	f	f	f	f	1000	0	0	f	f	1	2	2	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2075	71	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+2076	71	14	Corps_Artillery	Corps Artillery			10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2077	71	14	Corps_Cavaly.11e_Chasseur	11e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2078	71	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2079	71	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2080	71	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2081	72	14	Cav_Bde	Cav Bde		Trelliard	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2082	72	14	Cav_Bde.10e_Hussar	10e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2083	72	14	Cav_Bde.9e_Hussar_Copy	9e Hussar_Copy			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2084	72	14	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2085	72	14	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+2086	72	14	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1747	42	4	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1783	44	4	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	5	4	6	0	f	f	f	0	4	f	2	0
+2087	72	14	1eme_Division.34e_Ligne	34e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2088	72	14	1eme_Division.40e_Ligne	40e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2089	72	14	1eme_Division.64e_Ligne	64e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2090	72	14	1eme_Division.88e_Ligne	88e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2091	72	14	1eme_Division.17e_Legere	17e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2100	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2092	72	14	2eme_Division	2eme Division		Gazan	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2093	72	14	2eme_Division.28e_Legere	28e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	900	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2094	72	14	2eme_Division.100e_Ligne	100e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2095	72	14	2eme_Division.103e_Ligne	103e Ligne			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2096	72	14	2eme_Division.21e_Legere	21e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	1	0	0	0	f	f	f	0	0	f	2	0
+2097	72	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2098	72	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2099	73	14	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2100	73	14	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2101	73	14	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2102	73	14	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2103	73	14	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2104	73	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2105	73	14	2eme_Division.59e_Ligne	59e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2106	73	14	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+2107	73	14	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+2108	73	14	2eme_Division	2eme Division		Gardanne	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2109	73	14	1eme_Division	1eme Division		Marchand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2110	73	14	Cav_Bde	Cav Bde		Charbanais	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2111	73	14	2eme_Division.50e_Ligne	50e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2112	73	14	2eme_Division.27e_Ligne	27e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2113	73	14	1eme_Division.6e_Legere	6e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2114	73	14	2eme_Division.25e_Legere	25e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2115	74	14	Corps_Artillery	Corps Artillery			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2116	74	14	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2117	74	14	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2118	74	14	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2119	74	14	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2120	74	14	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+2121	74	14	3e_Dragoon_Div	3e Dragoon Div		Beaumont	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2122	74	14	4e_Dragoon_Div	4e Dragoon Div		Sahut	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2123	74	14	2e_Cuirassier_Div.Bde_StSulpice	Bde St.Sulpice			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
+2124	74	14	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2125	74	14	Light_Div.Milhaud_1e_Hussar	Milhaud 1e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2126	74	14	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2127	74	14	2e_Dragoon_Div.Bde_Roget	Bde Roget			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2128	74	14	1e_Cuirassier_Div.Bde_Defrance	Bde Defrance			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	9	2	0	0	f	f	f	0	0	f	2	0
+2129	74	14	2e_Dragoon_Div.Bde_Milet	Bde Milet			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2130	74	14	1e_Cuirassier_Div.Bde_Housaye	Bde Housaye			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1300	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2131	74	14	1e_Dragoon_Div.Bde_Fenerolz	Bde Fenerolz			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2132	74	14	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2133	74	14	4e_Dragoon_Div.Bde_Margaron	Bde Margaron	17th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 27th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2134	74	14	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2135	74	14	3e_Dragoon_Div.Bde_Maubourg	Bde Maubourg			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2136	74	14	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+2137	74	14	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+2138	74	14	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche	18th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 19th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2139	75	14	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2140	75	14	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2141	75	14	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	4	6	0	f	f	f	0	3	f	2	3
+2143	75	14	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+2144	76	14	1eme_Division.13e_Legere	13e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2145	76	14	1eme_Division	1eme Division		Morand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2146	76	14	2eme_Division.108e_Ligne	108e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2147	76	14	1eme_Division.51e_Ligne	51e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2148	76	14	1eme_Division.17e_Ligne	17e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2149	76	14	1eme_Division.61e_Ligne	61e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2150	76	14	1eme_Division.30e_Ligne	30e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2151	76	14	2eme_Division	2eme Division		Friant	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2152	76	14	2eme_Division.33e_Ligne	33e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2153	76	14	2eme_Division.111e_Ligne	111e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2154	76	14	Cav_Bde	Cav Bde		Viallanes	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2155	76	14	3eme_Division	3eme Division		Gudin	10	France	1	2	1	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2156	76	14	3eme_Division.12e_Ligne	12e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2157	76	14	3eme_Division.21e_Ligne	21e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2158	76	14	3eme_Division.25e_Ligne	25e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2159	76	14	3eme_Division.85e_Ligne	85e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2160	76	14	Cav_Bde.1e_Chasseur	1e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+2161	76	14	Cav_Bde.2e_Chasseur	2e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	3	0	0	f	f	f	0	0	f	2	0
+2162	76	14	Corps_Artillery	Corps Artillery		Hannicque	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2163	76	14	2eme_Division.48e_Ligne	48e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2164	76	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2165	76	14	Corps_Artillery.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2166	76	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2167	76	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2168	77	14	Infantry_Division	Infantry Division		Lefebvre	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2169	77	14	Infantry_Division.1e_Grenadiers	1e Grenadiers			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2170	77	14	Infantry_Division.2e_Grenadiers	2e Grenadiers			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2171	77	14	Guard_Artillery.Army_Artillery_Park	Army Artillery Park			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	16	0	f	f	f	0	1	f	2	2
+2172	77	14	Cavalry_Division.Chasseurs_a_Cheval	Chasseurs a Cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	1	0	0	f	f	f	0	0	f	2	0
+2173	77	14	Infantry_Division.1e_Chasseurs	1e Chasseurs			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2174	77	14	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	8	1	0	0	f	f	f	0	0	f	2	0
+2175	77	14	Guard_Artillery	Guard Artillery		de Lamartiniére	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2176	77	14	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2177	77	14	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2178	77	14	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2179	77	14	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	1
+2180	77	14	Guard_Artillery.Guard_Foot_Artillery	Guard Foot Artillery			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	24	0	f	f	f	0	3	f	2	1
+2181	78	14	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2182	78	14	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2183	78	14	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	422	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+2184	78	14	Artillery_Reserve	Artillery Reserve		Eble	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2185	78	14	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2186	78	14	3eme_Division.95e_Ligne	95e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2187	78	14	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2188	78	14	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2189	78	14	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2190	78	14	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2191	78	14	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2192	78	14	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2194	78	14	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2195	78	14	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2197	78	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2198	78	14	1eme_Division.9e_Legere	9e Legere		de l'Eltang	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2600	0	0	f	f	1	2	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+2199	78	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2200	78	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2201	78	14	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2202	79	14	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2203	79	14	1eme_Division.105e_Ligne	105e Ligne			10	France	2	2	1	3	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2204	79	14	Corps_Cav.20e_Chasseur	20e Chasseur			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2205	79	14	1eme_Division.14e_Ligne	14e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2206	79	14	Corps_Cav	Corps Cav		Durosnel	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2207	79	14	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2208	79	14	2eme_Division.63e_Ligne	63e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2209	79	14	Corps_Artillery.Heavy_Bty	Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+2210	79	14	1eme_Division.16e_Legere	16e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2211	79	14	1eme_Division.44e_Ligne	44e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2212	79	14	1eme_Division	1eme Division		Desjardin	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2213	79	14	2eme_Division.24e_Ligne	24e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2214	79	14	2eme_Division.7e_Legere	7e Legere			10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2215	79	14	2eme_Division	2eme Division		Bierre	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2216	79	14	2eme_Division.Hesse_Darmstadt	Hesse Darmstadt			10	Hesse	2	2	1	1	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2217	79	14	2eme_Division.Allied_Nassau	Allied Nassau			10	Nassau	2	2	1	5	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2218	79	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2219	79	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2220	80	14	Supply_Train	Supply Train			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2221	80	14	Supply_Train.Supply_Escort_Detachment	Supply Escort Detachment			10		5	2	5	6	1	1	f	f	f	f	f	f	f	300	0	0	f	f	1	2	4	0	f	0	0	6	50	0	0	0	3	0	0	0	f	f	f	0	0	f	2	0
+2222	81	14	1st_Div.3rd_special_regt	3rd special regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2223	81	14	1st_Div	1st Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2224	81	14	2nd_Div.1st_Regt_of_Death	1st Regt of Death	with data		10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2225	81	14	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2226	81	14	2nd_Div	2nd Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2227	81	14	1st_Div.2nd_Regt	2nd Regt			10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	6	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2228	81	14	2nd_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2229	81	14	2nd_Div.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2230	81	14	6th_Division	6th Division			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2231	81	14	6th_Division.2nd_Regt	2nd Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2232	81	14	7th_Div	7th Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2233	81	14	6th_Division.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2234	81	14	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2235	81	14	7th_Div.4th_Bn	4th Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2236	81	14	2nd_Duvussion	2nd Duvussion			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2237	81	14	2nd_Duvussion.NZ_Brugade_from_NZ	NZ Brugade from NZ			10		2	2	4	7	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2238	81	14	2nd_Div.Devils_Bde_as_such	Devils Bde as such	as such six much as such		10	gotta break this	2	2	4	4	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	3	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2239	81	14	2nd_Div.3rd_special_regt_von_X	3rd special regt von X			10		2	2	1	8	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	2	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2240	82	14	Adv_Guard	Adv Guard	Blucher own	Blucher	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2241	82	14	1st_Div	1st Div		Pr Wiliam of Orange	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2242	82	14	2nd_Div	2nd Div		Wartensleben	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2243	82	14	Adv_Guard.Lt_Bde_Oswald	Lt Bde Oswald	Weimar Fusilier Battalion Greiffenberg Fusilier Battalion # 4 Oswald Fusilier Battalion # 14 Kloch Fusilier Battalion # 18		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2300	0	0	f	f	1	3	0	4	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2244	82	14	3rd_Division	3rd Division		von Schmettau	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2245	82	14	Cav_Bde_Blucher.Wurttemberg_Hussars_Nr_4	Württemberg Hussars Nr 4	Württemberg Hussar Regiment # 4		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2246	82	14	Cav_Bde_Blucher.Blucher_Hussar_Regt_Nr_8	Blucher Hussar Regt Nr 8			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2247	82	14	Cav_Bde_Blucher	Cav Bde Blucher	Bluchers cav bde as part of the advance guard	Blucher	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2248	82	14	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2249	82	14	Cav_Bde_Blucher.Schorlemmer	Schorlemmer	Schorlemmer Horse Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	3
+2250	82	14	2nd_Div.Bde_von_Renouard	Bde von Renouard	Alt-Braun Grenadier Battalion Prince Louis Infantry Regiment # 20, two battalions Brunswick Infantry Regiment # 21, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2251	82	14	2nd_Div.Merkatz	Merkatz	Merkatz Horse Artillery Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	2
+2252	82	14	1st_Div.Bde_Prinz_Henry	Bde Prinz Henry	Rheinbaben Grenadier Battalion Prince Ferdinand Infantry Regiment # 34, two battalions Puttkammer Infantry Regiment # 36, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2253	82	14	2nd_Div.Bde_von_Wedel	Bde von Wedel	Hanstein Grenadier Battalion Renouard Infantry Regiment # 3, two battalions Kleist Infantry Regiment # 5, two battalions Wilkins Foot Artillery battery, six 8-pound guns		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2254	82	14	1st_Div.Bde_von_Lutzow	Bde von Lützow	Knebel Grenadier Battalion Möllendorf Infantry Regiment # 25, two battalions Wartensleben Infantry Regiment # 59, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2255	82	14	3rd_Division.Bde_von_Schimonsky	Bde von Schimonsky	Krafft Grenadier Battalion Malschitsky Infantry Regiment # 28, two battalions Schimonsky Infantry Regiment # 40, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2257	82	14	1st_Div.Cav_Bde_Prinz_Wilhelm	Cav Bde Prinz Wilhelm	Leib Carabinier Regiment # 12, five squadrons Garde du Corps Cuirassier Regiment # 14, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
 1160	3	14	Corps_Artillery	Corps Artillery		Careil	10	France	1	2	5	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1161	3	14	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
 1162	3	14	1eme_Division	1eme Division		Suchet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
@@ -3637,8 +3951,99 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1173	4	14	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
 1174	4	14	1eme_Division.39e_Ligne	39e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1175	4	14	1eme_Division.69e_Ligne	69e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2258	82	14	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1800	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2259	82	14	3rd_Division.Bde_von_Alvensleben	Bde von Alvensleben	Schack Grenadier Battalion Alvensleben Infantry Regiment # 33, two battalions Prince Heinrich Infantry Regiment # 35, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
+2260	82	14	1st_Div.Willmann	Willmann	Willmann Horse Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	2
+2261	83	14	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2262	83	14	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	700	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+2263	83	14	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2264	83	14	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2265	83	14	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	12	3	0	0	f	f	f	0	0	f	2	0
+2266	83	14	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2267	83	14	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+2268	83	14	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	4
+2269	83	14	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
+2270	83	14	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2271	83	14	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	1	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2272	83	14	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
+2275	83	14	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
+2277	83	14	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+2278	83	14	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	4
+2280	83	14	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+2281	83	14	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3300	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+2282	83	14	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2285	83	14	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2287	84	14	Corps_Artillery.Kirchfeld_Nr_16	Kirchfeld Nr 16			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2288	84	14	Corps_Artillery.Kirchfeld_Nr_16.Schaefer_Nr_17.Kirchfeld_Nr_16.Horse_Bty_Nr_11	Horse Bty Nr 11			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	3	t	2	3
+2273	83	14	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
+2289	84	14	Corps_Artillery.Kirchfeld_Nr_16.Schaefer_Nr_17	Schaefer Nr 17			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2290	84	14	Corps_Artillery	Corps Artillery			10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2291	84	14	Corps_de_Bataille.Katte_Dragoon_Regt_Nr_4	Katte Dragoon Regt Nr 4			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	800	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2292	84	14	Corps_de_Bataille.Bailliodz_Cuirassier_Nr_5	Bailliodz Cuirassier Nr 5			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	800	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2293	84	14	Corps_de_Bataille.3rd_Bde	3rd Bde	Sobbe Fusilier Battalion # 18 Wedell Infantry Regiment # 10, two battalions Tschepe Infantry Regiment # 37, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2294	84	14	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2295	84	14	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4400	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2296	84	14	Corps_de_Bataille	Corps de Bataille		General Karl August, Grand Duke of Saxe-Weimar-Eisenach	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2297	84	14	Adv_Guard.Bde_von_Wobeser	Bde von Wobeser	Ernst Fusilier Battalion # 19 One Foot Jäger company Wobeser Dragoon Regiment # 14, five squadrons Lehmann Horse Artillery Battery # 4 (-), four 4-pound guns		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	3	0	1	f	0	0	4	750	0	0	0	5	4	4	0	f	f	f	0	4	f	2	2
+2298	84	14	Adv_Guard.Horse_Bty_Nr_12	Horse Bty Nr 12			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	3
+2299	84	14	Adv_Guard.Bty_Nr_19	Bty Nr 19			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2300	84	14	Adv_Guard.Bde_von_Winning	Bde von Winning	Kaiserlingk Fusilier Battalion # 1 Bila Fusilier Battalion # 2 Tschammer Infantry Regiment # 27, two battalions Two Foot Jäger companies		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2301	84	14	Adv_Guard	Adv Guard	part of the OOB, but they didnt make it to the actual battle	von Winning	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2302	85	14	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2303	85	14	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	1	0	0	f	f	f	0	0	f	2	0
+2304	85	14	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2305	85	14	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2306	85	14	1st_Div.Guard_Bde_von_Pletz	Guard Bde von Pletz			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2307	85	14	1st_Div.Guard_Bde_von_Hirschfeld	Guard Bde von Hirschfeld			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	1	f	0	0	2	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2308	85	14	2nd_Div.von_Zenge_Grenadiers	von Zenge Grenadiers			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2309	85	14	2nd_Div.Zenge_Regt_Musketeer	Zenge Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2310	85	14	2nd_Div.Arnim_Regt_Musketeer	Arnim Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2311	85	14	2nd_Div.Pirch_Regt_Musketeer	Pirch Regt Musketeer			10	Prussia	2	2	1	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2312	85	14	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+2313	85	14	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
+2314	85	14	2nd_Div.von_Malschitsky_Grenadiers	von Malschitsky Grenadiers			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	1
+2315	86	14	Reserve_Cavalry	Reserve Cavalry			10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2316	86	14	Adv_Guard	Adv Guard		General-Major Johann von Hinrichs	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2317	86	14	New_Division				10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2318	86	14	1st_Div	1st Div		von Natzmer	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2319	86	14	2nd_Div	2nd Div		von Larisch	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2320	86	14	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17		10		2	2	4	9	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	-3	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2322	86	14	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2323	86	14	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+2324	86	14	1st_Div.Foot_Bti	Foot Bti			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
+2325	86	14	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2326	86	14	2nd_Div.Foot_Bty	Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
+2328	86	14	Adv_Guard.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	t	2	4
+2329	86	14	Reserve_Cavalry.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, four squadrons Katte Dragoon Regiment # 10, four squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2331	86	14	1st_Div.Grenadier_Bde	Grenadier Bde	Schmeling Grenadier Battalion Crety Grenadier Battalion		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2332	86	14	Reserve_Cavalry.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	3
+2321	86	14	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	5400	0	0	f	f	1	2	3	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2327	86	14	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2330	86	14	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1176	4	14	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
 1177	4	14	1eme_Division.76e_Ligne	76e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1783	44	4	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	5	4	6	0	f	f	f	0	4	f	2	3
+2256	82	14	3rd_Division.Cav_Bde_von_Irwing	Cav Bde von Irwing	Königin Dragoon Regiment # 5, ten squadrons Graumann Horse Artillery Battery, six guns		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	5	4	6	0	f	f	f	0	4	f	2	3
+2193	78	14	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2196	78	14	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	2	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+2276	83	14	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+2279	83	14	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+2283	83	14	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+2284	83	14	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
+2286	83	14	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	2	2	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2142	75	14	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
+2274	83	14	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1225	6	14	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1242	7	14	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
+1215	6	14	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1219	6	14	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1224	6	14	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
+1229	6	14	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1234	6	14	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	2	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1296	12	14	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	2	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1307	12	14	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1723	40	4	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	2	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
+1857	48	4	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	2	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1647	36	4	2e_Cuirassier_Div.Bde_Verdiere	Bde Verdiere			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	4	0	0	f	f	f	0	0	f	2	0
 1665	36	4	4e_Dragoon_Div.Bde_Laplanche	Bde Laplanche	18th Dragoon Regiment, 1st, 2nd, and 3rd squadrons 19th Dragoon Regiment, 1st, 2nd, and 3rd squadrons		10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
 1663	36	4	Corps_Artillery.1e_Horse	1e Horse			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
@@ -3682,13 +4087,13 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1844	48	4	New_Division				10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1708	40	4	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1612	34	4	Corps_Artillery.Heavy_Foot	Heavy Foot			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
+1810	45	4	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1633	35	4	Corps_Artillery.1e_Heavy_Bty	1e Heavy Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	2
 1784	44	4	1st_Div.Cav_Bde_Prinz_Wilhelm	Cav Bde Prinz Wilhelm	Leib Carabinier Regiment # 12, five squadrons Garde du Corps Cuirassier Regiment # 14, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
 1785	44	4	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1800	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
 1786	44	4	3rd_Division.Bde_von_Alvensleben	Bde von Alvensleben	Schack Grenadier Battalion Alvensleben Infantry Regiment # 33, two battalions Prince Heinrich Infantry Regiment # 35, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4500	0	0	f	f	1	3	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
 1791	45	4	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1809	45	4	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
-1810	45	4	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1789	45	4	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	700	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
 1790	45	4	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1808	45	4	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3300	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
@@ -3718,13 +4123,13 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1775	44	4	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
 1812	45	4	2nd_Div.Horse_Bty	Horse Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
 1827	46	4	Corps_Artillery	Corps Artillery			10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1803	45	4	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1802	45	4	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
-1801	45	4	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
-1806	45	4	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1803	45	4	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
+1801	45	4	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1804	45	4	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
 1807	45	4	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1805	45	4	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	4
+1806	45	4	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1148	2	14	Corps_Cavaly	Corps Cavaly		Guyot	10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1149	2	14	3eme_Division	3eme Division		LeGrand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1150	2	14	3eme_Division.75e_Ligne	75e Ligne			10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1700	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
@@ -3743,11 +4148,10 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1796	45	4	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
 1798	45	4	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	1	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1797	45	4	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1813	45	4	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	2	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
-1811	45	4	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
-1800	45	4	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
 1792	45	4	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	12	3	0	0	f	f	f	0	0	f	2	0
 1794	45	4	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1813	45	4	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	2	2	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1811	45	4	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
 1829	47	4	1st_Div	1st Div		Kuhnheim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1831	47	4	1st_Div.Beeren_Cuirassier	Beeren Cuirassier			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
 1830	47	4	1st_Div.Garde_du_Corps_Cavalry	Garde du Corps Cavalry			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	1	1	0	0	f	f	f	0	0	f	2	0
@@ -3765,6 +4169,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1795	45	4	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	4
 1799	45	4	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
 1793	45	4	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+1800	45	4	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
 1821	46	4	Adv_Guard.Horse_Bty_Nr_12	Horse Bty Nr 12			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	3
 1826	46	4	Corps_Artillery.Kirchfeld_Nr_16.Schaefer_Nr_17.Kirchfeld_Nr_16.Horse_Bty_Nr_11	Horse Bty Nr 11			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	3	t	2	3
 1855	48	4	Adv_Guard.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	t	2	4
@@ -3795,35 +4200,28 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1207	5	14	1e_Dragoon_Div.Bde_Picard	Bde Picard			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
 1208	5	14	4e_Dragoon_Div.Bde_Margaron	Bde Margaron			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
 1209	5	14	3e_Dragoon_Div.Bde_Boye	Bde Boye			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
-1214	6	14	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
-1215	6	14	2nd_Div.von_Dyherrn	von Dyherrn			10	Saxony	2	2	4	3	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1216	6	14	1st_Div.Horse_Bty	Horse Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
 1217	6	14	Reserve_Div.Prittwitz_Grenadier_Bde	Prittwitz Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3300	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1218	6	14	Reserve_Div.Cerrini_Grenadier_Bde	Cerrini Grenadier Bde			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	4200	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
-1219	6	14	1st_Div.von_Schimonsky	von Schimonsky			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1220	6	14	Reserve_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	4
 1221	6	14	3rd_Div	3rd Div		Tauentzein	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1222	6	14	3rd_Div.Cav_Bde_Prince_Clement	Cav Bde Prince Clement			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	700	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
 1223	6	14	3rd_Div.Rosen_Fusilers	Rosen Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	400	0	0	f	f	1	0	0	2	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
-1224	6	14	3rd_Div.von_Schoeneberg	von Schöneberg			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	4
-1225	6	14	3rd_Div.von_Zweiffel	von Zweiffel			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
 1226	6	14	1st_Div	1st Div		Grawert	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1227	6	14	3rd_Div.Lt_Bty	Lt Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
 1228	6	14	Reserve_Div.Cav_Bde_von_Krafft	Cav Bde von Krafft			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	12	3	0	0	f	f	f	0	0	f	2	0
-1229	6	14	1st_Div.von_Mueffling	von Müffling			10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1230	6	14	Reserve_Div	Reserve Div		Prittwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1231	6	14	Reserve_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
 1232	6	14	1st_Div.Heavy_Bty	Heavy Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	4
 1233	6	14	1st_Div.Bde_Henkel	Bde Henkel			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
-1234	6	14	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	800	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1235	6	14	2nd_Div	2nd Div		Zechwitz	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1236	6	14	1st_Div.Erichsen_Fusilers	Erichsen Fusilers			10		2	2	4	9	1	1	f	f	f	f	f	f	f	700	0	0	f	f	1	0	0	1	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1237	6	14	2nd_Div.Cav_Bde_von_Kochitsky	Cav Bde von Kochitsky			10	Saxony	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
 1238	6	14	2nd_Div.Heavy_Bty	Heavy Bty			10	Saxony	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	1	f	2	3
+1214	6	14	2nd_Div.von_Burgsdorf	von Burgsdorf			10	Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	3400	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	1	0	f	f	f	0	4	f	2	3
 1239	7	14	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
 1240	7	14	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	4	6	0	f	f	f	0	3	f	2	3
 1241	7	14	Adv_Guard_Div.Bde_von_Pelet	Bde von Pelet	Rabenau # 13 Pelet # 14 Rühle # 15 Fusiliers, Masars and Valentin Jager 		10	Prussia	2	2	4	9	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	2	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	3	f	2	3
-1242	7	14	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	0
 1243	7	14	Adv_Guard_Div	Adv Guard Div		Ferdinand	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1245	9	14	2nd_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
 1246	9	14	1st_Div.Md_Foot_Bty	Md Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	1
@@ -3874,7 +4272,6 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1292	11	14	Cavalry_Division	Cavalry Division		Bessieres	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1294	12	14	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
 1295	12	14	3eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
-1296	12	14	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
 1297	12	14	Artillery_Reserve.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
 1298	12	14	2eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
 1299	12	14	1eme_Division.Md_Foot_Bty	Md Foot Bty			10		4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
@@ -3884,7 +4281,6 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1303	12	14	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1304	12	14	1eme_Division.32e_Ligne	32e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1305	12	14	1eme_Division	1eme Division		de l'Eltang	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1307	12	14	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1308	12	14	Cav_Reserve	Cav Reserve		Tilley	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1309	12	14	Cav_Reserve.2e_Hussar	2e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
 1310	12	14	Cav_Reserve.4e_Hussar	4e Hussar			10	France	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	422	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
@@ -3942,9 +4338,9 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1351	15	14	1st_Div.1st_Regt	1st Regt			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1352	15	14	1st_Div	1st Div			10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1578	31	4	6th_Div	6th Div			10	Norman	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1579	31	4	6th_Div.44th_Light_Fusilier	44th Light Fusilier			10	Norman	2	2	4	4	1	1	f	f	f	f	f	f	f	2200	0	0	f	f	1	3	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	0
 1580	31	4	6th_Div.Devil_Bde	Devil Bde	oeu		10		5	2	6	9	1	1	f	f	f	f	f	f	f	200	0	0	f	f	1	2	1	1	f	0	0	3	80	0	0	0	10	0	0	0	f	f	f	0	0	f	2	0
 1586	33	4	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			10	France/Corsica	2	2	1	6	1	1	f	f	f	f	f	f	f	1300	0	0	f	f	1	2	0	1	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1579	31	4	6th_Div.44th_Light_Fusilier	44th Light Fusilier			10	Norman	2	2	4	4	1	1	f	f	f	f	f	f	f	2200	0	0	f	f	1	3	0	1	f	0	0	4	0	0	0	0	0	0	2	0	f	f	f	0	4	f	2	3
 1588	33	4	1eme_Division.43e_Ligne	43e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1589	33	4	2eme_Division.24e_Legere	24e Legere			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1587	33	4	2eme_Division.46e_Ligne	46e Ligne			10	France	2	2	1	5	1	1	f	f	f	f	f	f	f	1400	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
@@ -4001,7 +4397,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1629	35	4	Cav_Bde.10e_Chasseur	10e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
 1626	35	4	Cav_Bde.9e_Hussar	9e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
 1631	35	4	Corps_Artillery	Corps Artillery			10	France	1	2	4	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1669	37	4	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	0
+1669	37	4	Adv_Guard_Div.Bde_Belvilaqua	Bde Belvilaqua	Combined Bns from IR 49,  Prinz Clemens (saxon), and Kurfurst (saxon)		10	Prussia/Saxony	2	2	4	1	1	1	f	f	f	f	f	f	f	5100	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	6	0	f	f	f	0	4	f	2	3
 1668	37	4	Adv_Guard_Div.Cav_Bde_von_Schimmelpfennig	Cav Bde von Schimmelpfennig	Schimmelpfennig Hussar Regiment # 6, ten squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1500	0	0	0	2	4	6	0	f	f	f	0	3	f	2	3
 1670	37	4	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
 1646	36	4	2e_Dragoon_Div	2e Dragoon Div		Grouchy	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
@@ -4033,13 +4429,12 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1702	39	4	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1704	39	4	Infantry_Division.Foot_Dragoons	Foot Dragoons			10	France	2	2	1	6	1	1	f	f	f	f	f	f	f	2400	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1761	43	4	7th_Div.1st_Bn	1st Bn			10		2	2	4	3	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1720	40	4	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	2	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1718	40	4	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1715	40	4	2eme_Division.45e_Ligne	45e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1721	40	4	2eme_Division	2eme Division		Rivaud	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1720	40	4	2eme_Division.4e_Legere	4e Legere		Rivaud	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	1	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1716	40	4	2eme_Division.54e_Ligne	54e Ligne		Rivaud	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1712	40	4	3eme_Division	3eme Division		Drouet	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1723	40	4	3eme_Division.27e_Legere	27e Legere		Drouet	10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	2	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	4	f	2	0
 1714	40	4	3eme_Division.94e_Ligne	94e Ligne		Drouet	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1500	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1728	40	4	2eme_Division.Md_Foot_Bty_Copy	Md Foot Bty_Copy			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	0	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
 1306	12	14	1eme_Division.96e_Ligne	96e Ligne		de l'Eltang	10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	2000	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
@@ -4088,12 +4483,11 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1581	32	4	Supply_Train	Supply Train		von Schulze	10	Prussia	1	2	6	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1851	48	4	1st_Div.Foot_Bti	Foot Bti			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
 1858	48	4	1st_Div.Grenadier_Bde	Grenadier Bde	Schmeling Grenadier Battalion Crety Grenadier Battalion		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
-1854	48	4	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	1	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
-1857	48	4	2nd_Div.2nd_Line	2nd Line	Jung-Larisch Infantry Regiment # 53, two battalions Manstein Infantry Regiment # 55, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	3600	0	0	f	f	1	0	2	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1853	48	4	2nd_Div.Foot_Bty	Foot Bty			10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	12	0	f	f	f	0	3	f	2	3
 1852	48	4	Adv_Guard.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1856	48	4	Reserve_Cavalry.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, four squadrons Katte Dragoon Regiment # 10, four squadrons		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
 1850	48	4	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+1854	48	4	2nd_Div.1st_Line	1st Line	Vieregg Grenadier Battalion Kalckreuth Infantry Regiment # 4, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	2	1	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1664	36	4	Corps_Artillery.2e_Horse	2e Horse			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
 1706	39	4	Guard_Artillery.Guard_Horse_Bty	Guard Horse Bty			10		4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	4	t	2	1
 1768	44	4	1st_Div	1st Div		Pr Wiliam of Orange	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
@@ -4101,10 +4495,10 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1769	44	4	2nd_Div	2nd Div		Wartensleben	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1778	44	4	2nd_Div.Merkatz	Merkatz	Merkatz Horse Artillery Bty		10	Prussia	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	2
 1845	48	4	1st_Div	1st Div		von Natzmer	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
-1848	48	4	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	5400	0	0	f	f	1	0	3	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1846	48	4	2nd_Div	2nd Div		von Larisch	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1849	48	4	Adv_Guard.Dragoons	Dragoons	Hertzberg Dragoon Regiment # 9, one squadron Katte Dragoon Regiment # 10, one squadron		10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	300	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
 1847	48	4	Adv_Guard.Fusilier_Bde	Fusilier Bde	Borstell Fusilier Battalion # 9 Knorr Fusilier Battalion # 12 Hinrichs Fusilier Battalion # 17		10		2	2	4	9	1	1	f	f	f	f	f	f	f	2700	0	0	f	f	1	0	0	-3	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+1848	48	4	1st_Div.Musketeer_Bde	Musketeer Bde	Treskow Infantry Regiment # 17, two battalions Kauffberg Infantry Regiment # 51, two battalions Natzmer Infantry Regiment # 54, two battalions		10	Prussia	2	2	4	1	1	1	f	f	f	f	f	f	f	5400	0	0	f	f	1	2	3	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
 1643	36	4	1e_Cuirassier_Div	1e Cuirassier Div		Nansouty	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1644	36	4	1e_Dragoon_Div	1e Dragoon Div		Klein	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1645	36	4	2e_Cuirassier_Div	2e Cuirassier Div		d'Hautpoul	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
@@ -4133,7 +4527,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 -- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('unit_id_seq', 2053, true);
+SELECT pg_catalog.setval('unit_id_seq', 2332, true);
 
 
 --
@@ -4149,8 +4543,8 @@ COPY user_rego (user_id, created, expires, charge, receipt) FROM stdin;
 --
 
 COPY users (id, username, passwd, name, email, rank, created, expires, channel, ip_address, country, bloglink, notes, banned, disqus, newsletter) FROM stdin;
-2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.105:50657	Australia	http://witchwoodstudio.com		f	f	t
-1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:34278	Australia	15mm-madness.blogspot.com		f	f	t
+2	kat	fysherdog	Kat Formato tt	kformato@gmail.comu	1	2016-10-12 23:21:42.685479+10:30	2016-10-12 23:21:42.685479+10:30	0	192.168.1.101:46511	Australia	http://witchwoodstudio.com		f	f	t
+1	steveoc64	unx911zxx	STEVEN OCONNOR	steveoc64@gmail.com	10	2016-10-12 10:30:00+10:30	2016-10-12 10:30:00+10:30	1	127.0.0.1:36644	Australia	15mm-madness.blogspot.com		f	f	t
 \.
 
 

@@ -11,6 +11,9 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 	retval := []shared.UserRoute{
 		{Route: "/", Func: "mainpage"},
 		{Route: "/games", Func: "mainpage"},
+		{Route: "/manual", Func: "manual"},
+		{Route: "/contact", Func: "contact"},
+		{Route: "/invite", Func: "invite"},
 		{Route: "/settings", Func: "settings"},
 		{Route: "/scenarios", Func: "scenarios"},
 		{Route: "/scenario/add", Func: "scenario-add"},

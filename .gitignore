@@ -16,3 +16,6 @@ cert
 backup
 templates/old
 *~
+users.sql
+paypal
+paypal-server.go

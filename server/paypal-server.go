@@ -91,7 +91,7 @@ func PaypalPayment(value int, descr string) {
 	go func() {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Direct Payment")
 
-		vstring := fmt.Sprintf("%0.2f", float64(value/100))
+		vstring := fmt.Sprintf("%0.2f", float64(value)/100.0)
 		fmt.Fprintf(PaypalLog, "Value from %d to %s\n", value, vstring)
 
 		amount := paypalsdk.Amount{

@@ -28,7 +28,15 @@ func ppgood(c echo.Context) error {
 	payerID := c.QueryParam("PayerID")
 	fmt.Fprintf(PaypalLog, "PaymentID %s\nToken %s\nPayerID %s\n", id, token, payerID)
 	fmt.Printf("PaymentID %s\nToken %s\nPayerID %s\n", id, token, payerID)
-	return c.String(http.StatusOK, "Thanks, that seemed to work")
+
+	// And the last step is to execute approved payment
+	executeResult, err := PaypalClient.ExecuteApprovedPayment(id, payerID)
+	if err == nil {
+		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
+		return c.String(http.StatusOK, "Thanks, that seemed to work, you are now promoted")
+	} else {
+		return c.String(http.StatusOK, "Thanks for authorizing the payment, but something else when wrong ... no promotion for you")
+	}
 }
 
 func ppbad(c echo.Context) error {

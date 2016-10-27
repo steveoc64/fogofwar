@@ -945,7 +945,7 @@ func (s *ScenarioRPC) Fork(data shared.ScenarioRPCData, newID *int) error {
 			newForceID := 0
 			oldForce.ScenarioID = *newID
 			err := DB.InsertInto("force").
-				Whitelist("scenario_id", "red_team", "blue_team", "nation",
+				Whitelist("scenario_id", "red_team", "blue_team", "nation", "name",
 					"commander_name", "level", "descr", "rating", "inspiration", "condition").
 				Record(oldForce).
 				Returning("id").

@@ -118,16 +118,16 @@
             border-bottom: none
         [data-field-span]
             padding: $field-padding
-            float: left
             background: rgba(255,255,250,0.3)
+            display: block
+            float: left
             +_breakpoints(0, 700px)
                 border-bottom: 1px solid $grid-border-color
                 // width: 100% !important
                 padding: 5px
-                display: flex
+                // display: flex
             +_breakpoints(700px)
                 border-right: 1px solid $grid-border-color
-                display: block
             label:first-child
                 margin-top: 0
                 text-transform: uppercase

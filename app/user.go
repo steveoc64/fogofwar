@@ -28,20 +28,26 @@ func _userList(action string, id int, context *router.Context) {
 		form := formulate.ListForm{}
 		form.New("fa-user", "Users Online")
 
-		// Define the layout
-		form.Column("Channel", "Channel")
-		form.Column("Rank", "GetRank")
-		form.Column("Username", "Username")
-		form.Column("Country", "Country")
-		form.Column("IP", "IPAddress")
-		form.Column("Ch", "Channel")
-		// form.Column("Name", "Name")
-		form.EmailAvatarColumn("Email", "Email")
-		form.Column("Scenarios", "NumScenarios")
-		form.Column("Games", "NumGames")
-		// form.Column("Bloglink", "Bloglink")
-		// form.DateColumn("Created", "Created")
-		form.DateColumn("Expires", "Expires")
+		if Session.SubMobile() {
+			// Define the layout
+			form.Column("Rank", "GetRank")
+			form.Column("Username", "Username")
+			form.Column("Country", "Country")
+			form.EmailAvatarColumn("Email", "Email")
+			form.DateColumn("Expires", "Expires")
+		} else {
+
+			// Define the layout
+			form.Column("Rank", "GetRank")
+			form.Column("Username", "Username")
+			form.Column("Country", "Country")
+			form.Column("IP", "IPAddress")
+			form.Column("Ch", "Channel")
+			form.EmailAvatarColumn("Email", "Email")
+			form.Column("Scenarios", "NumScenarios")
+			form.Column("Games", "NumGames")
+			form.DateColumn("Expires", "Expires")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -129,6 +135,7 @@ func userEdit(context *router.Context) {
 
 	go func() {
 		user := shared.User{}
+		Session.MobileSensitive = true
 		RPC("UserRPC.Get", shared.UserRPCData{
 			Channel: Session.Channel,
 			ID:      id,
@@ -138,35 +145,74 @@ func userEdit(context *router.Context) {
 		form.New("fa-user", "User Details - "+user.Name)
 
 		// Layout the fields
+		if Session.Mobile() {
+			form.Row(1).
+				AddSelect(1, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank)
 
-		form.Row(3).
-			AddSelect(1, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank).
-			AddInput(1, "Username", "Username").
-			AddInput(1, "Password", "Passwd")
+			form.Row(2).
+				AddInput(1, "Username", "Username").
+				AddInput(1, "Password", "Passwd")
 
-		form.Row(5).
-			AddInput(2, "Name", "Name").
-			AddInput(2, "Email", "Email").
-			AddInput(1, "Country", "Country")
+			form.Row(1).
+				AddInput(1, "Name", "Name")
 
-		form.Row(9).
-			AddInput(3, "Blog Link", "Bloglink").
-			AddCheck(1, "Disqus", "Disqus").
-			AddCheck(1, "Banned", "Banned").
-			AddDisplay(1, "Channel", "Channel").
-			AddDisplay(1, "IP", "IPAddress")
+			form.Row(1).
+				AddInput(1, "Email", "Email")
 
-		form.Row(2).
-			AddDate(1, "Account Created", "Created").
-			AddDate(1, "Commission Expires", "Expires")
+			form.Row(1).
+				AddInput(1, "Country", "Country")
+
+			form.Row(1).
+				AddInput(1, "Blog Link", "Bloglink")
+
+			form.Row(2).
+				AddCheck(1, "Disqus", "Disqus").
+				AddCheck(1, "Banned", "Banned")
+
+			form.Row(4).
+				AddDisplay(1, "Channel", "Channel").
+				AddDisplay(3, "IP", "IPAddress")
+
+			form.Row(1).
+				AddDate(1, "Created", "Created")
+
+			form.Row(1).
+				AddDate(1, "Expires", "Expires")
+
+			form.Row(1).
+				AddBigTextarea(1, "Notes", "Notes")
+
+		} else {
+			form.Row(3).
+				AddSelect(1, "Rank", "Rank", ranks, "ID", "Name", 1, user.Rank).
+				AddInput(1, "Username", "Username").
+				AddInput(1, "Password", "Passwd")
+
+			form.Row(3).
+				AddInput(1, "Name", "Name").
+				AddInput(1, "Email", "Email").
+				AddInput(1, "Country", "Country")
+
+			form.Row(9).
+				AddInput(3, "Blog Link", "Bloglink").
+				AddCheck(1, "Disqus", "Disqus").
+				AddCheck(1, "Banned", "Banned").
+				AddDisplay(1, "Channel", "Channel").
+				AddDisplay(3, "IP", "IPAddress")
+
+			form.Row(2).
+				AddDate(1, "Account Created", "Created").
+				AddDate(1, "Commission Expires", "Expires")
+
+			form.Row(1).
+				AddTextarea(1, "Notes", "Notes")
+		}
 
 		if user.Channel != 0 {
 			form.Row(1).
 				AddCustom(1, "Activity", "Activity", "")
-		}
 
-		form.Row(1).
-			AddTextarea(1, "Notes", "Notes")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -382,6 +428,7 @@ func _usersOnline(action string, id int, context *router.Context) {
 func userSettings(context *router.Context) {
 
 	go func() {
+		Session.MobileSensitive = true
 		user := shared.User{}
 		RPC("UserRPC.Me", Session.Channel, &user)
 		form := formulate.EditForm{}
@@ -410,7 +457,7 @@ func userSettings(context *router.Context) {
 				AddDate(1, "Account Created", "Created")
 
 			form.Row(1).
-				AddDate(2, "Commission Expires", "Expires")
+				AddDate(1, "Commission Expires", "Expires")
 
 			form.Row(1).
 				AddTextarea(1, "Notes", "Notes")

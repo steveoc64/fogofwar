@@ -28,6 +28,7 @@ func _scenarioList(action string, id int, context *router.Context) {
 		return
 	}
 	go func() {
+		Session.MobileSensitive = true
 		s1 := []shared.Scenario{}
 		s2 := []shared.Scenario{}
 		RPC("ScenarioRPC.List", Session.Channel, &s1)
@@ -42,9 +43,13 @@ func _scenarioList(action string, id int, context *router.Context) {
 		form.AvatarColumn("Author", "AuthorEmail")
 		form.Column("Name", "Name")
 		form.Column("Year", "Year")
-		form.Column("Description", "Descr")
-		form.BoolColumn("Reviewing", "Review")
-		form.BoolColumn("Published", "Public")
+		if Session.Mobile() {
+			form.BoolColumn("Published", "Public")
+		} else {
+			form.Column("Description", "Descr")
+			form.BoolColumn("Reviewing", "Review")
+			form.BoolColumn("Published", "Public")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -71,6 +76,7 @@ func scenarioAdd(context *router.Context) {
 
 	go func() {
 		data := shared.Scenario{}
+		Session.MobileSensitive = true
 
 		form := formulate.EditForm{}
 
@@ -78,12 +84,18 @@ func scenarioAdd(context *router.Context) {
 
 		form.New("fa-sitemap", "Add Scenario")
 
-		form.Row(5).
-			AddInput(3, "Name", "Name").
-			AddNumber(1, "Year", "Year", "0")
+		if Session.Mobile() {
+			form.Row(1).AddInput(1, "Name", "Name")
+			form.Row(1).AddNumber(1, "Year", "Year", "0")
+			form.Row(1).AddTextarea(1, "Decription", "Descr")
+		} else {
+			form.Row(5).
+				AddInput(3, "Name", "Name").
+				AddNumber(1, "Year", "Year", "0")
 
-		form.Row(1).
-			AddInput(1, "Description", "Descr")
+			form.Row(1).
+				AddInput(1, "Description", "Descr")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -141,6 +153,7 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 	}
 
 	go func() {
+		Session.MobileSensitive = true
 		data := shared.Scenario{}
 		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
 			Channel: Session.Channel,
@@ -161,16 +174,30 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 
 			form.New("fa-sitemap", "Edit Scenario Details - "+data.Name)
 
-			rowElem := form.Row(6).
-				AddInput(3, "Name", "Name").
-				AddNumber(1, "Year", "Year", "0")
-
-			if Session.Rank > 9 {
-				rowElem.AddCheck(1, "Published", "Public")
-				rowElem.AddCheck(1, "Under Review", "Review")
+			if Session.Mobile() {
+				form.Row(1).AddInput(1, "Name", "Name")
+				form.Row(1).AddNumber(1, "Year", "Year", "0")
+				if Session.Rank > 9 {
+					form.Row(2).
+						AddCheck(1, "Published", "Public").
+						AddCheck(1, "Review", "Review")
+				} else {
+					form.Row(2).
+						AddDisplayCheck(1, "Published", "Public").
+						AddDisplayCheck(1, "Review", "Review")
+				}
 			} else {
-				rowElem.AddDisplayCheck(1, "Published", "Public")
-				rowElem.AddDisplayCheck(1, "Under Review", "Review")
+				rowElem := form.Row(6).
+					AddInput(3, "Name", "Name").
+					AddNumber(1, "Year", "Year", "0")
+
+				if Session.Rank > 9 {
+					rowElem.AddCheck(1, "Published", "Public")
+					rowElem.AddCheck(1, "Under Review", "Review")
+				} else {
+					rowElem.AddDisplayCheck(1, "Published", "Public")
+					rowElem.AddDisplayCheck(1, "Under Review", "Review")
+				}
 			}
 
 			form.Row(1).
@@ -218,13 +245,18 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 			// 	dom.GetWindow().Print()
 			// })
 
-		} else {
+		} else { // View only mode
 
 			form.New("fa-sitemap", "View Details of Scenario - "+data.Name)
 
-			form.Row(4).
-				AddDisplay(3, "Name", "Name").
-				AddDisplay(1, "Year", "Year")
+			if Session.Mobile() {
+				form.Row(1).AddDisplay(1, "Name", "Name")
+				form.Row(1).AddDisplay(1, "Year", "Year")
+			} else {
+				form.Row(4).
+					AddDisplay(3, "Name", "Name").
+					AddDisplay(1, "Year", "Year")
+			}
 
 			form.Row(1).
 				AddDisplay(1, "Description", "Descr")
@@ -553,6 +585,7 @@ func scenarioRedAdd(context *router.Context) {
 	}
 
 	go func() {
+		Session.MobileSensitive = true
 		data := shared.Force{}
 		scenario := shared.Scenario{}
 		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
@@ -566,17 +599,41 @@ func scenarioRedAdd(context *router.Context) {
 
 		form.New("fa-flag-o", fmt.Sprintf("Add Red Force - %s", scenario.Name))
 
-		form.Row(6).
-			AddInput(2, "Nation", "Nation").
-			AddInput(2, "Unit Name", "Name").
-			AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
-			AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+		if Session.Mobile() {
 
-		form.Row(5).
-			AddInput(3, "Commander", "CommanderName").
-			AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-			AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+			if Session.SubMobile() {
+				form.Row(1).
+					AddInput(1, "Unit Name", "Name")
+				form.Row(1).
+					AddInput(1, "Nation", "Nation")
+			} else {
+				form.Row(2).
+					AddInput(1, "Unit Name", "Name").
+					AddInput(1, "Nation", "Nation")
+			}
 
+			form.Row(2).
+				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+			form.Row(1).
+				AddInput(1, "Commander", "CommanderName")
+			form.Row(2).
+				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+
+		} else {
+
+			form.Row(6).
+				AddInput(2, "Unit Name", "Name").
+				AddInput(2, "Nation", "Nation").
+				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+
+			form.Row(5).
+				AddInput(3, "Commander", "CommanderName").
+				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+		}
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
@@ -640,6 +697,7 @@ func scenarioBlueAdd(context *router.Context) {
 	}
 
 	go func() {
+		Session.MobileSensitive = true
 		data := shared.Force{}
 		scenario := shared.Scenario{}
 		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
@@ -653,16 +711,41 @@ func scenarioBlueAdd(context *router.Context) {
 
 		form.New("fa-flag", fmt.Sprintf("Add Blue Force - %s", scenario.Name))
 
-		form.Row(6).
-			AddInput(2, "Nation", "Nation").
-			AddInput(2, "Unit Name", "Name").
-			AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
-			AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+		if Session.Mobile() {
 
-		form.Row(5).
-			AddInput(3, "Commander", "CommanderName").
-			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-			AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+			if Session.SubMobile() {
+				form.Row(1).
+					AddInput(1, "Unit Name", "Name")
+				form.Row(1).
+					AddInput(1, "Nation", "Nation")
+			} else {
+				form.Row(2).
+					AddInput(1, "Unit Name", "Name").
+					AddInput(1, "Nation", "Nation")
+			}
+
+			form.Row(2).
+				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+			form.Row(1).
+				AddInput(1, "Commander", "CommanderName")
+			form.Row(2).
+				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+
+		} else {
+
+			form.Row(6).
+				AddInput(2, "Unit Name", "Name").
+				AddInput(2, "Nation", "Nation").
+				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+
+			form.Row(5).
+				AddInput(3, "Commander", "CommanderName").
+				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

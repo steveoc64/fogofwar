@@ -20,6 +20,7 @@ func forceEdit(context *router.Context) {
 	TheUnit := shared.ForceUnit{}
 	w := dom.GetWindow()
 	doc := w.Document()
+	Session.MobileSensitive = true
 
 	go func() {
 		force := shared.Force{}
@@ -60,28 +61,74 @@ func forceEdit(context *router.Context) {
 
 		if canEdit {
 
-			form.Row(10).
-				AddInput(3, "Unit Name", "Name").
-				AddInput(3, "Nation", "Nation").
-				AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-				AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+			if Session.Mobile() {
+				if Session.SubMobile() {
+					form.Row(1).
+						AddInput(1, "Unit Name", "Name")
+					form.Row(1).
+						AddInput(1, "Nation", "Nation")
+				} else {
+					form.Row(2).
+						AddInput(1, "Unit Name", "Name").
+						AddInput(1, "Nation", "Nation")
+				}
+				form.Row(2).
+					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
 
-			form.Row(10).
-				AddInput(6, "Commander", "CommanderName").
-				AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-				AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+				form.Row(1).
+					AddInput(1, "Commander", "CommanderName")
+				form.Row(2).
+					AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+					AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+			} else {
+				form.Row(10).
+					AddInput(3, "Unit Name", "Name").
+					AddInput(3, "Nation", "Nation").
+					AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+					AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+
+				form.Row(10).
+					AddInput(6, "Commander", "CommanderName").
+					AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+					AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+			}
 		} else {
+			if Session.Mobile() {
+				if Session.SubMobile() {
+					form.Row(1).
+						AddDisplay(1, "Unit Name", "Name")
+					form.Row(1).
+						AddDisplay(1, "Nation", "Nation")
+				} else {
+					form.Row(2).
+						AddDisplay(1, "Unit Name", "Name").
+						AddDisplay(1, "Nation", "Nation")
+				}
+				form.Row(2).
+					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+				form.Row(2).
+					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
 
-			form.Row(10).
-				AddDisplay(3, "Unit Name", "Name").
-				AddDisplay(3, "Nation", "Nation").
-				AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-				AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+				form.Row(1).
+					AddInput(1, "Commander", "CommanderName")
+				form.Row(2).
+					AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+					AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+			} else {
+				form.Row(10).
+					AddDisplay(3, "Unit Name", "Name").
+					AddDisplay(3, "Nation", "Nation").
+					AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+					AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
 
-			form.Row(10).
-				AddDisplay(6, "Commander", "CommanderName").
-				AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-				AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+				form.Row(10).
+					AddDisplay(6, "Commander", "CommanderName").
+					AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+					AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+			}
 		}
 
 		form.Row(1).
@@ -101,9 +148,17 @@ func forceEdit(context *router.Context) {
 				AddButton(1, "Guns", "AddGun")
 		}
 
-		form.Row(5).
-			AddCustom(2, "Order Of Battle", "UnitList", "").
-			AddSwapper(3, "Unit Details", &swapper)
+		if Session.Mobile() {
+			form.Row(1).
+				AddCustom(1, "Order of Battle", "UnitList", "")
+			form.Row(1).
+				AddSwapper(1, "Unit Details", &swapper) // grid-8-0
+
+		} else {
+			form.Row(5).
+				AddCustom(2, "Order Of Battle", "UnitList", "").
+				AddSwapper(3, "Unit Details", &swapper) // grid-7-1
+		}
 
 		// Create the swapper panels, one for each unit type :
 		// -- unit type
@@ -123,10 +178,19 @@ func forceEdit(context *router.Context) {
 			AddInput(1, "Nationality", "Nation")
 		cmdPanel.AddRow(1).
 			AddInput(1, "Description", "Descr")
-		cmdPanel.AddRow(3).
-			AddInput(1, "Commander", "CommanderName").
-			AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-			AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
+
+		if Session.Mobile() {
+			cmdPanel.AddRow(1).
+				AddInput(1, "Commander", "CommanderName")
+			cmdPanel.AddRow(2).
+				AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
+		} else {
+			cmdPanel.AddRow(3).
+				AddInput(1, "Commander", "CommanderName").
+				AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+				AddSelect(1, "Command Level", "CmdLevel", Session.Lookup.CmdLevel, "ID", "Name", 1, 3)
+		}
 		if canEdit {
 			cmdPanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").
@@ -139,23 +203,44 @@ func forceEdit(context *router.Context) {
 			AddInput(1, "Nationality", "Nation")
 		bdePanel.AddRow(1).
 			AddInput(1, "Description", "Descr")
-		bdePanel.AddRow(12).
-			AddNumber(2, "Bayonets", "Bayonets", "100").
-			AddSelect(2, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Code", 1, 5).
-			AddSelect(4, "Drill", "Drill", Session.Lookup.DrillType, "ID", "Name", 1, 1).
-			AddSelect(4, "Arms", "SmallArms", Session.Lookup.SmallArms, "ID", "Name", 1, 1)
-		bdePanel.AddRow(3).
-			AddNumber(1, "Extra - Light Coys", "LtCoy", "0").
-			AddNumber(1, "Jager Coys", "JgCoy", "0").
-			AddSelect(1, "Lt Coy Arms", "EliteArms", Session.Lookup.SmallArms, "ID", "Name", 0, 0)
-		bdePanel.AddRow(3).
-			AddNumber(1, "Attached Sabres", "Sabres", "10").
-			AddSelect(1, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
-			AddSelect(1, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
-		bdePanel.AddRow(3).
-			AddNumber(1, "Attached Guns", "Guns", "0").
-			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
-			AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		if Session.Mobile() {
+			bdePanel.AddRow(2).
+				AddNumber(1, "Bayonets", "Bayonets", "100").
+				AddSelect(1, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Code", 1, 5)
+			bdePanel.AddRow(2).
+				AddSelect(1, "Drill", "Drill", Session.Lookup.DrillType, "ID", "Name", 1, 1).
+				AddSelect(1, "Arms", "SmallArms", Session.Lookup.SmallArms, "ID", "Name", 1, 1)
+			bdePanel.AddRow(4).
+				AddNumber(1, "+Light", "LtCoy", "0").
+				AddNumber(1, "+Jager", "JgCoy", "0").
+				AddSelect(2, "Arms", "EliteArms", Session.Lookup.SmallArms, "ID", "Name", 0, 0)
+			bdePanel.AddRow(7).
+				AddNumber(1, "Sabres", "Sabres", "10").
+				AddSelect(3, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
+				AddSelect(3, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
+			bdePanel.AddRow(7).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(3, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(3, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		} else {
+			bdePanel.AddRow(12).
+				AddNumber(2, "Bayonets", "Bayonets", "100").
+				AddSelect(2, "Rating", "Rating", Session.Lookup.UnitRating, "ID", "Code", 1, 5).
+				AddSelect(4, "Drill", "Drill", Session.Lookup.DrillType, "ID", "Name", 1, 1).
+				AddSelect(4, "Arms", "SmallArms", Session.Lookup.SmallArms, "ID", "Name", 1, 1)
+			bdePanel.AddRow(3).
+				AddNumber(1, "+Light", "LtCoy", "0").
+				AddNumber(1, "+Jager", "JgCoy", "0").
+				AddSelect(1, "Arms", "EliteArms", Session.Lookup.SmallArms, "ID", "Name", 0, 0)
+			bdePanel.AddRow(3).
+				AddNumber(1, "Sabres", "Sabres", "10").
+				AddSelect(1, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
+				AddSelect(1, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
+			bdePanel.AddRow(3).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		}
 		if canEdit {
 			bdePanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").
@@ -168,14 +253,25 @@ func forceEdit(context *router.Context) {
 			AddInput(1, "Nationality", "Nation")
 		cavPanel.AddRow(1).
 			AddInput(1, "Description", "Descr")
-		cavPanel.AddRow(3).
-			AddNumber(1, "Sabres", "Sabres", "100").
-			AddSelect(1, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
-			AddSelect(1, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
-		cavPanel.AddRow(3).
-			AddNumber(1, "Attached Guns", "Guns", "0").
-			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
-			AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		if Session.Mobile() {
+			cavPanel.AddRow(7).
+				AddNumber(1, "Sabres", "Sabres", "100").
+				AddSelect(3, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
+				AddSelect(3, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
+			cavPanel.AddRow(7).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(3, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(3, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		} else {
+			cavPanel.AddRow(3).
+				AddNumber(1, "Sabres", "Sabres", "100").
+				AddSelect(1, "Type", "CavType", Session.Lookup.CavType, "ID", "Name", 0, 0).
+				AddSelect(1, "Rating", "CavRating", Session.Lookup.UnitRating, "ID", "Name", 0, 0)
+			cavPanel.AddRow(3).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(1, "Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		}
 		if canEdit {
 			cavPanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").
@@ -183,16 +279,30 @@ func forceEdit(context *router.Context) {
 		}
 
 		gunPanel := swapper.AddPanel("Gun")
-		gunPanel.AddRow(3).
-			AddInput(1, "Battery Name", "Name").
-			AddCheck(1, "Horse Artillery", "HorseGuns").
-			AddInput(1, "Nationality", "Nation")
-		gunPanel.AddRow(1).
-			AddInput(1, "Description", "Descr")
-		gunPanel.AddRow(3).
-			AddNumber(1, "Guns", "Guns", "0").
-			AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
-			AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		if Session.Mobile() {
+			gunPanel.AddRow(1).
+				AddInput(1, "Name", "Name")
+			gunPanel.AddRow(2).
+				AddCheck(1, "Horse", "HorseGuns").
+				AddInput(1, "Nationality", "Nation")
+			gunPanel.AddRow(1).
+				AddInput(1, "Description", "Descr")
+			gunPanel.AddRow(7).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(3, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(3, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		} else {
+			gunPanel.AddRow(3).
+				AddInput(1, "Name", "Name").
+				AddCheck(1, "Horse", "HorseGuns").
+				AddInput(1, "Nationality", "Nation")
+			gunPanel.AddRow(1).
+				AddInput(1, "Description", "Descr")
+			gunPanel.AddRow(3).
+				AddNumber(1, "Guns", "Guns", "0").
+				AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+		}
 		if canEdit {
 			gunPanel.AddRow(2).
 				AddButton(1, "Copy", "Copy").
@@ -261,13 +371,18 @@ func forceEdit(context *router.Context) {
 		form.Render("edit-form", "main", &force)
 		swapper.Panels[0].Paint(&shared.ForceUnit{})
 		swapper.Select(0)
-		form.Focus("Name")
+		if !Session.Mobile() {
+			form.Focus("Name")
+		}
 
 		// Turn off printing for some fields
+		// If mobile - ignore this since mobile cant print !!
 		if canEdit {
-			form.Class("row-3").Add("no-print")
-			form.Class("grid-4-0").Add("full-print")
-			form.Class("grid-4-1").Add("no-print")
+			if !Session.Mobile() {
+				form.Class("row-3").Add("no-print")
+				form.Class("grid-4-0").Add("full-print")
+				form.Class("grid-4-1").Add("no-print")
+			}
 		}
 
 		// Action Grid
@@ -350,27 +465,39 @@ func forceEdit(context *router.Context) {
 			case 1: // Command
 				swapper.Panels[1].Paint(&TheUnit)
 				swapper.Select(1)
-				form.FocusSelect("Cmd-Name")
+				if Session.SubMobile() {
+					form.ScrollTo("grid-8-0")
+				} else {
+					form.FocusSelect("Cmd-Name")
+				}
 			case 2: // Bde
 				// print("paint panel 2")
 				swapper.Panels[2].Paint(&TheUnit)
 				swapper.Select(2)
-				form.FocusSelect("Bde-Name")
+				if !Session.SubMobile() {
+					form.FocusSelect("Bde-Name")
+				}
 			case 3: // Cav
 				// print("paint panel 2")
 				swapper.Panels[3].Paint(&TheUnit)
 				swapper.Select(3)
-				form.FocusSelect("Cav-Name")
+				if !Session.SubMobile() {
+					form.FocusSelect("Cav-Name")
+				}
 			case 4: // Bty
 				// print("paint panel 2")
 				swapper.Panels[4].Paint(&TheUnit)
 				swapper.Select(4)
-				form.FocusSelect("Gun-Name")
+				if !Session.SubMobile() {
+					form.FocusSelect("Gun-Name")
+				}
 			case 5: // Other
 				// print("paint panel 2")
 				swapper.Panels[5].Paint(&TheUnit)
 				swapper.Select(5)
-				form.FocusSelect("Other-Name")
+				if !Session.SubMobile() {
+					form.FocusSelect("Other-Name")
+				}
 			}
 			Nation = TheUnit.Nation
 		}
@@ -559,6 +686,10 @@ func forceEdit(context *router.Context) {
 					drawUnitPanel()
 					break
 				}
+			}
+			// and then scroll to start of unitdetails panel
+			if Session.Mobile() {
+				form.ScrollTo("grid-8-0")
 			}
 		})
 

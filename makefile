@@ -24,6 +24,7 @@ get:
 	go get -u gopkg.in/mgutz/dat.v1/sqlx-runner
 	go get -u github.com/nfnt/resize
 	go get -u gopkg.in/gomail.v2
+	go get -u github.com/logpacker/PayPal-Go-SDK
 	mkdir -p scripts
 	mkdir -p backup
 
@@ -64,10 +65,10 @@ cert:
 	openssl genrsa -out cert/actionfront.key 2048
 	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650
 
-dist/assets.log: assets/index.html assets/img/*  assets/fonts/* assets/css/* assets/manual/*
+dist/assets.log: assets/*.html assets/img/*  assets/fonts/* assets/css/* assets/manual/*
 	@mplayer -quiet audio/attention.oga 2> /dev/null > /dev/null
 	@mkdir -p dist/public/css dist/public/font dist/public/js
-	cp assets/index.html dist/public
+	cp assets/*.html dist/public
 	cp -R assets/img dist/public
 	cp -R assets/css dist/public
 	cp -R assets/fonts dist/public

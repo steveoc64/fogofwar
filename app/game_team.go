@@ -26,6 +26,7 @@ func gameEditTeam(context *router.Context) {
 
 		game := Session.EditGame
 		game.InMode = "Team"
+		game.Mobile = Session.Mobile()
 		form := formulate.EditForm{}
 
 		// Layout the fields

@@ -32,6 +32,7 @@ func gameChecklist(context *router.Context) {
 		}
 		game := Session.EditGame
 		game.InMode = "Checklist"
+		game.Mobile = Session.Mobile()
 		// print("using existing game", game)
 
 		w := dom.GetWindow()
@@ -161,6 +162,7 @@ func gameEditOverview(context *router.Context) {
 	go func() {
 		game := Session.EditGame
 		game.InMode = "Overview"
+		game.Mobile = Session.Mobile()
 
 		form := formulate.EditForm{}
 
@@ -237,6 +239,7 @@ func gameEditPlayers(context *router.Context) {
 
 	game := Session.EditGame
 	game.InMode = "Players"
+	game.Mobile = Session.Mobile()
 	form := formulate.EditForm{}
 
 	// Layout the fields

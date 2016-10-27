@@ -14,7 +14,9 @@
 		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
 		<div class="action__text">
 			<p>Use the <b>TABLE</b> Tool to set table dimensions and ground scale.</p>
+			{{if not .Mobile}}
 			<p>Use the TERRAIN Tool to lay out the approximate terrain on the map.</p>
+			{{end}}
 		</div>
 	</div>
 	{{end}}
@@ -33,7 +35,9 @@
 		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
 		<div class="action__text">
 			<p>Use the <b>TABLE-OBJECTIVE</b> Tool to add objectives to the map.</p>
+			{{if not .Mobile}}
 			<p>Ensure that both Red and Blue Teams have at least 1 Objective defined.</p>
+			{{end}}
 		</div>
 	</div>
 	{{end}}
@@ -52,7 +56,9 @@
 		<div class="action__icon"><i class="fa fa-square-o fa-lg"></i></div>
 		<div class="action__text">
 			<p>Use the <b>RED-BLUE</b> Tools to setup the forces for the Game.</p>
+			{{if not .Mobile}}
 			<p>Apply pre-game attrition, and edit the player briefings.</p>
+			{{end}}
 		</div>
 	</div>
 	{{end}}

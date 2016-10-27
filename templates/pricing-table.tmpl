@@ -1,4 +1,4 @@
-{{if .}}
+{{if ne 0 .}}
 <center>
 <img src="/img/ranks.png">
 <iframe name="paypal-frame" class="paypal-frame paypal-frame hidden" src=""></iframe>
@@ -7,6 +7,7 @@
 {{end}}
 <!-- <div class="pricing pricing--jinpa"> -->
 <div class="pricing pricing--yama">
+	{{if lt . 1}}
 	<div class="pricing__item">
 		<h3 class="pricing__title">Lieutenant</h3>
 		<div class="pricing__price">
@@ -21,6 +22,8 @@
 		</ul>
 		<button class="button-outline" name="account_1">Free Sign Up</button>
 	</div>
+	{{end}}
+	{{if lt . 2}}
 	<div class="pricing__item" name="buy-commission-2">
 		<h3 class="pricing__title">Colonel</h3>
 		<div class="pricing__price">
@@ -35,6 +38,8 @@
 		</ul>
 		<button class="button-outline" name="buy-commission-2a">Gaming at the NextLevel</button>
 	</div>
+	{{end}}
+	{{if lt . 3}}
 	<div class="pricing__item pricing__item--featured" name="buy-commission-3">
 		<h3 class="pricing__title">Brigadier</h3>
 		<div class="pricing__price">
@@ -49,6 +54,8 @@
 		</ul>
 		<button class="button-primary" name="buy-commission-3a">Best Value for Serious Gamers</button>
 	</div>
+	{{end}}
+	{{if lt . 4}}
 	<div class="pricing__item" name="buy-commission-4">
 		<h3 class="pricing__title">Maréchal</h3>
 		<div class="pricing__price">
@@ -63,4 +70,5 @@
 		</ul>
 		<button class="button-outline" name="buy-commission-4a">Now Thats What Im Talking About !</button>
 	</div>
+	{{end}}
 </div>

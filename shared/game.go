@@ -128,6 +128,7 @@ type Game struct {
 	CheckForces     bool             `db:"check_forces"`
 	CheckPlayers    bool             `db:"check_players"`
 	CheckConnected  bool             `db:"check_connected"`
+	Mobile          bool             `db:"mobile"` // Derived field based on is mobile - useful for templates
 }
 
 type GameRPCData struct {

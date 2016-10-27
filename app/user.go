@@ -388,25 +388,57 @@ func userSettings(context *router.Context) {
 
 		form.New("fa-cog", "Account Settings - "+user.Username)
 
-		form.Row(4).
-			AddInput(2, "Full Name", "Name").
-			AddDisplay(1, "Username", "Username").
-			AddInput(1, "Country", "Country")
+		if Session.SubMobile() {
 
-		form.Row(4).
-			AddInput(2, "Email", "Email").
-			AddCheck(1, "Subscribe to Newsletter", "Newsletter").
-			AddCheck(1, "Disqus Forum", "Disqus")
+			form.Row(1).
+				AddInput(1, "Name", "Name")
 
-		form.Row(4).
-			AddDate(2, "Account Created", "Created").
-			AddDate(2, "Commission Expires", "Expires")
+			form.Row(1).
+				AddDisplay(1, "Username", "Username")
 
-		form.Row(1).
-			AddTextarea(1, "Notes", "Notes")
+			form.Row(1).
+				AddInput(1, "Country", "Country")
 
-		form.Row(1).
-			AddInput(1, "Blog / Website Address", "Bloglink")
+			form.Row(1).
+				AddInput(1, "Email", "Email")
+
+			form.Row(2).
+				AddCheck(1, "Newsletter", "Newsletter").
+				AddCheck(1, "Disqus Forum", "Disqus")
+
+			form.Row(1).
+				AddDate(1, "Account Created", "Created")
+
+			form.Row(1).
+				AddDate(2, "Commission Expires", "Expires")
+
+			form.Row(1).
+				AddTextarea(1, "Notes", "Notes")
+
+			form.Row(1).
+				AddInput(1, "Website", "Bloglink")
+		} else {
+
+			form.Row(4).
+				AddInput(2, "Full Name", "Name").
+				AddDisplay(1, "Username", "Username").
+				AddInput(1, "Country", "Country")
+
+			form.Row(4).
+				AddInput(2, "Email", "Email").
+				AddCheck(1, "Newsletter", "Newsletter").
+				AddCheck(1, "Disqus Forum", "Disqus")
+
+			form.Row(4).
+				AddDate(2, "Account Created", "Created").
+				AddDate(2, "Commission Expires", "Expires")
+
+			form.Row(1).
+				AddTextarea(1, "Notes", "Notes")
+
+			form.Row(1).
+				AddInput(1, "Blog / Website Address", "Bloglink")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -470,7 +502,7 @@ func userSettings(context *router.Context) {
 
 		// Now add a pricing table
 		formulate.AppendDiv("pricing-table")
-		loadTemplate("pricing-table", "#pricing-table", true)
+		loadTemplate("pricing-table", "#pricing-table", Session.Rank)
 
 		doc.QuerySelector("[name=buy-commission-2]").AddEventListener("click", false, func(evt dom.Event) {
 			print("buy commission 2")

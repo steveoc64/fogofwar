@@ -40,7 +40,8 @@ func gameEditTable(context *router.Context) {
 	go func() {
 		Session.MobileSensitive = true
 		game := Session.EditGame
-		print("in here with tile 0", game.Tiles[0])
+		game.Mobile = Session.Mobile()
+		// print("in here with tile 0", game.Tiles[0])
 		game.InMode = "Table"
 
 		if len(game.Tiles) == 0 {

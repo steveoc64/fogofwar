@@ -112,7 +112,8 @@ func _mainPage(action string, id int, context *router.Context) {
 		})
 
 		// formulate.AppendDiv("hosted-games").Class().SetString("wide-container")
-		formulate.AppendDiv("hosted-games")
+		// formulate.AppendDiv("hosted-games")
+		formulate.InsertDiv("hosted-games", ".data-container", "#action-grid")
 		form.Render("game-list", "#hosted-games", games)
 
 		// print("add action grid")

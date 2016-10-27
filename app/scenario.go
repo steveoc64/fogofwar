@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"./shared"
 	"github.com/go-humble/router"
@@ -162,53 +163,59 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 
 		form := formulate.EditForm{}
 		canEdit := data.AuthorID == Session.UserID
+		form.DisplayMode = !canEdit
 
 		// LeEmpereur can always edit
-		if Session.Rank > 9 {
-			canEdit = true
-		}
+		// if Session.Rank > 9 {
+		// 	canEdit = true
+		// }
+		print("scenario details with displaymode", form.DisplayMode)
 
 		// Layout the fields
 
 		if canEdit {
+			form.New("fa-sitemap", "Edit Scenario - "+data.Name)
+		} else {
+			form.New("fa-sitemap", "View Scenario - "+data.Name)
+		}
 
-			form.New("fa-sitemap", "Edit Scenario Details - "+data.Name)
-
-			if Session.Mobile() {
-				form.Row(1).AddInput(1, "Name", "Name")
-				form.Row(1).AddNumber(1, "Year", "Year", "0")
-				if Session.Rank > 9 {
-					form.Row(2).
-						AddCheck(1, "Published", "Public").
-						AddCheck(1, "Review", "Review")
-				} else {
-					form.Row(2).
-						AddDisplayCheck(1, "Published", "Public").
-						AddDisplayCheck(1, "Review", "Review")
-				}
+		if Session.Mobile() {
+			form.Row(1).AddInput(1, "Name", "Name")
+			form.Row(1).AddNumber(1, "Year", "Year", "0")
+			if Session.Rank > 9 {
+				form.Row(2).
+					AddCheck(1, "Published", "Public").
+					AddCheck(1, "Review", "Review")
 			} else {
-				rowElem := form.Row(6).
-					AddInput(3, "Name", "Name").
-					AddNumber(1, "Year", "Year", "0")
-
-				if Session.Rank > 9 {
-					rowElem.AddCheck(1, "Published", "Public")
-					rowElem.AddCheck(1, "Under Review", "Review")
-				} else {
-					rowElem.AddDisplayCheck(1, "Published", "Public")
-					rowElem.AddDisplayCheck(1, "Under Review", "Review")
-				}
+				form.Row(2).
+					AddDisplayCheck(1, "Published", "Public").
+					AddDisplayCheck(1, "Review", "Review")
 			}
+		} else {
+			rowElem := form.Row(6).
+				AddInput(3, "Name", "Name").
+				AddNumber(1, "Year", "Year", "0")
 
-			form.Row(1).
-				AddInput(1, "Description", "Descr")
+			if Session.Rank > 9 {
+				rowElem.AddCheck(1, "Published", "Public")
+				rowElem.AddCheck(1, "Under Review", "Review")
+			} else {
+				rowElem.AddDisplayCheck(1, "Published", "Public")
+				rowElem.AddDisplayCheck(1, "Under Review", "Review")
+			}
+		}
 
-			// form.Row(2).
-			// 	AddInput(1, "Red Team", "RedTeam").
-			// 	AddInput(1, "Blue Team", "BlueTeam")
+		form.Row(1).
+			AddInput(1, "Description", "Descr")
 
-			form.Row(1).
-				AddBigTextarea(1, "Notes", "Notes")
+		// form.Row(2).
+		// 	AddInput(1, "Red Team", "RedTeam").
+		// 	AddInput(1, "Blue Team", "BlueTeam")
+
+		form.Row(1).
+			AddBigTextarea(1, "Notes", "Notes")
+
+		if canEdit {
 
 			form.DeleteEvent(func(evt dom.Event) {
 				evt.PreventDefault()
@@ -240,39 +247,38 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 					Session.Reload(context)
 				}()
 			})
-
-			// form.PrintEvent(func(evt dom.Event) {
-			// 	dom.GetWindow().Print()
-			// })
-
-		} else { // View only mode
-
-			form.New("fa-sitemap", "View Details of Scenario - "+data.Name)
-
-			if Session.Mobile() {
-				form.Row(1).AddDisplay(1, "Name", "Name")
-				form.Row(1).AddDisplay(1, "Year", "Year")
-			} else {
-				form.Row(4).
-					AddDisplay(3, "Name", "Name").
-					AddDisplay(1, "Year", "Year")
-			}
-
-			form.Row(1).
-				AddDisplay(1, "Description", "Descr")
-
-			form.Row(1).
-				AddDisplayArea(1, "Notes", "Notes")
-
-			// form.Row(2).
-			// 	AddDisplay(1, "Red Team", "RedTeam").
-			// 	AddDisplay(1, "Blue Team", "BlueTeam")
-
-			// form.Row(2).
-			// 	AddDisplayArea(1, "Red Briefing", "RedBrief").
-			// 	AddDisplayArea(1, "Blue Briefing", "BlueBrief")
-
 		}
+
+		// 	// form.PrintEvent(func(evt dom.Event) {
+		// 	// 	dom.GetWindow().Print()
+		// 	// })
+
+		// } else { // View only mode
+
+		// 	if Session.Mobile() {
+		// 		form.Row(1).AddDisplay(1, "Name", "Name")
+		// 		form.Row(1).AddDisplay(1, "Year", "Year")
+		// 	} else {
+		// 		form.Row(4).
+		// 			AddDisplay(3, "Name", "Name").
+		// 			AddDisplay(1, "Year", "Year")
+		// 	}
+
+		// 	form.Row(1).
+		// 		AddDisplay(1, "Description", "Descr")
+
+		// 	form.Row(1).
+		// 		AddDisplayArea(1, "Notes", "Notes")
+
+		// 	// form.Row(2).
+		// 	// 	AddDisplay(1, "Red Team", "RedTeam").
+		// 	// 	AddDisplay(1, "Blue Team", "BlueTeam")
+
+		// 	// form.Row(2).
+		// 	// 	AddDisplayArea(1, "Red Briefing", "RedBrief").
+		// 	// 	AddDisplayArea(1, "Blue Briefing", "BlueBrief")
+
+		// }
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
@@ -420,8 +426,12 @@ func scenarioRed(context *router.Context) {
 		if data.AuthorID == Session.UserID {
 			canEdit = true
 		}
+		// if Session.Rank > 9 {
+		// 	canEdit = true
+		// }
 
 		form := formulate.EditForm{}
+		form.DisplayMode = !canEdit
 
 		// Layout the fields
 
@@ -439,24 +449,27 @@ func scenarioRed(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
-		// Autosave on change
-		SaveMe := func() {
-			form.Bind(&data)
-			go func() {
-				print("save")
-				newData := shared.Scenario{}
-				RPC("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
-					Channel:  Session.Channel,
-					ID:       id,
-					Scenario: &data,
-				}, &newData)
-			}()
-		}
+		if canEdit {
 
-		form.SaveEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			SaveMe()
-		})
+			// Autosave on change
+			SaveMe := func() {
+				form.Bind(&data)
+				go func() {
+					print("save")
+					newData := shared.Scenario{}
+					RPC("ScenarioRPC.UpdateRed", shared.ScenarioRPCData{
+						Channel:  Session.Channel,
+						ID:       id,
+						Scenario: &data,
+					}, &newData)
+				}()
+			}
+
+			form.SaveEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				SaveMe()
+			})
+		}
 
 		// form.ChangeEvent(func(evt dom.Event) {
 		// 	evt.PreventDefault()
@@ -506,8 +519,12 @@ func scenarioBlue(context *router.Context) {
 		if data.AuthorID == Session.UserID {
 			canEdit = true
 		}
+		// if Session.Rank > 9 {
+		// 	canEdit = true
+		// }
 
 		form := formulate.EditForm{}
+		form.DisplayMode = !canEdit
 
 		// Layout the fields
 
@@ -525,25 +542,28 @@ func scenarioBlue(context *router.Context) {
 			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
-		SaveMe := func() {
-			form.Bind(&data)
-			go func() {
-				print("manual save")
-				newData := shared.Scenario{}
-				RPC("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
-					Channel:  Session.Channel,
-					ID:       id,
-					Scenario: &data,
-				}, &newData)
-				print("got back", newData)
-			}()
-		}
+		if canEdit {
 
-		// Back to saveCB
-		form.SaveEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			SaveMe()
-		})
+			SaveMe := func() {
+				form.Bind(&data)
+				go func() {
+					print("manual save")
+					newData := shared.Scenario{}
+					RPC("ScenarioRPC.UpdateBlue", shared.ScenarioRPCData{
+						Channel:  Session.Channel,
+						ID:       id,
+						Scenario: &data,
+					}, &newData)
+					print("got back", newData)
+				}()
+			}
+
+			// Back to saveCB
+			form.SaveEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				SaveMe()
+			})
+		}
 
 		// form.ChangeEvent(func(evt dom.Event) {
 		// 	evt.PreventDefault()
@@ -578,6 +598,14 @@ func scenarioBlue(context *router.Context) {
 var NationLastUsed string
 
 func scenarioRedAdd(context *router.Context) {
+	scenarioForceAdd("Red", context)
+}
+
+func scenarioBlueAdd(context *router.Context) {
+	scenarioForceAdd("Blue", context)
+}
+
+func scenarioForceAdd(team string, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -597,7 +625,7 @@ func scenarioRedAdd(context *router.Context) {
 
 		// Layout the fields
 
-		form.New("fa-flag-o", fmt.Sprintf("Add Red Force - %s", scenario.Name))
+		form.New("fa-flag-o", fmt.Sprintf("Add %s Force - %s", team, scenario.Name))
 
 		if Session.Mobile() {
 
@@ -623,9 +651,9 @@ func scenarioRedAdd(context *router.Context) {
 
 		} else {
 
-			form.Row(6).
+			form.Row(5).
 				AddInput(2, "Unit Name", "Name").
-				AddInput(2, "Nation", "Nation").
+				AddInput(1, "Nation", "Nation").
 				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
 				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
 
@@ -637,13 +665,18 @@ func scenarioRedAdd(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate(fmt.Sprintf("/scenario/%d/red", id))
+			// Session.Navigate(fmt.Sprintf("/scenario/%d/%s", id, strings.ToLower(team)))
+			Session.Navigate(fmt.Sprintf("/scenario/%d", id))
 		})
 
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(&data)
 			data.RedTeam = true
+			if team == "Blue" {
+				data.BlueTeam = true
+				data.RedTeam = false
+			}
 			data.ScenarioID = id
 			NationLastUsed = data.Nation
 
@@ -663,23 +696,23 @@ func scenarioRedAdd(context *router.Context) {
 		data.Nation = NationLastUsed
 		form.Render("edit-form", "main", &data)
 
-		if NationLastUsed == "" {
-			form.Focus("Nation")
-		} else {
-			form.Focus("Name")
-		}
+		// if NationLastUsed == "" {
+		// form.Focus("Nation")
+		// } else {
+		form.Focus("Name")
+		// }
 
 		// Action Grid
 		forces := []shared.Force{}
-		RPC("ScenarioRPC.GetRedForces", shared.ScenarioRPCData{
+		RPC(fmt.Sprintf("ScenarioRPC.Get%sForces", team), shared.ScenarioRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &forces)
 		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
 			ScenarioID: id,
-			Color:      "Red",
+			Color:      team,
 			CanEdit:    false,
-			LColor:     "red",
+			LColor:     strings.ToLower(team),
 			Forces:     &forces,
 		}, func(url string) {
 			// print("clicked on", url)
@@ -689,117 +722,117 @@ func scenarioRedAdd(context *router.Context) {
 	}()
 }
 
-func scenarioBlueAdd(context *router.Context) {
-	id, err := strconv.Atoi(context.Params["id"])
-	if err != nil {
-		print(err.Error())
-		return
-	}
+// func scenarioBlueAdd(context *router.Context) {
+// 	id, err := strconv.Atoi(context.Params["id"])
+// 	if err != nil {
+// 		print(err.Error())
+// 		return
+// 	}
 
-	go func() {
-		Session.MobileSensitive = true
-		data := shared.Force{}
-		scenario := shared.Scenario{}
-		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &scenario)
+// 	go func() {
+// 		Session.MobileSensitive = true
+// 		data := shared.Force{}
+// 		scenario := shared.Scenario{}
+// 		RPC("ScenarioRPC.Get", shared.ScenarioRPCData{
+// 			Channel: Session.Channel,
+// 			ID:      id,
+// 		}, &scenario)
 
-		form := formulate.EditForm{}
+// 		form := formulate.EditForm{}
 
-		// Layout the fields
+// 		// Layout the fields
 
-		form.New("fa-flag", fmt.Sprintf("Add Blue Force - %s", scenario.Name))
+// 		form.New("fa-flag", fmt.Sprintf("Add Blue Force - %s", scenario.Name))
 
-		if Session.Mobile() {
+// 		if Session.Mobile() {
 
-			if Session.SubMobile() {
-				form.Row(1).
-					AddInput(1, "Unit Name", "Name")
-				form.Row(1).
-					AddInput(1, "Nation", "Nation")
-			} else {
-				form.Row(2).
-					AddInput(1, "Unit Name", "Name").
-					AddInput(1, "Nation", "Nation")
-			}
+// 			if Session.SubMobile() {
+// 				form.Row(1).
+// 					AddInput(1, "Unit Name", "Name")
+// 				form.Row(1).
+// 					AddInput(1, "Nation", "Nation")
+// 			} else {
+// 				form.Row(2).
+// 					AddInput(1, "Unit Name", "Name").
+// 					AddInput(1, "Nation", "Nation")
+// 			}
 
-			form.Row(2).
-				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
-				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
-			form.Row(1).
-				AddInput(1, "Commander", "CommanderName")
-			form.Row(2).
-				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+// 			form.Row(2).
+// 				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+// 				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+// 			form.Row(1).
+// 				AddInput(1, "Commander", "CommanderName")
+// 			form.Row(2).
+// 				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+// 				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
 
-		} else {
+// 		} else {
 
-			form.Row(6).
-				AddInput(2, "Unit Name", "Name").
-				AddInput(2, "Nation", "Nation").
-				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
-				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
+// 			form.Row(5).
+// 				AddInput(2, "Unit Name", "Name").
+// 				AddInput(1, "Nation", "Nation").
+// 				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
+// 				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)
 
-			form.Row(5).
-				AddInput(3, "Commander", "CommanderName").
-				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
-				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
-		}
+// 			form.Row(5).
+// 				AddInput(3, "Commander", "CommanderName").
+// 				AddSelect(1, "Commander Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, 3).
+// 				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, 3)
+// 		}
 
-		// Add event handlers
-		form.CancelEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate(fmt.Sprintf("/scenario/%d/blue", id))
-		})
+// 		// Add event handlers
+// 		form.CancelEvent(func(evt dom.Event) {
+// 			evt.PreventDefault()
+// 			Session.Navigate(fmt.Sprintf("/scenario/%d/blue", id))
+// 		})
 
-		form.SaveEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			form.Bind(&data)
-			data.BlueTeam = true
-			data.ScenarioID = id
-			NationLastUsed = data.Nation
+// 		form.SaveEvent(func(evt dom.Event) {
+// 			evt.PreventDefault()
+// 			form.Bind(&data)
+// 			data.BlueTeam = true
+// 			data.ScenarioID = id
+// 			NationLastUsed = data.Nation
 
-			RPCdata := shared.ForceRPCData{
-				Channel: Session.Channel,
-				Force:   &data,
-			}
-			go func() {
-				RPC("ScenarioRPC.InsertForce", RPCdata, &data)
-				// Session.Navigate(fmt.Sprintf("/scenario/%d/blue/add", id))
-				Session.Reload(context)
-			}()
-		})
+// 			RPCdata := shared.ForceRPCData{
+// 				Channel: Session.Channel,
+// 				Force:   &data,
+// 			}
+// 			go func() {
+// 				RPC("ScenarioRPC.InsertForce", RPCdata, &data)
+// 				// Session.Navigate(fmt.Sprintf("/scenario/%d/blue/add", id))
+// 				Session.Reload(context)
+// 			}()
+// 		})
 
-		// All done, so render the form
-		data.Nation = NationLastUsed
-		form.Render("edit-form", "main", &data)
+// 		// All done, so render the form
+// 		data.Nation = NationLastUsed
+// 		form.Render("edit-form", "main", &data)
 
-		if NationLastUsed == "" {
-			form.Focus("Nation")
-		} else {
-			form.Focus("Name")
-		}
+// 		// if NationLastUsed == "" {
+// 		// form.Focus("Nation")
+// 		// } else {
+// 		form.Focus("Name")
+// 		// }
 
-		// Action Grid
-		forces := []shared.Force{}
-		RPC("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &forces)
-		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
-			ScenarioID: id,
-			Color:      "Blue",
-			CanEdit:    false,
-			LColor:     "blue",
-			Forces:     &forces,
-		}, func(url string) {
-			// print("clicked on", url)
-			Session.Navigate(url)
-		})
+// 		// Action Grid
+// 		forces := []shared.Force{}
+// 		RPC("ScenarioRPC.GetBlueForces", shared.ScenarioRPCData{
+// 			Channel: Session.Channel,
+// 			ID:      id,
+// 		}, &forces)
+// 		form.ActionGrid("scenario-forces", "#action-grid", ForceArray{
+// 			ScenarioID: id,
+// 			Color:      "Blue",
+// 			CanEdit:    false,
+// 			LColor:     "blue",
+// 			Forces:     &forces,
+// 		}, func(url string) {
+// 			// print("clicked on", url)
+// 			Session.Navigate(url)
+// 		})
 
-	}()
-}
+// 	}()
+// }
 
 func scenarioFork(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])

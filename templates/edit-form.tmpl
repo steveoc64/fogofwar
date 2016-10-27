@@ -48,10 +48,10 @@
                     <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>
                   {{end}}                               
                   {{if eq .Type "date"}}
-                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}">
+                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>
                   {{end}}
                   {{if eq .Type "number"}}
-                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" step="{{.Step}}">
+                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" step="{{.Step}}" {{if .Readonly}}readonly{{end}}>
                   {{end}}
                   {{if eq .Type "textarea"}}
                     {{if .CodeBlock}}
@@ -61,11 +61,15 @@
                     {{end}}
                   {{end}}
                   {{if eq .Type "select"}}
+                    {{if .Readonly}}
+                    <input readonly name="{{$panelname}}-{{.Model}}" value="{{.Selected}} of {{.Options}}">
+                    {{else}}
                     <select name="{{$panelname}}-{{.Model}}">
                       {{range .Options}}
                         <option value="{{.Key}}" {{if .Selected}}selected{{end}}>{{.Display}}</option>
                       {{end}}
                     </select>
+                    {{end}}
                   {{end}}
                   {{if eq .Type "checkbox"}}
                     <input type="checkbox" name="{{$panelname}}-{{.Model}}" {{if .Checked}}checked{{end}} {{if .Readonly}}disabled{{end}}>
@@ -121,10 +125,10 @@
             {{end}}
           {{end}}
           {{if eq .Type "date"}}
-            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}">
+            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>
           {{end}}
           {{if eq .Type "number"}}
-            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}" step="{{.Step}}">
+            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}" step="{{.Step}}" {{if .Readonly}}readonly{{end}}>
           {{end}}
           {{if eq .Type "textarea"}}
             {{if .CodeBlock}}
@@ -134,11 +138,16 @@
             {{end}}
           {{end}}
           {{if eq .Type "select"}}
+            {{if .Readonly}}
+              <input readonly name="{{.Model}}" value="{{.Selected}} of {{.Options}}">
+            {{else}}
             <select name="{{.Model}}">
+
               {{range .Options}}
                 <option value="{{.Key}}" {{if .Selected}}selected{{end}}>{{.Display}}</option>
               {{end}}
             </select>
+            {{end}}
           {{end}}
           {{if eq .Type "groupselect"}}
             {{$sel := .Selected}}
@@ -172,7 +181,7 @@
       </div>
       {{end}}
     </fieldset>
-    <div class="row no-print">
+    <div class="row no-print" name="form-button-bar">
       <div class="column">
         <div class="button-bar">
           {{if .SaveCB}}

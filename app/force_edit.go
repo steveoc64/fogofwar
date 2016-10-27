@@ -41,9 +41,9 @@ func forceEdit(context *router.Context) {
 		if scenario.AuthorID == Session.UserID {
 			canEdit = true
 		}
-		if Session.Rank > 9 {
-			canEdit = true
-		}
+		// if Session.Rank > 9 {
+		// 	canEdit = true
+		// }
 
 		Nation := ""
 
@@ -58,78 +58,80 @@ func forceEdit(context *router.Context) {
 			LColor = "blue"
 		}
 		form.New("fa-flag", fmt.Sprintf("%s Force - %s", Color, scenario.Name))
+		form.DisplayMode = !canEdit
+		print("here with displaymode", form.DisplayMode)
 
-		if canEdit {
+		// if canEdit {
 
-			if Session.Mobile() {
-				if Session.SubMobile() {
-					form.Row(1).
-						AddInput(1, "Unit Name", "Name")
-					form.Row(1).
-						AddInput(1, "Nation", "Nation")
-				} else {
-					form.Row(2).
-						AddInput(1, "Unit Name", "Name").
-						AddInput(1, "Nation", "Nation")
-				}
-				form.Row(2).
-					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
-
+		if Session.Mobile() {
+			if Session.SubMobile() {
 				form.Row(1).
-					AddInput(1, "Commander", "CommanderName")
-				form.Row(2).
-					AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-					AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+					AddInput(1, "Unit Name", "Name")
+				form.Row(1).
+					AddInput(1, "Nation", "Nation")
 			} else {
-				form.Row(10).
-					AddInput(3, "Unit Name", "Name").
-					AddInput(3, "Nation", "Nation").
-					AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-					AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
-
-				form.Row(10).
-					AddInput(6, "Commander", "CommanderName").
-					AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-					AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+				form.Row(2).
+					AddInput(1, "Unit Name", "Name").
+					AddInput(1, "Nation", "Nation")
 			}
+			form.Row(2).
+				AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+				AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+
+			form.Row(1).
+				AddInput(1, "Commander", "CommanderName")
+			form.Row(2).
+				AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
 		} else {
-			if Session.Mobile() {
-				if Session.SubMobile() {
-					form.Row(1).
-						AddDisplay(1, "Unit Name", "Name")
-					form.Row(1).
-						AddDisplay(1, "Nation", "Nation")
-				} else {
-					form.Row(2).
-						AddDisplay(1, "Unit Name", "Name").
-						AddDisplay(1, "Nation", "Nation")
-				}
-				form.Row(2).
-					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
-				form.Row(2).
-					AddSelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-					AddSelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+			form.Row(10).
+				AddInput(3, "Unit Name", "Name").
+				AddInput(3, "Nation", "Nation").
+				AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+				AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
 
-				form.Row(1).
-					AddInput(1, "Commander", "CommanderName")
-				form.Row(2).
-					AddSelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-					AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
-			} else {
-				form.Row(10).
-					AddDisplay(3, "Unit Name", "Name").
-					AddDisplay(3, "Nation", "Nation").
-					AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
-					AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
-
-				form.Row(10).
-					AddDisplay(6, "Commander", "CommanderName").
-					AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
-					AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
-			}
+			form.Row(10).
+				AddInput(6, "Commander", "CommanderName").
+				AddSelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+				AddSelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
 		}
+		// } else { // Not in edit mode - this is handled inside editform now
+		// 	if Session.Mobile() {
+		// 		if Session.SubMobile() {
+		// 			form.Row(1).
+		// 				AddDisplay(1, "Unit Name", "Name")
+		// 			form.Row(1).
+		// 				AddDisplay(1, "Nation", "Nation")
+		// 		} else {
+		// 			form.Row(2).
+		// 				AddDisplay(1, "Unit Name", "Name").
+		// 				AddDisplay(1, "Nation", "Nation")
+		// 		}
+		// 		form.Row(2).
+		// 			AddDisplaySelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+		// 			AddDisplaySelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+		// 		form.Row(2).
+		// 			AddDisplaySelect(1, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+		// 			AddDisplaySelect(1, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+
+		// 		form.Row(1).
+		// 			AddInput(1, "Commander", "CommanderName")
+		// 		form.Row(2).
+		// 			AddDisplaySelect(1, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+		// 			AddDisplaySelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+		// 	} else {
+		// 		form.Row(10).
+		// 			AddDisplay(3, "Unit Name", "Name").
+		// 			AddDisplay(3, "Nation", "Nation").
+		// 			AddDisplaySelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
+		// 			AddDisplaySelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)
+
+		// 		form.Row(10).
+		// 			AddDisplay(6, "Commander", "CommanderName").
+		// 			AddDisplaySelect(2, "Command Rating", "Rating", Session.Lookup.CmdRating, "ID", "Name", 1, force.Rating).
+		// 			AddDisplaySelect(2, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
+		// 	}
+		// }
 
 		form.Row(1).
 			AddCustom(1, "Summary", "Summary", "")
@@ -280,17 +282,18 @@ func forceEdit(context *router.Context) {
 
 		gunPanel := swapper.AddPanel("Gun")
 		if Session.Mobile() {
-			gunPanel.AddRow(1).
-				AddInput(1, "Name", "Name")
 			gunPanel.AddRow(2).
-				AddCheck(1, "Horse", "HorseGuns").
-				AddInput(1, "Nationality", "Nation")
+				AddInput(1, "Name", "Name").
+				AddInput(1, "Nation", "Nation")
+			gunPanel.AddRow(1).
+				AddCheck(1, "Horse", "HorseGuns")
 			gunPanel.AddRow(1).
 				AddInput(1, "Description", "Descr")
-			gunPanel.AddRow(7).
-				AddNumber(1, "Guns", "Guns", "0").
-				AddSelect(3, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
-				AddSelect(3, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
+			gunPanel.AddRow(1).
+				AddNumber(1, "Guns", "Guns", "0")
+			gunPanel.AddRow(2).
+				AddSelect(1, "Type", "GunneryType", Session.Lookup.Gunnery, "ID", "Name", 0, 0).
+				AddSelect(1, "Gun Condition", "GunCondition", Session.Lookup.Condition, "ID", "Name", 0, 0)
 		} else {
 			gunPanel.AddRow(3).
 				AddInput(1, "Name", "Name").
@@ -342,7 +345,8 @@ func forceEdit(context *router.Context) {
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
+			// Session.Navigate(fmt.Sprintf("/scenario/%d/%s", scenario.ID, LColor))
+			Session.Navigate(fmt.Sprintf("/scenario/%d", scenario.ID))
 		})
 
 		// Add print handlers
@@ -465,37 +469,35 @@ func forceEdit(context *router.Context) {
 			case 1: // Command
 				swapper.Panels[1].Paint(&TheUnit)
 				swapper.Select(1)
-				if Session.SubMobile() {
-					form.ScrollTo("grid-8-0")
-				} else {
+				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Cmd-Name")
 				}
 			case 2: // Bde
 				// print("paint panel 2")
 				swapper.Panels[2].Paint(&TheUnit)
 				swapper.Select(2)
-				if !Session.SubMobile() {
+				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Bde-Name")
 				}
 			case 3: // Cav
 				// print("paint panel 2")
 				swapper.Panels[3].Paint(&TheUnit)
 				swapper.Select(3)
-				if !Session.SubMobile() {
+				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Cav-Name")
 				}
 			case 4: // Bty
 				// print("paint panel 2")
 				swapper.Panels[4].Paint(&TheUnit)
 				swapper.Select(4)
-				if !Session.SubMobile() {
+				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Gun-Name")
 				}
 			case 5: // Other
 				// print("paint panel 2")
 				swapper.Panels[5].Paint(&TheUnit)
 				swapper.Select(5)
-				if !Session.SubMobile() {
+				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Other-Name")
 				}
 			}
@@ -687,27 +689,41 @@ func forceEdit(context *router.Context) {
 					break
 				}
 			}
-			// and then scroll to start of unitdetails panel
+			// and then scroll so that the end of the form is visible, which
+			// makes the unit details visible
 			if Session.Mobile() {
-				form.ScrollTo("grid-8-0")
+				if Session.SubMobile() {
+					form.ScrollToFit("grid-8-0", "form-button-bar")
+				} else {
+					form.ScrollToFit("grid-7-0", "form-button-bar")
+
+				}
 			}
 		})
 
 		// Put up down arrows on the name entry fields only, to nav to different units
-		form.OnEvent("grid-4-1", "keydown", func(evt dom.Event) {
-			kevent := evt.(*dom.KeyboardEvent)
-			// print("kevent is", kevent.KeyCode)
-			if evt.Target().TagName() == "INPUT" {
-				switch kevent.KeyCode {
-				case 27:
-					drawUnitPanel() // which restores the screen to the known record
-				case 38:
-					goUpOne()
-				case 40:
-					goDownOne()
-				}
+
+		if !Session.Mobile() { // assume no keyboard if on mobile !!
+			keygrid := "grid-3-1" // without the unit btns above, we are on row 3
+			if canEdit {
+				keygrid = "grid-4-1" // with unit btn above, and focus on the fields to the right
 			}
-		})
+
+			form.OnEvent(keygrid, "keydown", func(evt dom.Event) {
+				kevent := evt.(*dom.KeyboardEvent)
+				// print("kevent is", kevent.KeyCode)
+				if evt.Target().TagName() == "INPUT" {
+					switch kevent.KeyCode {
+					case 27:
+						drawUnitPanel() // which restores the screen to the known record
+					case 38:
+						goUpOne()
+					case 40:
+						goDownOne()
+					}
+				}
+			})
+		}
 
 		// Add Buttons
 		if canEdit {

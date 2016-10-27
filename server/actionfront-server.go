@@ -135,17 +135,9 @@ func main() {
 	// kick off a database backup every 24hrs
 	go autoBackup()
 
-	InitPaypal(e)
-	// PaypalPayment(590, "1 Month Colonels Commission")
+	InitPaypal(Config, e)
 
 	errRun := e.Run(std)
 	println("ActionFront Server All Done", errRun.Error())
 
-	// std.SetHandler(e)
-	// gracehttp.Serve(std.Server)
-
 }
-
-// func initPaypal_stub() {
-// 	print("this is a stub ... replace with the real one, but Im not putting the code for that in the github repo for now")
-// }

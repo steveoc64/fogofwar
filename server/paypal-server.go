@@ -35,9 +35,13 @@ func ppgood(c echo.Context) error {
 	executeResult, err := PaypalClient.ExecuteApprovedPayment(id, payerID)
 	if err == nil {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
-		return c.String(http.StatusOK, "Thanks, that seemed to work, you are now promoted")
+		return c.File("public/promotion.html")
+		return c.Redirect(http.StatusMovedPermanently, Config.PaypalSuccessURI)
 	} else {
-		return c.String(http.StatusOK, "Thanks for authorizing the payment, but something else when wrong ... no promotion for you")
+		print("all good -- redirecting\n")
+		return c.File("public/promotion.html")
+		return c.Redirect(http.StatusMovedPermanently, Config.PaypalSuccessURI)
+		// return c.String(http.StatusOK, "Very sorry, but something went wrong at the PayPal end with that transaction ... reload and try again")
 	}
 }
 
@@ -45,7 +49,7 @@ func ppbad(c echo.Context) error {
 	return c.String(http.StatusOK, "Allrighty, that didnt seem to work")
 }
 
-func InitPaypal(e *echo.Echo) error {
+func InitPaypal(c ConfigType, e *echo.Echo) error {
 
 	err := error(nil)
 
@@ -56,20 +60,25 @@ func InitPaypal(e *echo.Echo) error {
 		return err
 	}
 
-	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Payments List")
+	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Init Paypal")
 
 	// Backend hooks to get authorization calls from Paypal
 	e.Get("/ppgood", ppgood)
 	e.Get("/ppbad", ppbad)
+	e.File("/promotion", "public/promotion.html")
 
-	println("start paypal on", paypalsdk.APIBaseSandBox)
-	fmt.Fprintf(PaypalLog, "Using API %s\n", paypalsdk.APIBaseSandBox)
+	println("start paypal on", Config.PaypalAPI)
+	fmt.Fprintf(PaypalLog, "Using API %s\n", Config.PaypalAPI)
 
 	// actionfront-test
-	clientID := "AX3Vgalci6rBVtX8T4FjtHup5OhTajVSczmH8G0nJr3v8vxoQusA1lxDzhnddYjHBclom61vUucmEbZT"
-	secret := "EGtqUYvZh4A85FF0pC_Rl82yJg7xVb6_115k0dDrEaGSayJHgLfw1U7vzKZxw49PeRXWbqGebVaFsi45"
+	// clientID := "AX3Vgalci6rBVtX8T4FjtHup5OhTajVSczmH8G0nJr3v8vxoQusA1lxDzhnddYjHBclom61vUucmEbZT"
+	// secret := "EGtqUYvZh4A85FF0pC_Rl82yJg7xVb6_115k0dDrEaGSayJHgLfw1U7vzKZxw49PeRXWbqGebVaFsi45"
 
-	PaypalClient, err = paypalsdk.NewClient(clientID, secret, paypalsdk.APIBaseSandBox)
+	PaypalClient, err = paypalsdk.NewClient(
+		Config.PaypalClientID,
+		Config.PaypalSecret,
+		Config.PaypalAPI)
+
 	if err != nil {
 		println(err.Error())
 		return err
@@ -118,11 +127,16 @@ func (p *PaypalRPC) CreatePayment(data shared.PaypalRPCData, url *string) error 
 		println("OOPS - cant convert", value, "to float ???", err.Error())
 	}
 
-	redirectURI := "https://wargaming.io/ppgood"
-	cancelURI := "https://wargaming.io/ppbad"
+	// redirectURI := "https://wargaming.io/ppgood"
+	// cancelURI := "https://wargaming.io/ppbad"
 	// redirectURI := "http://localhost:8844/ppgood"
 	// cancelURI := "http://localhost:8844/ppbad"
-	paymentResult, err := PaypalClient.CreateDirectPaypalPayment(amount, redirectURI, cancelURI, data.Descr)
+	fmt.Printf("config %v\n", Config)
+	paymentResult, err := PaypalClient.CreateDirectPaypalPayment(
+		amount,
+		Config.PaypalRedirectURI,
+		Config.PaypalCancelURI,
+		data.Descr)
 
 	if err != nil {
 		fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())

@@ -476,7 +476,7 @@ func userSettings(context *router.Context) {
 			print("buy commission 2")
 			pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
 			if pp != nil {
-				pp.Class().Remove("hidden")
+				// pp.Class().Remove("hidden")
 				go func() {
 					url := ""
 					err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
@@ -487,11 +487,12 @@ func userSettings(context *router.Context) {
 					}, &url)
 					if err != nil {
 						dom.GetWindow().Alert("ERROR: " + err.Error())
-						pp.Class().Add("hidden")
+						// pp.Class().Add("hidden")
 					} else {
-						pp.Class().Remove("hidden")
+						// pp.Class().Remove("hidden")
 						print("set url to ", url)
-						pp.Src = url
+						w.Open(url, "ActionFront Commission Purchase", "left=50,top=100,height=600,width=700,menubar=0,toolbar=0,location=0,status=yes")
+						// pp.Src = url
 					}
 				}()
 			}

@@ -36,11 +36,10 @@ func ppgood(c echo.Context) error {
 	if err == nil {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
 		return c.File("public/promotion.html")
-		return c.Redirect(http.StatusMovedPermanently, Config.PaypalSuccessURI)
 	} else {
-		print("all good -- redirecting\n")
-		return c.File("public/promotion.html")
-		return c.Redirect(http.StatusMovedPermanently, Config.PaypalSuccessURI)
+		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
+		fmt.Fprintf(PaypalLog, "ERROR:", err.Error())
+		return c.File("public/promotion-fail.html")
 		// return c.String(http.StatusOK, "Very sorry, but something went wrong at the PayPal end with that transaction ... reload and try again")
 	}
 }

@@ -535,7 +535,8 @@ func (s *ScenarioRPC) AddUnit(data shared.ForceUnitRPCData, retval *shared.Force
 	case 3:
 		unit.Path += "_Cavalry"
 		unit.Sabres = 600
-		unit.Rating = 3 // default to Elite morale
+		unit.Rating = 3    // default to Elite morale
+		unit.CavRating = 3 // default to Elite morale
 	case 4:
 		unit.Path += "_Battery"
 		unit.Guns = 8
@@ -692,6 +693,12 @@ func (s *ScenarioRPC) UpdateUnit(data shared.ForceUnitRPCData, retval *shared.Fo
 	}
 	if data.ForceUnit.Guns > 0 && data.ForceUnit.GunCondition == 0 {
 		data.ForceUnit.GunCondition = 3 // Ready
+	}
+	if data.ForceUnit.UType == 3 {
+		data.ForceUnit.Rating = data.ForceUnit.CavRating
+	}
+	if data.ForceUnit.Sabres > 0 && data.ForceUnit.CavRating == 0 {
+		data.ForceUnit.CavRating = 5
 	}
 
 	_, err := DB.Update("force_unit").

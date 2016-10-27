@@ -497,6 +497,9 @@ func gameEditTeam(context *router.Context) {
 				// print("clicked on row with key", key)
 				unit := game.GetUnit(team, key)
 				// print("unit is", unit)
+				if unit.UType == 1 {
+					unit.Summary = unit.GetSummary(TheCmd)
+				}
 				loadTemplate("unit-details", "#unit-details", unit)
 				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")

@@ -508,6 +508,53 @@ type Unit struct {
 	GunsLimbered     bool   `db:"guns_limbered"`
 	GunsMState       int    `db:"guns_mstate"`
 	GunMaxCondition  int    `db:"gun_max_condition"`
+	Summary          string `db:"summary"` // derived data
+}
+
+func (u *Unit) GetSummary(corps *GameCmd) string {
+	// Loop through the Corp, and work out which units are childs of this, and sum
+	// up the total bayonets and sabres and guns
+
+	mode := 0
+	b := u.Bayonets
+	bl := u.BayonetsLost
+	s := u.Sabres
+	sl := u.SabresLost
+	g := u.Guns
+	gl := u.GunsLost
+	for _, v := range corps.Units {
+		switch v.UType {
+		case 1:
+			if mode == 1 {
+				mode = 2
+			}
+			if v.ID == u.ID {
+				mode = 1
+				// everything from here is mine until we hit the next thing
+			}
+		default:
+			if mode == 1 {
+				b += v.Bayonets
+				bl += v.BayonetsLost
+				s += v.Sabres
+				sl += v.SabresLost
+				g += v.Guns
+				gl += v.GunsLost
+			}
+		}
+	}
+
+	retval := ""
+	if b > 0 {
+		retval += fmt.Sprintf("Total of %d Bayonets (%d unfit for duty)\n", b, bl)
+	}
+	if s > 0 {
+		retval += fmt.Sprintf("Total of %d Sabres (%d out of action)\n", s, sl)
+	}
+	if g > 0 {
+		retval += fmt.Sprintf("Total of %d Guns (%d under repair)\n", g, gl)
+	}
+	return retval
 }
 
 func (u *Unit) GetSitrep() string {
@@ -546,7 +593,6 @@ func (u *Unit) GetSupport() string {
 				u.Sabres, Lookups.UnitRating[u.CavRating-1], Lookups.CavType[u.CavType-1].Name)
 		}
 		if u.Guns > 0 {
-			print("gun unit", u)
 			if u.GunCondition == 0 {
 				u.GunCondition = 3
 			}

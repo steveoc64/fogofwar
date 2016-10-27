@@ -68,10 +68,13 @@ func gameEditTable(context *router.Context) {
 
 		if Session.Mobile() {
 			if Session.SubMobile() {
-				form.Row(1).
-					AddNumber(1, "Width in Feet", "TableX", "1")
-				form.Row(1).
-					AddNumber(1, "Depth in Feet", "TableY", "1")
+				form.Row(2).
+					AddNumber(1, "Width in Feet", "TableX", "1").
+					AddDisplay(1, "= Real m Wide", "KmX")
+				form.Row(2).
+					AddNumber(1, "Depth in Feet", "TableY", "1").
+					AddDisplay(1, "= Real m Deep", "KmY")
+
 				form.Row(1).
 					AddSelect(1, "", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
 			} else {
@@ -85,9 +88,9 @@ func gameEditTable(context *router.Context) {
 		} else {
 			form.Row(10).
 				AddNumber(1, "Width in Feet", "TableX", "1").
-				AddDisplay(1, "= Km Wide", "KmX").
+				AddDisplay(1, "= Real m Wide", "KmX").
 				AddNumber(1, "Depth in Feet", "TableY", "1").
-				AddDisplay(1, "= Km Deep", "KmY").
+				AddDisplay(1, "= Real m Deep", "KmY").
 				AddSelect(6, "Grid Size / Figure Basing Guide", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
 		}
 
@@ -532,10 +535,10 @@ func gameEditTable(context *router.Context) {
 			rect := form.Get("map-rect")
 			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
 			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
-			if !Session.Mobile() {
-				form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
-				form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
-			}
+			// if !Session.Mobile() {
+			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
+			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			// }
 			game.ResizeTiles()
 			drawTiles()
 			b := form.Get("save-button")
@@ -572,10 +575,10 @@ func gameEditTable(context *router.Context) {
 			rect := form.Get("map-rect")
 			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
 			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
-			if !Session.Mobile() {
-				form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
-				form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
-			}
+			// if !Session.Mobile() {
+			form.Get("KmX").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmX)
+			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
+			// }
 			drawTiles()
 		}
 

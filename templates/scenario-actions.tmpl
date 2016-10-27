@@ -1,4 +1,19 @@
 <div class="action-grid">
+	<div class="action__item" url="/scenario/{{.ID}}/red">
+		<div class="action__title">Red Team</div>
+		<div class="action__icon"><i class="fa fa-flag-o fa-lg"></i></div>
+		<div class="action__text">
+			{{.RedTeam}}
+		</div>
+	</div>
+	<div class="action__item" url="/scenario/{{.ID}}/blue">
+		<div class="action__title">Blue Team</div>
+		<div class="action__icon"><i class="fa fa-flag fa-lg"></i></div>
+		<div class="action__text">
+			{{.BlueTeam}}
+		</div>
+	</div>	
+	
 	{{if .Public}}
 		{{if .IsMine}}
 		<div class="action__item" url="lock">
@@ -29,6 +44,7 @@
 			{{end}}
 		{{end}}
 	{{end}}
+
 	{{if .Review}}
 		{{if .Admin}}
 		<div class="action__item" url="accept">
@@ -48,18 +64,5 @@
 		</div>	
 		{{end}}
 	{{end}}
-	<div class="action__item" url="/scenario/{{.ID}}/red">
-		<div class="action__title">Red Team</div>
-		<div class="action__icon"><i class="fa fa-flag-o fa-lg"></i></div>
-		<div class="action__text">
-			{{.RedTeam}}
-		</div>
-	</div>
-	<div class="action__item" url="/scenario/{{.ID}}/blue">
-		<div class="action__title">Blue Team</div>
-		<div class="action__icon"><i class="fa fa-flag fa-lg"></i></div>
-		<div class="action__text">
-			{{.BlueTeam}}
-		</div>
-	</div>	
+	
 </div>

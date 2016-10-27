@@ -18,17 +18,6 @@
 		</div>
 	</div>
 	{{end}}
-	
-	{{if ne .InMode "Overview"}}
-	<div class="action__item" url="/game/{{.ID}}/overview">
-		<div class="action__title">Overview</div>
-		<div class="action__icon"><i class="fa fa-bookmark fa-lg"></i></div>
-		<div class="action__text">
-			Game Overview
-		</div>
-	</div>
-	{{end}}
-
 	<div class="action__item" url="/game/{{.ID}}/red">
 		<div class="action__title">Red Team</div>
 		<div class="action__icon"><i class="fa fa-flag-o fa-lg"></i></div>
@@ -43,6 +32,17 @@
 			{{.BlueTeam}}
 		</div>
 	</div>
+
+	
+	{{if ne .InMode "Overview"}}
+	<div class="action__item" url="/game/{{.ID}}/overview">
+		<div class="action__title">Overview</div>
+		<div class="action__icon"><i class="fa fa-bookmark fa-lg"></i></div>
+		<div class="action__text">
+			Game Overview
+		</div>
+	</div>
+	{{end}}
 
 	{{if ne .InMode "Players"}}
 	<div class="action__item" url="/game/{{.ID}}/players">

@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"net/http"
 	"os"
 	"strconv"
 	"time"
@@ -40,12 +39,13 @@ func ppgood(c echo.Context) error {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
 		fmt.Fprintf(PaypalLog, "ERROR:", err.Error())
 		return c.File("public/promotion-fail.html")
-		// return c.String(http.StatusOK, "Very sorry, but something went wrong at the PayPal end with that transaction ... reload and try again")
 	}
 }
 
 func ppbad(c echo.Context) error {
-	return c.String(http.StatusOK, "Allrighty, that didnt seem to work")
+	fmt.Fprintf(PaypalLog, "------------------------------\n%s\n", "Cancel Payment")
+	return c.File("public/promotion-cancel.html")
+	// return c.String(http.StatusOK, "Very sorry, but something went wrong at the PayPal end with that transaction ... reload and try again")
 }
 
 func InitPaypal(c ConfigType, e *echo.Echo) error {

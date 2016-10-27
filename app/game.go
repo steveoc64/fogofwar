@@ -170,19 +170,38 @@ func gameEditOverview(context *router.Context) {
 
 		form.New("fa-bookmark", "Edit Game Details - "+game.Name)
 
-		form.Row(5).
-			AddDate(1, "Start Date", "StartDate").
-			AddDate(1, "Game Ends", "Expires").
-			AddNumber(1, "Year", "Year", "1").
-			AddNumber(1, "Turn", "Turn", "1").
-			AddNumber(1, "Turn Limit", "TurnLimit", "1")
+		if Session.Mobile() {
+			form.Row(2).
+				AddDate(1, "Start Date", "StartDate").
+				AddDate(1, "Game Ends", "Expires")
+			form.Row(3).
+				AddNumber(1, "Year", "Year", "1").
+				AddNumber(1, "Turn", "Turn", "1").
+				AddNumber(1, "Turn Limit", "TurnLimit", "1")
 
-		form.Row(5).
-			AddInput(1, "Name", "Name").
-			AddInput(4, "Description", "Descr")
+			form.Row(1).
+				AddInput(1, "Name", "Name")
 
-		form.Row(1).
-			AddTextarea(1, "Notes", "Notes")
+			form.Row(1).
+				AddTextarea(1, "Description", "Descr")
+
+			form.Row(1).
+				AddBigTextarea(1, "Notes", "Notes")
+		} else {
+			form.Row(5).
+				AddDate(1, "Start Date", "StartDate").
+				AddDate(1, "Game Ends", "Expires").
+				AddNumber(1, "Year", "Year", "1").
+				AddNumber(1, "Turn", "Turn", "1").
+				AddNumber(1, "Turn Limit", "TurnLimit", "1")
+
+			form.Row(5).
+				AddInput(1, "Name", "Name").
+				AddInput(4, "Description", "Descr")
+
+			form.Row(1).
+				AddTextarea(1, "Notes", "Notes")
+		}
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

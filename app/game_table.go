@@ -78,9 +78,11 @@ func gameEditTable(context *router.Context) {
 				form.Row(1).
 					AddSelect(1, "", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
 			} else {
-				form.Row(2).
+				form.Row(4).
 					AddNumber(1, "Width in Feet", "TableX", "1").
-					AddNumber(1, "Depth in Feet", "TableY", "1")
+					AddDisplay(1, "= Real m Wide", "KmX").
+					AddNumber(1, "Depth in Feet", "TableY", "1").
+					AddDisplay(1, "= Real m Deep", "KmY")
 				form.Row(1).
 					AddSelect(1, "Grid", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
 			}
@@ -157,7 +159,10 @@ func gameEditTable(context *router.Context) {
 
 		objRow := "row-3"
 		if Session.Mobile() {
-			objRow = "row-5"
+			objRow = "row-4"
+			if Session.SubMobile() {
+				objRow = "row-5"
+			}
 		}
 		form.Get(objRow).Class().Add("hidden")
 

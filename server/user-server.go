@@ -273,7 +273,7 @@ func (u *UserRPC) InviteFriend(data shared.ContactMessageRPCData, retval *int) e
 
 		msg := fmt.Sprintf("Message sent from %s %s\n<br><br>", user.Username, user.Email)
 		msg += data.ContactMessage.Message
-		msg += "\n<p>Click <a href=https://wargaming.io>https://wargaming.io</a> to sign up.</p>\n"
+		msg += "\n<p>Click <a href=https://wargaming.io>https://wargaming.io</a> to sign up and start playing for free.</p>\n"
 
 		m := NewMail()
 		m.SetHeader("From", "ActionFront <actionfront@wargaming.io>")

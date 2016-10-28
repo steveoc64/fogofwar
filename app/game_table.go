@@ -100,6 +100,13 @@ func gameEditTable(context *router.Context) {
 		form.Row(1).
 			AddCustom(1, "", "ActionButtons", "button-bar-left")
 
+		form.Row(7).
+			AddInput(3, "Objective", "ObjectiveName").
+			AddNumber(1, "VP Per Turn", "VPPerTurn", "1").
+			AddNumber(1, "VP Red", "RedVP", "1").
+			AddNumber(1, "VP Blue", "BlueVP", "1").
+			AddButton(1, "Delete", "DeleteObj")
+
 		form.Row(1).
 			AddCustom(1, "", "ModeButtons", "button-bar-left")
 
@@ -138,8 +145,17 @@ func gameEditTable(context *router.Context) {
 		modeSet := defaultMode
 		oldModeSet := ""
 		TheCmd := &shared.GameCmd{}
+		TheObj := &shared.GameObjective{}
 		currentObjX := -1
 		currentObjY := -1
+
+		// if modeSet == "objective" {
+		// 	form.Get("row-3").Class().Remove("hidden")
+		// } else {
+		// 	form.Get("row-3").Class().Add("hidden")
+		// }
+
+		form.Get("row-3").Class().Add("hidden")
 
 		// Scroll to the map
 		scrollToMap := func() {
@@ -301,17 +317,17 @@ func gameEditTable(context *router.Context) {
 		}
 
 		// Add an edit field to the abar
-		editField := func(span int, div *dom.HTMLDivElement, title, name, theType string) *dom.HTMLDivElement {
-			col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-			col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
-			el := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
-			el.SetAttribute("name", name)
-			el.Placeholder = title
-			el.Type = theType
-			col.AppendChild(el)
-			div.AppendChild(col)
-			return div
-		}
+		// editField := func(span int, div *dom.HTMLDivElement, title, name, theType string) *dom.HTMLDivElement {
+		// 	col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+		// 	col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
+		// 	el := doc.CreateElement("INPUT").(*dom.HTMLInputElement)
+		// 	el.SetAttribute("name", name)
+		// 	el.Placeholder = title
+		// 	el.Type = theType
+		// 	col.AppendChild(el)
+		// 	div.AppendChild(col)
+		// 	return div
+		// }
 		// labelField := func(span int, div *dom.HTMLDivElement, lbl string) *dom.HTMLDivElement {
 		// 	col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
 		// 	col.SetAttribute("data-field-span", fmt.Sprintf("%d", span))
@@ -324,6 +340,7 @@ func gameEditTable(context *router.Context) {
 			print("doing a setmode of", modeSet)
 			switch modeSet {
 			case "terrain":
+				form.Get("row-3").Class().Add("hidden")
 				actionBtn("Clear")
 				actionBtn("Rough")
 				actionBtn("Woods")
@@ -335,6 +352,7 @@ func gameEditTable(context *router.Context) {
 				actionBtn("Higher")
 				actionBtn("Lower")
 			case "red":
+				form.Get("row-3").Class().Add("hidden")
 				TheCmd = &shared.GameCmd{}
 				for _, v := range game.RedCmd {
 					if !v.Cull {
@@ -342,6 +360,7 @@ func gameEditTable(context *router.Context) {
 					}
 				}
 			case "blue":
+				form.Get("row-3").Class().Add("hidden")
 				TheCmd = &shared.GameCmd{}
 				for _, v := range game.BlueCmd {
 					if !v.Cull {
@@ -349,63 +368,63 @@ func gameEditTable(context *router.Context) {
 					}
 				}
 			case "objective":
+				// form.Get("row-3").Class().Remove("hidden")
 				// Create a set of fields for the objective details
-				print("oms vs ms", oldModeSet, modeSet)
 				if oldModeSet != modeSet {
-					if Session.Mobile() {
-						abar.SetInnerHTML("")
-					} else {
-						abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
-					}
-					ddc := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-					ddc.Class().Add("row")
-					ddc.Class().Add("hidden")
-					ddc.SetID("objective-fields")
+					// if Session.Mobile() {
+					// 	abar.SetInnerHTML("")
+					// } else {
+					// 	abar.SetInnerHTML("Click on a Tile to set an Objective, and then fill in the defails")
+					// }
+					// ddc := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					// ddc.Class().Add("row")
+					// ddc.Class().Add("hidden")
+					// ddc.SetID("objective-fields")
 
-					dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-					dd.Class().Add("row")
+					// dd := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					// dd.Class().Add("row")
 
-					if Session.Mobile() {
-						dd.SetAttribute("data-row-span", "6")
-					} else {
-						dd.SetAttribute("data-row-span", "12")
-					}
-					dd = editField(6, dd, "Name", "obj-name", "text")
-					// dd = labelField(3, dd, "VP Per Turn / Red / Blue")
-					dd = editField(2, dd, "VP Per Turn", "obj-vpperturn", "number")
-					dd = editField(2, dd, "Red VP", "obj-redvp", "number")
-					dd = editField(2, dd, "Blue VP", "obj-bluevp", "number")
-					col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
-					col.SetAttribute("data-field-span", "1")
-					col.SetInnerHTML(`<i class="fa fa-close">`)
-					col.SetID("delete-obj")
-					dd.AppendChild(col)
-					ddc.AppendChild(dd)
-					abar.AppendChild(ddc)
-					col.AddEventListener("click", false, func(evt dom.Event) {
-						if dom.GetWindow().Confirm("Remove this Objective ?") {
-							game.RemoveObjective(currentObjX, currentObjY)
-							doc.QuerySelector("#objective-fields").Class().Add("hidden")
-							currentObjX = -1
-							currentObjY = -1
-							drawTiles()
-						}
-					})
+					// if Session.Mobile() {
+					// 	dd.SetAttribute("data-row-span", "6")
+					// } else {
+					// 	dd.SetAttribute("data-row-span", "12")
+					// }
+					// dd = editField(6, dd, "Name", "obj-name", "text")
+					// // dd = labelField(3, dd, "VP Per Turn / Red / Blue")
+					// dd = editField(2, dd, "VP Per Turn", "obj-vpperturn", "number")
+					// dd = editField(2, dd, "Red VP", "obj-redvp", "number")
+					// dd = editField(2, dd, "Blue VP", "obj-bluevp", "number")
+					// col := doc.CreateElement("DIV").(*dom.HTMLDivElement)
+					// col.SetAttribute("data-field-span", "1")
+					// col.SetInnerHTML(`<i class="fa fa-close">`)
+					// col.SetID("delete-obj")
+					// dd.AppendChild(col)
+					// ddc.AppendChild(dd)
+					// abar.AppendChild(ddc)
+					// col.AddEventListener("click", false, func(evt dom.Event) {
+					// 	if dom.GetWindow().Confirm("Remove this Objective ?") {
+					// 		game.RemoveObjective(currentObjX, currentObjY)
+					// 		doc.QuerySelector("#objective-fields").Class().Add("hidden")
+					// 		currentObjX = -1
+					// 		currentObjY = -1
+					// 		drawTiles()
+					// 	}
+					// })
 
-					abar.AddEventListener("change", false, func(evt dom.Event) {
-						// print("one of the objective properties has changed !!")
-						// print("X Y of the objective is", currentObjX, currentObjY)
-						o := game.GetObjective(currentObjX, currentObjY)
-						if o != nil {
-							o.Name = abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value
-							o.VPPerTurn, _ = strconv.Atoi(abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value)
-							o.RedVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value)
-							o.BlueVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value)
-							// print("set into o", o)
-							// print("and in the game object, its now", game)
+					// abar.AddEventListener("change", false, func(evt dom.Event) {
+					// 	// print("one of the objective properties has changed !!")
+					// 	// print("X Y of the objective is", currentObjX, currentObjY)
+					// 	o := game.GetObjective(currentObjX, currentObjY)
+					// 	if o != nil {
+					// 		o.Name = abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value
+					// 		o.VPPerTurn, _ = strconv.Atoi(abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value)
+					// 		o.RedVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value)
+					// 		o.BlueVP, _ = strconv.Atoi(abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value)
+					// 		// print("set into o", o)
+					// 		// print("and in the game object, its now", game)
 
-						}
-					})
+					// 	}
+					// })
 					print("drawing the tiles again !!")
 					drawTiles() // do it again, to ensure that the objective tiles are displayed correctly
 				}
@@ -432,6 +451,17 @@ func gameEditTable(context *router.Context) {
 				modeSet = evt.Target().(*dom.HTMLInputElement).Value
 				setMode()
 				abar.Class().Remove("hidden")
+
+				// set all buttons in this bar to button-outline, except for me, and im button-primary
+				for _, v := range bbar.QuerySelectorAll(".button") {
+					if v.(*dom.HTMLInputElement).Value == modeSet {
+						v.Class().Add("button-primary")
+						v.Class().Remove("button-outline")
+					} else {
+						v.Class().Remove("button-primary")
+						v.Class().Add("button-outline")
+					}
+				}
 			})
 			bbar.AppendChild(btn)
 		}
@@ -597,10 +627,14 @@ func gameEditTable(context *router.Context) {
 		})
 
 		setObjectiveFields := func(theObj *shared.GameObjective) {
-			abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value = theObj.Name
-			abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.VPPerTurn)
-			abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.RedVP)
-			abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.BlueVP)
+			// abar.QuerySelector("[name=obj-name]").(*dom.HTMLInputElement).Value = theObj.Name
+			// abar.QuerySelector("[name=obj-vpperturn]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.VPPerTurn)
+			// abar.QuerySelector("[name=obj-redvp]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.RedVP)
+			// abar.QuerySelector("[name=obj-bluevp]").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.BlueVP)
+			form.Get("ObjectiveName").(*dom.HTMLInputElement).Value = theObj.Name
+			form.Get("VPPerTurn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.VPPerTurn)
+			form.Get("RedVP").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.RedVP)
+			form.Get("BlueVP").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", theObj.BlueVP)
 			currentObjX = theObj.X
 			currentObjY = theObj.Y
 		}
@@ -630,7 +664,8 @@ func gameEditTable(context *router.Context) {
 					drawTiles()
 				case "objective":
 					// print("click on tile in objective mode")
-					doc.QuerySelector("#objective-fields").Class().Remove("hidden")
+					// doc.QuerySelector("#objective-fields").Class().Remove("hidden")
+					form.Get("row-3").Class().Remove("hidden")
 					tName := t.GetAttribute("name")
 					if strings.HasPrefix(tName, "objective-") {
 						// Clicked on existing objective
@@ -639,19 +674,20 @@ func gameEditTable(context *router.Context) {
 							print("something went a bit wrong there - index out of range", i, len(game.Objectives))
 						} else {
 							// print("looks like a valid objective", i)
-							theObj := game.Objectives[i]
-							print("which gives", theObj)
-							setObjectiveFields(theObj)
+							TheObj = game.Objectives[i]
+							print("which gives", TheObj)
+							setObjectiveFields(TheObj)
 						}
 					} else {
 						// Clicked on terrain tile with no existing objective
 						// print("the tile is", theTile)
-						theObj := game.AddObjective(theTile.X, theTile.Y)
+						TheObj = game.AddObjective(theTile.X, theTile.Y)
 						// print("got", theObj)
-						setObjectiveFields(theObj)
+						setObjectiveFields(TheObj)
 					}
 					changed = true
 					drawTiles()
+					form.Focus("ObjectiveName")
 					// case "Zones":
 					// 	print("click on tile in zone mode")
 				}
@@ -669,6 +705,34 @@ func gameEditTable(context *router.Context) {
 			if evt.Target().TagName() == "INPUT" {
 				drawTiles()
 			}
+		})
+
+		form.OnEvent("DeleteObj", "click", func(evt dom.Event) {
+			if dom.GetWindow().Confirm("Remove this Objective ?") {
+				game.RemoveObjective(currentObjX, currentObjY)
+				form.Get("row-3").Class().Add("hidden")
+				currentObjX = -1
+				currentObjY = -1
+				drawTiles()
+			}
+		})
+
+		form.OnEvent("ObjectiveName", "change", func(evt dom.Event) {
+			print("name has changed, and theObj is", TheObj)
+			TheObj.Name = evt.Target().(*dom.HTMLInputElement).Value
+			drawTiles()
+		})
+
+		form.OnEvent("VPPerTurn", "change", func(evt dom.Event) {
+			TheObj.VPPerTurn, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+		})
+
+		form.OnEvent("RedVP", "change", func(evt dom.Event) {
+			TheObj.RedVP, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+		})
+
+		form.OnEvent("BlueVP", "change", func(evt dom.Event) {
+			TheObj.BlueVP, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
 		})
 
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))

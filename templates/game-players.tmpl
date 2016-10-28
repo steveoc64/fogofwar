@@ -6,13 +6,27 @@
 <h3>{{.Name}}, {{.Year}}</h3>
 <table>
 	<tr>
-		<th>{{.RedTeam}}</th>
-		<th>{{.BlueTeam}}</th>
+		<th colspan=2>{{.RedTeam}}</th>
+		<th colspan=2>{{.BlueTeam}}</th>
 	</tr>
 	{{range .GetPlayerRows}}
 	<tr>
-		<td>{{.Red}}</td>
-		<td>{{.Blue}}</td>
+		<td>{{.Red.Username}}</td>
+		<td>
+		 {{if .Red.Accepted}}
+		  <i class="fa fa-check-square fa-2x"></i>
+		 {{else}}
+		  <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
+		 {{end}}
+		</td>
+		<td>{{.Blue.Username}}</td>
+		<td>
+  	 {{if .Blue.Accepted}}
+		  <i class="fa fa-check-square fa-2x"></i>
+		 {{else}}
+		  <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
+		 {{end}}
+		</td>
 	</tr>
 	{{end}}
 </table>

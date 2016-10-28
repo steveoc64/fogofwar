@@ -139,8 +139,13 @@ type Game struct {
 	VPPerTurn       int
 	RedVP           int
 	BlueVP          int
-	RedPlayers      []string
-	BluePlayers     []string
+	RedPlayers      []GamePlayerData
+	BluePlayers     []GamePlayerData
+}
+
+type GamePlayerData struct {
+	Username string `db:"username"`
+	Accepted bool   `db:"accepted"`
 }
 
 type GameRPCData struct {
@@ -157,8 +162,8 @@ func (g *Game) GetStartDate() string {
 }
 
 type GamePlayerRow struct {
-	Red  string
-	Blue string
+	Red  GamePlayerData
+	Blue GamePlayerData
 }
 
 func (g *Game) GetPlayerRows() []GamePlayerRow {

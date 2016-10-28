@@ -422,8 +422,9 @@ drop table if exists game_players;
 create table game_players (
 	game_id int not null,
 	player_id int not null,
-	red_team bool,
-	blue_team bool
+	red_team bool not null default false,
+	blue_team bool not null default false,
+	accepted bool not null default false,
 );
 \i data/game_players.sql
 create unique index game_player_game_idx on game_players (game_id, player_id);

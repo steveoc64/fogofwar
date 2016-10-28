@@ -65,7 +65,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 102, true);
+SELECT pg_catalog.setval('force_id_seq', 105, true);
 
 
 --

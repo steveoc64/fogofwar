@@ -76,7 +76,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 997	78	1eme_Division.35e_Ligne	35e Ligne			France	2	4	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
 998	78	3eme_Division.Corsican_Legere_Copy	Corsican Legere_Copy			France/Corsica	2	1	6	1300	1	2	0	1	3	0	0	0	0	0	0	f
 17	2	3eme_Division.94e_Ligne	94e Ligne		Drouet	France	2	4	5	1500	1	0	0	0	5	0	0	0	0	0	0	f
-999	78	2eme_Division.46e_Ligne	46e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
 62	3	2eme_Division.33e_Ligne	33e Ligne			France	2	1	5	1800	1	0	0	0	5	0	0	0	0	0	0	f
 83	4	2eme_Division	2eme Division		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 13	2	2eme_Division.45e_Ligne	45e Ligne		Rivaud	France	2	4	5	2000	1	0	0	0	5	0	0	0	0	0	0	f
@@ -110,6 +109,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 92	4	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
 10	2	2eme_Division.4e_Legere	4e Legere		Rivaud	France	2	4	6	2000	1	2	1	0	5	0	0	0	0	0	0	f
 5	1	Cavalry_Division	Cavalry Division		Bessieres	France	1	3	1	0	0	0	0	0	1	0	0	0	0	0	2	f
+999	78	2eme_Division.46e_Ligne	46e Ligne			France	2	1	5	1400	1	2	2	0	5	2	3	4	2	1	3	f
 106	5	Cav_Bde	Cav Bde		Trelliard	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1002	78	2eme_Division.4e_Ligne	4e Ligne			France	2	1	5	1400	1	0	0	0	5	0	0	0	0	0	0	f
 98	4	3eme_Division.18e_Ligne	18e Ligne			France	2	4	5	1800	1	0	0	0	4	0	0	0	0	0	0	f
@@ -150,7 +150,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 121	5	2eme_Division.100e_Ligne	100e Ligne			France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
 122	5	2eme_Division.103e_Ligne	103e Ligne			France	2	4	3	1800	1	0	0	0	5	0	0	0	0	0	0	f
 129	6	Corps_Artillery.2e_Heavy_Bty	2e Heavy Bty				4	1	0	0	0	0	0	0	4	0	0	0	8	1	2	f
-1006	78	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
 135	6	2eme_Division	2eme Division		Gardanne	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 130	6	1eme_Division	1eme Division		Marchand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 124	6	Cav_Bde	Cav Bde		Charbanais	France	1	4	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -501,6 +500,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1326	95	Bde_Durosnel	Bde Durosnel		Durosnel	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1327	95	Bde_Bruyeres	Bde Bruyères		Bruyères	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1366	97	Div_Legrand.17e_Co_5e_dArt_de_Pied.3e_Co_5e_dArt_a_cheval	3° Co. 5° d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t
+1006	78	2eme_Division.57e_Ligne	57e Ligne			France	2	1	5	1700	1	0	0	0	5	0	0	0	0	0	0	f
 1328	95	Bde_Bruyeres.1e_Hussards	1° Hussards			France	3	4	0	0	0	0	0	0	3	250	2	3	0	0	0	f
 1329	95	Bde_Bruyeres.13e_Chas_a_cheval	13° Chas. à cheval			France	3	4	0	0	0	0	0	0	3	350	3	4	0	0	0	f
 1364	97	Div_Leval.Bde_Schiner	Bde Schiner	4° Rgt. d’infanterie de ligne [2 bat.] 28° Rgt. d’infanterie de ligne [2 bat.]		France	2	4	5	3980	1	0	0	0	5	0	0	0	0	0	0	f
@@ -618,7 +618,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 1371, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 1401, true);
 
 
 --

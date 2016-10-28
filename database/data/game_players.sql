@@ -15,9 +15,9 @@ SET search_path = public, pg_catalog;
 -- Data for Name: game_players; Type: TABLE DATA; Schema: public; Owner: steve
 --
 
-COPY game_players (game_id, player_id, red_team, blue_team) FROM stdin;
-4	2	t	\N
-4	1	\N	t
+COPY game_players (game_id, player_id, red_team, blue_team, accepted) FROM stdin;
+4	1	\N	t	t
+4	2	t	\N	t
 \.
 
 

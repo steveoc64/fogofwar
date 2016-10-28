@@ -16,6 +16,8 @@ func gameInvite(context *router.Context) {
 		print(err.Error())
 		return
 	}
+	w := dom.GetWindow()
+	doc := w.Document()
 
 	go func() {
 		game := shared.Game{}
@@ -86,13 +88,42 @@ func gameInvite(context *router.Context) {
 		loadTemplate("view-units", "[name=ViewUnits]", nil)
 		form.ActionGrid("game-invite-actions", "#action-grid", game, func(url string) {
 			print("action url", url)
+			switch url {
+			case "Overview":
+				loadTemplate("game-overview", "#game-overview", &game)
+				doc.QuerySelector("#game-overview").AddEventListener("click", false, func(evt dom.Event) {
+					doc.QuerySelector("#game-overview").Class().Remove("md-show")
+				})
+				doc.QuerySelector("#game-overview").Class().Add("md-show")
+			case "Players":
+				loadTemplate("game-players", "#game-players", &game)
+				doc.QuerySelector("#game-players").AddEventListener("click", false, func(evt dom.Event) {
+					doc.QuerySelector("#game-players").Class().Remove("md-show")
+				})
+				doc.QuerySelector("#game-players").Class().Add("md-show")
+			case "Accept":
+				loadTemplate("game-accept", "#game-accept", &game)
+				doc.QuerySelector("#game-accept").AddEventListener("click", false, func(evt dom.Event) {
+					doc.QuerySelector("#game-accept").Class().Remove("md-show")
+				})
+				doc.QuerySelector("#game-accept").Class().Add("md-show")
+			case "Decline":
+				loadTemplate("game-decline", "#game-decline", &game)
+				doc.QuerySelector("#game-decline").AddEventListener("click", false, func(evt dom.Event) {
+					doc.QuerySelector("#game-decline").Class().Remove("md-show")
+					Session.Navigate("/")
+				})
+				doc.QuerySelector("#game-decline").Class().Add("md-show")
+			}
+
 		})
 
 		form.AppendDiv("unit-details", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("game-overview", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("game-players", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("game-accept", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("game-decline", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("overlay", "md-overlay")
-
-		w := dom.GetWindow()
-		doc := w.Document()
 
 		drawUnitList := func() {
 			// print("asked to render a unit list of", TheCmd)
@@ -293,4 +324,17 @@ func gameInvite(context *router.Context) {
 
 	}()
 
+}
+
+func gameInviteOverview(context *router.Context) {
+	print("TODO - gameInviteOverview")
+
+}
+
+func gameInviteTable(context *router.Context) {
+	print("TODO - gameInviteTable")
+}
+
+func gameInvitePlayers(context *router.Context) {
+	print("TODO - gameInvitePlayers")
 }

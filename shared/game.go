@@ -139,6 +139,8 @@ type Game struct {
 	VPPerTurn       int
 	RedVP           int
 	BlueVP          int
+	RedPlayers      []string
+	BluePlayers     []string
 }
 
 type GameRPCData struct {
@@ -148,6 +150,32 @@ type GameRPCData struct {
 	Blue     bool
 	GetUnits bool
 	Game     *Game
+}
+
+func (g *Game) GetStartDate() string {
+	return g.StartDate.Format("Mon, Jan 2 2006")
+}
+
+type GamePlayerRow struct {
+	Red  string
+	Blue string
+}
+
+func (g *Game) GetPlayerRows() []GamePlayerRow {
+	lr := len(g.RedPlayers)
+	lb := len(g.BluePlayers)
+	numRows := lr
+	if lb > lr {
+		numRows = lb
+	}
+	retval := make([]GamePlayerRow, numRows)
+	for i, v := range g.RedPlayers {
+		retval[i].Red = v
+	}
+	for i, v := range g.BluePlayers {
+		retval[i].Blue = v
+	}
+	return retval
 }
 
 func (g *Game) GoodToGo() bool {

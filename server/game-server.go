@@ -161,6 +161,17 @@ func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error 
 		where g.id=$1`, data.ID).QueryStruct(retval)
 
 	if err == nil {
+		// fill in the players on each side
+		DB.SQL(`select distinct(u.username)
+			from game_players p
+			left join users u on u.id=p.player_id
+			where p.game_id=$1 and p.red_team`, data.ID).QuerySlice(&retval.RedPlayers)
+
+		DB.SQL(`select distinct(u.username)
+			from game_players p
+			left join users u on u.id=p.player_id
+			where p.game_id=$1 and p.blue_team`, data.ID).QuerySlice(&retval.BluePlayers)
+
 		count := 0
 		DB.SQL(`select count(*)
 			from game_players

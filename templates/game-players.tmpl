@@ -1,0 +1,19 @@
+<div name="Players"></div>
+<h2>Who else is playing in this Game ?</h2>
+<center>
+<img src="/img/players.png">
+</center>
+<h3>{{.Name}}, {{.Year}}</h3>
+<table>
+	<tr>
+		<th>{{.RedTeam}}</th>
+		<th>{{.BlueTeam}}</th>
+	</tr>
+	{{range .GetPlayerRows}}
+	<tr>
+		<td>{{.Red}}</td>
+		<td>{{.Blue}}</td>
+	</tr>
+	{{end}}
+</table>
+</table>

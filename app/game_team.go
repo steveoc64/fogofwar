@@ -12,6 +12,15 @@ import (
 	"honnef.co/go/js/dom"
 )
 
+func breakLine(s string) string {
+	r := strings.Replace(s, ") ", ")<br>\n", -1)
+	r = strings.Replace(s, "] ", "]<br>\n", -1)
+	r = strings.Replace(s, " ~ ", "<br>\n", -1)
+	r = strings.Replace(r, " and ", "<br>\nand ", -1)
+	// r = strings.Replace(r, ", ", "<br>\n", -1)
+	return r
+}
+
 func gameEditTeam(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
@@ -121,16 +130,6 @@ func gameEditTeam(context *router.Context) {
 		viewUnits.Class().Add("hidden")
 
 		TheCmd := &shared.GameCmd{}
-
-		breakLine := func(s string) string {
-			r := strings.Replace(s, ") ", ")<br>\n", -1)
-			r = strings.Replace(s, "] ", "]<br>\n", -1)
-			r = strings.Replace(s, " ~ ", "<br>\n", -1)
-			r = strings.Replace(r, " and ", "<br>\nand ", -1)
-			// r = strings.Replace(r, ", ", "<br>\n", -1)
-			return r
-		}
-
 		showSummary := func(cmd *shared.GameCmd) {
 			totalBayonets := 0
 			totalSabres := 0
@@ -490,7 +489,7 @@ func gameEditTeam(context *router.Context) {
 		form.OnEvent("UnitList", "click", func(evt dom.Event) {
 			td := evt.Target()
 			tag := td.TagName()
-			print("clicked on", tag)
+			// print("clicked on", tag)
 			if tag == "TD" {
 				tr := td.ParentElement()
 				key, _ := strconv.Atoi(tr.GetAttribute("key"))

@@ -464,8 +464,8 @@ type GameCmd struct {
 	Inspiration   int     `db:"inspiration"`
 	Condition     int     `db:"condition"`
 	PlayerID      int     `db:"player_id"`
-	PlayerName    string  `db:"player_name"` // derived data
-	PlayerReady   bool    `db:"player_ready"`
+	PlayerName    string  `db:"player_name"`  // derived data
+	PlayerReady   bool    `db:"player_ready"` // derived data
 	Units         []*Unit `db:"units"`
 	VP            int     `db:"vp"`
 	Bayonets      *int    `db:"bayonets"` // derived data

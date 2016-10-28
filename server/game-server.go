@@ -84,16 +84,18 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// Fill in the cmd arrays
 		if data.Red {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name
+				g.*,coalesce(u.username,'') as player_name,coalesce(p.accepted, false) as player_ready
 				from game_cmd g
 				left join users u on u.id=g.player_id
+				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
 				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
 		if data.Blue {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name
+				g.*,coalesce(u.username,'') as player_name,coalesce(p.accepted, false) as player_ready
 				from game_cmd g
 				left join users u on u.id=g.player_id
+				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
 				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
 
@@ -500,9 +502,10 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			}
 		}
 		for _, v := range RedList {
+			a := v == conn.UserID
 			_, err = DB.SQL(`insert into game_players
-				(game_id,player_id,red_team)
-				values ($1,$2,true)`, data.ID, v).Exec()
+				(game_id,player_id,red_team,accepted)
+				values ($1,$2,true,$3)`, data.ID, v, a).Exec()
 			if err != nil {
 				println(err.Error())
 				break
@@ -513,13 +516,15 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			for _, v := range BlueList {
 				println("blue", v)
 				// If they are already in RedList, then just update the record
+				a := v == conn.UserID
 				if IntSliceContains(RedList, v) {
-					_, err = DB.SQL(`update game_players set blue_team=true where game_id=$1 and player_id=$2 and red_team`,
-						data.ID, v).Exec()
+					_, err = DB.SQL(`update game_players set blue_team=true, accepted=$3
+						where game_id=$1 and player_id=$2 and red_team`,
+						data.ID, v, a).Exec()
 				} else {
 					_, err = DB.SQL(`insert into game_players
-				(game_id,player_id,blue_team)
-				values ($1,$2,true)`, data.ID, v).Exec()
+				(game_id,player_id,blue_team,accepted)
+				values ($1,$2,true,$3)`, data.ID, v, a).Exec()
 				}
 				if err != nil {
 					println(err.Error())

@@ -34,6 +34,36 @@ func ppgood(c echo.Context) error {
 	executeResult, err := PaypalClient.ExecuteApprovedPayment(id, payerID)
 	if err == nil {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)
+		_, perr := DB.SQL(`update paypal 
+			set approved=true
+			where payment_id=$1`, id).Exec()
+		if perr != nil {
+			fmt.Fprintf(PaypalLog, "DB ERROR: %s\n", perr.Error())
+			fmt.Printf("DB ERROR: %s\n", perr.Error())
+		}
+
+		userID := 0
+		newRank := 0
+		var newExpiry time.Time
+		perr = DB.SQL(`select user_id,end_date,rank from paypal where payment_id=$1`, id).
+			QueryScalar(&userID, &newExpiry, &newRank)
+
+		if perr != nil {
+			fmt.Fprintf(PaypalLog, "DB ERROR: %s\n", perr.Error())
+			fmt.Printf("DB ERROR: %s\n", perr.Error())
+		}
+		fmt.Fprintf(PaypalLog, "Upgrading User %d to Rank %d till %s", userID, newRank, newExpiry)
+
+		_, perr = DB.SQL(`update users set rank=$2, expires=$3 where id=$1`,
+			userID, newRank, newExpiry).Exec()
+		if perr != nil {
+			fmt.Fprintf(PaypalLog, "DB ERROR: ", perr.Error())
+			fmt.Printf("DB ERROR: ", perr.Error())
+		}
+
+		// signal the user to have a new rank
+		Connections.BroadcastPlayer(userID, "Promotion", "Success", newRank)
+
 		return c.File("public/promotion.html")
 	} else {
 		fmt.Fprintf(PaypalLog, "------------------------------\n%s\n%v\n", "Exec Payment Result", executeResult)

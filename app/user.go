@@ -425,7 +425,25 @@ func _usersOnline(action string, id int, context *router.Context) {
 
 }
 
+func promoteMe(action string, id int, context *router.Context) {
+	print("Promoting Rank to", id, "with", action)
+	Session.Subscriptions = make(map[string]MessageFunction)
+
+	go func() {
+		// Login again to get a fresh new set of things
+		RPC("LoginRPC.Logout", Session.Channel, nil)
+		Login(Session.Username, Session.Passwd)
+		_userSettings("User", 0, context)
+	}()
+
+}
+
 func userSettings(context *router.Context) {
+	Session.Subscribe("Promotion", promoteMe, context)
+	_userSettings("User", 0, context)
+}
+
+func _userSettings(action string, id int, context *router.Context) {
 
 	go func() {
 		Session.MobileSensitive = true
@@ -551,39 +569,87 @@ func userSettings(context *router.Context) {
 		formulate.AppendDiv("pricing-table")
 		loadTemplate("pricing-table", "#pricing-table", Session.Rank)
 
-		doc.QuerySelector("[name=buy-commission-2]").AddEventListener("click", false, func(evt dom.Event) {
-			print("buy commission 2")
-			pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
-			if pp != nil {
-				// pp.Class().Remove("hidden")
-				go func() {
-					url := ""
-					err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
-						Channel: Session.Channel,
-						Months:  1,
-						Rank:    2,
-						Descr:   "ActionFront Colonels Commission (1 Month)",
-					}, &url)
-					if err != nil {
-						dom.GetWindow().Alert("ERROR: " + err.Error())
-						// pp.Class().Add("hidden")
-					} else {
-						// pp.Class().Remove("hidden")
-						print("set url to ", url)
-						w.Open(url, "ActionFront Commission Purchase", "left=50,top=100,height=600,width=700,menubar=0,toolbar=0,location=0,status=yes")
-						// pp.Src = url
-					}
-				}()
-			}
-		})
+		if Session.Rank < 2 {
+			doc.QuerySelector("[name=buy-commission-2]").AddEventListener("click", false, func(evt dom.Event) {
+				print("buy commission 2")
+				pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
+				if pp != nil {
+					// pp.Class().Remove("hidden")
+					go func() {
+						url := ""
+						err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
+							Channel: Session.Channel,
+							Months:  1,
+							Rank:    2,
+							Descr:   "ActionFront Colonels Commission (1 Month)",
+						}, &url)
+						if err != nil {
+							dom.GetWindow().Alert("ERROR: " + err.Error())
+							// pp.Class().Add("hidden")
+						} else {
+							// pp.Class().Remove("hidden")
+							print("set url to ", url)
+							w.Open(url, "ActionFront Commission Purchase", "left=50,top=100,height=600,width=700,menubar=0,toolbar=0,location=0,status=yes")
+							// pp.Src = url
+						}
+					}()
+				}
+			})
+		}
 
-		doc.QuerySelector("[name=buy-commission-3]").AddEventListener("click", false, func(evt dom.Event) {
-			print("buy commission 3")
-		})
+		if Session.Rank < 3 {
+			doc.QuerySelector("[name=buy-commission-3]").AddEventListener("click", false, func(evt dom.Event) {
+				print("buy commission 3")
+				pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
+				if pp != nil {
+					go func() {
+						url := ""
+						err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
+							Channel: Session.Channel,
+							Months:  1,
+							Rank:    3,
+							Descr:   "ActionFront Brigadier Commission (1 Month)",
+						}, &url)
+						if err != nil {
+							dom.GetWindow().Alert("ERROR: " + err.Error())
+							// pp.Class().Add("hidden")
+						} else {
+							// pp.Class().Remove("hidden")
+							print("set url to ", url)
+							w.Open(url, "ActionFront Commission Purchase", "left=50,top=100,height=600,width=700,menubar=0,toolbar=0,location=0,status=yes")
+							// pp.Src = url
+						}
+					}()
+				}
+			})
+		}
 
-		doc.QuerySelector("[name=buy-commission-4]").AddEventListener("click", false, func(evt dom.Event) {
-			print("buy commission 4")
-		})
+		if Session.Rank < 4 {
+			doc.QuerySelector("[name=buy-commission-4]").AddEventListener("click", false, func(evt dom.Event) {
+				print("buy commission 4")
+				pp := doc.QuerySelector(".paypal-frame").(*dom.HTMLIFrameElement)
+				if pp != nil {
+					go func() {
+						url := ""
+						err := RPC("PaypalRPC.CreatePayment", shared.PaypalRPCData{
+							Channel: Session.Channel,
+							Months:  1,
+							Rank:    4,
+							Descr:   "ActionFront Marechal Commission (1 Month)",
+						}, &url)
+						if err != nil {
+							dom.GetWindow().Alert("ERROR: " + err.Error())
+							// pp.Class().Add("hidden")
+						} else {
+							// pp.Class().Remove("hidden")
+							print("set url to ", url)
+							w.Open(url, "ActionFront Commission Purchase", "left=50,top=100,height=600,width=700,menubar=0,toolbar=0,location=0,status=yes")
+							// pp.Src = url
+						}
+					}()
+				}
+			})
+		}
 
 	}()
 }

@@ -94,10 +94,12 @@ func Login(username string, passwd string) {
 			evt.PreventDefault()
 			Session.Navigate("/")
 		})
-		doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/invite")
-		})
+		if Session.Rank > 1 {
+			doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
+				evt.PreventDefault()
+				Session.Navigate("/invite")
+			})
+		}
 		doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
 			evt.PreventDefault()
 			loc := dom.GetWindow().Location()

@@ -201,6 +201,22 @@ func (c *ConnectionsList) BroadcastAdmin(name string, action string, id int) {
 	}
 }
 
+// Send an async message to all admins that are connected
+func (c *ConnectionsList) BroadcastPlayer(playerID int, name string, action string, id int) {
+
+	data := shared.AsyncMessage{
+		Action: action,
+		ID:     id,
+	}
+
+	for _, v := range c.cmap {
+		if v.UserID == playerID {
+			log.Println("BroadcastPlayer", name, action, id, "»", v.ID)
+			go v.Send(name, data)
+		}
+	}
+}
+
 var Connections *ConnectionsList
 
 // Find the connection that owns the socket, return nil if not found

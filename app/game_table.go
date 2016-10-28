@@ -155,7 +155,11 @@ func gameEditTable(context *router.Context) {
 		// 	form.Get("row-3").Class().Add("hidden")
 		// }
 
-		form.Get("row-3").Class().Add("hidden")
+		objRow := "row-3"
+		if Session.Mobile() {
+			objRow = "row-5"
+		}
+		form.Get(objRow).Class().Add("hidden")
 
 		// Scroll to the map
 		scrollToMap := func() {
@@ -340,7 +344,7 @@ func gameEditTable(context *router.Context) {
 			print("doing a setmode of", modeSet)
 			switch modeSet {
 			case "terrain":
-				form.Get("row-3").Class().Add("hidden")
+				form.Get(objRow).Class().Add("hidden")
 				actionBtn("Clear")
 				actionBtn("Rough")
 				actionBtn("Woods")
@@ -352,7 +356,7 @@ func gameEditTable(context *router.Context) {
 				actionBtn("Higher")
 				actionBtn("Lower")
 			case "red":
-				form.Get("row-3").Class().Add("hidden")
+				form.Get(objRow).Class().Add("hidden")
 				TheCmd = &shared.GameCmd{}
 				for _, v := range game.RedCmd {
 					if !v.Cull {
@@ -360,7 +364,7 @@ func gameEditTable(context *router.Context) {
 					}
 				}
 			case "blue":
-				form.Get("row-3").Class().Add("hidden")
+				form.Get(objRow).Class().Add("hidden")
 				TheCmd = &shared.GameCmd{}
 				for _, v := range game.BlueCmd {
 					if !v.Cull {

@@ -630,3 +630,62 @@ func (g *GameRPC) Update(data shared.GameRPCData, done *bool) error {
 
 	return err
 }
+
+func (g *GameRPC) DeclineInvite(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	_, err := DB.SQL(`delete from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).Exec()
+
+	if err == nil {
+		_, err = DB.SQL(`update game_cmd set player_id=0 
+			where game_id=$1 and player_id=$2`,
+			data.ID, conn.UserID).Exec()
+	}
+
+	logger(start, "Game.DeclineInvite", conn,
+		fmt.Sprintf("Game ID %d", data.ID), "")
+
+	if err == nil {
+		*done = true
+		// For any players on this game list, let them know its changed
+		players := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
+		fmt.Printf("players who need to know about this update %v\n", players)
+		for _, v := range players {
+			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+		}
+		tx.Commit()
+	}
+	return err
+}
+
+func (g *GameRPC) AcceptInvite(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.SQL(`update game_players set accepted = true where game_id=$1 and player_id=$2`,
+		data.ID, conn.UserID).Exec()
+
+	logger(start, "Game.AcceptInvite", conn,
+		fmt.Sprintf("Game ID %d", data.ID), "")
+
+	if err == nil {
+		*done = true
+		// For any players on this game list, let them know its changed
+		players := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
+		fmt.Printf("players who need to know about this update %v\n", players)
+		for _, v := range players {
+			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+		}
+	}
+	return err
+}

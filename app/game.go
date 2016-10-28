@@ -11,10 +11,23 @@ import (
 )
 
 func gameChecklist(context *router.Context) {
+	Session.Subscribe("Game", _gameChecklist, context)
+	_gameChecklist("Edit", 0, context)
+}
+
+func _gameChecklist(action string, actionID int, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
 		return
+	}
+
+	switch action {
+	case "Update":
+		if actionID != id {
+			return
+		}
+		break
 	}
 	go func() {
 		// Create a new Game Editting Object
@@ -250,6 +263,11 @@ func gameEditBlue(context *router.Context) {
 }
 
 func gameEditPlayers(context *router.Context) {
+	Session.Subscribe("Game", _gameEditPlayers, context)
+	_gameEditPlayers("Edit", 0, context)
+}
+
+func _gameEditPlayers(action string, actionID int, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -257,6 +275,24 @@ func gameEditPlayers(context *router.Context) {
 	}
 
 	game := Session.EditGame
+	if action == "Update" {
+		if actionID != id {
+			return
+		}
+		Session.EditGame = &shared.Game{}
+		err := RPC("GameRPC.Get", shared.GameRPCData{
+			Channel:  Session.Channel,
+			ID:       id,
+			Red:      true,
+			Blue:     true,
+			GetUnits: true,
+		}, Session.EditGame)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			return
+		}
+		game = Session.EditGame
+	}
 	game.InMode = "Players"
 	game.Mobile = Session.Mobile()
 	form := formulate.EditForm{}

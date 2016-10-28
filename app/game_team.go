@@ -22,6 +22,11 @@ func breakLine(s string) string {
 }
 
 func gameEditTeam(context *router.Context) {
+	Session.Subscribe("Game", _gameEditTeam, context)
+	go _gameEditTeam("Edit", 0, context)
+}
+
+func _gameEditTeam(action string, actionID int, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -32,6 +37,27 @@ func gameEditTeam(context *router.Context) {
 	go func() {
 		w := dom.GetWindow()
 		doc := w.Document()
+
+		switch action {
+		case "Update":
+			if id == actionID {
+				Session.EditGame = &shared.Game{}
+				err := RPC("GameRPC.Get", shared.GameRPCData{
+					Channel:  Session.Channel,
+					ID:       id,
+					Red:      true,
+					Blue:     true,
+					GetUnits: true,
+				}, Session.EditGame)
+				if err != nil {
+					dom.GetWindow().Alert(err.Error())
+					return
+				}
+				break
+			}
+			print("this update is not for us ..")
+			return
+		}
 
 		game := Session.EditGame
 		game.InMode = "Team"

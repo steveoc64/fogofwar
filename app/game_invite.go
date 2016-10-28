@@ -105,13 +105,30 @@ func gameInvite(context *router.Context) {
 				loadTemplate("game-accept", "#game-accept", &game)
 				doc.QuerySelector("#game-accept").AddEventListener("click", false, func(evt dom.Event) {
 					doc.QuerySelector("#game-accept").Class().Remove("md-show")
+					go func() {
+						done := false
+						RPC("GameRPC.AcceptInvite", shared.GameRPCData{
+							Channel: Session.Channel,
+							ID:      game.ID,
+						}, &done)
+					}()
 				})
 				doc.QuerySelector("#game-accept").Class().Add("md-show")
 			case "Decline":
 				loadTemplate("game-decline", "#game-decline", &game)
 				doc.QuerySelector("#game-decline").AddEventListener("click", false, func(evt dom.Event) {
 					doc.QuerySelector("#game-decline").Class().Remove("md-show")
-					Session.Navigate("/")
+				})
+				doc.QuerySelector("[name=really-decline]").AddEventListener("click", false, func(evt dom.Event) {
+					doc.QuerySelector("#game-decline").Class().Remove("md-show")
+					go func() {
+						done := false
+						RPC("GameRPC.DeclineInvite", shared.GameRPCData{
+							Channel: Session.Channel,
+							ID:      game.ID,
+						}, &done)
+						Session.Navigate("/")
+					}()
 				})
 				doc.QuerySelector("#game-decline").Class().Add("md-show")
 			}

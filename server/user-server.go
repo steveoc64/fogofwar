@@ -215,8 +215,8 @@ func (u *UserRPC) Contact(data shared.ContactMessageRPCData, retval *int) error 
 	*retval = 0
 
 	err := DB.SQL(`insert into contact_message
-		(user_id, subject, message) 
-		values ($1, $2, $3)
+		(user_id, email_to, subject, message) 
+		values ($1, 'steveoc64@gmail.com', $2, $3)
 		returning id`, conn.UserID, data.ContactMessage.Subject, data.ContactMessage.Message).
 		QueryScalar(retval)
 
@@ -239,6 +239,51 @@ Message: <br>
 	}
 
 	logger(start, "User.Contact", conn,
+		fmt.Sprintf("%s", data.ContactMessage.Subject),
+		fmt.Sprintf("MsgID: %d", *retval))
+
+	return err
+}
+
+func (u *UserRPC) InviteFriend(data shared.ContactMessageRPCData, retval *int) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	if conn.Rank < 2 {
+		return errors.New("Insufficient Priv")
+	}
+
+	// Lookup the user
+	user := shared.User{}
+	DB.SQL(`select email from users where id=$1`, conn.UserID).QueryStruct(&user)
+
+	*retval = 0
+
+	err := DB.SQL(`insert into contact_message
+		(user_id, email_to, subject, message) 
+		values ($1, $2, $3, $4)
+		returning id`,
+		conn.UserID,
+		data.ContactMessage.EmailTo,
+		data.ContactMessage.Subject,
+		data.ContactMessage.Message).
+		QueryScalar(retval)
+
+	if Config.MailServer != "" {
+
+		msg := fmt.Sprintf("Message sent from %s %s\n<br><br>", user.Username, user.Email)
+		msg += data.ContactMessage.Message
+		msg += "\n<p>Click <a href=https://wargaming.io>https://wargaming.io</a> to sign up.</p>\n"
+
+		m := NewMail()
+		m.SetHeader("From", "ActionFront <actionfront@wargaming.io>")
+		m.SetHeader("To", data.ContactMessage.EmailTo)
+		m.SetHeader("Subject", data.ContactMessage.Subject)
+		m.SetBody("text/html", msg)
+		MailChannel <- m
+	}
+
+	logger(start, "User.InviteFriends", conn,
 		fmt.Sprintf("%s", data.ContactMessage.Subject),
 		fmt.Sprintf("MsgID: %d", *retval))
 

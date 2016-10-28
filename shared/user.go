@@ -131,6 +131,7 @@ type ContactMessage struct {
 	ID      int    `db:"id"`
 	RefID   int    `db:"ref_id"`
 	UserID  int    `db:"user_id"`
+	EmailTo string `dm:"email_to"`
 	Subject string `db:"subject"`
 	Message string `db:"message"`
 }

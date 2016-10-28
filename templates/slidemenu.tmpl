@@ -7,7 +7,9 @@
   <a href="#" id="menu-settings"><i class="fa fa-cog"></i> Settings</a>
   <a href="#" id="menu-game"><i class="fa fa-bookmark"></i> Games</a>
   <a href="#" id="menu-scenario"><i class="fa fa-sitemap"></i> Scenarios</a>
-  <!-- <a href="#" id="menu-invite"><i class="fa fa-gift"></i> Invite Friends</a> -->
+  {{if gt .Rank 1}}
+  <a href="#" id="menu-invite"><i class="fa fa-gift"></i> Invite Friends</a>
+  {{end}}
   <a href="#" id="menu-manpages"><i class="fa fa-graduation-cap"></i> Manual</a>
   <a href="#" id="menu-contact"><i class="fa fa-envelope"></i> Contact</a>
   <a href="#" id="menu-signout"><i class="fa fa-sign-out"></i> SignOut</a>

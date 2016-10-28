@@ -639,5 +639,61 @@ func contactForm(context *router.Context) {
 }
 
 func inviteFriend(context *router.Context) {
-	print("TODO - inviteFriend, not so straight fwd")
+
+	print("invite")
+	if Session.Rank < 2 {
+		return
+	}
+
+	go func() {
+		data := shared.ContactMessage{}
+
+		form := formulate.EditForm{}
+
+		// Layout the fields
+
+		form.New("fa-gift", "Invite a Friend")
+
+		form.Row(1).
+			AddInput(1, "Friends Email", "EmailTo")
+
+		form.Row(1).
+			AddInput(1, "Subject", "Subject")
+
+		form.Row(1).
+			AddBigTextarea(1, "Message", "Message")
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Back()
+		})
+
+		form.SaveEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+
+			go func() {
+				form.Bind(&data)
+				newID := 0
+				err := RPC("UserRPC.InviteFriend", shared.ContactMessageRPCData{
+					Channel:        Session.Channel,
+					ContactMessage: &data,
+				}, &newID)
+				if err != nil {
+					dom.GetWindow().Alert(err.Error())
+				} else {
+					dom.GetWindow().Alert("Thanks .. Your message has been sent.\n")
+					Session.Back()
+				}
+			}()
+		})
+
+		// All done, so render the form
+		data.Subject = "Invite to a new Wargaming Site"
+		data.Message = ".. enter your message here"
+		form.Render("edit-form", "main", &data)
+		form.Focus("EmailTo")
+
+	}()
+
 }

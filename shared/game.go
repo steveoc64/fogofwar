@@ -128,7 +128,10 @@ type Game struct {
 	CheckForces     bool             `db:"check_forces"`
 	CheckPlayers    bool             `db:"check_players"`
 	CheckConnected  bool             `db:"check_connected"`
-	Mobile          bool             `db:"mobile"` // Derived field based on is mobile - useful for templates
+	Mobile          bool             `db:"mobile"`         // Derived field based on is mobile - useful for templates
+	AssignToPlayer  string           `db:"current_player"` // scratchpad used for editting
+	Included        bool             `db:"included"`       // scratchpad
+	StartTurn       int              `db:"start_turn"`     // scratchpad
 }
 
 type GameRPCData struct {

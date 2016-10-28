@@ -44,8 +44,10 @@ func gameEditTeam(context *router.Context) {
 			form.Row(1).
 				AddCustom(1, "", "Commands", "")
 
-			form.Row(1).
-				AddCustom(1, "", "ToggleCmd", "hidden")
+			form.Row(6).
+				AddCheck(1, "Included", "Included").
+				AddInput(3, "Assign to Player", "AssignToPlayer").
+				AddNumber(2, "Arrives on Turn", "StartTurn", "1")
 
 			form.Row(1).
 				AddCustom(1, "", "ViewUnits", "")
@@ -60,8 +62,13 @@ func gameEditTeam(context *router.Context) {
 			form.Row(1).
 				AddCustom(1, "Commands", "Commands", "")
 
-			form.Row(1).
-				AddCustom(1, "", "ToggleCmd", "hidden")
+			// form.Row(1).
+			// 	AddCustom(1, "", "ToggleCmd", "hidden")
+
+			form.Row(6).
+				AddCheck(1, "Included", "Included").
+				AddInput(3, "Assign to Player", "AssignToPlayer").
+				AddNumber(2, "Arrives on Turn", "StartTurn", "1")
 
 			form.Row(1).
 				AddCustom(1, "", "ViewUnits", "")
@@ -104,6 +111,8 @@ func gameEditTeam(context *router.Context) {
 		})
 		form.AppendDiv("unit-details", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("overlay", "md-overlay")
+		form.Get("row-3").Class().Add("hidden")
+
 		// loadTemplate("unit-details", "#unit-details", nil)
 
 		// Create the ViewUnits panel, and set to hidden
@@ -388,38 +397,30 @@ func gameEditTeam(context *router.Context) {
 					TheCmd = game.GetCmd(team, k)
 
 					// Fill in the start turn
-					form.Get("cmd-turn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", TheCmd.StartTurn)
+					form.Get("StartTurn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", TheCmd.StartTurn)
 
 					// Fill in the username
-					form.Get("cmd-player").(*dom.HTMLInputElement).Value = TheCmd.PlayerName
+					form.Get("AssignToPlayer").(*dom.HTMLInputElement).Value = TheCmd.PlayerName
 
 					// Draw up the units
 
 					drawUnitList()
-					form.Get("ToggleCmd").Class().Remove("hidden")
-					checkIcon := form.Get("cmd-include")
-					if TheCmd.Cull {
-						checkIcon.Class().Remove("fa-check-square-o")
-						checkIcon.Class().Add("fa-square-o")
-						checkIcon.SetInnerHTML(" Excluded from this Game")
-					} else {
-						checkIcon.Class().Add("fa-check-square-o")
-						checkIcon.Class().Remove("fa-square-o")
-						checkIcon.SetInnerHTML(" Included in this Game")
-					}
+					form.Get("row-3").Class().Remove("hidden")
+					checkIcon := form.Get("Included").(*dom.HTMLInputElement)
+					checkIcon.Checked = !TheCmd.Cull
 				}
 			})
 		}
 		div.AppendChild(bbar)
 
-		div = form.Get("ToggleCmd")
-		div.SetInnerHTML("")
+		// div = form.Get("ToggleCmd")
+		// div.SetInnerHTML("")
 
-		player := fmt.Sprintf(`<label for="cmd-player">Assign to Player</label><input name="cmd-player" placeholder="PlayerID">  `)
-		turn := fmt.Sprintf(`<label for="cmd-turn">Arrives on Turn</label><input name="cmd-turn" value="1" type="number" step="1" min="1"><br>`)
-		div.SetInnerHTML(`<i name="cmd-include" class="fa fa-check-square-o fa-lg"> Included in this Game</i><br>` + player + turn)
+		// player := fmt.Sprintf(`<label for="cmd-player">Assign to Player</label><input name="cmd-player" placeholder="PlayerID">  `)
+		// turn := fmt.Sprintf(`<label for="cmd-turn">Arrives on Turn</label><input name="cmd-turn" value="1" type="number" step="1" min="1"><br>`)
+		// div.SetInnerHTML(`<i name="cmd-include" class="fa fa-check-square-o fa-lg"> Included in this Game</i><br>` + player + turn)
 
-		form.OnEvent("cmd-player", "change", func(evt dom.Event) {
+		form.OnEvent("AssignToPlayer", "change", func(evt dom.Event) {
 			print("player changed")
 			go func() {
 				thePlayer := evt.Target().(*dom.HTMLInputElement).Value
@@ -441,46 +442,45 @@ func gameEditTeam(context *router.Context) {
 						} else {
 							TheCmd.PlayerName = thePlayer
 						}
-						print("assign cmd to player", TheCmd, thePlayer)
+						// print("assign cmd to player", TheCmd, thePlayer)
 					}
 				}
 			}()
 		})
 
-		form.OnEvent("cmd-turn", "change", func(evt dom.Event) {
-			print("turn changed")
+		form.OnEvent("StartTurn", "change", func(evt dom.Event) {
 			TheCmd.StartTurn, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
 		})
 
-		form.OnEvent("cmd-include", "click", func(evt dom.Event) {
+		// click on a cmd button = load the cmd and draw thi unit list
+		form.OnEvent("Included", "change", func(evt dom.Event) {
+			print("included has changed")
 			if TheCmd != nil {
-				checkIcon := form.Get("cmd-include")
-				cmdBtn := evt.Target()
+				checkIcon := form.Get("Included").(*dom.HTMLInputElement)
+				TheCmd.Cull = !checkIcon.Checked
+				print("set TheCmd.Cull", TheCmd.Cull, TheCmd)
+
+				// clear the other fields if excluded
+				if TheCmd.Cull {
+					form.Get("AssignToPlayer").(*dom.HTMLInputElement).Value = ""
+					form.Get("StartTurn").(*dom.HTMLInputElement).Value = ""
+				} else {
+					form.Get("StartTurn").(*dom.HTMLInputElement).Value = "1"
+					form.Focus("AssignToPlayer")
+				}
+
 				for _, v := range form.Get("Commands").QuerySelectorAll(".button") {
 					theID, _ := strconv.Atoi(v.GetAttribute("data-cmd-id"))
 					if theID == TheCmd.ID {
-						cmdBtn = v
+						print("got a matching button")
+						if TheCmd.Cull {
+							v.Class().Remove("button-primary")
+							v.Class().Add("button-clear")
+						} else {
+							v.Class().Add("button-primary")
+							v.Class().Remove("button-clear")
+						}
 						break
-					}
-				}
-				switch TheCmd.Cull {
-				case true:
-					TheCmd.Cull = false
-					checkIcon.Class().Add("fa-check-square-o")
-					checkIcon.Class().Remove("fa-square-o")
-					checkIcon.SetInnerHTML(" Included in this Game")
-					if cmdBtn != evt.Target() {
-						cmdBtn.Class().Add("button-primary")
-						cmdBtn.Class().Remove("button-clear")
-					}
-				case false:
-					TheCmd.Cull = true
-					checkIcon.Class().Remove("fa-check-square-o")
-					checkIcon.Class().Add("fa-square-o")
-					checkIcon.SetInnerHTML(" Excluded from this Game")
-					if cmdBtn != evt.Target() {
-						cmdBtn.Class().Remove("button-primary")
-						cmdBtn.Class().Add("button-clear")
 					}
 				}
 			}

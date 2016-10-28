@@ -50,6 +50,11 @@ func ppbad(c echo.Context) error {
 
 func InitPaypal(c ConfigType, e *echo.Echo) error {
 
+	if c.PaypalAPI == "" {
+		println("Paypal disabled in this session")
+		return nil
+	}
+
 	err := error(nil)
 
 	PaypalLog, err = os.OpenFile("../paypal/paypal.log", os.O_RDWR|os.O_APPEND, os.FileMode(0666))

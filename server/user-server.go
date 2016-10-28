@@ -194,7 +194,7 @@ func (u *UserRPC) GetIDByName(data shared.UserRPCData, retval *int) error {
 	conn := Connections.Get(data.Channel)
 
 	*retval = 0
-	err := DB.SQL(`select id from users where username=$1`, data.Username).QueryStruct(retval)
+	err := DB.SQL(`select id from users where lower(username)=lower($1)`, data.Username).QueryStruct(retval)
 
 	logger(start, "User.GetIDByName", conn,
 		fmt.Sprintf("ID %d", data.ID),

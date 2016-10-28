@@ -70,19 +70,19 @@ func gameEditTable(context *router.Context) {
 			if Session.SubMobile() {
 				form.Row(2).
 					AddNumber(1, "Width in Feet", "TableX", "1").
-					AddDisplay(1, "= Real m Wide", "KmX")
+					AddDisplay(1, "= Scale m Wide", "KmX")
 				form.Row(2).
 					AddNumber(1, "Depth in Feet", "TableY", "1").
-					AddDisplay(1, "= Real m Deep", "KmY")
+					AddDisplay(1, "= Scale m Deep", "KmY")
 
 				form.Row(1).
 					AddSelect(1, "", "GridSize", Session.Lookup.GridSizesMobile, "ID", "Name", 1, game.GridSize)
 			} else {
 				form.Row(4).
 					AddNumber(1, "Width in Feet", "TableX", "1").
-					AddDisplay(1, "= Real m Wide", "KmX").
+					AddDisplay(1, "= Scale m Wide", "KmX").
 					AddNumber(1, "Depth in Feet", "TableY", "1").
-					AddDisplay(1, "= Real m Deep", "KmY")
+					AddDisplay(1, "= Scale m Deep", "KmY")
 				form.Row(1).
 					AddSelect(1, "Grid", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
 			}
@@ -90,9 +90,9 @@ func gameEditTable(context *router.Context) {
 		} else {
 			form.Row(10).
 				AddNumber(1, "Width in Feet", "TableX", "1").
-				AddDisplay(1, "= Real m Wide", "KmX").
+				AddDisplay(1, "= Scale m Wide", "KmX").
 				AddNumber(1, "Depth in Feet", "TableY", "1").
-				AddDisplay(1, "= Real m Deep", "KmY").
+				AddDisplay(1, "= Scale m Deep", "KmY").
 				AddSelect(6, "Grid Size / Figure Basing Guide", "GridSize", Session.Lookup.GridSizes, "ID", "Name", 1, game.GridSize)
 		}
 

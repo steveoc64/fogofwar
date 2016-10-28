@@ -88,7 +88,10 @@ func (t *Tile) ApplyObjective(mode string) {
 }
 
 type Game struct {
-	ID              int              `db:"id"`
+	ID              int `db:"id"`
+	Red             bool
+	Blue            bool
+	Team            string
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
 	HostName        string           `db:"host_name"`

@@ -63,6 +63,7 @@ func enableRoutes(Rank int) {
 		"scenario-blue":       scenarioBlue,
 		"scenario-blue-add":   scenarioBlueAdd,
 		"force-edit":          forceEdit,
+		"game-invite":         gameInvite,
 		"game-new":            gameNew,
 		"game-edit-checklist": gameChecklist,
 		"game-edit-overview":  gameEditOverview,

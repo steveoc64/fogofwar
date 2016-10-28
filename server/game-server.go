@@ -145,6 +145,120 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 	return err
 }
 
+func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select
+			g.*,u.username as host_name,u.email as host_email,
+				coalesce(p_red.reds, 0) as num_red_players,
+				coalesce(p_blue.blues, 0) as num_blue_players
+		from game g
+			left join users u on u.id=g.hosted_by
+	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
+	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
+		where g.id=$1`, data.ID).QueryStruct(retval)
+
+	if err == nil {
+		count := 0
+		DB.SQL(`select count(*)
+			from game_players
+			where game_id=$1 and player_id=$2 and red_team`, data.ID, conn.UserID).QueryScalar(&count)
+		if count > 0 {
+			retval.Red = true
+		}
+
+		DB.SQL(`select count(*)
+			from game_players
+			where game_id=$1 and player_id=$2 and blue_team`, data.ID, conn.UserID).QueryScalar(&count)
+		if count > 0 {
+			retval.Blue = true
+		}
+
+		retval.Team = "Blue Team"
+		if retval.Red {
+			if retval.Blue {
+				retval.Team = "Both Red and Blue Teams"
+			} else {
+				retval.Team = "Red Team"
+			}
+		}
+
+		if !retval.Red {
+			retval.BlueBrief = ""
+		}
+		if !retval.Blue {
+			retval.RedBrief = ""
+		}
+
+		// Fill in the cmd arrays
+		if retval.Red {
+			DB.SQL(`select
+				g.*,coalesce(u.username,'') as player_name
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
+		}
+		if retval.Blue {
+			DB.SQL(`select
+				g.*,coalesce(u.username,'') as player_name
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
+		}
+
+		// If the GetUnits flag was set, then get all the units for each of the commands as well
+		if data.GetUnits {
+			if retval.Red {
+				for _, v := range retval.RedCmd {
+					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
+					// println("red", v.ID, data.ID, v.Units)
+				}
+			}
+			if retval.Blue {
+				for _, v := range retval.BlueCmd {
+					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
+					// println("blue", v.ID, data.ID, v.Units)
+				}
+			}
+		}
+
+		// calculate the x and y km
+		retval.CalcKm()
+		retval.CalcGrid()
+		retval.TileX = retval.GridX
+		retval.TileY = retval.GridY
+
+		// and fetch the tiles from storage
+		err2 := DB.SQL(`select i,height,content,owner from tiles where game_id=$1 order by i`, data.ID).QueryStructs(&retval.Tiles)
+		if err2 != nil {
+			print("hmmm ... ", err2.Error())
+		}
+		// fmt.Printf("tiles 0 %v\n", retval.Tiles[0])
+
+		// and fetch the objectives
+		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
+
+		// TODO - pull in the players on this game
+
+		// Dont need the orders for each corps at this level
+		// Dont need the units for each corps at this level
+
+	}
+
+	logger(start, "Game.GetInvite", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%s Red %v Blue %v %dx%d on a %d Grid, with %d:%d cmds",
+			retval.Name, retval.Red, retval.Blue,
+			retval.TableX, retval.TableY, retval.GridSize,
+			len(retval.RedCmd), len(retval.BlueCmd)))
+
+	return err
+}
+
 func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	start := time.Now()
 	*done = false

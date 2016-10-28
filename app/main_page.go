@@ -46,6 +46,10 @@ func _mainPage(action string, id int, context *router.Context) {
 			formInvite.DateColumn("End Date", "Expires")
 		}
 
+		formInvite.RowEvent(func(key string) {
+			Session.Navigate("/game/invite/" + key)
+		})
+
 		// formulate.MainContainer("wide-container")
 		// formInvite.Render("game-invites-list", "#main-container", &invites)
 		formInvite.Render("game-invites-list", "main", &invites)

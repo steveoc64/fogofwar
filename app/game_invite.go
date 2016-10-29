@@ -43,6 +43,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 			GetUnits: true,
 		}, &game)
 		if rerr != nil || game.ID == 0 {
+			dom.GetWindow().Alert("Looks like you are no longer registered to be playing in this game ...")
 			Session.Navigate("/")
 		}
 

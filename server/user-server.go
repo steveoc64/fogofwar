@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/md5"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"../shared"
@@ -286,6 +288,32 @@ func (u *UserRPC) InviteFriend(data shared.ContactMessageRPCData, retval *int) e
 	logger(start, "User.InviteFriends", conn,
 		fmt.Sprintf("%s", data.ContactMessage.Subject),
 		fmt.Sprintf("MsgID: %d", *retval))
+
+	return err
+}
+
+func (u *UserRPC) GetAvatar(data shared.AvatarRequest, avatar *string) error {
+	start := time.Now()
+
+	*avatar = ""
+	conn := Connections.Get(data.Channel)
+
+	email := ""
+	err := error(nil)
+	data.Username = strings.TrimSpace(data.Username)
+	if data.Username != "" {
+		err := DB.SQL(`select email from users where lower(username)=lower($1)`, data.Username).QueryScalar(&email)
+		if err == nil {
+			em5 := md5.Sum([]byte(email))
+			// print("compute avatar for", theEmail)
+			*avatar = fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", em5, data.Size)
+		} else {
+			println(err.Error())
+		}
+	}
+
+	logger(start, "User.GetAvatar", conn,
+		fmt.Sprintf("Username %s Size %d", data.Username, data.Size), *avatar)
 
 	return err
 }

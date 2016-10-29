@@ -369,6 +369,16 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 				}, &done)
 				if err == nil {
 					print("new player set")
+					gravatar := ""
+					err = RPC("UserRPC.GetAvatar", shared.AvatarRequest{
+						Channel:  Session.Channel,
+						Username: thePlayer,
+						Size:     64,
+					}, &gravatar)
+					if err == nil {
+						el := form.Get(fmt.Sprintf("avatar-%d", key)).(*dom.HTMLImageElement)
+						el.Src = gravatar
+					}
 				}
 			}()
 		}

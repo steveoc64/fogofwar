@@ -1,3 +1,3 @@
 package main
 
-const CodeVersion = "Jena 2910.5"
+const CodeVersion = "Jena 2910.6"

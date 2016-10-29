@@ -28,6 +28,12 @@ type User struct {
 	NumGames     int        `db:"num_games"`
 }
 
+type AvatarRequest struct {
+	Channel  int
+	Username string
+	Size     int
+}
+
 func (u *User) GetAvatar(size int) string {
 	theEmail := strings.TrimSpace(strings.ToLower(u.Email))
 	avatar := md5.Sum([]byte(theEmail))

@@ -10,7 +10,7 @@
     <tr class="data-row">
       {{if not .Cull}}
       <td>{{.Name}}</td>
-      <td><img src="{{.GetAvatar 64}}"></td>
+      <td><img src="{{.GetAvatar 64}}" name="avatar-{{.ID}}"></td>
       <td><input class="edit__player" type="text" value="{{.PlayerName}}" data-id={{.ID}} data-team="Red"></td>
       <td>
       {{if .PlayerReady}}
@@ -31,7 +31,7 @@
     <tr class="data-row">
       {{if not .Cull}}
       <td>{{.Name}}</td>
-      <td><img src="{{.GetAvatar 64}}"></td>
+      <td><img src="{{.GetAvatar 64}}" name="avatar-{{.ID}}"></td>
       <td><input class="edit__player" type="text" value="{{.PlayerName}}" data-id={{.ID}} data-team="Blue"></td>
       <td>
       {{if .PlayerReady}}

@@ -1,0 +1,57 @@
+{{$rating := .GetRatingData}}
+{{$cav := .GetCavData}}
+<ul>
+	<li><h4>{{.Name}} ~ Rated as {{$rating.Name}}</h4></li>
+	{{if eq 1 $cav.Weight}}
+		<li>Mounted on Fast but Light horses</li>
+	{{end}}
+	{{if eq 2 $cav.Weight}}
+		<li>Mounted on Medium Weight horses</li>
+	{{end}}
+	{{if eq 3 $cav.Weight}}
+		<li>Mounted on the Finest Heavy Chargers</li>
+	{{end}}
+  {{if gt $rating.MeleeBonus 0}}
+    <li>Skilled and practiced with the Sabre</li>
+  {{end}}
+  {{if lt $rating.MeleeBonus 0}}
+    <li>Yet to prove themselves with cold steel</li>
+  {{end}}
+	{{if $cav.Battle}}
+		<li>Battle Cavalry, ideal for determined charges over good terrain</li>
+	{{end}}
+	{{if $cav.Lances}}
+		<li>Lancers, ideal for dealing with squares, and muddy conditions</li>
+	{{end}}
+	{{if $cav.Dragoon}}
+		<li>Can dismount and fight as skirmishers</li>
+	{{end}}
+	{{if $cav.Cossack}}
+		<li>Frightful Savages perhaps, but useful for their fieldcraft</li>
+	{{end}}
+	{{if $cav.Dubious}}
+		<li>Not highly regarded around the King's stables .. but may prove their worth over time. We shall see</li>
+	{{end}}
+  {{if $rating.Shock}}
+  	<li>Shock Troops, will not hesitate on the Assault</li>
+  {{else}}
+  	<li>Will close with the enemy under the right circumstances</li>
+  {{end}}
+  {{if $rating.AttackSuperior}}
+  	<li>Brave, will attack forces superior in number</li>
+  {{else}}
+  	<li>May lose their nerve against superior numbers</li>
+  {{end}}
+  {{if $rating.AttackGuns}}
+  	<li>Fearless, will attack enemy guns</li>
+  {{else}}
+  	<li>May require some encouragement to attack enemy guns</li>
+  {{end}}
+  {{if $rating.FormEngage}}
+  	{{if $rating.FormClose}}
+  		<li>Will be able to change formation up close with the enemy</li>
+  	{{else}}
+  		<li>Will be able to change formation within shot of the enemy</li>
+  	{{end}}
+  {{end}}
+</ul>

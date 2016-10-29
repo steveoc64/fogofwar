@@ -156,6 +156,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		viewUnits.Class().Add("hidden")
 
 		TheCmd := &shared.GameCmd{}
+		TheUnit := &shared.Unit{}
 		showSummary := func(cmd *shared.GameCmd) {
 			totalBayonets := 0
 			totalSabres := 0
@@ -526,23 +527,46 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
+				TheUnit = unit
 				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
+					unit := TheUnit
 					el := evt.Target()
-					print("clicked on a ", el.TagName())
+					// print("clicked on a ", el.TagName())
 					if el.TagName() == "INPUT" {
-						print("with value", el.(*dom.HTMLInputElement).Value)
-						switch el.(*dom.HTMLInputElement).Value {
-						case "Valour":
-							loadTemplate("unit-valour", "[name=unitcard]", unit)
-							return
-						case "Discipline":
-							loadTemplate("unit-discipline", "[name=unitcard]", unit)
-							return
-						case "At Ease", "As You Were":
-							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+						value := el.(*dom.HTMLInputElement).Value
+						switch unit.UType {
+						case 2, 5:
+							switch value {
+							case "Valour":
+								loadTemplate("unit-valour", "[name=unitcard]", unit)
+								return
+							case "Discipline":
+								loadTemplate("unit-discipline", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
+						case 3:
+							// print("in cav with", value)
+							switch value {
+							case "Honours":
+								// print("here with Honours")
+								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
+						case 4:
+							switch value {
+							case "Gunnery":
+								loadTemplate("unit-gunnery", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
 						}
-					}
+					} // tag input
 				})
 				doc.QuerySelector("#unit-details").Class().Add("md-show")
 			}

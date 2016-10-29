@@ -1,30 +1,48 @@
 {{$rating := .GetRatingData}}
+{{$drill := .GetDrillData}}
 <ul>
-  <li><h4>Rated as {{$rating.Name}}</h4></li>
+	<li><h4>{{.Name}} ~ Rated as {{$rating.Name}}</h4></li>
   {{if $rating.Shock}}
-  	<li>Shock Troops: Wont hesitate on the Assault</li>
+  	<li>Shock Troops, will not hesitate on the Assault</li>
+  {{else}}
+  	<li>Will close with the enemy under the right circumstances</li>
   {{end}}
   {{if $rating.AttackSuperior}}
-  	<li>Brave: Will attack forces superior in number<li>
+  	<li>Brave, will attack forces superior in number</li>
+  {{else}}
+  	<li>May lose their nerve against superior numbers</li>
   {{end}}
   {{if $rating.AttackGuns}}
-  	<li>Fearless: Will attack enemy guns<li>
+  	<li>Fearless, will attack enemy guns</li>
+  {{else}}
+  	<li>May require some encouragement to attack enemy guns</li>
   {{end}}
   {{if $rating.FormEngage}}
   	{{if $rating.FormClose}}
-  		<li>Nerves of Steel: Change formation up close with the enemy</li>
+  		<li>Will be able to change formation up close with the enemy</li>
   	{{else}}
-  		<li>Calm: Can change formation within shot of the enemy</li>
+  		<li>Will be able to change formation within shot of the enemy, but no closer</li>
   	{{end}}
   {{end}}
-
-  {{if gt $rating.FireBonus 0}}
-  {{end}}
-  {{if lt $rating.FireBonus 0}}
-  {{end}}
-  {{if gt $rating.MeleeBonus 0}}
-  {{end}}
-  {{if lt $rating.MeleeBonus 0}}
+  {{if $rating.SKClose}}
+    {{if eq "Linear" $drill.Name}}
+  	<li>Will stick the bayonet up any Skirmisher that gets too close</li>
+    {{else}}
+    <li>Can deploy skrimishers up close with the enemy</li>
+    {{end}}
+  {{else}}
+  	{{if $drill.Flankers}}	
+  		<li>Flank Companies will deploy within shot of the enemy, but no closer</li>
+  	{{else}}
+  		{{if $drill.EliteCoy}}
+  			<li>Skirmish companies will operate within shot of the enemy, but no closer</li>
+  		{{else}}
+  			{{if $drill.ThirdRank}}
+  			<li>Third Rank skirmishers will deploy within shot of the enemy, but not closer</li>
+  			{{else}}
+  				<li>Unfamiliar with skirmish tactics. May become nervous in the face of enemy skirmishers</li>
+  			{{end}}
+  		{{end}}
+  	{{end}}
   {{end}}
 </ul>
-{{$rating}}

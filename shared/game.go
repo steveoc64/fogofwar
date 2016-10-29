@@ -660,6 +660,16 @@ func (u *Unit) GetDrillData() *DrillType {
 	return nil
 }
 
+func (u *Unit) GetCavData() *CavType {
+	switch u.UType {
+	default:
+		return nil
+	case 3:
+		return &Lookups.CavType[u.CavType-1]
+	}
+	return nil
+}
+
 func (u *Unit) GetBayonets() string {
 	return fmt.Sprintf("%d", u.Bayonets-u.BayonetsLost)
 }

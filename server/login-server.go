@@ -292,10 +292,10 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 
 	cnt := 0
 	// Zap any un-authenticated user with the same name
-	DB.SQL(`delete from users where username=$1 and rank=0`, u.Username).Exec()
+	DB.SQL(`delete from users where lower(username)=lower($1) and rank=0`, u.Username).Exec()
 
 	// Reject the request if someone else has the name
-	DB.SQL(`select count(*) from users where username=$1`, u.Username).QueryScalar(&cnt)
+	DB.SQL(`select count(*) from users where lower(username)=lower($1)`, u.Username).QueryScalar(&cnt)
 	if cnt > 0 {
 		return errors.New("Username in use")
 	}
@@ -348,7 +348,7 @@ func (l *LoginRPC) ValidateNewUser(u *shared.UserSignup, ok *bool) error {
 	println("Validating New User", u.Username, u.Secret)
 
 	uid := 0
-	DB.SQL(`select id from users where rank=0 and username=$1`, u.Username).QueryScalar(&uid)
+	DB.SQL(`select id from users where rank=0 and lower(username)=lower($1)`, u.Username).QueryScalar(&uid)
 	if uid == 0 {
 		return errors.New("Invalid New Username")
 	}

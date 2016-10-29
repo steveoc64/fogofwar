@@ -19,7 +19,7 @@ func (u *UserRPC) List(data shared.UserRPCData, retval *[]shared.User) error {
 		return errors.New("Insufficient Privileges")
 	}
 
-	err := DB.SQL(`select * from users order by username`).QueryStructs(retval)
+	err := DB.SQL(`select * from users order by lower(username)`).QueryStructs(retval)
 	print("retval", retval)
 
 	logger(start, "User.List", conn,
@@ -45,7 +45,7 @@ func (u *UserRPC) ListOnline(data shared.UserRPCData, retval *[]shared.User) err
 	 	left join (select hosted_by, count(*) as ct from game group by 1) g on g.hosted_by=u.id
 	 	left join (select author_id, count(*) as ct from scenario group by 1) s on s.author_id=u.id
 	 where u.channel != 0 
-	 order by u.username`).QueryStructs(retval)
+	 order by lower(u.username)`).QueryStructs(retval)
 	print("retval", retval)
 
 	logger(start, "User.ListOnline", conn,
@@ -71,7 +71,7 @@ func (u *UserRPC) ListOffline(data shared.UserRPCData, retval *[]shared.User) er
 	 	left join (select hosted_by, count(*) as ct from game group by 1) g on g.hosted_by=u.id
 	 	left join (select author_id, count(*) as ct from scenario group by 1) s on s.author_id=u.id
 	 where u.channel = 0 
-	 order by u.username`).QueryStructs(retval)
+	 order by lower(u.username)`).QueryStructs(retval)
 	print("retval", retval)
 
 	logger(start, "User.ListOffline", conn,

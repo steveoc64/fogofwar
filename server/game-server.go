@@ -84,7 +84,10 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// Fill in the cmd arrays
 		if data.Red {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name,coalesce(p.accepted, false) as player_ready
+				g.*,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email,
+					coalesce(p.accepted, false) as player_ready
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
@@ -92,7 +95,10 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		}
 		if data.Blue {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name,coalesce(p.accepted, false) as player_ready
+				g.*,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email,
+					coalesce(p.accepted, false) as player_ready
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
@@ -152,6 +158,13 @@ func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error 
 
 	conn := Connections.Get(data.Channel)
 
+	// check that we are on the invite list
+	c1 := 0
+	DB.SQL(`select count(*) from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&c1)
+	if c1 == 0 {
+		return errors.New("Insufficient Privilege")
+	}
+
 	err := DB.SQL(`select
 			g.*,u.username as host_name,u.email as host_email,
 				coalesce(p_red.reds, 0) as num_red_players,
@@ -210,14 +223,18 @@ func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error 
 		// Fill in the cmd arrays
 		if retval.Red {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name
+				g.*,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
 		if retval.Blue {
 			DB.SQL(`select
-				g.*,coalesce(u.username,'') as player_name
+				g.*,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
@@ -687,5 +704,102 @@ func (g *GameRPC) AcceptInvite(data shared.GameRPCData, done *bool) error {
 			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
 		}
 	}
+	return err
+}
+
+func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	// Check that we can actually do this
+	gc := shared.GameCmd{}
+	gp_old := shared.GamePlayers{}
+	gp_me := shared.GamePlayers{}
+	game := shared.Game{}
+	DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(&gc)
+	DB.SQL(`select * from game_players where game_id=$1 and player_id=$2`, gc.GameID, gc.PlayerID).QueryStruct(&gp_old)
+	DB.SQL(`select * from game_players where game_id=$1 and player_id=$2`, gc.GameID, data.PlayerID).QueryStruct(&gp_me)
+	DB.SQL(`select * from game where id=$1`, gc.GameID).QueryStruct(&game)
+	if conn.Rank < 9 && conn.UserID != game.HostedBy {
+		return errors.New("Insufficient Privilege")
+	}
+
+	// Change the player on the command
+	_, err := DB.SQL(`update game_cmd set player_id=$2 where id=$1`, data.ID, data.PlayerID).Exec()
+	if err == nil {
+		if gp_me.PlayerID == data.PlayerID {
+			// New player is already in the game, so update the game_player record
+			if data.Team == "Red" && !gp_me.RedTeam {
+				_, err = DB.SQL(`update game_players set red_team=true where game_id=$1 and player_id=$2`, gc.GameID, data.PlayerID).Exec()
+			}
+			if err == nil && (data.Team == "Blue" && !gp_me.BlueTeam) {
+				DB.SQL(`update game_players set blue_team=true where game_id=$1 and player_id=$2`, gc.GameID, data.PlayerID).Exec()
+			}
+		} else {
+			// this player is brand new to the game .. so create a new record for them
+			a := game.HostedBy == data.PlayerID
+			if data.Team == "Red" {
+				DB.SQL(`insert into game_players
+				(game_id,player_id,red_team,blue_team,accepted)
+				values ($1,$2,true,false,$3)`, gc.GameID, data.PlayerID, a).Exec()
+			} else {
+				DB.SQL(`insert into game_players
+				(game_id,player_id,red_team,blue_team,accepted)
+				values ($1,$2,false,true,$3)`, gc.GameID, data.PlayerID, a).Exec()
+			}
+		}
+
+		if err == nil {
+			// If the old player has no more commands in this game, then remove their invite entirely
+			count := 0
+			err = DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+			if err == nil && count == 0 {
+				DB.SQL(`delete from game_players where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
+			} else {
+				// OK, so they have some commands, but have they lost the right to view a red or blue ?
+				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and red_team`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+				if count == 0 {
+					DB.SQL(`update game_players set red_team=false where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
+				}
+				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and blue_team`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+				if count == 0 {
+					DB.SQL(`update game_players set blue_team=false where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
+				}
+			}
+		}
+	}
+
+	// And twiddle the game cmd details
+
+	logger(start, "Game.SetCmdPlayer", conn,
+		fmt.Sprintf("ID %d Player %d", data.ID, data.PlayerID), "")
+
+	if err == nil {
+		*done = true
+		// Tell all the players that something changed
+		players := []int{}
+		doneOld := false
+		DB.SQL(`select player_id from game_players where game_id=$1`, gc.GameID).QuerySlice(&players)
+		fmt.Printf("players who need to know about this update %v\n", players)
+		for _, v := range players {
+			if v == gp_old.PlayerID {
+				doneOld = true
+			}
+			conn.BroadcastPlayer(v, "Game", "Update", gc.GameID)
+		}
+
+		// The player has been dropped entirely - so let them know as well
+		if gp_old.PlayerID != 0 && !doneOld {
+			conn.BroadcastPlayer(gp_old.PlayerID, "Game", "Update", gc.GameID)
+		}
+
+		tx.Commit()
+	}
+
 	return err
 }

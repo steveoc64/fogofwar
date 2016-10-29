@@ -317,6 +317,63 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		Session.Navigate(url)
 	})
 
+	// editted one of the edit fields with player names
+	form.OnEvent("PlayerList", "focus", func(evt dom.Event) {
+		el := evt.Target()
+		if el.TagName() == "INPUT" {
+
+		}
+	})
+
+	form.OnEvent("PlayerList", "change", func(evt dom.Event) {
+		el := evt.Target()
+		if el.TagName() == "INPUT" {
+			print("changed input field")
+			key, _ := strconv.Atoi(el.GetAttribute("data-id"))
+			print("key", key)
+			team := el.GetAttribute("data-team")
+			print("team", team)
+			thePlayer := el.(*dom.HTMLInputElement).Value
+			print("value", thePlayer)
+			print("player changed")
+			TheCmd := game.GetCmd(team, key)
+			go func() {
+				if thePlayer == "" {
+					TheCmd.PlayerID = 0
+					TheCmd.PlayerName = ""
+				} else {
+					err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
+						Channel:  Session.Channel,
+						Username: thePlayer,
+					}, &TheCmd.PlayerID)
+					if err != nil {
+						dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
+						TheCmd.PlayerName = ""
+						TheCmd.PlayerID = 0
+					} else {
+						if TheCmd.PlayerID == 0 {
+							TheCmd.PlayerName = ""
+						} else {
+							TheCmd.PlayerName = thePlayer
+						}
+						// print("assign cmd to player", TheCmd, thePlayer)
+					}
+				}
+				// Now update the command
+				done := false
+				err := RPC("GameRPC.SetCmdPlayer", shared.GameCmdRPCData{
+					Channel:  Session.Channel,
+					ID:       key,
+					PlayerID: TheCmd.PlayerID,
+					Team:     team,
+				}, &done)
+				if err == nil {
+					print("new player set")
+				}
+			}()
+		}
+	})
+
 	showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 
 }

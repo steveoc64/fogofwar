@@ -148,6 +148,14 @@ type GamePlayerData struct {
 	Accepted bool   `db:"accepted"`
 }
 
+type GamePlayers struct {
+	GameID   int  `db:"game_id"`
+	PlayerID int  `db:"player_id"`
+	RedTeam  bool `db:"red_team"`
+	BlueTeam bool `db:"blue_team"`
+	Accepted bool `db:"accepted"`
+}
+
 type GameRPCData struct {
 	Channel  int
 	ID       int
@@ -465,6 +473,7 @@ type GameCmd struct {
 	Condition     int     `db:"condition"`
 	PlayerID      int     `db:"player_id"`
 	PlayerName    string  `db:"player_name"`  // derived data
+	PlayerEmail   string  `db:"player_email"` // derived data
 	PlayerReady   bool    `db:"player_ready"` // derived data
 	Units         []*Unit `db:"units"`
 	VP            int     `db:"vp"`
@@ -472,6 +481,22 @@ type GameCmd struct {
 	Sabres        *int    `db:"sabres"`   // derived data
 	Guns          *int    `db:"guns"`     // derived data
 	Cull          bool    `db:"cull"`     // Dont use in game
+}
+
+type GameCmdRPCData struct {
+	Channel  int
+	ID       int
+	PlayerID int
+	Team     string
+}
+
+func (g *GameCmd) GetAvatar(size int) string {
+	theEmail := strings.TrimSpace(strings.ToLower(g.PlayerEmail))
+	avatar := md5.Sum([]byte(theEmail))
+	// print("compute avatar for", theEmail)
+	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
+	// print("got", avatarURL)
+	return avatarURL
 }
 
 func (g *GameCmd) GetCSS() string {

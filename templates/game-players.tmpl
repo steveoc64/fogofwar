@@ -16,7 +16,9 @@
 		 {{if .Red.Accepted}}
 		  <i class="fa fa-check-square fa-2x"></i> Ready
 		 {{else}}
+		 	{{if ne "" .Red.Username}}
 		  <i class="fa fa-circle-o-notch fa-spin fa-2x"></i> .. waiting
+		  {{end}}
 		 {{end}}
 		</td>
 		<td>{{.Blue.Username}}</td>
@@ -24,7 +26,9 @@
   	 {{if .Blue.Accepted}}
 		  <i class="fa fa-check-square fa-2x"></i> Ready
 		 {{else}}
+		 	{{if ne "" .Blue.Username}}
 		  <i class="fa fa-circle-o-notch fa-spin fa-2x"></i> .. waiting
+		  {{end}}
 		 {{end}}
 		</td>
 	</tr>

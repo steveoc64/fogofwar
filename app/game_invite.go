@@ -11,11 +11,25 @@ import (
 )
 
 func gameInvite(context *router.Context) {
+	Session.Subscribe("Game", _gameInvite, context)
+	_gameInvite("Edit", 0, context)
+}
+
+func _gameInvite(action string, actionID int, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
 		return
 	}
+
+	switch action {
+	case "Update":
+		if actionID != id {
+			// not for us
+			return
+		}
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 
@@ -23,12 +37,14 @@ func gameInvite(context *router.Context) {
 		game := shared.Game{}
 		TheCmd := &shared.GameCmd{}
 
-		RPC("GameRPC.GetInvite", shared.GameRPCData{
+		rerr := RPC("GameRPC.GetInvite", shared.GameRPCData{
 			Channel:  Session.Channel,
 			ID:       id,
 			GetUnits: true,
 		}, &game)
-		// print("you got game", game)
+		if rerr != nil || game.ID == 0 {
+			Session.Navigate("/")
+		}
 
 		form := formulate.EditForm{}
 		form.New("fa-bookmark-o", "Game Invite - "+game.Name)
@@ -79,9 +95,17 @@ func gameInvite(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
-		redRow := "row-4"
-		blueRow := "row-5"
-		oobRow := "row-6"
+		start := 3
+		if game.Red {
+			start++
+		}
+		if game.Blue {
+			start++
+		}
+		redRow := fmt.Sprintf("row-%d", start)
+		blueRow := fmt.Sprintf("row-%d", start+1)
+		oobRow := fmt.Sprintf("row-%d", start+2)
+
 		form.Get(redRow).Class().Add("hidden")
 		form.Get(blueRow).Class().Add("hidden")
 		form.Get(oobRow).Class().Add("hidden")
@@ -306,10 +330,12 @@ func gameInvite(context *router.Context) {
 		}
 
 		if game.Red {
+			print("show red commands")
 			showCommands("Red")
 		}
 
 		if game.Blue {
+			print("show blue commands")
 			showCommands("Blue")
 		}
 

@@ -4,12 +4,14 @@
       <th>Red Team</th>
       <th>Player</th>
       <th></th>
+      <th></th>
     </tr>
     {{range .RedCmd}}
     <tr class="data-row">
       {{if not .Cull}}
       <td>{{.Name}}</td>
-      <td>{{.PlayerName}}</td>
+      <td><img src="{{.GetAvatar 64}}"></td>
+      <td><input class="edit__player" type="text" value="{{.PlayerName}}" data-id={{.ID}} data-team="Red"></td>
       <td>
       {{if .PlayerReady}}
         <i class="fa fa-check-square fa-2x"></i> Ready
@@ -29,7 +31,8 @@
     <tr class="data-row">
       {{if not .Cull}}
       <td>{{.Name}}</td>
-      <td>{{.PlayerName}}</td>
+      <td><img src="{{.GetAvatar 64}}"></td>
+      <td><input class="edit__player" type="text" value="{{.PlayerName}}" data-id={{.ID}} data-team="Blue"></td>
       <td>
       {{if .PlayerReady}}
         <i class="fa fa-check-square fa-2x"></i> Ready

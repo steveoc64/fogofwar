@@ -146,6 +146,7 @@ func gameEditTable(context *router.Context) {
 		editMode := "" // This is the sub-thing within the mode, ie in mode terrain, editmode = rough, woods, etc
 		modeSet := defaultMode
 		oldModeSet := ""
+		flipped := false
 		TheCmd := &shared.GameCmd{}
 		TheObj := &shared.GameObjective{}
 		currentObjX := -1
@@ -199,7 +200,6 @@ func gameEditTable(context *router.Context) {
 				i := 0
 				// print("tiles is", game.Tiles)
 				if len(game.Tiles) > 0 {
-
 					for y := 0; y < game.GridY; y++ {
 						for x := 0; x < game.GridX; x++ {
 							t := game.Tiles[i]
@@ -217,11 +217,19 @@ func gameEditTable(context *router.Context) {
 						}
 					}
 				}
+
 				// add objective tiles on top !!
 				if modeSet == "objective" {
 					for i, v := range game.Objectives {
 						// print("gen svg for obj", v)
-						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								v.X*game.GridSize+1,
+								v.Y*game.GridSize-2)
+						}
+						newHTML += fmt.Sprintf(`<rect %s x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
+							tt,
 							v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
 							game.GridSize, game.GridSize, // width and height in inches
 							v.GetCSS(), // self-computed CSS content type
@@ -250,7 +258,14 @@ func gameEditTable(context *router.Context) {
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
 							if modeSet == "red" {
-								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
+								tt := ""
+								if flipped {
+									tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+										v.StartX*game.GridSize+2,
+										v.StartY*game.GridSize-3)
+								}
+								newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
+									tt,
 									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
 									team,
 									v.Name)
@@ -266,7 +281,14 @@ func gameEditTable(context *router.Context) {
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
 							if modeSet == "blue" {
-								newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="unitname-%s">%s</text>`,
+								tt := ""
+								if flipped {
+									tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+										v.StartX*game.GridSize+2,
+										v.StartY*game.GridSize-3)
+								}
+								newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
+									tt,
 									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
 									team,
 									v.Name)
@@ -536,6 +558,36 @@ func gameEditTable(context *router.Context) {
 			bbar.AppendChild(btn)
 		}
 
+		// Add a flip button to the button bar
+		flipButton := func() {
+			btn := doc.CreateElement("I")
+			btn.Class().SetString("fa fa-refresh fa-2x")
+			btn.SetAttribute("name", "flip-button")
+			btn.AddEventListener("click", false, func(evt dom.Event) {
+				print("flip")
+				flipped = !flipped
+				tileset := form.Get("map-tileset")
+
+				if flipped {
+					tileset.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", game.TableX*6, game.TableY*6))
+					for _, v := range tileset.QuerySelectorAll("text") {
+						x, _ := strconv.Atoi(v.GetAttribute("x"))
+						y, _ := strconv.Atoi(v.GetAttribute("y"))
+						// Black Magic here .. the offsets work, but its hard to understand why
+						v.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", x+1, y-2))
+					}
+
+				} else {
+					tileset.RemoveAttribute("transform")
+					for _, v := range tileset.QuerySelectorAll("text") {
+						v.RemoveAttribute("transform")
+					}
+
+				}
+			})
+			bbar.AppendChild(btn)
+		}
+
 		// Create the mode buttons
 		modeButton("terrain")
 		modeButton("objective")
@@ -544,6 +596,7 @@ func gameEditTable(context *router.Context) {
 		// modeButton("Zones")
 		saveButton("Save Map")
 		restoreButton("Restore Map")
+		flipButton()
 		setMode()
 
 		// Add a reset all button

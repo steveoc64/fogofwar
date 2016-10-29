@@ -20,12 +20,12 @@ COPY rating (id, name, code, shock, form_close, form_engage, sk_close, attack_su
 2	Grenadier	Grend	t	t	t	t	t	t	1	2	9
 3	Elite	Elite	f	t	t	t	t	t	1	1	8
 4	Crack Line	Crack	f	t	t	f	t	t	1	1	7
-5	Regular Line	Reglr	f	f	t	f	t	t	0	0	7
-6	Reserve Line	2ndLn	f	f	f	f	t	t	0	0	6
-7	Conscript	Consr	f	f	f	f	f	t	0	-1	6
 8	Landwehr	Landw	f	f	f	f	f	f	-1	-1	5
 9	Militia	Milit	f	f	f	f	f	f	0	-1	7
 10	Rabble	Mob	t	f	f	f	t	f	-2	-2	2
+5	Regular Line	Reglr	f	f	t	f	f	t	0	0	7
+6	Reserve Line	2ndLn	f	f	f	f	f	f	0	0	6
+7	Conscript	Consr	f	f	f	f	f	f	0	-1	6
 \.
 
 

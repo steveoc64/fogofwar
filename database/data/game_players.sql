@@ -16,8 +16,9 @@ SET search_path = public, pg_catalog;
 --
 
 COPY game_players (game_id, player_id, red_team, blue_team, accepted) FROM stdin;
-4	1	\N	t	t
-4	2	t	\N	t
+4	12	f	t	t
+4	1	f	t	t
+4	2	t	f	t
 \.
 
 

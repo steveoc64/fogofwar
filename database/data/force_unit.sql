@@ -58,9 +58,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 41	1	Cavalry_Division.Grenadier_a_Cheval	Grenadier a Cheval			France	3	1	0	0	0	0	0	0	3	400	8	1	0	0	0	f
 995	78	2eme_Division	2eme Division		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 38	1	Guard_Artillery	Guard Artillery		de Lamartiniére	France	1	4	1	0	0	0	0	0	2	0	0	0	0	0	2	f
-47	1	Infantry_Division.2e_Chasseurs_Copy	2e Chasseurs_Copy			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 1275	94	Infanterie_de_la_garde.Bde_Soules	Bde Soulès	1°/2° Rgt. de chasseurs à pied de la Garde impériale		France	2	4	6	1800	1	0	0	0	1	0	0	0	0	0	0	f
 237	10	3rd_Div.von_Schoeneberg	von Schöneberg			Saxony	2	4	1	3400	1	2	1	0	5	0	0	0	2	4	4	f
+47	1	Infantry_Division.2e_Chasseurs	2e Chasseurs			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 46	1	Infantry_Division.Foot_Dragoons	Foot Dragoons			France	2	1	6	2400	1	0	0	0	1	0	0	0	0	0	0	f
 53	3	1eme_Division.13e_Legere	13e Legere			France	2	4	6	1400	1	0	0	0	3	0	0	0	0	0	0	f
 52	3	1eme_Division	1eme Division		Morand	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -517,7 +517,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1299	102	2nd_Div.Center_Bde	Center Bde	Erzherzog Karl IR #3 (four fusilier battalions) Erzherzog Auersperg #24 (four fusilier battalions) Cuirassier Regt Erzherzog Franz #2 (one-and-a-half squadrons)		Austria	2	4	3	6000	1	0	0	0	5	200	1	2	0	0	0	f
 1331	95	Bde_Durosnel.20e_Rgt_de_chasseurs_a_cheval	20° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	484	3	4	0	0	0	f
 1367	97	Div_Legrand.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
-1368	97	Div_Legrand.Bde_Ledru	Bde Ledru	26° Rgt. d’infanterie légère [2 à 3 bat.]		France	2	4	6	2052	1	0	0	0	4	0	0	0	0	0	0	f
 1310	101	Cav_Bde.10e_Chasseur	10e Chasseur			France	3	4	0	0	0	0	0	0	3	140	3	4	0	0	0	f
 1301	101	2eme_Division	2eme Division		Louis Henri Loison	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1307	101	4eme_Dragoon_Division.19e_Dragoon_Regt	19e Dragoon Regt			France	3	4	0	0	0	0	0	0	3	290	5	4	0	0	0	f
@@ -529,7 +528,6 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1304	101	Artillery_Reserve	Artillery Reserve		Colonel Jean Nicolas Seroux	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1305	101	4eme_Dragoon_Division	4eme Dragoon Division		Laplanche	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1308	101	4eme_Dragoon_Division.25e_Dragoon_Regt	25e Dragoon Regt			France	3	4	0	0	0	0	0	0	3	240	5	4	0	0	0	f
-1369	97	Div_Legrand.Tirailleurs_Corses	Tirailleurs Corses	Rgt. de Tirailleurs Corses [1 bat.]		Corsica	2	4	6	579	1	0	0	0	3	0	0	0	0	0	0	f
 1315	101	2eme_Division.Bde_Roguet	Bde Roguet	69th Line Infantry Regiment (two battalion, 1,698 men) 76th Line Infantry Regiment (three battalions, 1,789 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1314	101	2eme_Division.Bde_Villatte	Bde Villatte	6th Light Infantry Regiment (two battalions, 1,728 men) 39th Line Infantry Regiment (two battalions, 1,633 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1313	101	Artillery_Reserve.2e_Regt_Horse_Bty	2e Regt Horse Bty	2nd Regt of Horse Artillery (two sections of the 1st company armed with two 8-pound cannons and two howitzers, 65 men)		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	t
@@ -545,7 +543,9 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1224	12	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			Prussia	3	4	0	0	0	0	0	0	3	600	5	4	0	0	0	f
 1222	12	Cav_Bde_Blucher.Wurttemberg_Hussars_Nr_4	Württemberg Hussars Nr 4	Württemberg Hussar Regiment # 4		Prussia	3	4	0	0	0	0	0	0	3	1500	2	3	0	0	0	f
 1259	93	Reserve_Cavalry	Reserve Cavalry			Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
-1371	97	Div_Legrand.Bde_Levasseur	Bde Levasseur	18° Rgt. d’infanterie de ligne ~ 75° Rgt. d’infanterie de ligne		France	2	4	5	3847	1	0	0	0	4	0	0	0	0	0	0	f
+1371	97	Div_Legrand.Bde_Levasseur	Bde Levasseur	18° Rgt. d’infanterie de ligne ~ 75° Rgt. d’infanterie de ligne		France	2	4	2	3847	1	0	0	0	7	0	0	0	0	0	0	f
+1368	97	Div_Legrand.Bde_Ledru	Bde Ledru	26° Rgt. d’infanterie légère [2 à 3 bat.]		France	2	4	3	2052	1	0	0	0	6	0	0	0	0	0	0	f
+1369	97	Div_Legrand.Tirailleurs_Corses	Tirailleurs Corses	Rgt. de Tirailleurs Corses [1 bat.]		Corsica	2	4	8	579	1	0	0	0	8	0	0	0	0	0	0	f
 1243	92	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1244	92	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1232	12	2nd_Div.Kurrassier_Bde_von_Quitzow	Kurrassier Bde von Quitzow	Quitzow Cuirassier Regiment # 6, five squadrons Reitzenstein Cuirassier Regiment # 7, five squadrons		Prussia	3	4	0	0	0	0	0	0	3	1800	1	2	0	0	0	f
@@ -601,7 +601,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1339	95	Bde_Colbert.3e_Rgt_de_hussards	3° Rgt. de hussards			France	3	4	0	0	0	0	0	0	3	350	2	3	0	0	0	f
 1347	96	Div_Klein.4e_Rgt_de_Dragons	4° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	3	305	5	4	0	0	0	f
 1335	95	Bde_Guyot.22e_Rgt_de_chasseurs_a_cheval	22° Rgt. de chasseurs à cheval			France	3	4	0	0	0	0	0	0	3	464	3	4	0	0	0	f
-1370	97	Div_Legrand.Tirailleurs_du_Po	Tirailleurs du Pô	Rgt. de Tirailleurs du Pô [1 bat.]		Italy	2	4	6	469	1	0	0	0	3	0	0	0	0	0	0	f
+1370	97	Div_Legrand.Tirailleurs_du_Po	Tirailleurs du Pô	Rgt. de Tirailleurs du Pô [1 bat.]		Italy	2	4	9	469	1	0	0	0	9	0	0	0	0	0	0	f
 1342	96	Div_Grouchy	Div Grouchy		Grouchy	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1341	96	Div_Klein	Div Klein		Klein	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1344	96	Div_Klein.2e_Co_dArt_a_cheval	2° Co. d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	4	4	3	t

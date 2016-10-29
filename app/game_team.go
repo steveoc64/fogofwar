@@ -536,6 +536,8 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					if el.TagName() == "INPUT" {
 						value := el.(*dom.HTMLInputElement).Value
 						switch unit.UType {
+						case 1:
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
 						case 2, 5:
 							switch value {
 							case "Valour":

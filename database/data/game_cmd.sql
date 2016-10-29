@@ -58,15 +58,22 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 71	14	1	5	1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	f
 84	14	1	8	5	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	f	0	t
 70	14	1	1	5	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	f	0	f
-44	4	1	2	6	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	1	f	0	f
-47	4	1	4	9	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	1	f	0	f
+47	4	1	4	9	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	12	f	0	f
 46	4	1	-1	-1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	f	0	t
 45	4	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	0	f	0	t
 32	4	1	1	8	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	1	f	0	f
 48	4	1	-1	-1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	f	0	t
+44	4	1	2	6	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	12	f	0	f
 42	4	1	14	0	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	t
 43	4	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	t
 34	4	4	-1	-1	t	f	France	V Corps	Lannes	2		2	1	3	0	f	0	t
+103	18	1	-1	-1	t	f	France	Aile gauche Lasalle	Lasalle	2		2	2	3	0	f	0	f
+104	18	1	-1	-1	t	f	France	Réserve de cavalerie	Murat	2		2	2	3	0	f	0	f
+105	18	1	-1	-1	t	f	France	IVe Corps	Soult	2		2	3	3	0	f	0	f
+106	18	1	-1	-1	t	f	France	VIIe Corps	Augereau	2		2	3	3	0	f	0	f
+107	18	1	-1	-1	t	f	France	III° Corps	Davout	2		2	3	3	0	f	0	f
+108	18	1	-1	-1	t	f	France	VIe Corps	Ney	2		2	3	3	0	f	0	f
+109	18	1	-1	-1	t	f	France	Garde Impériale	Bessières	2		2	3	2	0	f	0	f
 \.
 
 
@@ -74,7 +81,7 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 88, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 109, true);
 
 
 --

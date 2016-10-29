@@ -23,6 +23,8 @@
   	{{else}}
   		<li>Will be able to change formation within shot of the enemy, but no closer</li>
   	{{end}}
+  {{else}}
+    <li>Unlikely to change formation within shot of the enemy</li>
   {{end}}
   {{if $rating.SKClose}}
     {{if eq "Linear" $drill.Name}}

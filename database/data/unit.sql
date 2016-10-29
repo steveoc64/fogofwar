@@ -401,6 +401,66 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 1729	41	4	Corps_Cav.7e_Chasseur	7e Chasseur			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	600	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
 1670	37	4	Adv_Guard_Div.Saxon_Hussar_von_Truetzschler	Saxon Hussar von Trützschler	Saxon Hussar Regiment, eight squadrons		10	Saxony	3	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
 1850	48	4	Reserve_Cavalry.Usedom_Hussar_Nr_10	Usedom Hussar Nr 10			10	Prussia	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	1200	0	0	0	2	4	0	0	f	f	f	0	0	f	2	0
+2482	103	18	Bde_Guyot	Bde Guyot		Guyot	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2483	103	18	Bde_Colbert	Bde Colbert		Colbert	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2484	103	18	Bde_Durosnel	Bde Durosnel		Durosnel	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2485	103	18	Bde_Bruyeres	Bde Bruyères		Bruyères	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2486	103	18	Bde_Bruyeres.1e_Hussards	1° Hussards			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	250	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2487	103	18	Bde_Bruyeres.13e_Chas_a_cheval	13° Chas. à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2488	103	18	Bde_Durosnel.20e_Rgt_de_chasseurs_a_cheval	20° Rgt. de chasseurs à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	484	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2489	103	18	Bde_Durosnel.7e_Rgt_de_chasseurs_a_cheval	7° Rgt. de chasseurs à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	413	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2490	103	18	Bde_Durosnel.5e_Co_6e_dArt_a_cheval	5° Co. 6e d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	6	0	f	f	f	0	4	t	2	3
+2491	103	18	Bde_Guyot.16e_Rgt_de_chasseurs_a_cheval	16° Rgt. de chasseurs à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	364	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2492	103	18	Bde_Colbert.3e_Rgt_de_hussards	3° Rgt. de hussards			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2493	103	18	Bde_Guyot.22e_Rgt_de_chasseurs_a_cheval	22° Rgt. de chasseurs à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	464	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2494	103	18	Bde_Guyot.8e_Rgt_de_hussards	8° Rgt. de hussards			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	391	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
+2495	103	18	Bde_Guyot.4e_Co_5e_dArt_a_cheval	4° Co. 5° d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	4	t	2	3
+2496	103	18	Bde_Colbert.10e_Rgt_de_chasseurs_a_cheval	10° Rgt. de chasseurs à cheval			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	3	4	0	0	f	f	f	0	0	f	2	0
+2497	104	18	Div_Grouchy.11e_Rgt_de_Dragons	11° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	445	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2498	104	18	Div_Grouchy.6e_Rgt_de_Dragons	6° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	487	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2499	104	18	Div_Grouchy.2e_Co_2e_dArt_a_cheval	2° Co. 2° d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	4	t	2	3
+2500	104	18	Div_DHautpoul.10e_Rgt_de_Cuirassiers	10° Rgt. de Cuirassiers			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2501	104	18	Div_Grouchy.3e_Rgt_de_Dragons	3° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	463	0	0	0	5	3	0	0	f	f	f	0	0	f	2	0
+2502	104	18	Div_Grouchy.10e_Rgt_de_Dragons	10° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	363	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2503	104	18	Div_DHautpoul.4e_Co_2e_dArt_a_cheval	4° Co. 2° d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	4	t	2	3
+2504	104	18	Div_DHautpoul.5e_Rgt_de_Cuirassiers	5° Rgt. de Cuirassiers			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2505	104	18	Div_DHautpoul.11e_Rgt_de_Cuirassiers	11° Rgt. de Cuirassiers			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	1	3	0	0	f	f	f	0	0	f	2	0
+2506	104	18	Div_DHautpoul.1e_Rgt_de_Cuirassiers	1° Rgt. de Cuirassiers			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	1	2	0	0	f	f	f	0	0	f	2	0
+2507	104	18	Div_Klein	Div Klein		Klein	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2508	104	18	Div_Klein.2e_Co_dArt_a_cheval	2° Co. d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	4	t	2	3
+2509	104	18	Div_Klein.4e_Rgt_de_Dragons	4° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	305	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2510	104	18	Div_Grouchy	Div Grouchy		Grouchy	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2511	104	18	Div_Klein.14e_Rgt_de_Dragons	14° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	350	0	0	0	5	4	0	0	f	f	f	0	0	f	2	0
+2512	104	18	Div_DHautpoul	Div D’Hautpoul		D’Hautpoul	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2513	104	18	Div_Klein.1e_Rgt_de_Dragons	1° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	250	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2514	104	18	Div_Klein.2e_Rgt_de_Dragons	2° Rgt. de Dragons			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	400	0	0	0	5	5	0	0	f	f	f	0	0	f	2	0
+2515	105	18	Div_Leval	Div Leval		Leval	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2516	105	18	Div_Legrand	Div Legrand		Legrand	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2517	105	18	Div_Leval.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	1	f	2	3
+2518	105	18	Div_Leval.13e_Co_5e_dArt_de_Pied	13° Co. 5° d’Art. de Pied			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2519	105	18	Div_Leval.Bde_Ferey	Bde Férey	46° Rgt. d’infanterie de ligne [2 bat.]  57° Rgt. d’infanterie de ligne [2 bat.]		10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	3900	0	0	f	f	1	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2520	105	18	Div_Leval.Bde_Schiner	Bde Schiner	4° Rgt. d’infanterie de ligne [2 bat.] 28° Rgt. d’infanterie de ligne [2 bat.]		10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	3980	0	0	f	f	1	0	0	0	f	0	0	5	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2521	105	18	Div_Legrand.14e_Co_5e_dArt_de_Pied	14° Co. 5° d’Art. de Pied			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	3
+2522	105	18	Div_Legrand.17e_Co_5e_dArt_de_Pied.3e_Co_5e_dArt_a_cheval	3° Co. 5° d’Art. à cheval			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	4	t	2	3
+2523	105	18	Div_Legrand.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	4	0	f	f	f	0	1	f	2	3
+2524	105	18	Div_Legrand.Tirailleurs_Corses	Tirailleurs Corses	Rgt. de Tirailleurs Corses [1 bat.]		10	Corsica	2	2	4	8	1	1	f	f	f	f	f	f	f	579	0	0	f	f	1	0	0	0	f	0	0	8	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2525	105	18	Div_Legrand.Bde_Ledru	Bde Ledru	26° Rgt. d’infanterie légère [2 à 3 bat.]		10	France	2	2	4	3	1	1	f	f	f	f	f	f	f	2052	0	0	f	f	1	0	0	0	f	0	0	6	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2526	105	18	Div_Legrand.Bde_Levasseur	Bde Levasseur	18° Rgt. d’infanterie de ligne ~ 75° Rgt. d’infanterie de ligne		10	France	2	2	4	2	1	1	f	f	f	f	f	f	f	3847	0	0	f	f	1	0	0	0	f	0	0	7	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2527	105	18	Div_Legrand.Tirailleurs_du_Po	Tirailleurs du Pô	Rgt. de Tirailleurs du Pô [1 bat.]		10	Italy	2	2	4	9	1	1	f	f	f	f	f	f	f	469	0	0	f	f	1	0	0	0	f	0	0	9	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2528	109	18	Infanterie_de_la_garde	Infanterie de la garde		Soulès	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2529	109	18	Infanterie_de_la_garde.Bde_Soules	Bde Soulès	1°/2° Rgt. de chasseurs à pied de la Garde impériale		10	France	2	2	4	6	1	1	f	f	f	f	f	f	f	1800	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2530	109	18	Infanterie_de_la_garde.Bde_Dorsenne	Bde Dorsenne	1°/2° Rgt. de Grenadiers à pied de la Garde impériale		10	France	2	2	4	5	1	1	f	f	f	f	f	f	f	1600	0	0	f	f	1	0	0	0	f	0	0	1	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	0
+2531	109	18	Division_de_cavalerie_de_la_Garde.Brigade_Dahlmann	Brigade Dahlmann	1° Rgt. de chasseurs à cheval de la Garde impériale		10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	3	1	0	0	f	f	f	0	0	f	2	0
+2532	109	18	Division_de_cavalerie_de_la_Garde.Brigade_Jacquin	Brigade Jacquin	1° Rgt. de la gendarmerie d’élite		10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	200	0	0	0	8	1	0	0	f	f	f	0	0	f	2	0
+2533	109	18	Artillerie.Horse_Bty_2	Horse Bty 2	2° Co. d’Art. à cheval		10	France	4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	9	0	f	f	f	0	3	t	2	2
+2534	109	18	Division_de_cavalerie_de_la_Garde.Mamelouks_de_la_Garde_imperiale	Mamelouks de la Garde impériale			10	Egypt	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	100	0	0	0	2	1	0	0	f	f	f	0	0	f	2	0
+2535	109	18	Division_de_cavalerie_de_la_Garde	Division de cavalerie de la Garde		Walther	10		1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	2	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2536	109	18	Artillerie	Artillerie			10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
+2537	109	18	Division_de_cavalerie_de_la_Garde.Brigade_de_Vieille_Garde_Lepic	Brigade de Vieille Garde Lepic	Grenadiers à cheval de la Garde impériale		10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	900	0	0	0	8	1	0	0	f	f	f	0	0	f	2	0
+2538	109	18	Artillerie.Horse_Bty_1.Horse_Bty_3	Horse Bty 3	1° Co. 6e d’Art. à cheval		10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	t	2	2
+2539	109	18	Artillerie.Horse_Bty_1	Horse Bty 1	1° Co. d’Art. à cheval		10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	9	0	f	f	f	0	3	t	2	2
+2540	109	18	Artillerie.Foot_Bty_1	Foot Bty 1	2° Co. 1° d’Art. de Pied		10	France	4	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
+2541	109	18	Artillerie.Foot_Bty_2	Foot Bty 2	6° Co. 1° d’Art. de Pied		10	France	4	2	1	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	8	0	f	f	f	0	3	f	2	2
 1256	9	14	2nd_Div	2nd Div		von Arnim	10	Prussia	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	4	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1651	36	4	Light_Div	Light Div		Lasalle	10	France	1	2	3	1	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	0	0	0	0	0	0	0	0	f	f	f	0	0	f	2	2
 1653	36	4	Light_Div.Bde_Lasalle_5_7e_Hussar	Bde Lasalle 5/7e Hussar			10	France	3	2	4	0	1	1	f	f	f	f	f	f	f	0	0	0	f	f	0	0	0	0	f	0	0	3	600	0	0	0	2	3	0	0	f	f	f	0	0	f	2	0
@@ -838,7 +898,7 @@ COPY unit (id, cmd_id, game_id, path, name, descr, commander_name, commander_con
 -- Name: unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('unit_id_seq', 2361, true);
+SELECT pg_catalog.setval('unit_id_seq', 2541, true);
 
 
 --

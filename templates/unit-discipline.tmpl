@@ -11,13 +11,21 @@
     <li>Can operate in Full Open Order if needed</li>
   {{end}}
   {{if gt $rating.FireBonus 0}}
+    {{if gt $rating.FireBonus 1}}
     <li>Superb Musketry Skills</li>
+    {{else}}
+    <li>Well practiced with the Musket</li>
+    {{end}}
   {{end}}
   {{if lt $rating.FireBonus 0}}
     <li>Could do with some shooting practice</li>
   {{end}}
   {{if gt $rating.MeleeBonus 0}}
+    {{if gt $rating.MeleeBonus 1}}
     <li>Frightfully good with the bayonet</li>
+    {{else}}
+    <li>Dependable with the Cold Steel</li>
+    {{end}}
   {{end}}
   {{if lt $rating.MeleeBonus 0}}
     <li>A little hesitant at close quarters</li>
@@ -45,33 +53,6 @@
   </li>
   {{if $drill.Mob}}<li>Can form an angry Mob / Swarm if provoked</li>{{end}}
   </li>
-    <li>Sergeant Major's Appraisal: <i>"
-  {{if gt $drill.Control 3}}
-    {{if gt $drill.Control 4}}
-      {{if gt $drill.Control 5}}
-        {{if gt $drill.Control 6}}
-          {{if gt $drill.Control 7}} 
-            {{if gt $drill.Control 8}} 
-              A fine group of Lads they are Sir. They know how to handle a musket, and they polish up allght too. Good Soldiers they are.
-            {{else}}
-              Dependable, and well disciplined they are Sir. They will follow orders without question.
-            {{end}}
-          {{else}}
-           Not the most pleasant company this lot, and they are looking a little worn around the edges Sir ... but the enemy wont go near em either. Run in fear for their lives whenever this lot turns up they do, Sir.
-          {{end}}
-        {{else}}
-        Their muskets are dirty and their boots are clean ... Aye ... but they are learning the trade. We will make soldiers out of them yet, Sir.
-        {{end}}
-      {{else}}
-       They might look like soldiers, and sometimes act like them ... but I wouldnt trust them to care for my dog.
-      {{end}}
-    {{else}}
-      A sorry looking bunch of threadbare miserables, barely able to tie their own shoelaces ... let alone fight. I pity them Sir ... Pity their sorry backsides I do.
-    {{end}}
-  {{else}}
-    Terribly poor discipline, illiterate, often drunk, and uncouth in the extreme. They understand the Lash ... and little else
-  {{end}}
-  "</i></li>
+  <li>Sergeant Major's Appraisal: "<i>{{.GetAppraisal}}</i>"</li>
   </ul>
- 
 </ul>

@@ -3,6 +3,7 @@ package shared
 import (
 	"crypto/md5"
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 )
@@ -660,6 +661,36 @@ func (u *Unit) GetDrillData() *DrillType {
 	return nil
 }
 
+func (u *Unit) GetAppraisal() string {
+	switch u.UType {
+	case 2, 5:
+		d := Lookups.DrillType[u.Drill-1].Control
+		r := Lookups.UnitRating[u.Rating-1].FireBonus
+		c := d + r + rand.Intn(3) - 1
+		switch c {
+		case 0, 1, 2:
+			return "This unit, Sir, is a discrace. A total discrace to arms, infested with the worst sort of criminal, scoundrel and skiving laggard."
+		case 3:
+			return "Terribly poor discipline, illiterate, often drunk, and uncouth in the extreme. They understand the Lash ... and little else."
+		case 4:
+			return "A sorry looking bunch of threadbare miserables, barely able to tie their own shoelaces ... let alone fight. I pity them Sir ... Pity their sorry backsides I do."
+		case 5:
+			return "They might look like soldiers, and sometimes act like them ... but I wouldnt trust them to care for my dog."
+		case 6:
+			return "Their muskets are dirty and their boots are clean ... Aye ... but they are learning the trade. We will make soldiers out of them yet, Sir."
+		case 7:
+			return "Not the most pleasant company this lot, and they are looking a little worn around the edges Sir ... but the enemy wont go near em either. Run in fear for their lives whenever this lot turns up they do, Sir."
+		case 8:
+			return "Dependable, and well disciplined they are Sir. They will follow orders without question or hesitation"
+		case 9:
+			return "A fine group of Lads they are Sir. They know how to handle a musket, and they polish up allght too. Good Soldiers they are."
+		case 10, 11, 12:
+			return "Remarkable ! I have rarely seen a better prepared unit Sir, and it will be an honour to fight with them."
+		}
+	}
+	return ""
+}
+
 func (u *Unit) GetCavData() *CavType {
 	switch u.UType {
 	default:
@@ -688,8 +719,9 @@ func (u *Unit) GetSupport() string {
 			retval += fmt.Sprintf(" + %d Attached Jager/Rifle Coy\n", u.JgCoy)
 		}
 		if u.Sabres > 0 {
+			print("here with u", u)
 			retval += fmt.Sprintf(" + %d Attached %s %s\n",
-				u.Sabres, Lookups.UnitRating[u.CavRating-1], Lookups.CavType[u.CavType-1].Name)
+				u.Sabres, Lookups.UnitRating[u.CavRating-1].Name, Lookups.CavType[u.CavType-1].Name)
 		}
 		if u.Guns > 0 {
 			if u.GunCondition == 0 {

@@ -1,0 +1,64 @@
+{{$drill := .GetDrillData}}
+<ul>
+  <li><h4>Trained as {{$drill.Name}}</h4></li>
+  <li>Operate in {{$drill.Ranks}} Ranks</li>
+  {{if $drill.Flankers}}
+    <li>Has specially trained Flank Companies</li>
+  {{end}}
+  {{if $drill.EliteCoy}}
+    <li>Has integral Voltigeur and Grenadiers per Battalion</li>
+  {{end}}
+  {{if $drill.OpenOrder}}
+    <li>Can operate in Full Open Order</li>
+  {{end}}
+  <li><b><u>Bde Formations:</u></b></li>
+  {{if $drill.Line}}
+    <li>Line</li>
+  {{end}}
+  {{if $drill.Lines}}
+    <li>Sucessive Lines</li>
+  {{end}}
+  {{if $drill.Mixed}}
+    <li>Mixed Formation</li>
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  {{if $drill.Line}}
+  {{end}}
+  Line      bool   `db:"line"`
+  Lines     bool   `db:"lines"`
+  Mixed     bool   `db:"mixed"`
+  AttCol    bool   `db:"att_col"`
+  CloseCol  bool   `db:"close_col"`
+  Oblique   bool   `db:"oblique"`
+  Square    bool   `db:"square"`
+  Mob       bool   `db:"mob"`
+  Control   int    `db:"control"`
+  Speed     int    `db:"speed"`
+  {{if $rating.Shock}}
+    <li>Shock Troops: Wont hesitate on the Assault</li>
+  {{end}}
+  {{if $rating.AttackSuperior}}
+    <li>Brave: Will attack forces superior in number<li>
+  {{end}}
+  {{if $rating.AttackGuns}}
+    <li>Fearless: Will attack enemy guns<li>
+  {{end}}
+  {{if gt $rating.FireBonus 0}}
+  {{end}}
+  {{if lt $rating.FireBonus 0}}
+  {{end}}
+  {{if gt $rating.MeleeBonus 0}}
+  {{end}}
+  {{if lt $rating.MeleeBonus 0}}
+  {{end}}
+</ul>
+{{$rating}}

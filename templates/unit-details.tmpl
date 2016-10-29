@@ -2,7 +2,10 @@
 {{if eq .UType 1}}
   <h3>Division Command Inspection</h3>
   <img src="/img/div_inspection.png">
-  <div class="row">
+  <div class="row button-bar">
+    <input type="button" class="button button-outline" value="As You Were">
+  </div>
+  <div class="row" name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li><b>Commanded by</b> {{.CommanderName}} ({{.GetRating}})</li>
@@ -17,6 +20,12 @@
 {{if eq .UType 2}}
   <h3>Infantry Brigade Inspection</h3>
   <img src="/img/inspection.png">
+  <div class="row button-bar">
+    <input type="button" class="button button-outline" value="Valour">
+    <input type="button" class="button button-outline" value="Discipline">
+    <input type="button" class="button button-clear" value="At Ease">
+  </div>
+  <dir class="row" name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
@@ -32,10 +41,17 @@
     <li>{{.Descr}}</li>
     {{end}}
   </ul>
+  </dir>
 {{end}}
 {{if eq .UType 3}}
   <h3>Cavalry Brigade Inspection</h3>
   <img src="/img/cav_inspection.png">
+  <div class="row button-bar">
+    <input type="button" class="button button-outline" value="Valour">
+    <input type="button" class="button button-outline" value="Discipline">
+    <input type="button" class="button button-clear" value="At Ease">
+  </div>
+  <div class="row" name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
@@ -50,10 +66,17 @@
     <li>{{.Descr}}</li>
     {{end}}
   </ul>
+  </div>
 {{end}}
 {{if eq .UType 4}}
   <h3>Artillery Battery Inspection</h3>
   <img src="/img/gun_inspection.png">
+  <div class="row button-bar">
+    <input type="button" class="button button-outline" value="Valour">
+    <input type="button" class="button button-outline" value="Discipline">
+    <input type="button" class="button button-clear" value="At Ease">
+  </div>
+  <div class="row" name="unitcard">
   <ul>
     {{if ne "" .Name}}
     <li>{{.Name}}
@@ -72,10 +95,33 @@
     <li>{{.Descr}}</li>
     {{end}}
   </ul>
+  </div>
 {{end}}
 {{if eq .UType 5}}
   <h3>Brigade Inspection</h3>
   <img src="/img/inspection.png">
+  <div class="row button-bar">
+    <input type="button" class="button button-outline" value="Valour">
+    <input type="button" class="button button-outline" value="Discipline">
+    <input type="button" class="button button-clear" value="At Ease">
+  </div>
+  <dir class="row" name="unitcard">
+  <ul>
+    <li>{{.Name}} of {{.Nation}}</li>
+    <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
+    <li>Trained as {{.GetDrill}}</li>
+    <li>In {{.GetCondition}} condition.</li>
+    {{if ne 0 .BayonetsLost}}
+    <li>.. with {{.BayonetsLost}} men currently unfit for duty.</li>
+    {{end}}
+    {{if ne "" .GetSupport}}
+    <li>{{.GetSupport}}</li>
+    {{end}}
+    {{if ne "" .Descr}}
+    <li>{{.Descr}}</li>
+    {{end}}
+  </ul>
+  </dir>
 {{end}}
 </div>
 

@@ -1,0 +1,30 @@
+{{$rating := .GetRatingData}}
+<ul>
+  <li><h4>Rated as {{$rating.Name}}</h4></li>
+  {{if $rating.Shock}}
+  	<li>Shock Troops: Wont hesitate on the Assault</li>
+  {{end}}
+  {{if $rating.AttackSuperior}}
+  	<li>Brave: Will attack forces superior in number<li>
+  {{end}}
+  {{if $rating.AttackGuns}}
+  	<li>Fearless: Will attack enemy guns<li>
+  {{end}}
+  {{if $rating.FormEngage}}
+  	{{if $rating.FormClose}}
+  		<li>Nerves of Steel: Change formation up close with the enemy</li>
+  	{{else}}
+  		<li>Calm: Can change formation within shot of the enemy</li>
+  	{{end}}
+  {{end}}
+
+  {{if gt $rating.FireBonus 0}}
+  {{end}}
+  {{if lt $rating.FireBonus 0}}
+  {{end}}
+  {{if gt $rating.MeleeBonus 0}}
+  {{end}}
+  {{if lt $rating.MeleeBonus 0}}
+  {{end}}
+</ul>
+{{$rating}}

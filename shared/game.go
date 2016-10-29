@@ -640,6 +640,26 @@ func (u *Unit) GetRating() string {
 	return ""
 }
 
+func (u *Unit) GetRatingData() *UnitRating {
+	switch u.UType {
+	case 1:
+		return nil
+	case 2, 3, 5:
+		return &Lookups.UnitRating[u.Rating-1]
+	}
+	return nil
+}
+
+func (u *Unit) GetDrillData() *DrillType {
+	switch u.UType {
+	case 1, 3, 4:
+		return nil
+	case 2, 5:
+		return &Lookups.DrillType[u.Drill-1]
+	}
+	return nil
+}
+
 func (u *Unit) GetBayonets() string {
 	return fmt.Sprintf("%d", u.Bayonets-u.BayonetsLost)
 }

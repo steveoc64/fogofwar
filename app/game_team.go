@@ -528,7 +528,21 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				loadTemplate("unit-details", "#unit-details", unit)
 				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
-					doc.QuerySelector("#unit-details").Class().Remove("md-show")
+					el := evt.Target()
+					print("clicked on a ", el.TagName())
+					if el.TagName() == "INPUT" {
+						print("with value", el.(*dom.HTMLInputElement).Value)
+						switch el.(*dom.HTMLInputElement).Value {
+						case "Valour":
+							loadTemplate("unit-valour", "[name=unitcard]", unit)
+							return
+						case "Discipline":
+							loadTemplate("unit-discipline", "[name=unitcard]", unit)
+							return
+						case "At Ease", "As You Were":
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+						}
+					}
 				})
 				doc.QuerySelector("#unit-details").Class().Add("md-show")
 			}

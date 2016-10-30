@@ -368,7 +368,7 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 					Team:     team,
 				}, &done)
 				if err == nil {
-					print("new player set")
+					// print("new player set")
 					gravatar := ""
 					err = RPC("UserRPC.GetAvatar", shared.AvatarRequest{
 						Channel:  Session.Channel,

@@ -100,6 +100,7 @@ type Game struct {
 	Created         *time.Time       `db:"created"`
 	StartDate       *time.Time       `db:"start_date"`
 	Expires         *time.Time       `db:"expires"`
+	Started         bool             `db:"started"`
 	Turn            int              `db:"turn"`
 	TurnLimit       int              `db:"turn_limit"`
 	Name            string           `db:"name"`

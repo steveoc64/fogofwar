@@ -72,13 +72,16 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 			AddDisplay(3, "Blue Team", "BlueTeam").
 			AddDisplay(1, lbl, "NumBluePlayers")
 
+		flipped := false
 		if game.Red {
 			form.Row(1).
 				AddDisplayArea(1, "Red Team Briefing", "RedBrief")
+			flipped = game.RedFlip
 		}
 		if game.Blue {
 			form.Row(1).
 				AddDisplayArea(1, "Blue Team Briefing", "BlueBrief")
+			flipped = game.BlueFlip
 		}
 
 		form.Row(1).
@@ -102,14 +105,11 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
 		start := 3
-		flipped := false
 		if game.Red {
 			start++
-			flipped = true
 		}
 		if game.Blue {
 			start++
-			flipped = false
 		}
 		redRow := fmt.Sprintf("row-%d", start)
 		blueRow := fmt.Sprintf("row-%d", start+1)

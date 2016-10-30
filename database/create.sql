@@ -386,7 +386,8 @@ create table game (
 	check_forces bool default false,
 	check_players bool default false,
 	check_connected bool default false,
-	red_flip bool not null default false
+	red_flip bool not null default false,
+	blue_flip bool not null default true
 );
 \i data/game.sql
 create index game_scenario_idx on game (scenario_id);

@@ -33,6 +33,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		return
 	}
 	team := context.Params["team"]
+	Session.MobileSensitive = true
 
 	go func() {
 		w := dom.GetWindow()
@@ -69,8 +70,9 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		form.New("fa-flag-o", fmt.Sprintf("%s Team Details - %s ", team, game.Name))
 
 		if Session.Mobile() {
-			form.Row(1).
-				AddInput(1, "", fmt.Sprintf("%sTeam", team))
+			form.Row(4).
+				AddInput(3, "", fmt.Sprintf("%sTeam", team)).
+				AddCheck(1, "FlipMap", fmt.Sprintf("%sFlip", team))
 
 			form.Row(1).
 				AddDisplayArea(1, "", fmt.Sprintf("%sBrief", team))
@@ -88,8 +90,9 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				AddCustom(1, "", "ViewUnits", "")
 		} else {
 			form.Row(6).
-				AddInput(5, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
-				AddDisplay(1, "# Players", fmt.Sprintf("Num%sPlayers", team))
+				AddInput(4, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
+				AddDisplay(1, "# Players", fmt.Sprintf("Num%sPlayers", team)).
+				AddCheck(1, "Flip Map", fmt.Sprintf("%sFlip", team))
 
 			form.Row(1).
 				AddTextarea(1, "Briefing", fmt.Sprintf("%sBrief", team))
@@ -146,7 +149,8 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		})
 		form.AppendDiv("unit-details", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("overlay", "md-overlay")
-		form.Get("row-3").Class().Add("hidden")
+		assignToRow := "row-3"
+		form.Get(assignToRow).Class().Add("hidden")
 
 		// loadTemplate("unit-details", "#unit-details", nil)
 
@@ -418,7 +422,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					// Draw up the units
 
 					drawUnitList()
-					form.Get("row-3").Class().Remove("hidden")
+					form.Get(assignToRow).Class().Remove("hidden")
 					checkIcon := form.Get("Included").(*dom.HTMLInputElement)
 					checkIcon.Checked = !TheCmd.Cull
 				}

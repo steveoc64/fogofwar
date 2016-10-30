@@ -135,6 +135,7 @@ type Game struct {
 	CheckPlayers    bool             `db:"check_players"`
 	CheckConnected  bool             `db:"check_connected"`
 	RedFlip         bool             `db:"red_flip"`
+	BlueFlip        bool             `db:"blue_flip"`
 	Mobile          bool             // Derived field based on is mobile - useful for templates
 	AssignToPlayer  string           // scratchpad used for editting
 	Included        bool             // scratchpad

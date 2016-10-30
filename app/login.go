@@ -316,32 +316,48 @@ func signUp(context *router.Context) {
 		// var validEmail = regexp.MustCompile(`^(([^<>()[\\]\\.,;:\\s@\"]+(\\.[^<>()[\\]\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$`)
 		// var validEmail2 = regexp.MustCompile('/^(?!(?>"?(?>\\\[ -~]|[^"])"?){255,})(?!"?(?>\\\[ -~]|[^"]){65,}"?@)(?>([!#-\'*+\/-9=?^-~-]+)(?>\.(?1))*|"(?>[ !#-\[\]-~]|\\\[ -~])*")@(?!.*[^.]{64,})(?>([a-z\d](?>[a-z\d-]*[a-z\d])?)(?>\.(?2)){0,126}|\[(?:(?>IPv6:(?>([a-f\d]{1,4})(?>:(?3)){7}|(?!(?:.*[a-f\d][:\]]){8,})((?3)(?>:(?3)){0,6})?::(?4)?))|(?>(?>IPv6:(?>(?3)(?>:(?3)){5}:|(?!(?:.*[a-f\d]:){6,})(?5)?::(?>((?3)(?>:(?3)){0,4}):)?))?(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(?>\.(?6)){3}))\])$/iD')
 		var mailAddressRE = regexp.MustCompile(`^([a-zA-Z0-9][-_.a-zA-Z0-9]*)(@[-_.a-zA-Z0-9]+)?$`)
+		Session.MobileSensitive = true
 
 		// Layout the fields
 
 		form.Row(1).
 			AddCustom(1, "!!! Error !!!", "Errors", "")
 
-		form.Row(3).
+		form.Row(2).
 			AddInput(1, "Username", "Username").
-			AddInput(2, "Email", "Email")
+			AddInput(1, "Email", "Email")
 
 		form.Row(1).
-			AddInput(1, "Magic Authentication Code", "Secret")
+			AddInput(1, "Secret Code", "Secret")
 
 		form.Row(2).
 			AddInput(1, "Password", "Passwd1").
 			AddInput(1, "Repeat Password", "Passwd2")
 
-		form.Row(3).
-			AddInput(1, "What Country are you in ?", "Country").
-			AddInput(2, "Full Name", "Name")
+		if Session.Mobile() {
+			form.Row(1).
+				AddInput(1, "Country", "Country")
+			form.Row(1).
+				AddInput(1, "Full Name", "Name")
+		} else {
+			form.Row(4).
+				AddInput(1, "Country", "Country").
+				AddInput(3, "Full Name", "Name")
+		}
 
-		form.Row(1).
-			AddInput(1, "Link Address for Your Website / Blog / Club", "Bloglink")
+		if Session.Mobile() {
+			form.Row(1).
+				AddInput(1, "Website", "Bloglink")
 
-		form.Row(1).
-			AddTextarea(1, "Tell us a bit about yourself, the games you play, figs, rules preferences, etc.", "Notes")
+			form.Row(1).
+				AddTextarea(1, ".. a bit about yourself", "Notes")
+		} else {
+			form.Row(1).
+				AddInput(1, "Link Address for Your Website / Blog / Club", "Bloglink")
+
+			form.Row(1).
+				AddTextarea(1, "Tell us a bit about yourself, the games you play, figs, rules preferences, etc.", "Notes")
+		}
 
 		form.Row(1).
 			AddCustom(1, "", "Graphic", "")
@@ -361,6 +377,9 @@ func signUp(context *router.Context) {
 
 			// before we go much further, work out how far into this form we are
 			graphic := form.GetRow(7)
+			if Session.Mobile() {
+				graphic = form.GetRow(8)
+			}
 			// print("graphic =", graphic)
 			// print("gr class =", graphic.Class().String(), "is hidden", graphic.Class().Contains("hidden"))
 			if !graphic.Class().Contains("hidden") {
@@ -420,8 +439,13 @@ func signUp(context *router.Context) {
 						form.Hide("row-4")
 						form.Hide("row-5")
 						form.Hide("row-6")
+						form.Hide("row-7")
 						loadTemplate("magic-secret", "[name=Graphic]", &user)
-						form.Show("row-7")
+						if Session.Mobile() {
+							form.Show("row-8")
+						} else {
+							form.Show("row-7")
+						}
 						form.Focus("Secret")
 					}
 				}()
@@ -439,7 +463,11 @@ func signUp(context *router.Context) {
 		magicRow := form.GetRow(2)
 		magicRow.Class().Add("hidden")
 
-		form.Hide("row-7")
+		if Session.Mobile() {
+			form.Hide("row-8")
+		} else {
+			form.Hide("row-7")
+		}
 
 		form.OnEvent("Username", "change", func(evt dom.Event) {
 

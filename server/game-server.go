@@ -464,6 +464,16 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&DList)
 	_, err = DB.SQL(`delete from game_players where game_id=$1`, data.ID).Exec()
 
+	// Update the briefing
+	_, err = DB.SQL(`update game set
+		red_flip=$2,blue_flip=$3,
+		red_team=$4,blue_team=$5,
+		red_brief=$6,blue_brief=$7
+		where id=$1`, data.ID,
+		data.Game.RedFlip, data.Game.BlueFlip,
+		data.Game.RedTeam, data.Game.BlueTeam,
+		data.Game.RedBrief, data.Game.BlueBrief).Exec()
+
 	// For each command Red and Blue
 	for _, v := range data.Game.RedCmd {
 		if err != nil {

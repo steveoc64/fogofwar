@@ -24,8 +24,8 @@ COPY rating (id, name, code, shock, form_close, form_engage, sk_close, attack_su
 10	Rabble	Mob	t	f	f	f	t	f	-2	-2	2
 5	Regular Line	Reglr	f	f	t	f	f	t	0	0	7
 7	Conscript	Consr	f	f	f	f	f	f	-1	-1	6
-6	Reserve Line	2ndLn	f	f	f	f	f	f	-1	0	6
 4	Crack Line	Crack	f	f	t	t	t	t	1	1	7
+6	Reserve Line	2ndLn	f	f	f	f	f	t	-1	0	6
 \.
 
 

@@ -3,7 +3,19 @@
   <h3>Division Command Inspection</h3>
   <img src="/img/div_inspection.png">
   <div class="row button-bar">
-    <input type="button" class="button button-outline" value="As You Were">
+    {{if lt .Rating 3}}
+    <input type="button" class="button button-clear button-case" value="Good as always my Dear {{.CommanderName}}. I can trust you to lead this unit.">
+    {{else}}
+      {{if lt .Rating 4}}
+      <input type="button" class="button button-clear button-case" value="Good Show. I am counting on you {{.CommanderName}}.">
+      {{else}}
+        {{if eq 5 .Rating}}
+      <input type="button" class="button button-clear button-case" value="I will be watching you closely {{.CommanderName}}. Now get the men ready for Battle.">
+        {{else}}
+      <input type="button" class="button button-clear button-case" value="Very Good. Dont let us down {{.CommanderName}}.">
+        {{end}}
+      {{end}}
+    {{end}}
   </div>
   <div class="row" name="unitcard">
   <ul>
@@ -23,7 +35,7 @@
   <div class="row button-bar">
     <input type="button" class="button button-outline" value="Valour">
     <input type="button" class="button button-outline" value="Discipline">
-    <input type="button" class="button button-clear" value="At Ease">
+    <input type="button" class="button button-clear button-case" value="At Ease">
   </div>
   <dir class="row" name="unitcard">
   <ul>
@@ -48,7 +60,7 @@
   <img src="/img/cav_inspection.png">
   <div class="row button-bar">
     <input type="button" class="button button-outline" value="Honours">
-    <input type="button" class="button button-clear" value="Good Show Gentlemen, Carry On">
+    <input type="button" class="button button-clear button-case" value="Good Show Gentlemen, Carry On">
   </div>
   <div class="row" name="unitcard">
   <ul>
@@ -72,7 +84,7 @@
   <img src="/img/gun_inspection.png">
   <div class="row button-bar">
     <input type="button" class="button button-outline" value="Gunnery Chart">
-    <input type="button" class="button button-clear" value="Back to work, gunners">
+    <input type="button" class="button button-clear button-case" value="Back to work, gunners">
   </div>
   <div name="unitcard">
   <ul>
@@ -101,7 +113,7 @@
   <div class="row button-bar">
     <input type="button" class="button button-outline" value="Valour">
     <input type="button" class="button button-outline" value="Discipline">
-    <input type="button" class="button button-clear" value="At Ease">
+    <input type="button" class="button button-clear button-case" value="At Ease">
   </div>
   <dir class="row" name="unitcard">
   <ul>

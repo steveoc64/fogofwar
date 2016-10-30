@@ -36,6 +36,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 	go func() {
 		game := shared.Game{}
 		TheCmd := &shared.GameCmd{}
+		TheUnit := &shared.Unit{}
 
 		rerr := RPC("GameRPC.GetInvite", shared.GameRPCData{
 			Channel:  Session.Channel,
@@ -349,16 +350,57 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				tr := td.ParentElement()
 				key, _ := strconv.Atoi(tr.GetAttribute("key"))
 				team := tr.GetAttribute("data-team")
-				// print("clicked on row with key", key)
+				print("clicked on row with key", key)
 				unit := game.GetUnit(team, key)
-				// print("unit is", unit)
+				TheUnit = unit
+				print("unit is", unit)
 				if unit.UType == 1 {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
 				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
-					doc.QuerySelector("#unit-details").Class().Remove("md-show")
+					unit := TheUnit
+					el := evt.Target()
+					print("clicked on a ", el.TagName())
+					if el.TagName() == "INPUT" {
+						value := el.(*dom.HTMLInputElement).Value
+						print("with value", value)
+						print("on utype", unit.UType)
+						switch unit.UType {
+						case 1:
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+						case 2, 5:
+							switch value {
+							case "Valour":
+								loadTemplate("unit-valour", "[name=unitcard]", unit)
+								return
+							case "Discipline":
+								loadTemplate("unit-discipline", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
+						case 3:
+							// print("in cav with", value)
+							switch value {
+							case "Honours":
+								// print("here with Honours")
+								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
+						case 4:
+							switch value {
+							case "Gunnery Chart":
+								loadTemplate("unit-gunnery", "[name=unitcard]", unit)
+								return
+							default:
+								doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							}
+						}
+					} // tag input
 				})
 				doc.QuerySelector("#unit-details").Class().Add("md-show")
 			}

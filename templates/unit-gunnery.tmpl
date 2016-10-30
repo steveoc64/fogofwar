@@ -2,8 +2,16 @@
 <b>{{.Name}} ~ {{.Guns}} Guns of {{.GetGunType}} shot</b>
 </div>
 <div class="row">
-Gunnery Chart - Effective Range in m
+Gunnery Chart - Effective Range in metres.
 </div>
-<div class="row">
-<img src="/img/gunnery6.png">
+<div>
+{{if lt .GunneryType 2}}
+<img class="gunnery_chart" src="/img/gunnery12.png">
+{{else}}
+  {{if eq 4 .GunneryType}}
+    <img class="gunnery_chart" src="/img/gunnery3.png">
+  {{else}}
+    <img class="gunnery_chart" src="/img/gunnery6.png">
+  {{end}}
+{{end}}
 </div>

@@ -666,8 +666,14 @@ func (u *Unit) GetAppraisal() string {
 	case 2, 5:
 		d := Lookups.DrillType[u.Drill-1].Control
 		r := Lookups.UnitRating[u.Rating-1].FireBonus
-		c := d + r + rand.Intn(3) - 1
+		cond := Lookups.Condition[u.Condition-1].Effect
+		if cond < 0 {
+			cond *= 2
+		}
+		c := cond + d + r + rand.Intn(3) - 1
 		switch c {
+		case -1, -2, -3:
+			return "This unit is unfit for battle Sir. They must be taken out of the line, or Surrender is our only option."
 		case 0, 1, 2:
 			return "This unit, Sir, is a discrace. A total discrace to arms, infested with the worst sort of criminal, scoundrel and skiving laggard."
 		case 3:
@@ -686,6 +692,8 @@ func (u *Unit) GetAppraisal() string {
 			return "A fine group of Lads they are Sir. They know how to handle a musket, and they polish up allght too. Good Soldiers they are."
 		case 10, 11, 12:
 			return "Remarkable ! I have rarely seen a better prepared unit Sir, and it will be an honour to fight with them."
+		case 13, 14, 15:
+			return "Splendid ! Let us at em Sir, we can take this battle single handed ... the enemy stands no chance against these fine men !"
 		}
 	}
 	return ""

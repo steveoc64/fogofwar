@@ -479,10 +479,11 @@ type GameCmd struct {
 	PlayerReady   bool    `db:"player_ready"` // derived data
 	Units         []*Unit `db:"units"`
 	VP            int     `db:"vp"`
-	Bayonets      *int    `db:"bayonets"` // derived data
-	Sabres        *int    `db:"sabres"`   // derived data
-	Guns          *int    `db:"guns"`     // derived data
-	Cull          bool    `db:"cull"`     // Dont use in game
+	Cull          bool    `db:"cull"` // Dont use in game
+	Cmdrs         int
+	Bayonets      int
+	Sabres        int
+	Guns          int
 }
 
 type GameCmdRPCData struct {
@@ -508,19 +509,28 @@ func (g *GameCmd) GetCSS() string {
 	return "tile-blue"
 }
 
+func (f *GameCmd) CalcTotals() {
+	f.Bayonets = 0
+	f.Sabres = 0
+	f.Guns = 0
+	f.Cmdrs = 0
+	for _, v := range f.Units {
+		f.Bayonets += v.Bayonets - v.BayonetsLost
+		f.Sabres += v.Sabres - v.SabresLost
+		f.Guns += v.Guns - v.GunsLost
+		if v.UType == 1 {
+			f.Cmdrs++
+		}
+	}
+}
+
 func (f *GameCmd) Summarize() string {
 	retval := "( "
-	if f.Bayonets != nil {
-		retval += fmt.Sprintf("%d", *f.Bayonets)
-	}
+	retval += fmt.Sprintf("%d Bayonets", f.Bayonets)
 	retval += " / "
-	if f.Sabres != nil {
-		retval += fmt.Sprintf("%d", *f.Sabres)
-	}
+	retval += fmt.Sprintf("%d Sabres", f.Sabres)
 	retval += " / "
-	if f.Guns != nil {
-		retval += fmt.Sprintf("%d", *f.Guns)
-	}
+	retval += fmt.Sprintf("%d Guns", f.Guns)
 	retval += " )"
 	return retval
 }

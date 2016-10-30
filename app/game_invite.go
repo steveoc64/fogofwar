@@ -28,6 +28,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 			// not for us
 			return
 		}
+		// dom.GetWindow().Alert("Game setup has changed .. click to refresh")
 	}
 
 	w := dom.GetWindow()
@@ -133,7 +134,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				}
 			}
 
-			print("call to draw tiles", game.Tiles, game.GridX, game.GridY, game.GridSize)
+			// print("call to draw tiles", game.Tiles, game.GridX, game.GridY, game.GridSize)
 			tileSet.SetInnerHTML("")
 			if game.GridSize > 0 {
 				newHTML := ""
@@ -157,11 +158,52 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 						}
 					}
 				}
-
-				// add objective tiles on top !!
+				team := "red"
+				for i, v := range game.RedCmd {
+					if v.StartX != -1 && !v.Cull {
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
+							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							v.GetCSS(), // self-computed CSS content type
+							v.StartX, v.StartY, i, v.ID)
+						xcoord := v.StartX*game.GridSize + 1
+						ycoord := v.StartY*game.GridSize + game.GridSize - 1
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								v.StartX*game.GridSize+game.GridSize/2,
+								v.StartY*game.GridSize+game.GridSize/2)
+						}
+						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s" data-id="%d">%s</text>`,
+							tt, xcoord, ycoord,
+							team, v.ID, v.Name)
+					}
+				}
+				team = "blue"
+				for i, v := range game.BlueCmd {
+					if v.StartX != -1 && !v.Cull {
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="blue-%d" data-id="%d"/>`,
+							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							v.GetCSS(), // self-computed CSS content type
+							v.StartX, v.StartY, i, v.ID)
+						xcoord := v.StartX*game.GridSize + 1
+						ycoord := v.StartY*game.GridSize + game.GridSize - 1
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								v.StartX*game.GridSize+game.GridSize/2,
+								v.StartY*game.GridSize+game.GridSize/2)
+						}
+						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s" data-id="%d">%s</text>`,
+							tt, xcoord, ycoord,
+							team, v.ID, v.Name)
+					}
+				}
+				// add objective tiles on top of everything else !!
 				for i, v := range game.Objectives {
 					print("gen svg for obj", v, flipped)
-					newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
+					newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" data-id="%d"/>`,
 						v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
 						game.GridSize, game.GridSize, // width and height in inches
 						v.GetCSS(), // self-computed CSS content type
@@ -181,57 +223,92 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 							xcoord,
 							ycoord)
 					}
-					newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="objective-name">%s</text>`,
+					newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="objective-name" data-id="%d">%s</text>`,
 						tt,
-						xcoord, ycoord, v.Name)
-				}
-				team := "red"
-				for i, v := range game.RedCmd {
-					if v.StartX != -1 && !v.Cull {
-						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
-							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
-							game.GridSize, game.GridSize, // width and height in inches
-							v.GetCSS(), // self-computed CSS content type
-							v.StartX, v.StartY, i, v.ID)
-						xcoord := v.StartX*game.GridSize + 1
-						ycoord := v.StartY*game.GridSize + game.GridSize - 1
-						tt := ""
-						if flipped {
-							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-								v.StartX*game.GridSize+game.GridSize/2,
-								v.StartY*game.GridSize+game.GridSize/2)
-						}
-						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
-							tt, xcoord, ycoord,
-							team,
-							v.Name)
-					}
-				}
-				team = "blue"
-				for i, v := range game.BlueCmd {
-					if v.StartX != -1 && !v.Cull {
-						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="blue-%d" data-id="%d"/>`,
-							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
-							game.GridSize, game.GridSize, // width and height in inches
-							v.GetCSS(), // self-computed CSS content type
-							v.StartX, v.StartY, i, v.ID)
-						xcoord := v.StartX*game.GridSize + 1
-						ycoord := v.StartY*game.GridSize + game.GridSize - 1
-						tt := ""
-						if flipped {
-							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-								v.StartX*game.GridSize+game.GridSize/2,
-								v.StartY*game.GridSize+game.GridSize/2)
-						}
-						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
-							tt, xcoord, ycoord,
-							team,
-							v.Name)
-					}
+						xcoord, ycoord, i, v.Name)
 				}
 
 				// print("setting newHTML", newHTML)
 				tileSet.SetInnerHTML(newHTML)
+
+				// Add click handlers on the tiles
+
+			}
+		}
+
+		handleMapClick := func(el *dom.BasicHTMLElement) {
+			cl := el.Class()
+			if cl.Contains("tile-objective") || cl.Contains("objective-name") {
+				obj, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				TheObjective := game.Objectives[obj]
+				html := fmt.Sprintf("Objective: %s, Victory Points ", TheObjective.Name)
+				if game.Red {
+					html += fmt.Sprintf("Red: %d + %d per turn",
+						TheObjective.RedVP, TheObjective.VPPerTurn)
+				}
+				if game.Blue {
+					html += fmt.Sprintf("Blue: %d + %d per turn",
+						TheObjective.BlueVP, TheObjective.VPPerTurn)
+				}
+				form.Get("tile-description").SetInnerHTML(html)
+			} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
+				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				cmd := game.GetCmd("Blue", uid)
+				cmd.CalcTotals()
+				html := fmt.Sprintf("<b>Player: %s</b><br><b>%s</b> Nation: %s. Commander: %s<br>Summary: %d Commands with %s<br>\n",
+					cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
+				form.Get("tile-description").SetInnerHTML(html)
+			} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
+				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				cmd := game.GetCmd("Red", uid)
+				cmd.CalcTotals()
+				html := fmt.Sprintf("<b>Player: %s</b><br><b>%s</b> Nation: %s. Commander: %s<br>Summary: %d Commands with %s<br>\n",
+					cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
+				form.Get("tile-description").SetInnerHTML(html)
+			} else {
+				html := ""
+				if cl.Contains("tile-content-0-0") {
+					html = "Clear Terrain"
+				}
+				if cl.Contains("tile-content-0-1") {
+					html = "Rough Ground"
+				}
+				if cl.Contains("tile-content-0-2") {
+					html = "Woods"
+				}
+				if cl.Contains("tile-content-0-3") {
+					html = "Built Up Area"
+				}
+				if cl.Contains("tile-content-0-4") {
+					html = "Fortified Position"
+				}
+				if cl.Contains("tile-content-0-5") {
+					html = "River"
+				}
+				if cl.Contains("tile-content-0-6") {
+					html = "River"
+				}
+				if cl.Contains("tile-content-0-7") {
+					html = "River"
+				}
+
+				if cl.Contains("tile-content-1-0") {
+					html = "High Ground - Clear"
+				}
+				if cl.Contains("tile-content-1-1") {
+					html = "High Ground - Rough"
+				}
+				if cl.Contains("tile-content-1-2") {
+					html = "High Ground - Woods"
+				}
+				if cl.Contains("tile-content-1-3") {
+					html = "High Ground - Built Up Area"
+				}
+				if cl.Contains("tile-content-1-4") {
+					html = "High Ground - Fortified Position"
+				}
+
+				form.Get("tile-description").SetInnerHTML(html)
 			}
 		}
 
@@ -259,8 +336,15 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				loadTemplate("game-map", "#game-map", &game)
 				doc.QuerySelector("#game-map").AddEventListener("click", false, func(evt dom.Event) {
 					el := evt.Target()
-					if el.TagName() == "INPUT" {
+					tag := el.TagName()
+					switch tag {
+					case "INPUT":
 						doc.QuerySelector("#game-map").Class().Remove("md-show")
+					case "rect", "RECT", "text", "TEXT":
+						print("clicked on a tile of class", el.GetAttribute("class"))
+						handleMapClick(el.(*dom.BasicHTMLElement))
+					default:
+						print("clicked on", tag)
 					}
 				})
 				drawTiles()

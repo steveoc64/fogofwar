@@ -158,27 +158,14 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		TheCmd := &shared.GameCmd{}
 		TheUnit := &shared.Unit{}
 		showSummary := func(cmd *shared.GameCmd) {
-			totalBayonets := 0
-			totalSabres := 0
-			totalGuns := 0
-			totalCmdrs := 0
-
-			for _, v := range cmd.Units {
-				totalBayonets += v.Bayonets - v.BayonetsLost
-				totalSabres += v.Sabres - v.SabresLost
-				totalGuns += v.Guns - v.GunsLost
-				if v.UType == 1 {
-					totalCmdrs += 1
-				}
-			}
-
+			cmd.CalcTotals()
 			cmdsummary := fmt.Sprintf("<h3>%s ~ %s</h3><h4>Commander: %s</h4>", cmd.Name, cmd.Nation, cmd.CommanderName)
 
 			totals := fmt.Sprintf("This Unit has a total of %d Commands, %d Bayonets, %d Sabres and %d Guns",
-				totalCmdrs,
-				totalBayonets,
-				totalSabres,
-				totalGuns)
+				cmd.Cmdrs,
+				cmd.Bayonets,
+				cmd.Sabres,
+				cmd.Guns)
 
 			// form.Get("Summary").SetInnerHTML(cmdsummary + cmd.Descr + player + turn + totals)
 			form.Get("Summary").SetInnerHTML(cmdsummary + cmd.Descr + totals)

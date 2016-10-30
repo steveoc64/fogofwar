@@ -98,11 +98,14 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", &game)
 		start := 3
+		flipped := false
 		if game.Red {
 			start++
+			flipped = true
 		}
 		if game.Blue {
 			start++
+			flipped = false
 		}
 		redRow := fmt.Sprintf("row-%d", start)
 		blueRow := fmt.Sprintf("row-%d", start+1)
@@ -111,22 +114,158 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		form.Get(redRow).Class().Add("hidden")
 		form.Get(blueRow).Class().Add("hidden")
 		form.Get(oobRow).Class().Add("hidden")
+
+		drawTiles := func() {
+			game.CalcKm()
+			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", game.TableX*12, game.TableY*12))
+			rect := form.Get("map-rect")
+			rect.SetAttribute("height", fmt.Sprintf("%d", game.TableY*12))
+			rect.SetAttribute("width", fmt.Sprintf("%d", game.TableX*12))
+
+			tileSet := form.Get("map-tileset")
+			if flipped {
+				tileSet.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", game.TableX*6, game.TableY*6))
+				for _, v := range tileSet.QuerySelectorAll("text") {
+					x, _ := strconv.Atoi(v.GetAttribute("x"))
+					y, _ := strconv.Atoi(v.GetAttribute("y"))
+					// Black Magic here .. the offsets work, but its hard to understand why
+					v.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", x+1, y-2))
+				}
+			}
+
+			print("call to draw tiles", game.Tiles, game.GridX, game.GridY, game.GridSize)
+			tileSet.SetInnerHTML("")
+			if game.GridSize > 0 {
+				newHTML := ""
+				i := 0
+				// print("tiles is", game.Tiles)
+				if len(game.Tiles) > 0 {
+					for y := 0; y < game.GridY; y++ {
+						for x := 0; x < game.GridX; x++ {
+							t := game.Tiles[i]
+							if t == nil {
+								print("aww snap - t is nil !!")
+								break
+							} else {
+								newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="tile-%d-%d" data-index="%d"/>`,
+									x*game.GridSize, y*game.GridSize, // x and y in inches
+									game.GridSize, game.GridSize, // width and height in inches
+									t.GetCSS(),    // self-computed CSS content type
+									x, y, x, y, i) // coords in terms of grid position, and offset into the parent array
+							}
+							i++
+						}
+					}
+				}
+
+				// add objective tiles on top !!
+				for i, v := range game.Objectives {
+					print("gen svg for obj", v, flipped)
+					newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
+						v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
+						game.GridSize, game.GridSize, // width and height in inches
+						v.GetCSS(), // self-computed CSS content type
+						v.X, v.Y, i)
+					ycoord := v.Y + 1
+					if ycoord >= game.GridY {
+						ycoord -= 2
+					}
+					if ycoord < 0 {
+						ycoord = 0
+					}
+					xcoord := v.X*game.GridSize + (game.GridSize / 2)
+					ycoord = ycoord*game.GridSize + (game.GridSize / 2)
+					tt := ""
+					if flipped {
+						tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+							xcoord,
+							ycoord)
+					}
+					newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="objective-name">%s</text>`,
+						tt,
+						xcoord, ycoord, v.Name)
+				}
+				team := "red"
+				for i, v := range game.RedCmd {
+					if v.StartX != -1 && !v.Cull {
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
+							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							v.GetCSS(), // self-computed CSS content type
+							v.StartX, v.StartY, i, v.ID)
+						xcoord := v.StartX*game.GridSize + 1
+						ycoord := v.StartY*game.GridSize + game.GridSize - 1
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								v.StartX*game.GridSize+game.GridSize/2,
+								v.StartY*game.GridSize+game.GridSize/2)
+						}
+						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
+							tt, xcoord, ycoord,
+							team,
+							v.Name)
+					}
+				}
+				team = "blue"
+				for i, v := range game.BlueCmd {
+					if v.StartX != -1 && !v.Cull {
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="blue-%d" data-id="%d"/>`,
+							v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+							game.GridSize, game.GridSize, // width and height in inches
+							v.GetCSS(), // self-computed CSS content type
+							v.StartX, v.StartY, i, v.ID)
+						xcoord := v.StartX*game.GridSize + 1
+						ycoord := v.StartY*game.GridSize + game.GridSize - 1
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								v.StartX*game.GridSize+game.GridSize/2,
+								v.StartY*game.GridSize+game.GridSize/2)
+						}
+						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
+							tt, xcoord, ycoord,
+							team,
+							v.Name)
+					}
+				}
+
+				// print("setting newHTML", newHTML)
+				tileSet.SetInnerHTML(newHTML)
+			}
+		}
+
 		loadTemplate("view-units", "[name=ViewUnits]", nil)
 		form.ActionGrid("game-invite-actions", "#action-grid", game, func(url string) {
-			print("action url", url)
+			// print("action url", url)
 			switch url {
 			case "Overview":
 				loadTemplate("game-overview", "#game-overview", &game)
 				doc.QuerySelector("#game-overview").AddEventListener("click", false, func(evt dom.Event) {
-					doc.QuerySelector("#game-overview").Class().Remove("md-show")
+					if evt.Target().TagName() == "INPUT" {
+						doc.QuerySelector("#game-overview").Class().Remove("md-show")
+					}
 				})
 				doc.QuerySelector("#game-overview").Class().Add("md-show")
 			case "Players":
 				loadTemplate("game-players", "#game-players", &game)
 				doc.QuerySelector("#game-players").AddEventListener("click", false, func(evt dom.Event) {
-					doc.QuerySelector("#game-players").Class().Remove("md-show")
+					if evt.Target().TagName() == "INPUT" {
+						doc.QuerySelector("#game-players").Class().Remove("md-show")
+					}
 				})
 				doc.QuerySelector("#game-players").Class().Add("md-show")
+			case "Table":
+				loadTemplate("game-map", "#game-map", &game)
+				doc.QuerySelector("#game-map").AddEventListener("click", false, func(evt dom.Event) {
+					el := evt.Target()
+					if el.TagName() == "INPUT" {
+						doc.QuerySelector("#game-map").Class().Remove("md-show")
+					}
+				})
+				drawTiles()
+				doc.QuerySelector("#game-map").Class().Add("md-show")
+
 			case "Accept":
 				loadTemplate("game-accept", "#game-accept", &game)
 				doc.QuerySelector("#game-accept").AddEventListener("click", false, func(evt dom.Event) {
@@ -166,6 +305,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		form.AppendDiv("game-players", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("game-accept", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("game-decline", "md-modal md-effect-1 unit-inspection")
+		form.AppendDiv("game-map", "md-modal md-effect-1 game-map")
 		form.AppendDiv("overlay", "md-overlay")
 
 		drawUnitList := func() {
@@ -332,12 +472,12 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		}
 
 		if game.Red {
-			print("show red commands")
+			// print("show red commands")
 			showCommands("Red")
 		}
 
 		if game.Blue {
-			print("show blue commands")
+			// print("show blue commands")
 			showCommands("Blue")
 		}
 

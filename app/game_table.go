@@ -222,14 +222,7 @@ func gameEditTable(context *router.Context) {
 				if modeSet == "objective" {
 					for i, v := range game.Objectives {
 						// print("gen svg for obj", v)
-						tt := ""
-						if flipped {
-							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-								v.X*game.GridSize+1,
-								v.Y*game.GridSize-2)
-						}
-						newHTML += fmt.Sprintf(`<rect %s x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
-							tt,
+						newHTML += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="objective-%d"/>`,
 							v.X*game.GridSize, v.Y*game.GridSize, // x and y in inches
 							game.GridSize, game.GridSize, // width and height in inches
 							v.GetCSS(), // self-computed CSS content type
@@ -243,7 +236,13 @@ func gameEditTable(context *router.Context) {
 						}
 						xcoord := v.X*game.GridSize + (game.GridSize / 2)
 						ycoord = ycoord*game.GridSize + (game.GridSize / 2)
-						newHTML += fmt.Sprintf(`<text x="%d" y="%d" class="objective-name">%s</text>`,
+						tt := ""
+						if flipped {
+							tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
+								xcoord, ycoord)
+						}
+						newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="objective-name">%s</text>`,
+							tt,
 							xcoord, ycoord, v.Name)
 					}
 				}
@@ -258,15 +257,16 @@ func gameEditTable(context *router.Context) {
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
 							if modeSet == "red" {
+								xcoord := v.StartX*game.GridSize + 1
+								ycoord := v.StartY*game.GridSize + game.GridSize - 1
 								tt := ""
 								if flipped {
 									tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-										v.StartX*game.GridSize+2,
-										v.StartY*game.GridSize-3)
+										v.StartX*game.GridSize+game.GridSize/2,
+										v.StartY*game.GridSize+game.GridSize/2)
 								}
 								newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
-									tt,
-									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
+									tt, xcoord, ycoord,
 									team,
 									v.Name)
 							}
@@ -281,15 +281,16 @@ func gameEditTable(context *router.Context) {
 								v.GetCSS(), // self-computed CSS content type
 								v.StartX, v.StartY, i, v.ID)
 							if modeSet == "blue" {
+								xcoord := v.StartX*game.GridSize + 1
+								ycoord := v.StartY*game.GridSize + game.GridSize - 1
 								tt := ""
 								if flipped {
 									tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-										v.StartX*game.GridSize+2,
-										v.StartY*game.GridSize-3)
+										v.StartX*game.GridSize+game.GridSize/2,
+										v.StartY*game.GridSize+game.GridSize/2)
 								}
 								newHTML += fmt.Sprintf(`<text %s x="%d" y="%d" class="unitname-%s">%s</text>`,
-									tt,
-									v.StartX*game.GridSize+1, v.StartY*game.GridSize+game.GridSize-1,
+									tt, xcoord, ycoord,
 									team,
 									v.Name)
 							}
@@ -573,8 +574,17 @@ func gameEditTable(context *router.Context) {
 					for _, v := range tileset.QuerySelectorAll("text") {
 						x, _ := strconv.Atoi(v.GetAttribute("x"))
 						y, _ := strconv.Atoi(v.GetAttribute("y"))
-						// Black Magic here .. the offsets work, but its hard to understand why
-						v.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", x+1, y-2))
+
+						// Adjust X,Y back to be the centre of the grid we are going to rotate around
+						if v.Class().Contains("objective") {
+							// then the x and y are ok as is
+						} else {
+							// unit text is drawn offset to the right by half a grid and then 1 inch more
+							x = x + game.GridSize/2 - 1
+							// unit text is drawn offset down 1 grid, and then up an inch
+							y = y - game.GridSize/2 + 1
+						}
+						v.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", x, y))
 					}
 
 				} else {

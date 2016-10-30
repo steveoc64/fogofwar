@@ -43,6 +43,7 @@ perspective effects (not including the modals and the overlay).
 	-ms-transform: translateX(-50%) translateY(-50%);
 	transform: translateX(-50%) translateY(-50%);
 	-webkit-filter: none;	
+	overflow: auto;
 }
 
 .md-show {

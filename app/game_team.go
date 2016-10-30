@@ -561,7 +561,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 							}
 						case 4:
 							switch value {
-							case "Gunnery":
+							case "Gunnery Chart":
 								loadTemplate("unit-gunnery", "[name=unitcard]", unit)
 								return
 							default:

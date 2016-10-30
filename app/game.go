@@ -128,12 +128,10 @@ func gameNew(context *router.Context) {
 
 		// Define the layout
 		form.Column("Author", "AuthorName")
-		form.AvatarColumn("Author", "AuthorEmail")
+		form.AvatarColumn("", "AuthorEmail")
 		form.Column("Name", "Name")
 		form.Column("Year", "Year")
 		form.Column("Description", "Descr")
-		form.BoolColumn("Reviewing", "Review")
-		form.BoolColumn("Published", "Public")
 
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {

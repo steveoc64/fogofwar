@@ -93,6 +93,7 @@ type Game struct {
 	Red             bool
 	Blue            bool
 	Team            string
+	CanStart        bool
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
 	HostName        string           `db:"host_name"`
@@ -686,7 +687,7 @@ func (u *Unit) GetAppraisal() string {
 		case -1, -2, -3:
 			return "This unit is unfit for battle Sir. They must be taken out of the line, or Surrender is our only option."
 		case 0, 1, 2:
-			return "This unit, Sir, is a discrace. A total discrace to arms, infested with the worst sort of criminal, scoundrel and skiving laggard."
+			return "This unit, Sir, is a disgrace. A total disgrace to arms, infested with the worst sort of criminal, scoundrel and skiving laggards."
 		case 3:
 			return "Terribly poor discipline, illiterate, often drunk, and uncouth in the extreme. They understand the Lash ... and little else."
 		case 4:

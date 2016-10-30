@@ -116,6 +116,19 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		form.Get(blueRow).Class().Add("hidden")
 		form.Get(oobRow).Class().Add("hidden")
 
+		scaleImages := func() {
+			gridInches := fmt.Sprintf("%d", game.GridSize)
+			for _, v := range []string{"rough", "woods", "building", "fort", "river", "river1", "river2", "objective"} {
+				// print("rescale", v)
+				el := doc.QuerySelector("#tile-" + v)
+				el.SetAttribute("height", gridInches)
+				el.SetAttribute("width", gridInches)
+				el = doc.QuerySelector("#tile-" + v + "-img")
+				el.SetAttribute("height", gridInches)
+				el.SetAttribute("width", gridInches)
+			}
+		}
+
 		drawTiles := func() {
 			game.CalcKm()
 			form.Get("svg-map").SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", game.TableX*12, game.TableY*12))
@@ -348,6 +361,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 					}
 				})
 				drawTiles()
+				scaleImages()
 				doc.QuerySelector("#game-map").Class().Add("md-show")
 
 			case "Accept":

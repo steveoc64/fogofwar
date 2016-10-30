@@ -1,5 +1,6 @@
 {{$drill := .GetDrillData}}
 {{$rating := .GetRatingData}}
+
 <ul>
   <li><h4>{{.Name}} ~ Trained as {{$drill.Name}}</h4></li>
   <li>Operate in {{$drill.Ranks}} Ranks
@@ -53,6 +54,13 @@
   </li>
   {{if $drill.Mob}}<li>Can form an angry Mob / Swarm if provoked</li>{{end}}
   </li>
-  <li>Sergeant Major's Appraisal:<br> "<i>{{.GetAppraisal}}</i>"</li>
-  </ul>
 </ul>
+
+  <table>
+    <tr>
+      <td><img src="/img/rsm.png"></td>
+      <td>Sergeant Major's Appraisal:<br>
+       "<i>{{.GetAppraisal}}</i>"
+      </td>  
+    </tr>
+  </table>

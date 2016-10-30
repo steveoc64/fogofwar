@@ -17,7 +17,7 @@
       {{end}}
     {{end}}
   </div>
-  <div class="row" name="unitcard">
+  <div name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li><b>Commanded by</b> {{.CommanderName}} ({{.GetRating}})</li>
@@ -37,7 +37,7 @@
     <input type="button" class="button button-outline" value="Discipline">
     <input type="button" class="button button-clear button-case" value="At Ease">
   </div>
-  <dir class="row" name="unitcard">
+  <dir name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
@@ -62,7 +62,7 @@
     <input type="button" class="button button-outline" value="Honours">
     <input type="button" class="button button-clear button-case" value="Good Show Gentlemen, Carry On">
   </div>
-  <div class="row" name="unitcard">
+  <div  name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
@@ -108,14 +108,14 @@
   </div>
 {{end}}
 {{if eq .UType 5}}
-  <h3>Brigade Inspection</h3>
+  <h3>Special Unit Inspection</h3>
   <img src="/img/inspection.png">
   <div class="row button-bar">
     <input type="button" class="button button-outline" value="Valour">
     <input type="button" class="button button-outline" value="Discipline">
     <input type="button" class="button button-clear button-case" value="At Ease">
   </div>
-  <dir class="row" name="unitcard">
+  <dir name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>

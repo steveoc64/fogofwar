@@ -535,7 +535,7 @@ func gameEditTable(context *router.Context) {
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				// print("clicked on the restore button")
-				if dom.GetWindow().Confirm("Restore the Map from file ?") {
+				if dom.GetWindow().Confirm("Restoring from file will discard any changes since the last save.\nReally restore the Map from file ?") {
 					go func() {
 						Session.EditGame = &shared.Game{}
 						err := RPC("GameRPC.Get", shared.GameRPCData{
@@ -682,6 +682,7 @@ func gameEditTable(context *router.Context) {
 			form.Get("KmY").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", game.KmY)
 			// }
 			drawTiles()
+			scaleImages()
 		}
 
 		// Resize the SVG rect whenever the table dimensions change

@@ -161,11 +161,26 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// and fetch the objectives
 		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
 
-		// TODO - pull in the players on this game
-
-		// Dont need the orders for each corps at this level
-		// Dont need the units for each corps at this level
-
+		if !retval.Started {
+			print("not started yet")
+			if len(retval.RedCmd) > 0 && len(retval.BlueCmd) > 0 {
+				print("got both red and blue commands")
+				// there are commands defined
+				count := 0
+				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, data.ID).QueryScalar(&count)
+				print("there are", count, "cmds with no player")
+				if count == 0 {
+					// all commands have players assigned
+					DB.SQL(`select count(*) from game_players where game_id=$1 and not accepted`, data.ID).QueryScalar(&count)
+					print("there are", count, "players who have not accepted the challenge")
+					if count == 0 {
+						// Everyone on the list has accepted .. so we can start
+						print("so we can start")
+						retval.CanStart = true
+					}
+				}
+			}
+		}
 	}
 
 	logger(start, "Game.Get", conn,
@@ -687,6 +702,11 @@ func (g *GameRPC) DeclineInvite(data shared.GameRPCData, done *bool) error {
 			data.ID, conn.UserID).Exec()
 	}
 
+	if err == nil {
+		// There is now a hole in the players set of this game
+		_, err = DB.SQL(`update game set check_players=false where id=$1`, data.ID).Exec()
+	}
+
 	logger(start, "Game.DeclineInvite", conn,
 		fmt.Sprintf("Game ID %d", data.ID), "")
 
@@ -712,6 +732,15 @@ func (g *GameRPC) AcceptInvite(data shared.GameRPCData, done *bool) error {
 
 	_, err := DB.SQL(`update game_players set accepted = true where game_id=$1 and player_id=$2`,
 		data.ID, conn.UserID).Exec()
+
+	if err == nil {
+		// see if there are any player slot left after this
+		count := 0
+		DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, data.ID).QueryScalar(&count)
+		if count > 0 {
+			DB.SQL(`update game set check_players=false where id=$1`, data.ID).Exec()
+		}
+	}
 
 	logger(start, "Game.AcceptInvite", conn,
 		fmt.Sprintf("Game ID %d", data.ID), "")
@@ -779,20 +808,29 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 		if err == nil {
 			// If the old player has no more commands in this game, then remove their invite entirely
 			count := 0
-			err = DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+			err = DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and cull=false`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
 			if err == nil && count == 0 {
 				DB.SQL(`delete from game_players where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
 			} else {
 				// OK, so they have some commands, but have they lost the right to view a red or blue ?
-				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and red_team`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and red_team and cull=false`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
 				if count == 0 {
 					DB.SQL(`update game_players set red_team=false where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
 				}
-				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and blue_team`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
+				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=$2 and blue_team and cull=false`, gc.GameID, gp_old.PlayerID).QueryScalar(&count)
 				if count == 0 {
 					DB.SQL(`update game_players set blue_team=false where game_id=$1 and player_id=$2`, gc.GameID, gp_old.PlayerID).Exec()
 				}
 			}
+		}
+	}
+
+	if err == nil {
+		// see if there are any player slot left after this
+		count := 0
+		DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, gc.GameID).QueryScalar(&count)
+		if count > 0 {
+			DB.SQL(`update game set check_players=false where id=$1`, gc.GameID).Exec()
 		}
 	}
 

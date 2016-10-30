@@ -28,7 +28,10 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 			// not for us
 			return
 		}
-		// dom.GetWindow().Alert("Game setup has changed .. click to refresh")
+	case "Start":
+		dom.GetWindow().Alert("Game has started .. click to begin")
+		Session.Navigate(fmt.Sprintf("/play/%d", id))
+		return
 	}
 
 	w := dom.GetWindow()

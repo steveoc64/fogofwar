@@ -23,7 +23,7 @@ func (g *GameRPC) List(data shared.GameRPCData, retval *[]shared.Game) error {
 			left join users u on u.id=g.hosted_by
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
-		where g.hosted_by=$1`, conn.UserID).QueryStructs(retval)
+		where not started and g.hosted_by=$1`, conn.UserID).QueryStructs(retval)
 
 	logger(start, "Game.List", conn,
 		"",
@@ -54,7 +54,7 @@ func (g *GameRPC) ListInvites(data shared.GameRPCData, retval *[]shared.Game) er
 	return err
 }
 
-func (g *GameRPC) ListMyGamesInProgress(data shared.GameRPCData, retval *[]shared.Game) error {
+func (g *GameRPC) PlayList(data shared.GameRPCData, retval *[]shared.Game) error {
 	start := time.Now()
 
 	conn := Connections.Get(data.Channel)
@@ -162,20 +162,15 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
 
 		if !retval.Started {
-			print("not started yet")
 			if len(retval.RedCmd) > 0 && len(retval.BlueCmd) > 0 {
-				print("got both red and blue commands")
 				// there are commands defined
 				count := 0
 				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, data.ID).QueryScalar(&count)
-				print("there are", count, "cmds with no player")
 				if count == 0 {
 					// all commands have players assigned
 					DB.SQL(`select count(*) from game_players where game_id=$1 and not accepted`, data.ID).QueryScalar(&count)
-					print("there are", count, "players who have not accepted the challenge")
 					if count == 0 {
 						// Everyone on the list has accepted .. so we can start
-						print("so we can start")
 						retval.CanStart = true
 					}
 				}
@@ -861,5 +856,72 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 		tx.Commit()
 	}
 
+	return err
+}
+
+func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+
+	conn := Connections.Get(data.Channel)
+
+	tx, _ := DB.Begin()
+	defer tx.AutoRollback()
+
+	// check that we own the game
+	game := shared.Game{}
+	err := DB.SQL(`select * from game where started=false and hosted_by=$2 and id=$1`, data.ID, conn.UserID).QueryStruct(&game)
+	if err == nil && game.ID != data.ID {
+		err = errors.New("Invalid Game ID")
+	}
+
+	// Set game to started
+	if err == nil {
+		_, err = DB.SQL(`update game set started=true where id=$1`, data.ID).Exec()
+
+		// Cull unused commands
+		if err == nil {
+			ids := []int{}
+			DB.SQL(`select id from game_cmd where game_id=$1 and cull`, data.ID).QuerySlice(&ids)
+			if len(ids) > 0 {
+				fmt.Printf("Cmds to cull %v\n", ids)
+				_, err = DB.SQL(`delete from game_cmd where game_id=$1 and id in $2`, data.ID, ids).Exec()
+				if err != nil {
+					println(err.Error())
+				} else {
+					_, err = DB.SQL(`delete from unit where game_id=$1 and cmd_id in $2`, data.ID, ids).Exec()
+				}
+			}
+		}
+
+		// Apply pregame attrition
+		if err == nil {
+			_, err = DB.SQL(`update unit set
+				bayonets=bayonets-bayonets_lost,
+				bayonets_lost=0,
+				sabres=sabres-sabres_lost,
+				sabres_lost=0,
+				guns=guns-guns_lost,
+				guns_lost=0
+				where game_id=$1`, data.ID).Exec()
+			if err != nil {
+				println(err.Error())
+			}
+		}
+	}
+
+	logger(start, "Game.Start", conn,
+		fmt.Sprintf("ID %d", data.ID), "")
+
+	if err == nil {
+		*done = true
+		ids := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&ids)
+		for _, v := range ids {
+			conn.BroadcastPlayer(v, "Game", "Start", data.ID)
+		}
+		tx.Commit()
+	}
 	return err
 }

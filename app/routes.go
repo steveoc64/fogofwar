@@ -72,6 +72,7 @@ func enableRoutes(Rank int) {
 		"game-edit-table":     gameEditTable,
 		"game-edit-players":   gameEditPlayers,
 		"unit-inspection":     unitInspection,
+		"play":                play,
 	}
 	switch Rank {
 	case 10:

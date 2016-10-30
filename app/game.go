@@ -97,7 +97,23 @@ func _gameChecklist(action string, actionID int, context *router.Context) {
 			if url != "" {
 				ai.AddEventListener("click", false, func(evt dom.Event) {
 					url := evt.CurrentTarget().GetAttribute("url")
-					Session.Navigate(url)
+					if url == "Start" {
+						print("Start Game")
+						go func() {
+							done := false
+							err := RPC("GameRPC.Start", shared.GameRPCData{
+								Channel: Session.Channel,
+								ID:      id,
+							}, &done)
+							if err != nil {
+								dom.GetWindow().Alert("Error starting game: " + err.Error())
+							} else {
+								Session.Navigate(fmt.Sprintf("/play/%d", id))
+							}
+						}()
+					} else {
+						Session.Navigate(url)
+					}
 				})
 			}
 		}
@@ -243,7 +259,6 @@ func gameEditOverview(context *router.Context) {
 		// All done, so render the form
 		form.Render("edit-form", "main", game)
 		form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
-			print("clicked on", url)
 			Session.Navigate(url)
 		})
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
@@ -326,14 +341,9 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 	form.OnEvent("PlayerList", "change", func(evt dom.Event) {
 		el := evt.Target()
 		if el.TagName() == "INPUT" {
-			print("changed input field")
 			key, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("key", key)
 			team := el.GetAttribute("data-team")
-			print("team", team)
 			thePlayer := el.(*dom.HTMLInputElement).Value
-			print("value", thePlayer)
-			print("player changed")
 			TheCmd := game.GetCmd(team, key)
 			go func() {
 				if thePlayer == "" {

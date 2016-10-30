@@ -31,7 +31,7 @@ func _mainPage(action string, id int, context *router.Context) {
 		doc.QuerySelector("main").SetInnerHTML(`<div class="data-container"><div id="action-grid" class="no-print"></div>`)
 
 		games := []shared.Game{}
-		RPC("GameRPC.ListMyGamesInProgress", shared.GameRPCData{
+		RPC("GameRPC.PlayList", shared.GameRPCData{
 			Channel: Session.Channel,
 		}, &games)
 
@@ -54,7 +54,7 @@ func _mainPage(action string, id int, context *router.Context) {
 			}
 
 			form.RowEvent(func(key string) {
-				Session.Navigate("/game/play/" + key)
+				Session.Navigate("/play/" + key)
 			})
 
 			// formulate.MainContainer("wide-container")

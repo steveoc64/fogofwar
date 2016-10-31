@@ -532,30 +532,38 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 
 					btn.AddEventListener("click", false, func(evt dom.Event) {
 						b := evt.Target()
-						// print("clicked on unit", b.(*dom.HTMLInputElement).Value)
-						keystr := b.GetAttribute("data-cmd-id")
-						k, _ := strconv.Atoi(keystr)
-						team := b.GetAttribute("data-team")
-						// unset them all, set this one to primary
-						scanBar := redBar
-						if team == "Blue" {
-							scanBar = blueBar
-						}
-						for _, v := range scanBar.QuerySelectorAll(".button") {
-							if v.GetAttribute("data-cmd-id") == keystr {
-								v.Class().Add("button-primary")
-								v.Class().Remove("button-outline")
-							} else {
-								v.Class().Remove("button-primary")
-								v.Class().Add("button-outline")
+						if b.Class().Contains("button-primary") {
+							b.Class().Remove("button-primary")
+							b.Class().Add("button-outline")
+							form.Get("UnitList").SetInnerHTML("")
+							form.Hide(oobRow)
+						} else {
+
+							// print("clicked on unit", b.(*dom.HTMLInputElement).Value)
+							keystr := b.GetAttribute("data-cmd-id")
+							k, _ := strconv.Atoi(keystr)
+							team := b.GetAttribute("data-team")
+							// unset them all, set this one to primary
+							scanBar := redBar
+							if team == "Blue" {
+								scanBar = blueBar
 							}
-						}
-						// print("with id", k, team)
-						if k > 0 {
-							TheCmd = game.GetCmd(team, k)
-							// print("which is", TheCmd)
-							// Draw up the units
-							drawUnitList()
+							for _, v := range scanBar.QuerySelectorAll(".button") {
+								if v.GetAttribute("data-cmd-id") == keystr {
+									v.Class().Add("button-primary")
+									v.Class().Remove("button-outline")
+								} else {
+									v.Class().Remove("button-primary")
+									v.Class().Add("button-outline")
+								}
+							}
+							// print("with id", k, team)
+							if k > 0 {
+								TheCmd = game.GetCmd(team, k)
+								// print("which is", TheCmd)
+								// Draw up the units
+								drawUnitList()
+							}
 						}
 					})
 				}

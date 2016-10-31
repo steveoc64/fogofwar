@@ -400,31 +400,48 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				b := evt.Target()
-				// reset all bbar buttons to outline mode
-				for _, v := range bbar.QuerySelectorAll(".button") {
-					if !v.Class().Contains("button-clear") {
-						v.Class().SetString("button button-outline")
+				doit := true
+				if b.Class().Contains("button-primary") {
+					b.Class().Remove("button-primary")
+					b.Class().Add("button-outline")
+					form.Hide("row-4")
+					doit = false
+				}
+				if b.Class().Contains("button-clear") {
+					if !form.Get("row-4").Class().Contains("hidden") {
+						form.Hide("row-4")
+						doit = false
 					}
 				}
-				if !b.Class().Contains("button-clear") {
-					b.Class().SetString("button button-primary")
-				}
-				k, _ := strconv.Atoi(b.GetAttribute("data-cmd-id"))
-				if k > 0 {
-					TheCmd = game.GetCmd(team, k)
+				if doit {
 
-					// Fill in the start turn
-					form.Get("StartTurn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", TheCmd.StartTurn)
+					// reset all bbar buttons to outline mode
+					for _, v := range bbar.QuerySelectorAll(".button") {
+						if !v.Class().Contains("button-clear") {
+							v.Class().SetString("button button-outline")
+						}
+					}
+					if !b.Class().Contains("button-clear") {
+						b.Class().SetString("button button-primary")
+					}
+					k, _ := strconv.Atoi(b.GetAttribute("data-cmd-id"))
+					if k > 0 {
+						TheCmd = game.GetCmd(team, k)
 
-					// Fill in the username
-					form.Get("AssignToPlayer").(*dom.HTMLInputElement).Value = TheCmd.PlayerName
+						// Fill in the start turn
+						form.Get("StartTurn").(*dom.HTMLInputElement).Value = fmt.Sprintf("%d", TheCmd.StartTurn)
 
-					// Draw up the units
+						// Fill in the username
+						form.Get("AssignToPlayer").(*dom.HTMLInputElement).Value = TheCmd.PlayerName
 
-					drawUnitList()
-					form.Get(assignToRow).Class().Remove("hidden")
-					checkIcon := form.Get("Included").(*dom.HTMLInputElement)
-					checkIcon.Checked = !TheCmd.Cull
+						// Draw up the units
+
+						drawUnitList()
+						form.Get(assignToRow).Class().Remove("hidden")
+						checkIcon := form.Get("Included").(*dom.HTMLInputElement)
+						checkIcon.Checked = !TheCmd.Cull
+						form.Get("row-4").Class().Remove("hidden")
+					}
 				}
 			})
 		}

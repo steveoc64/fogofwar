@@ -455,7 +455,7 @@ create  table game_cmd (
 	player_id int not null default 0,
 	player_ready bool not null default 'f',
 	vp int not null default 0,
-	cull bool not null default 'f'
+	cull bool not null default 't'
 );
 \i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);

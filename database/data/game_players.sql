@@ -25,6 +25,8 @@ COPY game_players (game_id, player_id, red_team, blue_team, accepted) FROM stdin
 21	2	t	f	t
 22	1	t	f	t
 22	14	f	t	t
+24	1	t	f	t
+24	13	f	t	f
 \.
 
 

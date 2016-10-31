@@ -23,6 +23,7 @@ COPY game_objective (game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_
 20	another thing	12	3	1	20	20	0
 21	The City	4	2	1	20	20	0
 22	The Abbey	6	2	1	20	20	0
+24	here	7	2	1	20	20	0
 \.
 
 

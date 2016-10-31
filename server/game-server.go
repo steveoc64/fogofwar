@@ -69,6 +69,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
 		where g.id=$1`, data.ID).QueryStruct(retval)
 
+	retval.CanStart = false
 	if err == nil {
 		// TODO - add some security stuff here to ensure that the caller has rights to
 		// be able to get this game - ie, they are either the owner of the game, or their ID
@@ -139,10 +140,20 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// and fetch the objectives
 		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
 
+		retval.CanStart = false
 		if !retval.Started {
-			if len(retval.RedCmd) > 0 && len(retval.BlueCmd) > 0 {
+			count := 0
+			DB.SQL(`select count(*) from game_cmd where game_id=$1 and cull=true`, data.ID).QueryScalar(&count)
+			if count == 0 {
+				print("no active commands")
+			} else {
+				DB.SQL(`select count(*) from game_players where game_id=$1`, data.ID).QueryScalar(&count)
+				if count == 0 {
+					print("no players at all")
+				}
+			}
+			if count > 0 && (len(retval.RedCmd) > 0 && len(retval.BlueCmd) > 0) {
 				// there are commands defined
-				count := 0
 				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, data.ID).QueryScalar(&count)
 				if count == 0 {
 					// all commands have players assigned
@@ -572,6 +583,25 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 
 		if err == nil {
+			count := 0
+			// trap if there are no active commands
+			DB.SQL(`select count(*) from game_cmd where game_id=$1 and not cull`, data.ID).QueryScalar(&count)
+			if count == 0 {
+				unassignedCmd = true
+			}
+
+			// trap if there are no players at all
+			DB.SQL(`select count(*) from game_players where game_id=$1`, data.ID).QueryScalar(&count)
+			if count == 0 {
+				unassignedCmd = true
+			}
+
+			// DblCheck
+			DB.SQL(`select count(*) from game_cmd where game_id=$1 and not cull and player_id=0`, data.ID).QueryScalar(&count)
+			if count > 0 {
+				unassignedCmd = true
+			}
+
 			println("unassigned", unassignedCmd)
 			DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, !unassignedCmd).Exec()
 			*done = true

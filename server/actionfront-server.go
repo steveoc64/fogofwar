@@ -130,14 +130,13 @@ func main() {
 	// std := standard.WithTLS(fmt.Sprintf(":%d", Config.WebPort), "actionfront.pem", "actionfront.key")
 	// func WithTLS(addr, certFile, keyFile string) *Server
 
-	logger(start, "System.Boot", nil, "", "")
-
 	// kick off a database backup every 24hrs
 	go autoBackup()
 
 	InitPaypal(Config, e)
 	InitGames()
 
+	logger(start, "System.Boot", nil, "", "")
 	errRun := e.Run(std)
 	println("ActionFront Server All Done", errRun.Error())
 

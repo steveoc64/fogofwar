@@ -143,6 +143,63 @@ func loadGameData(id int, retval *shared.Game) error {
 	return err
 }
 
+func dumpHeader(fp *os.File, game *shared.Game) {
+	fmt.Fprintf(fp, "Hosted By: %d %s %s\nName: %s %d\nDescr: %s\nTurn %d of %d\nTable: %d x %d ft grid size of %d\"\n",
+		game.HostedBy, game.HostName, game.HostEmail,
+		game.Name, game.Year,
+		game.Descr,
+		game.Turn, game.TurnLimit,
+		game.TableX, game.TableY, game.GridSize)
+	for _, v := range game.Objectives {
+		fmt.Fprintf(fp, "  Objective %s @ %d,%d VP: %d per turn, %d Red %d Blue\n",
+			v.Name, v.X, v.Y, v.VPPerTurn, v.RedVP, v.BlueVP)
+	}
+
+	fmt.Fprintf(fp, "Players:\n  Red Team: %s\n", game.RedTeam)
+	for _, v := range game.RedPlayers {
+		fmt.Fprintf(fp, "    %s\n", v.Username)
+	}
+	fmt.Fprintf(fp, "  Blue Team: %s\n", game.BlueTeam)
+	for _, v := range game.BluePlayers {
+		fmt.Fprintf(fp, "    %s\n", v.Username)
+	}
+	fmt.Fprintf(fp, "Red Commands:\n")
+	for _, v := range game.RedCmd {
+		fmt.Fprintf(fp, "  %s of %s, Commander: %s  Player: %d %s %s\n    @%d,%d %s\n",
+			v.Name, v.Nation, v.CommanderName, v.PlayerID, v.PlayerName, v.PlayerEmail,
+			v.StartX, v.StartY, v.Summarize())
+		for _, v1 := range v.Units {
+			if v1.UType != 1 {
+				fmt.Fprintf(fp, "  ")
+			}
+			fmt.Fprintf(fp, "      %s\n", v1.Name)
+		}
+	}
+	fmt.Fprintf(fp, "Blue Commands:\n")
+	for _, v := range game.BlueCmd {
+		fmt.Fprintf(fp, "  %s of %s, Commander: %s  Player: %d %s %s\n    @%d,%d %s\n",
+			v.Name, v.Nation, v.CommanderName, v.PlayerID, v.PlayerName, v.PlayerEmail,
+			v.StartX, v.StartY, v.Summarize())
+		for _, v1 := range v.Units {
+			if v1.UType != 1 {
+				fmt.Fprintf(fp, "  ")
+			}
+			fmt.Fprintf(fp, "      %s\n", v1.Name)
+		}
+	}
+}
+
+func exists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
+}
+
 func playRoutine(id int, playChannel <-chan PlayMessage) {
 
 	getTimeStamp := func() string {
@@ -158,15 +215,16 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	} else {
 		println("Created new directory for gamelogs")
 	}
-	fp, err := os.OpenFile(fmt.Sprintf("../gamelog/%d", id), os.O_CREATE|os.O_RDWR|os.O_APPEND, os.FileMode(0644))
+	// if file exists, open in append mode, else create and dump header
+
+	logname := fmt.Sprintf("../gamelog/%d", id)
+	logexists, _ := exists(logname)
+	fp, err := os.OpenFile(logname, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.FileMode(0644))
 	if err != nil {
 		println("Error opening game log", err.Error())
 		return
 	}
 	defer fp.Close()
-	log.Printf("Starting Game GoRoutine for %d\n", id)
-	fmt.Fprintf(fp, "====================================\nStart GameRoutine %s\n", getTimeStamp())
-
 	// all good - spawn our state
 	state := PlayState{
 		Game: &shared.Game{},
@@ -177,42 +235,12 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 		fmt.Fprintf(fp, "Error Loading Game State: %s\n", err.Error())
 		return
 	}
-	fmt.Fprintf(fp, "Hosted By: %d %s %s\nName: %s %d\nDescr: %s\nTurn %d of %d\nTable: %d x %d ft grid size of %d\"\n",
-		state.Game.HostedBy, state.Game.HostName, state.Game.HostEmail,
-		state.Game.Name, state.Game.Year,
-		state.Game.Descr,
-		state.Game.Turn, state.Game.TurnLimit,
-		state.Game.TableX, state.Game.TableY, state.Game.GridSize)
-	for _, v := range state.Game.Objectives {
-		fmt.Fprintf(fp, "  Objective %s @ %d,%d VP: %d per turn, %d Red %d Blue\n",
-			v.Name, v.X, v.Y, v.VPPerTurn, v.RedVP, v.BlueVP)
-	}
-
-	fmt.Fprintf(fp, "Players:\n  Red Team: %s\n", state.Game.RedTeam)
-	for _, v := range state.Game.RedPlayers {
-		fmt.Fprintf(fp, "    %s\n", v.Username)
-	}
-	fmt.Fprintf(fp, "  Blue Team: %s\n", state.Game.BlueTeam)
-	for _, v := range state.Game.BluePlayers {
-		fmt.Fprintf(fp, "    %s\n", v.Username)
-	}
-	fmt.Fprintf(fp, "Red Commands:\n")
-	for _, v := range state.Game.RedCmd {
-		fmt.Fprintf(fp, "  %s of %s, Commander: %s  Player: %d %s %s\n    @%d,%d %s\n",
-			v.Name, v.Nation, v.CommanderName, v.PlayerID, v.PlayerName, v.PlayerEmail,
-			v.StartX, v.StartY, v.Summarize())
-		for _, v1 := range v.Units {
-			fmt.Fprintf(fp, "      %s\n", v1.Name)
-		}
-	}
-	fmt.Fprintf(fp, "Blue Commands:\n")
-	for _, v := range state.Game.BlueCmd {
-		fmt.Fprintf(fp, "  %s of %s, Commander: %s  Player: %d %s %s\n    @%d,%d %s\n",
-			v.Name, v.Nation, v.CommanderName, v.PlayerID, v.PlayerName, v.PlayerEmail,
-			v.StartX, v.StartY, v.Summarize())
-		for _, v1 := range v.Units {
-			fmt.Fprintf(fp, "      %s\n", v1.Name)
-		}
+	log.Printf("Starting Game GoRoutine for %d\n", id)
+	if !logexists {
+		fmt.Fprintf(fp, "====================================\nStart GameRoutine %s\n", getTimeStamp())
+		dumpHeader(fp, state.Game)
+	} else {
+		fmt.Fprintf(fp, "====================================\nRe-Start GameRoutine %s\n", getTimeStamp())
 	}
 
 	for {

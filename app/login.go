@@ -224,7 +224,7 @@ func loginForm() {
 	// doc.QuerySelector("#signin-mobile").Class().Add("hidden")
 	doc.QuerySelector("#hamburger").Class().Add("hidden")
 	doc.QuerySelector("#faq").Class().Add("hidden")
-	loadTemplate("loginform", "main", nil)
+	loadTemplate("loginform", ".action-grid", nil)
 
 	doc.QuerySelector("#l-loginbtn").AddEventListener("click", false, func(evt dom.Event) {
 		// print("clickd on loginbtn")

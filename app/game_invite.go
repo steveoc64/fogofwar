@@ -652,16 +652,3 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 	}()
 
 }
-
-func gameInviteOverview(context *router.Context) {
-	print("TODO - gameInviteOverview")
-
-}
-
-func gameInviteTable(context *router.Context) {
-	print("TODO - gameInviteTable")
-}
-
-func gameInvitePlayers(context *router.Context) {
-	print("TODO - gameInvitePlayers")
-}

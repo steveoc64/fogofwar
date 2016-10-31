@@ -86,8 +86,16 @@ func InitPaypal(c ConfigType, e *echo.Echo) error {
 	}
 
 	err := error(nil)
-
-	PaypalLog, err = os.OpenFile("../paypal/paypal.log", os.O_RDWR|os.O_APPEND, os.FileMode(0666))
+	err = os.Mkdir("../paypal_log", os.FileMode(0700))
+	if err != nil {
+		// good if already exists
+		if err.(*os.PathError).Err.Error() != "file exists" {
+			println("Create Dir ../paypal_log", err.Error())
+		}
+	} else {
+		println("Created new directory for gamelogs")
+	}
+	PaypalLog, err = os.OpenFile("../paypal_log/paypal.log", os.O_CREATE|os.O_RDWR|os.O_APPEND, os.FileMode(0600))
 	if err != nil {
 		fmt.Fprintf(PaypalLog, "ERROR: %s\n", err.Error())
 		println(err.Error())
@@ -142,10 +150,13 @@ func (p *PaypalRPC) CreatePayment(data shared.PaypalRPCData, url *string) error 
 		return errors.New("Free Account - dont need to pay")
 	case 2:
 		value = "5.90"
+		data.Months = 1
 	case 3:
 		value = "9.90"
+		data.Months = 2
 	case 4:
 		value = "24.90"
+		data.Months = 3
 	}
 
 	// vstring := fmt.Sprintf("%0.2f", float64(data.Value)/100.0)

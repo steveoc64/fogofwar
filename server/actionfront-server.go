@@ -136,6 +136,7 @@ func main() {
 	go autoBackup()
 
 	InitPaypal(Config, e)
+	InitGames()
 
 	errRun := e.Run(std)
 	println("ActionFront Server All Done", errRun.Error())

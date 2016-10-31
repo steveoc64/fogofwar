@@ -36,6 +36,8 @@ type GlobalSessionData struct {
 	MobileSensitive bool
 	wasMobile       bool
 	wasSubmobile    bool
+	TilesChanged    bool
+	TeamsChanged    bool
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -59,7 +61,40 @@ func (g *GlobalSessionData) GetRank() string {
 
 var Session GlobalSessionData
 
+func (s *GlobalSessionData) SynchEditGame() {
+
+	go func() {
+		if s.TeamsChanged {
+			s.TeamsChanged = false
+			done := false
+			err := RPC("GameRPC.UpdateTeams", shared.GameRPCData{
+				Channel: Session.Channel,
+				ID:      s.EditGame.ID,
+				Game:    s.EditGame,
+			}, &done)
+			if err != nil {
+				print(err.Error())
+			}
+		}
+		if s.TilesChanged {
+			s.TilesChanged = false
+			err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
+				Channel: Session.Channel,
+				ID:      s.EditGame.ID,
+				Game:    s.EditGame,
+			}, &s.EditGame.CheckTable)
+			if err != nil {
+				print(err.Error())
+			}
+		}
+	}()
+}
+
 func (s *GlobalSessionData) Navigate(url string) {
+
+	if s.TeamsChanged || s.TilesChanged {
+		s.SynchEditGame()
+	}
 	// print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
 	s.Subscriptions = make(map[string]MessageFunction)

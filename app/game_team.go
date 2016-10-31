@@ -121,20 +121,22 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		form.SaveEvent(func(evt dom.Event) {
 			evt.PreventDefault()
 			form.Bind(game)
-			go func() {
-				done := false
-				err := RPC("GameRPC.UpdateTeams", shared.GameRPCData{
-					Channel: Session.Channel,
-					ID:      id,
-					Game:    game,
-				}, &done)
-				if err != nil {
-					dom.GetWindow().Alert(err.Error())
-				} else {
-					game.CheckForces = true
-				}
-				// Session.Navigate("/games")
-			}()
+			Session.TeamsChanged = true
+			Session.SynchEditGame()
+			// go func() {
+			// 	done := false
+			// 	err := RPC("GameRPC.UpdateTeams", shared.GameRPCData{
+			// 		Channel: Session.Channel,
+			// 		ID:      id,
+			// 		Game:    game,
+			// 	}, &done)
+			// 	if err != nil {
+			// 		dom.GetWindow().Alert(err.Error())
+			// 	} else {
+			// 		game.CheckForces = true
+			// 	}
+			// 	// Session.Navigate("/games")
+			// }()
 		})
 
 		form.PrintEvent(func(evt dom.Event) {
@@ -150,7 +152,8 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		form.AppendDiv("unit-details", "md-modal md-effect-1 unit-inspection")
 		form.AppendDiv("overlay", "md-overlay")
 		assignToRow := "row-3"
-		form.Get(assignToRow).Class().Add("hidden")
+		form.Hide(assignToRow)
+		form.Hide("row-4")
 
 		// loadTemplate("unit-details", "#unit-details", nil)
 
@@ -283,6 +286,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 								theCell := doc.QuerySelector(fmt.Sprintf("[name=descr-%d]", v.ID))
 								r := 1
 								if doIt {
+									Session.TeamsChanged = true
 									// This unit is a valid child of the selected Division
 									// Increment or decrement the losses in 1% increments
 									switch v.UType {
@@ -456,6 +460,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 
 		form.OnEvent("AssignToPlayer", "change", func(evt dom.Event) {
 			print("player changed")
+			Session.TeamsChanged = true
 			go func() {
 				thePlayer := evt.Target().(*dom.HTMLInputElement).Value
 				if thePlayer == "" {
@@ -484,15 +489,17 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 
 		form.OnEvent("StartTurn", "change", func(evt dom.Event) {
 			TheCmd.StartTurn, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+			Session.TeamsChanged = true
 		})
 
 		// click on a cmd button = load the cmd and draw thi unit list
 		form.OnEvent("Included", "change", func(evt dom.Event) {
-			print("included has changed")
+			// print("included has changed")
+			Session.TeamsChanged = true
 			if TheCmd != nil {
 				checkIcon := form.Get("Included").(*dom.HTMLInputElement)
 				TheCmd.Cull = !checkIcon.Checked
-				print("set TheCmd.Cull", TheCmd.Cull, TheCmd)
+				// print("set TheCmd.Cull", TheCmd.Cull, TheCmd)
 
 				// clear the other fields if excluded
 				if TheCmd.Cull {
@@ -506,7 +513,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				for _, v := range form.Get("Commands").QuerySelectorAll(".button") {
 					theID, _ := strconv.Atoi(v.GetAttribute("data-cmd-id"))
 					if theID == TheCmd.ID {
-						print("got a matching button")
+						// print("got a matching button")
 						if TheCmd.Cull {
 							v.Class().Remove("button-primary")
 							v.Class().Add("button-clear")

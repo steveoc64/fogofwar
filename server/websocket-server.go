@@ -143,7 +143,7 @@ func (c *Connection) BroadcastPlayer(playerID int, name string, action string, i
 		ID:     id,
 	}
 
-	println("broadcastPlayer", playerID, name, action)
+	// println("broadcastPlayer", playerID, name, action)
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID == playerID {
 			log.Println("broadcastPlayer", name, action, id, "»", v.ID)

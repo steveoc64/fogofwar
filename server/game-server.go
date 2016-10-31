@@ -339,7 +339,7 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 	defer tx.AutoRollback()
 
 	checkObjectives := (len(data.Game.Objectives) > 0)
-	println("objectives", checkObjectives)
+	// println("objectives", checkObjectives)
 
 	// Update the game header with the table geometry
 	_, err := DB.SQL(`update game set table_x=$2,table_y=$3,grid_size=$4,check_table=$5,check_objectives=$6 where id=$1`,
@@ -470,7 +470,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		if !v.Cull && v.PlayerID == 0 {
 			unassignedCmd = true
-			println("cmd is unassigned", v.ID)
+			// println("cmd is unassigned", v.ID)
 		}
 		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
 			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
@@ -506,7 +506,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		if !v.Cull && v.PlayerID == 0 {
 			unassignedCmd = true
-			println("blue cmd is unassigned", v.ID)
+			// println("blue cmd is unassigned", v.ID)
 		}
 		_, err = DB.SQL(`update game_cmd set cull=$2,start_turn=$3,player_id=$4,start_x=$5,start_y=$6 where id=$1`,
 			v.ID, v.Cull, v.StartTurn, v.PlayerID, v.StartX, v.StartY).Exec()
@@ -540,12 +540,12 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	if err == nil {
 		// De-Invite those not invited
 		AList := append(RedList, BlueList...)
-		fmt.Printf("AList is now %v\nRedList %v\nBlueList %v\nDList %v\n", AList, RedList, BlueList, DList)
+		// fmt.Printf("AList is now %v\nRedList %v\nBlueList %v\nDList %v\n", AList, RedList, BlueList, DList)
 		for _, v := range DList {
 			if IntSliceContains(AList, v) {
-				println("player is in the AList", v)
+				// println("player is in the AList", v)
 			} else {
-				println("player is in the DList", v)
+				// println("player is in the DList", v)
 				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
 			}
 		}
@@ -562,7 +562,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		if err == nil {
 			for _, v := range BlueList {
-				println("blue", v)
+				// println("blue", v)
 				// If they are already in RedList, then just update the record
 				a := v == conn.UserID
 				if IntSliceContains(RedList, v) {
@@ -602,7 +602,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 				unassignedCmd = true
 			}
 
-			println("unassigned", unassignedCmd)
+			// println("unassigned", unassignedCmd)
 			DB.SQL(`update game set check_forces='t',check_players=$2 where id=$1`, data.ID, !unassignedCmd).Exec()
 			*done = true
 			tx.Commit()

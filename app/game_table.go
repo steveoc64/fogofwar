@@ -35,7 +35,7 @@ func gameEditTable(context *router.Context) {
 	}
 
 	defaultMode := context.Params["mode"]
-	print("defaultMode", defaultMode)
+	// print("defaultMode", defaultMode)
 
 	go func() {
 		Session.MobileSensitive = true
@@ -169,8 +169,8 @@ func gameEditTable(context *router.Context) {
 
 		// Scroll to the map
 		scrollToMap := func() {
-			mapLoc := form.Get("Map").GetBoundingClientRect()
-			print("maploc is", mapLoc)
+			// mapLoc := form.Get("Map").GetBoundingClientRect()
+			// print("maploc is", mapLoc)
 			w.Scroll(0, 220)
 		}
 
@@ -369,7 +369,7 @@ func gameEditTable(context *router.Context) {
 		// }
 
 		setMode := func() {
-			print("doing a setmode of", modeSet)
+			// print("doing a setmode of", modeSet)
 			switch modeSet {
 			case "terrain":
 				form.Get(objRow).Class().Add("hidden")
@@ -506,22 +506,24 @@ func gameEditTable(context *router.Context) {
 			btn.SetAttribute("name", "save-button")
 			btn.Value = name
 			btn.AddEventListener("click", false, func(evt dom.Event) {
-				// print("clicked on the save button")
-				go func() {
-					err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
-						Channel: Session.Channel,
-						ID:      id,
-						Game:    game,
-					}, &game.CheckTable)
-					if err != nil {
-						dom.GetWindow().Alert(err.Error())
-					} else {
-						b := evt.Target()
-						c := b.Class()
-						c.Remove("button-primary")
-						c.Add("button-clear")
-					}
-				}()
+				Session.TilesChanged = true
+				Session.SynchEditGame()
+				// // print("clicked on the save button")
+				// go func() {
+				// 	err := RPC("GameRPC.SaveTiles", shared.GameRPCData{
+				// 		Channel: Session.Channel,
+				// 		ID:      id,
+				// 		Game:    game,
+				// 	}, &game.CheckTable)
+				// 	if err != nil {
+				// 		dom.GetWindow().Alert(err.Error())
+				// 	} else {
+				// 		b := evt.Target()
+				// 		c := b.Class()
+				// 		c.Remove("button-primary")
+				// 		c.Add("button-clear")
+				// 	}
+				// }()
 			})
 			bbar.AppendChild(btn)
 		}
@@ -536,6 +538,7 @@ func gameEditTable(context *router.Context) {
 			btn.AddEventListener("click", false, func(evt dom.Event) {
 				// print("clicked on the restore button")
 				if dom.GetWindow().Confirm("Restoring from file will discard any changes since the last save.\nReally restore the Map from file ?") {
+					Session.TilesChanged = false
 					go func() {
 						Session.EditGame = &shared.Game{}
 						err := RPC("GameRPC.Get", shared.GameRPCData{
@@ -765,6 +768,7 @@ func gameEditTable(context *router.Context) {
 					// 	print("click on tile in zone mode")
 				}
 				if changed {
+					Session.TilesChanged = true
 					b := form.Get("save-button")
 					c := b.Class()
 					c.Remove("button-clear")
@@ -787,6 +791,7 @@ func gameEditTable(context *router.Context) {
 				currentObjX = -1
 				currentObjY = -1
 				drawTiles()
+				Session.TilesChanged = true
 			}
 		})
 
@@ -794,18 +799,22 @@ func gameEditTable(context *router.Context) {
 			print("name has changed, and theObj is", TheObj)
 			TheObj.Name = evt.Target().(*dom.HTMLInputElement).Value
 			drawTiles()
+			Session.TilesChanged = true
 		})
 
 		form.OnEvent("VPPerTurn", "change", func(evt dom.Event) {
 			TheObj.VPPerTurn, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+			Session.TilesChanged = true
 		})
 
 		form.OnEvent("RedVP", "change", func(evt dom.Event) {
 			TheObj.RedVP, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+			Session.TilesChanged = true
 		})
 
 		form.OnEvent("BlueVP", "change", func(evt dom.Event) {
 			TheObj.BlueVP, _ = strconv.Atoi(evt.Target().(*dom.HTMLInputElement).Value)
+			Session.TilesChanged = true
 		})
 
 		showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))

@@ -436,9 +436,9 @@ func (s *ScenarioRPC) GetForce(data shared.ScenarioRPCData, retval *shared.Force
 		DB.SQL(`select * from force_unit where force_id=$1 order by path`, data.ID).QueryStructs(&retval.Units)
 	}
 
-	logger(start, "Session.GetForce", conn,
+	logger(start, "Scenario.GetForce", conn,
 		fmt.Sprintf("ID %d", data.ID),
-		fmt.Sprintf("%v", *retval))
+		fmt.Sprintf("%s", retval.Name))
 
 	return err
 }

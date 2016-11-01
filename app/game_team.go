@@ -543,7 +543,14 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
 				TheUnit = unit
-				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
+				ud := doc.QuerySelector("#unit-details")
+				ud.AddEventListener("keydown", false, func(evt dom.Event) {
+					switch evt.(*dom.KeyboardEvent).KeyCode {
+					case 27:
+						doc.QuerySelector("#unit-details").Class().Remove("md-show")
+					}
+				})
+				ud.AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
 					unit := TheUnit
 					el := evt.Target()

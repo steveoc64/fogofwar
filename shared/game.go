@@ -742,7 +742,6 @@ func (u *Unit) GetSupport() string {
 			retval += fmt.Sprintf(" + %d Attached Jager/Rifle Coy\n", u.JgCoy)
 		}
 		if u.Sabres > 0 {
-			print("here with u", u)
 			retval += fmt.Sprintf(" + %d Attached %s %s\n",
 				u.Sabres, Lookups.UnitRating[u.CavRating-1].Name, Lookups.CavType[u.CavType-1].Name)
 		}

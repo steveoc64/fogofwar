@@ -599,10 +599,10 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				tr := td.ParentElement()
 				key, _ := strconv.Atoi(tr.GetAttribute("key"))
 				team := tr.GetAttribute("data-team")
-				print("clicked on row with key", key)
+				// print("clicked on row with key", key)
 				unit := game.GetUnit(team, key)
 				TheUnit = unit
-				print("unit is", unit)
+				// print("unit is", unit)
 				if unit.UType == 1 {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}

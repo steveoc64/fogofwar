@@ -62,8 +62,7 @@
                   {{end}}
                   {{if eq .Type "select"}}
                     {{if .Readonly}}
-                      {{$vv := index .Options .Selected}} 
-                      <input type="text" readonly name="{{$panelname}}-{{.Model}}" value="{{$vv.Display}}">
+                      <input type="text" readonly name="{{$panelname}}-{{.Model}}" value="{{$.GetSelected}}">
                     {{else}}
                     <select name="{{$panelname}}-{{.Model}}">
                       {{range .Options}}
@@ -140,8 +139,7 @@
           {{end}}
           {{if eq .Type "select"}}
             {{if .Readonly}}
-              {{$vv := index .Options .Selected}}
-              <input type="text" readonly name="{{.Model}}" value="{{$vv.Display}}">
+              <input type="text" readonly name="{{.Model}}" value="{{$.GetSelected}}">
             {{else}}
             <select name="{{.Model}}">
               {{range .Options}}

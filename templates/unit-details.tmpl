@@ -4,15 +4,15 @@
   <img src="/img/div_inspection.png">
   <div class="row button-bar">
     {{if lt .Rating 3}}
-    <input type="button" class="button button-clear button-case" value="Good as always my Dear {{.CommanderName}}. I can trust you to lead this unit.">
+    <input id="ud-close" type="button" class="button button-clear button-case" value="Good as always my Dear {{.CommanderName}}. I can trust you to lead this unit.">
     {{else}}
       {{if lt .Rating 4}}
-      <input type="button" class="button button-clear button-case" value="Good Show. I am counting on you {{.CommanderName}}.">
+      <input id="ud-close" type="button" class="button button-clear button-case" value="Good Show. I am counting on you {{.CommanderName}}.">
       {{else}}
         {{if eq 5 .Rating}}
-      <input type="button" class="button button-clear button-case" value="I will be watching you closely {{.CommanderName}}. Now get the men ready for Battle.">
+      <input id="ud-close" type="button" class="button button-clear button-case" value="I will be watching you closely {{.CommanderName}}. Now get the men ready for Battle.">
         {{else}}
-      <input type="button" class="button button-clear button-case" value="Very Good. Dont let us down {{.CommanderName}}.">
+      <input id="ud-close" type="button" class="button button-clear button-case" value="Very Good. Dont let us down {{.CommanderName}}.">
         {{end}}
       {{end}}
     {{end}}

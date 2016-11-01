@@ -11,19 +11,10 @@
   background-repeat: no-repeat
   position: absolute
   top: 0
-  // background: rgb(213,206,166)
-  // background: -moz-linear-gradient(top,  rgba(213,206,166,1) 0%, rgba(201,193,144,1) 40%, rgba(183,173,112,1) 100%); /* FF3.6-15 */
-  // background: -webkit-linear-gradient(top,  rgba(213,206,166,1) 0%,rgba(201,193,144,1) 40%,rgba(183,173,112,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  // background: linear-gradient(to bottom,  rgba(213,206,166,1) 0%,rgba(201,193,144,1) 40%,rgba(183,173,112,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d5cea6', endColorstr='#b7ad70',GradientType=0 ); /* IE6-9 */
-  // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c9de96+0,8ab66b+44,398235+100;Green+3D+%233
-  // background: rgb(201,222,150); /* Old browsers */
-  // background: -moz-linear-gradient(top,  rgba(201,222,150,1) 0%, rgba(138,182,107,1) 44%, rgba(57,130,53,1) 100%); /* FF3.6-15 */
-  // background: -webkit-linear-gradient(top,  rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  // background: linear-gradient(to bottom,  rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c9de96', endColorstr='#398235',GradientType=0 ); /* IE6-9 */
+  @media (max-width: 800px)
+    width: calc(100% - 14rem)
 
-.svg-console-mobile
+.svg-console-portrait
   height: calc(100% - 12rem)
   width: calc(100% - 2rem)
   margin-left: 1rem
@@ -36,30 +27,23 @@
   background-repeat: no-repeat
   position: absolute
   top: 0
-  // background: rgb(213,206,166)
-  // background: -moz-linear-gradient(top,  rgba(213,206,166,1) 0%, rgba(201,193,144,1) 40%, rgba(183,173,112,1) 100%); /* FF3.6-15 */
-  // background: -webkit-linear-gradient(top,  rgba(213,206,166,1) 0%,rgba(201,193,144,1) 40%,rgba(183,173,112,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  // background: linear-gradient(to bottom,  rgba(213,206,166,1) 0%,rgba(201,193,144,1) 40%,rgba(183,173,112,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d5cea6', endColorstr='#b7ad70',GradientType=0 ); /* IE6-9 */
-  // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c9de96+0,8ab66b+44,398235+100;Green+3D+%233
-  // background: rgb(201,222,150); /* Old browsers */
-  // background: -moz-linear-gradient(top,  rgba(201,222,150,1) 0%, rgba(138,182,107,1) 44%, rgba(57,130,53,1) 100%); /* FF3.6-15 */
-  // background: -webkit-linear-gradient(top,  rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* Chrome10-25,Safari5.1-6 */
-  // background: linear-gradient(to bottom,  rgba(201,222,150,1) 0%,rgba(138,182,107,1) 44%,rgba(57,130,53,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c9de96', endColorstr='#398235',GradientType=0 ); /* IE6-9 */
 
 .console-title
   font-family: 'Playfair Display', serif
   font-size: 3rem
+  @media (max-width: 500px)
+    font-size: 2.2rem
 
 .console-button-bar
-	width: 20rem
-	height: calc(100% - 6rem)
-	padding: 0
-	margin: 0
-	position: absolute
-	top: 6rem
-	right: 0rem
+  width: 20rem
+  height: calc(100% - 6rem)
+  padding: 0
+  margin: 0
+  position: absolute
+  top: 6rem
+  right: 0rem
+  @media (max-width: 800px)
+    width: 13rem
 
 .console-button-bar .button
   width: 19rem
@@ -78,6 +62,11 @@
   background: linear-gradient(to bottom,  rgba(243,226,199,1) 0%,rgba(182,141,76,1) 76%,rgba(233,212,179,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3e2c7', endColorstr='#e9d4b3',GradientType=0 ); /* IE6-9 */
 
+  @media (max-width: 800px)
+    width: 12rem
+    font-size: 2rem
+    height: 4rem
+
   &:hover
   	color: black
   	border: 1px solid blue
@@ -86,7 +75,7 @@
     color: #5a2d32
     background: linear-gradient(to bottom, #e0a862 0%, #d89f46 76%, #dad2c5 100%)
 
-.console-button-bar-mobile
+.console-button-bar-portrait
 	width: calc(100% - 2rem)
 	height: 5rem
 	padding: 0
@@ -95,14 +84,13 @@
 	top: calc(100% - 6.5rem)
 	left: 1rem
 
-.console-button-bar-mobile .button
-  width: calc(calc(100% - 2rem) / 4)
+.console-button-bar-portrait .button
+  width: 24%
   height: 6rem
   margin-right: 0
   margin-left: 0
   padding: 0
-  // font-size: 2.2rem
-  font-size: 1rem
+  font-size: 2.2rem
   color: #2a2e2e
   // font-family: 'Domine', serif
   font-family: 'Playfair Display', serif
@@ -113,8 +101,8 @@
   background: linear-gradient(to bottom,  rgba(243,226,199,1) 0%,rgba(182,141,76,1) 76%,rgba(233,212,179,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f3e2c7', endColorstr='#e9d4b3',GradientType=0 ); /* IE6-9 */
 
-  @media (min-width: 500px) 
-    font-size: 1.2rem
+  @media (max-width: 500px)
+    font-size: 1.5rem
 
   &:hover
   	color: black
@@ -124,7 +112,7 @@
     color: #5a2d32
     background: linear-gradient(to bottom, #e0a862 0%, #d89f46 76%, #dad2c5 100%)
 
-.play-console
+.console
 	// transition: all 1s
 	border: .5rem solid rgba(80,78,48,0.74)
 	border-radius: 1rem

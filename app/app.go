@@ -147,9 +147,9 @@ func (s *GlobalSessionData) Resize() {
 	if s.OrientationSensitive {
 		w := dom.GetWindow()
 		o := s.Orientation
-		s.Orientation = "Portrait"
-		if w.InnerWidth() > w.InnerHeight() {
-			s.Orientation = "Landscape"
+		s.Orientation = "Landscape"
+		if w.InnerHeight() > w.InnerWidth() {
+			s.Orientation = "Portrait"
 		}
 		if s.Orientation != o {
 			print("Redraw due to orientation change")
@@ -189,7 +189,13 @@ func main() {
 	initForms()
 	grid1()
 
+	Session.Orientation = "Landscape"
+	if dom.GetWindow().InnerHeight() > dom.GetWindow().InnerWidth() {
+		Session.Orientation = "Portrait"
+	}
+
 	js.Global.Set("resize", func() {
 		Session.Resize()
 	})
+
 }

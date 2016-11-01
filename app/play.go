@@ -54,14 +54,14 @@ func _play(action string, actionID int, context *router.Context) {
 		}
 		print("flipped", flipped)
 		Session.MobileSensitive = true
-		if Session.Mobile() {
-			loadTemplate("play-console-mobile", "main", &game)
+		if Session.Orientation == "Landscape" {
+			loadTemplate("console", "main", &game)
 		} else {
-			loadTemplate("play-console", "main", &game)
+			loadTemplate("console-portrait", "main", &game)
 		}
 		w := dom.GetWindow()
 		doc := w.Document()
-		doc.QuerySelector("[name=play-console]").AddEventListener("click", false, func(evt dom.Event) {
+		doc.QuerySelector("[name=console]").AddEventListener("click", false, func(evt dom.Event) {
 			if evt.Target().TagName() == "INPUT" {
 				if evt.Target().(*dom.HTMLInputElement).Value == "Close" {
 					Session.Navigate("/")

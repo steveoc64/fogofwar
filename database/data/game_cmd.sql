@@ -31,39 +31,46 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 28	2	1	-1	-1	t	f	France	VII Corps	Augereau	2		2	2	2	0	f	0	f
 29	2	1	-1	-1	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	f
 30	2	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	f
+165	26	1	-1	-1	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	f	0	t
+168	26	1	-1	-1	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	t
+169	26	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	t
+170	26	1	-1	-1	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	0	f	0	t
+173	26	1	-1	-1	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	0	f	0	t
+110	19	1	5	1	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	12	f	0	f
+111	19	1	3	6	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	1	f	0	f
+157	25	1	-1	-1	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	13	f	0	f
+158	25	1	-1	-1	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	1	f	0	f
+171	26	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	0	f	0	t
 131	22	1	4	7	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	1	f	0	f
 132	22	1	5	1	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	14	f	0	f
+159	26	1	-1	-1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	f	0	t
+174	26	1	-1	-1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	f	0	t
 116	21	1	8	2	t	f	France	V Corps	Lannes	2		2	1	3	2	f	0	f
 127	21	1	0	5	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	1	f	0	f
+177	27	1	0	3	t	f	France	I corps	Soult	2		3	3	3	12	f	0	f
+161	26	1	5	4	t	f	France	V Corps	Lannes	2		2	1	3	2	f	0	f
+167	26	1	1	4	t	f	France	VII Corps	Augereau	2		2	2	2	12	f	0	f
 87	15	1	-1	-1	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	0	f	0	f
 88	15	1	-1	-1	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	0	f	0	f
+175	26	1	7	2	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	1	f	0	f
+172	26	1	6	0	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	1	f	0	f
+163	26	1	-1	-1	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	f	0	t
+166	26	1	-1	-1	t	f	France	I Corps	General Bernadotte	2		3	3	2	0	f	0	t
+164	26	1	-1	-1	t	f	France	III Corps	Davout	2		1	3	2	0	f	0	t
+160	26	1	-1	-1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	t
+162	26	1	-1	-1	t	f	France	VI Corps	Ney	2		2	3	2	0	f	0	t
+176	27	1	5	3	t	f	France	Ii corps	Davout	2		3	3	3	2	f	0	f
 113	20	1	3	4	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	1	f	0	f
 112	20	1	8	0	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	13	f	0	f
-146	24	1	-1	-1	t	f	France	III Corps	Davout	2		1	3	2	1	f	0	f
+178	27	1	2	0	f	t	Russia	Left	Bragavosky	2		3	3	3	1	f	0	f
 32	4	1	1	8	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	1	f	0	f
-153	24	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	13	f	0	f
-151	24	1	-1	-1	t	f	France	Test		2		3	3	3	0	f	0	t
-142	24	1	-1	-1	t	f	France	V Corps	Lannes	2		2	1	3	0	f	0	t
-143	24	1	-1	-1	t	f	France	VI Corps	Ney	2		2	3	2	0	f	0	t
-149	24	1	-1	-1	t	f	France	VII Corps	Augereau	2		2	2	2	0	f	0	t
-145	24	1	-1	-1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	0	f	0	t
-152	24	1	-1	-1	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	0	f	0	t
 40	4	1	14	8	t	f	France	I Corps	General Bernadotte	2		3	3	2	2	f	0	f
 38	4	1	11	1	t	f	France	III Corps	Davout	2		1	3	2	2	f	0	f
-155	24	1	-1	-1	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	0	f	0	t
-144	24	1	-1	-1	t	f	France	Cavalry Reserve	Murat	2		3	2	3	0	f	0	t
+146	24	1	-1	-1	t	f	France	III Corps	Davout	2		1	3	2	1	f	0	f
 37	4	1	4	4	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4	12	f	0	f
 44	4	1	2	6	f	t	Prussia	Brunswick - North	Duke of Brunswick	2		4	3	4	12	f	0	f
 47	4	1	4	9	f	t	Prussia	Reserve - Kalkreuth	Kalkreuth	3		4	4	1	12	f	0	f
-148	24	1	-1	-1	t	f	France	I Corps	General Bernadotte	2		3	3	2	0	f	0	t
-141	24	1	-1	-1	t	f	France	IV Corps	Soult	2		3	3	3	0	f	0	t
-147	24	1	-1	-1	t	f	France	Imperial Guard	Napoleon	2		1	1	1	0	f	0	t
-150	24	1	-1	-1	t	f	France	Supply	Supply Train	4		3	3	2	0	f	0	t
-154	24	1	-1	-1	f	t	Prussia	Reserve - Ruchel	Ernst von Ruchel	2		3	3	3	0	f	0	t
-140	24	1	-1	-1	f	t	Prussia	Supply Train	Officer of Supply von Schulze	5		5	1	4	0	f	0	t
-156	24	1	-1	-1	f	t	Prussia	Wurttemburg	Eugene, Duke of Wurttemburg	2		3	3	3	0	f	0	t
-110	19	1	-1	-1	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3	0	f	0	f
-111	19	1	-1	-1	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3	0	f	0	f
+153	24	1	-1	-1	f	t	Prussia	South - Hohenlohe	Hohenlohe	1		4	3	2	13	f	0	f
 \.
 
 
@@ -71,7 +78,7 @@ COPY game_cmd (id, game_id, start_turn, start_x, start_y, red_team, blue_team, n
 -- Name: game_cmd_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('game_cmd_id_seq', 156, true);
+SELECT pg_catalog.setval('game_cmd_id_seq', 179, true);
 
 
 --

@@ -28,7 +28,6 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 5	1	t	f	France	V Corps	Lannes	2		2	1	3
 6	1	t	f	France	VI Corps	Ney	2		2	3	2
 8	1	t	f	France	Cavalry Reserve	Murat	2		3	2	3
-11	1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4
 3	1	t	f	France	III Corps	Davout	2		1	3	2
 1	1	t	f	France	Imperial Guard	Napoleon	2		1	1	1
 2	1	t	f	France	I Corps	General Bernadotte	2		3	3	2
@@ -58,6 +57,11 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 94	17	t	f	France	Garde Impériale	Bessières	2		2	3	2
 101	18	t	f	France	VI Corps	Marshal Michel Ney	2		2	3	3
 102	18	f	t	Austria	Riesch Corps	FML Riesch	2		3	3	3
+11	1	f	t	Prussia	Advanced Guard	Ferdinand	3		4	4	4
+107	20	t	f	France	Ii corps	Davout	2		3	3	3
+106	20	t	f	France	I corps	Soult	2		3	3	3
+108	20	f	t	Russia	Left	Bragavosky	2		3	3	3
+109	20	f	t	Russia	Centre	Khutusov	2		3	3	3
 \.
 
 
@@ -65,7 +69,7 @@ COPY force (id, scenario_id, red_team, blue_team, nation, name, commander_name, 
 -- Name: force_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_id_seq', 105, true);
+SELECT pg_catalog.setval('force_id_seq', 109, true);
 
 
 --

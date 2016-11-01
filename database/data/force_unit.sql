@@ -496,16 +496,21 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1296	102	1st_Div.Reserve_Bde	Reserve Bde	Froon IR #54 (two fusilier battalions that had suffered greatly at Haslach-Jungingen) Froon IR #54 (one grenadier battalion only lightly engaged at Haslach-Jungingen) Josef Colloredo IR #57 (one grenadier battalion) Cuirassier Regt Hohenzollern #8 (two squadrons)		Austria	2	4	3	3100	1	0	0	0	5	300	1	2	0	0	0	f
 1299	102	2nd_Div.Center_Bde	Center Bde	Erzherzog Karl IR #3 (four fusilier battalions) Erzherzog Auersperg #24 (four fusilier battalions) Cuirassier Regt Erzherzog Franz #2 (one-and-a-half squadrons)		Austria	2	4	3	6000	1	0	0	0	5	200	1	2	0	0	0	f
 1367	97	Div_Legrand.17e_Co_5e_dArt_de_Pied	17° Co. 5° d’Art. de Pied			France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
+1403	106	1_div.9_legere	9 legere	25th Light Infantry Regiment (three battalions, 1,540 men) 27th Line Infantry Regiment (two battalions, 1,347 men)		France	2	4	5	1800	1	0	0	0	5	22	2	3	2	4	3	f
 1301	101	2eme_Division	2eme Division		Louis Henri Loison	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1302	101	3eme_Division	3eme Division		Jean-Pierre Firmin Malher	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1408	108	1_div.Azov	Azov			Russia	2	4	3	3000	1	0	0	0	5	0	0	0	0	0	0	f
 1311	101	Artillery_Reserve.1e_Regt_Foot_Hv	1e Regt Foot Hv	1st Regt of Foot Artillery (two companies armed with four 12-pound)		France	4	4	0	0	0	0	0	0	4	0	0	0	4	1	3	f
 1303	101	Cav_Bde	Cav Bde		Colbert-Chabanais	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1312	101	Artillery_Reserve.1e_Regt_Foot	1e Regt Foot	1st Regt of Foot Artillery (five 8-pound, and two 4-pound cannons and one howitzer, 331 men)		France	4	4	0	0	0	0	0	0	4	0	0	0	8	3	3	f
 1304	101	Artillery_Reserve	Artillery Reserve		Colonel Jean Nicolas Seroux	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1305	101	4eme_Dragoon_Division	4eme Dragoon Division		Laplanche	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1407	108	1_div	1 div		Levosky	Russia	1	3	1	0	0	0	0	0	2	0	0	0	0	0	2	f
+1402	106	1_div	1 div	Div	Fred Flintstone	France	1	3	1	0	0	0	0	0	4	0	0	0	0	0	2	f
 1315	101	2eme_Division.Bde_Roguet	Bde Roguet	69th Line Infantry Regiment (two battalion, 1,698 men) 76th Line Infantry Regiment (three battalions, 1,789 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1314	101	2eme_Division.Bde_Villatte	Bde Villatte	6th Light Infantry Regiment (two battalions, 1,728 men) 39th Line Infantry Regiment (two battalions, 1,633 men)		France	2	4	5	3400	1	0	0	0	4	0	0	0	0	0	0	f
 1313	101	Artillery_Reserve.2e_Regt_Horse_Bty	2e Regt Horse Bty	2nd Regt of Horse Artillery (two sections of the 1st company armed with two 8-pound cannons and two howitzers, 65 men)		France	4	4	0	0	0	0	0	0	4	0	0	0	4	3	3	t
+1406	107	4eme_Dragoon_Division.Dragoons	Dragoons			France	3	4	0	0	0	0	0	0	4	600	5	4	0	0	0	f
 1332	95	Bde_Durosnel.5e_Co_6e_dArt_a_cheval	5° Co. 6e d’Art. à cheval			France	4	4	0	0	0	0	0	0	4	0	0	0	6	4	3	t
 1215	12	Adv_Guard	Adv Guard	Blucher own	Blucher	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1218	12	3rd_Division	3rd Division		von Schmettau	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
@@ -513,6 +518,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1216	12	1st_Div	1st Div		Pr Wiliam of Orange	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1219	12	Adv_Guard.Lt_Bde_Oswald	Lt Bde Oswald	Weimar Fusilier Battalion Greiffenberg Fusilier Battalion # 4 Oswald Fusilier Battalion # 14 Kloch Fusilier Battalion # 18		Prussia	2	4	9	2300	1	3	0	4	4	0	0	0	6	3	3	f
 1221	12	Cav_Bde_Blucher	Cav Bde Blucher	Bluchers cav bde as part of the advance guard	Blucher	Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1405	107	4eme_Dragoon_Division	4eme Dragoon Division		Leval	France	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1259	93	Reserve_Cavalry	Reserve Cavalry			Prussia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
 1371	97	Div_Legrand.Bde_Levasseur	Bde Levasseur	18° Rgt. d’infanterie de ligne ~ 75° Rgt. d’infanterie de ligne		France	2	4	2	3847	1	0	0	0	7	0	0	0	0	0	0	f
 1368	97	Div_Legrand.Bde_Ledru	Bde Ledru	26° Rgt. d’infanterie légère [2 à 3 bat.]		France	2	4	3	2052	1	0	0	0	6	0	0	0	0	0	0	f
@@ -524,6 +530,13 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1309	101	Cav_Bde.3e_Hussar	3e Hussar			France	3	4	0	0	0	0	0	0	3	150	2	3	0	0	0	f
 1223	12	Cav_Bde_Blucher.Blucher_Hussar_Regt_Nr_8	Blucher Hussar Regt Nr 8			Prussia	3	4	0	0	0	0	0	0	3	1500	2	3	0	0	0	f
 1224	12	Cav_Bde_Blucher.Irwing_Dragoon_Nr_3	Irwing Dragoon Nr 3			Prussia	3	4	0	0	0	0	0	0	4	600	5	4	0	0	0	f
+1409	108	1_div.Ukraine_Musketeers	Ukraine Musketeers			Russia	2	4	3	4200	1	0	0	0	5	0	0	0	0	0	0	f
+1410	108	1_div.Rostov	Rostov			Russia	2	4	3	3200	1	0	0	0	5	0	0	0	0	0	0	f
+1411	108	1_div.Eger	Eger			Russia	2	4	9	2200	1	0	0	0	5	0	0	0	0	0	0	f
+1413	108	2_div	2 div			Russia	1	3	1	0	0	0	0	0	3	0	0	0	0	0	2	f
+1414	108	2_div.Moscow_Musketeers	Moscow Musketeers			Russia	2	4	3	4800	1	0	0	0	5	0	0	0	0	0	0	f
+1415	108	2_div.Smolensk_Musketeers	Smolensk Musketeers			Russia	2	4	3	2800	1	0	0	0	5	0	0	0	0	0	0	f
+1416	108	2_div.Kiev_jager	Kiev jager			Russia	2	4	9	2200	1	0	0	0	5	0	0	0	0	0	0	f
 1243	92	Corps_de_Bataille.1st_Bde	1st Bde	Borstell Grenadier Battalion Schenck Infantry Regiment # 9, two battalions Winning Infantry Regiment # 23, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 1244	92	Corps_de_Bataille.2nd_Bde	2nd Bde	Hellmann Grenadier Battalion Treuenfels Infantry Regiment # 29, two battalions Strachwitz Infantry Regiment # 43, two battalions		Prussia	2	4	1	4400	1	2	2	0	4	0	0	0	0	0	0	f
 231	10	2nd_Div.Boguslawsky_Fusilers	Boguslawsky Fusilers			Prussia	2	4	9	800	1	2	2	2	5	0	0	0	0	0	0	f
@@ -611,6 +624,10 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 1345	96	Div_Klein.1e_Rgt_de_Dragons	1° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	5	250	5	5	0	0	0	f
 1346	96	Div_Klein.2e_Rgt_de_Dragons	2° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	5	400	5	5	0	0	0	f
 1348	96	Div_Klein.14e_Rgt_de_Dragons	14° Rgt. de Dragons			France	3	4	0	0	0	0	0	0	4	350	5	4	0	0	0	f
+1412	108	1_div.Bty	Bty			Russia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
+1404	106	1_div.Bde_Defrance	Bde Defrance	Cuirassier		France	3	4	0	0	0	0	0	0	2	600	1	2	0	0	0	f
+1417	108	2_div.Bty	Bty			Russia	4	4	0	0	0	0	0	0	4	0	0	0	12	3	3	f
+1418	108	2_div.Hv_bty	Hv bty			Russia	4	4	0	0	0	0	0	0	4	0	0	0	6	1	3	f
 \.
 
 
@@ -618,7 +635,7 @@ COPY force_unit (id, force_id, path, name, descr, commander_name, nation, utype,
 -- Name: force_unit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: steve
 --
 
-SELECT pg_catalog.setval('force_unit_id_seq', 1401, true);
+SELECT pg_catalog.setval('force_unit_id_seq', 1418, true);
 
 
 --

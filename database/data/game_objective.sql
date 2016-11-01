@@ -24,6 +24,13 @@ COPY game_objective (game_id, name, x, y, vp_per_turn, red_vp, blue_vp, current_
 21	The City	4	2	1	20	20	0
 22	The Abbey	6	2	1	20	20	0
 24	here	7	2	1	20	20	0
+19		6	4	1	20	20	0
+25	an objective	4	4	1	20	20	0
+25	another objective	8	2	1	20	20	0
+25	one here	8	6	1	20	20	0
+26	Add one here	2	3	1	20	20	0
+26	One hete	7	0	1	20	20	0
+27	City	2	0	1	20	20	0
 \.
 
 

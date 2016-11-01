@@ -160,7 +160,7 @@ func (s *GlobalSessionData) Resize() {
 		}
 		if s.Orientation != o {
 			print("Redraw due to orientation change")
-			dom.GetWindow().Alert("orientation change")
+			// dom.GetWindow().Alert("orientation change")
 			formulate.Templates(GetTemplate)
 			s.Reload(s.Context)
 		}
@@ -175,12 +175,12 @@ func (s *GlobalSessionData) Resize() {
 		if s.Mobile() != s.wasMobile {
 			doIt = true
 			print("Major Redraw due to change from mobile to non-mobile or vise versa")
-			dom.GetWindow().Alert("changed to mobile")
+			// dom.GetWindow().Alert("changed to mobile")
 		}
 		if s.SubMobile() != s.wasSubmobile {
 			doIt = true
 			print("redraw due to change of orientation only, inside mobile mode")
-			dom.GetWindow().Alert("changed to submobile")
+			// dom.GetWindow().Alert("changed to submobile")
 		}
 	}
 

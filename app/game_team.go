@@ -82,9 +82,9 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				AddCustom(1, "", "Commands", "")
 
 			form.Row(6).
-				AddCheck(1, "Included", "Included").
-				AddInput(3, "Assign to Player", "AssignToPlayer").
-				AddNumber(2, "Arrives on Turn", "StartTurn", "1")
+				AddCheck(1, "Include", "Included").
+				AddInput(3, "Player", "AssignToPlayer").
+				AddNumber(2, "Turn", "StartTurn", "1")
 
 			form.Row(1).
 				AddCustom(1, "", "ViewUnits", "")
@@ -104,7 +104,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 			// 	AddCustom(1, "", "ToggleCmd", "hidden")
 
 			form.Row(6).
-				AddCheck(1, "Included", "Included").
+				AddCheck(1, "Include", "Included").
 				AddInput(3, "Assign to Player", "AssignToPlayer").
 				AddNumber(2, "Arrives on Turn", "StartTurn", "1")
 
@@ -543,14 +543,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
 				TheUnit = unit
-				ud := doc.QuerySelector("#unit-details")
-				ud.AddEventListener("keydown", false, func(evt dom.Event) {
-					switch evt.(*dom.KeyboardEvent).KeyCode {
-					case 27:
-						doc.QuerySelector("#unit-details").Class().Remove("md-show")
-					}
-				})
-				ud.AddEventListener("click", false, func(evt dom.Event) {
+				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
 					unit := TheUnit
 					el := evt.Target()

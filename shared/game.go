@@ -705,10 +705,14 @@ func (u *Unit) GetAppraisal() string {
 			return "Dependable, and well disciplined they are Sir. They will follow orders without question or hesitation"
 		case 9:
 			return "A fine group of Lads they are Sir. They know how to handle a musket, and they polish up allght too. Good Soldiers they are."
-		case 10, 11, 12:
-			return "Remarkable ! I have rarely seen a better prepared unit Sir, and it will be an honour to fight with them."
-		case 13, 14, 15:
+		case 10:
+			return "A fine unit Sir ! You can count on them in the coming hours ... no doubt about it."
+		case 11:
+			return "All in order Sir. The men are ready for anything."
+		case 12:
 			return "Splendid ! Let us at em Sir, we can take this battle single handed ... the enemy stands no chance against these fine men !"
+		case 13, 14, 15:
+			return "Remarkable ! I have rarely seen a better prepared unit Sir, and it will be an honour to fight with them."
 		}
 	}
 	return ""

@@ -330,14 +330,6 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		Session.Navigate(url)
 	})
 
-	// editted one of the edit fields with player names
-	form.OnEvent("PlayerList", "focus", func(evt dom.Event) {
-		el := evt.Target()
-		if el.TagName() == "INPUT" {
-
-		}
-	})
-
 	form.OnEvent("PlayerList", "change", func(evt dom.Event) {
 		el := evt.Target()
 		if el.TagName() == "INPUT" {
@@ -345,15 +337,20 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 			team := el.GetAttribute("data-team")
 			thePlayer := el.(*dom.HTMLInputElement).Value
 			TheCmd := game.GetCmd(team, key)
+
 			go func() {
 				if thePlayer == "" {
 					TheCmd.PlayerID = 0
 					TheCmd.PlayerName = ""
 				} else {
+					dom.GetWindow().Alert("getid ?")
+					theID := 0
 					err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
 						Channel:  Session.Channel,
 						Username: thePlayer,
-					}, &TheCmd.PlayerID)
+					}, &theID)
+					TheCmd.PlayerID = theID
+
 					if err != nil {
 						dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
 						TheCmd.PlayerName = ""
@@ -392,6 +389,6 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		}
 	})
 
-	showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
+	// showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 
 }

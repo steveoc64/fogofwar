@@ -13,31 +13,33 @@ import (
 type MessageFunction func(string, int, *router.Context)
 
 type GlobalSessionData struct {
-	Version         string
-	Username        string
-	Passwd          string
-	Rank            int
-	UserID          int
-	CanAllocate     bool
-	Channel         int
-	Router          *router.Router
-	AppFn           map[string]router.Handler
-	Subscriptions   map[string]MessageFunction
-	Context         *router.Context
-	ID              map[string]int
-	URL             string
-	Disqus          bool
-	Lookup          shared.LookupTable
-	MaxGames        int
-	MaxScenarios    int
-	MaxPlayers      int
-	EditGame        *shared.Game
-	RedrawOnResize  bool
-	MobileSensitive bool
-	wasMobile       bool
-	wasSubmobile    bool
-	TilesChanged    bool
-	TeamsChanged    bool
+	Version              string
+	Username             string
+	Passwd               string
+	Rank                 int
+	UserID               int
+	CanAllocate          bool
+	Channel              int
+	Router               *router.Router
+	AppFn                map[string]router.Handler
+	Subscriptions        map[string]MessageFunction
+	Context              *router.Context
+	ID                   map[string]int
+	URL                  string
+	Disqus               bool
+	Lookup               shared.LookupTable
+	MaxGames             int
+	MaxScenarios         int
+	MaxPlayers           int
+	EditGame             *shared.Game
+	RedrawOnResize       bool
+	MobileSensitive      bool
+	OrientationSensitive bool
+	wasMobile            bool
+	Orientation          string
+	wasSubmobile         bool
+	TilesChanged         bool
+	TeamsChanged         bool
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -142,6 +144,20 @@ func (s *GlobalSessionData) SubMobile() bool {
 
 func (s *GlobalSessionData) Resize() {
 	// print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
+	if s.OrientationSensitive {
+		w := dom.GetWindow()
+		o := s.Orientation
+		s.Orientation = "Portrait"
+		if w.InnerWidth() > w.InnerHeight() {
+			s.Orientation = "Landscape"
+		}
+		if s.Orientation != o {
+			print("Redraw due to orientation change")
+			formulate.Templates(GetTemplate)
+			s.Reload(s.Context)
+		}
+	}
+
 	doIt := false
 	if s.RedrawOnResize {
 		doIt = true

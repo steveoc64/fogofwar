@@ -94,6 +94,7 @@ type Game struct {
 	Blue            bool
 	Team            string
 	CanStart        bool
+	PhaseDone       bool
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
 	HostName        string           `db:"host_name"`
@@ -105,6 +106,7 @@ type Game struct {
 	Stopped         bool             `db:"stopped"`
 	Paused          bool             `db:"paused"`
 	Turn            int              `db:"turn"`
+	Phase           int              `db:"phase"`
 	TurnLimit       int              `db:"turn_limit"`
 	Name            string           `db:"name"`
 	Descr           string           `db:"descr"`

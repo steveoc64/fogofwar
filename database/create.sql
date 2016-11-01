@@ -370,6 +370,7 @@ create table game (
 	stopped  bool not null default false,
 	paused   bool not null default false,
 	turn int not null default 0,
+	phase int not null default 0,
 	turn_limit int not null default 12,
 	name text not null default '',
 	descr text not null default '',

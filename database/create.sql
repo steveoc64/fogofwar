@@ -430,7 +430,7 @@ create table game_players (
 	player_id int not null,
 	red_team bool not null default false,
 	blue_team bool not null default false,
-	accepted bool not null default false,
+	accepted bool not null default false
 );
 \i data/game_players.sql
 create unique index game_player_game_idx on game_players (game_id, player_id);

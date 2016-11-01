@@ -65,10 +65,11 @@ cert:
 	openssl genrsa -out cert/actionfront.key 2048
 	openssl req -new -x509 -key cert/actionfront.key -out cert/actionfront.pem -days 3650
 
-dist/assets.log: assets/*.html assets/img/*  assets/fonts/* assets/css/* assets/manual/*
+dist/assets.log: assets/*.html assets/img/*  assets/fonts/* assets/css/* assets/manual/* assets/*.webmanifest
 	@mplayer -quiet audio/attention.oga 2> /dev/null > /dev/null
 	@mkdir -p dist/public/css dist/public/font dist/public/js
 	cp assets/*.html dist/public
+	cp assets/*.webmanifest dist/public
 	cp -R assets/img dist/public
 	cp -R assets/css dist/public
 	cp -R assets/fonts dist/public
@@ -83,6 +84,8 @@ dist/public/app.js: app/*.go shared/*.go
 	@mplayer -quiet audio/frontend-compile.ogg 2> /dev/null > /dev/null &
 	@mkdir -p dist/public/js
 	cd app && gosimple
+	@echo -n Before :
+	@ls -l dist/public/app.js
 	GOOS=linux gopherjs build app/*.go -o dist/public/app.js -m
 	@ls -l dist/public/app.js
 

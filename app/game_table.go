@@ -102,12 +102,21 @@ func gameEditTable(context *router.Context) {
 		form.Row(1).
 			AddCustom(1, "", "ActionButtons", "button-bar-left")
 
-		form.Row(7).
-			AddInput(3, "Objective", "ObjectiveName").
-			AddNumber(1, "VP Per Turn", "VPPerTurn", "1").
-			AddNumber(1, "VP Red", "RedVP", "1").
-			AddNumber(1, "VP Blue", "BlueVP", "1").
-			AddButton(1, "Delete", "DeleteObj")
+		if Session.Mobile() {
+			form.Row(7).
+				AddInput(3, "Objective", "ObjectiveName").
+				AddNumber(1, "VP", "VPPerTurn", "1").
+				AddNumber(1, "Red", "RedVP", "1").
+				AddNumber(1, "Blue", "BlueVP", "1").
+				AddButton(1, "x", "DeleteObj")
+		} else {
+			form.Row(7).
+				AddInput(3, "Objective", "ObjectiveName").
+				AddNumber(1, "VP Per Turn", "VPPerTurn", "1").
+				AddNumber(1, "VP Red", "RedVP", "1").
+				AddNumber(1, "VP Blue", "BlueVP", "1").
+				AddButton(1, "Delete", "DeleteObj")
+		}
 
 		form.Row(1).
 			AddCustom(1, "", "ModeButtons", "button-bar-left")
@@ -165,6 +174,7 @@ func gameEditTable(context *router.Context) {
 				objRow = "row-5"
 			}
 		}
+		print("objRow", objRow)
 		form.Get(objRow).Class().Add("hidden")
 
 		// Scroll to the map
@@ -401,6 +411,7 @@ func gameEditTable(context *router.Context) {
 				}
 			case "objective":
 				// form.Get("row-3").Class().Remove("hidden")
+				form.Get(objRow).Class().Remove("hidden")
 				// Create a set of fields for the objective details
 				if oldModeSet != modeSet {
 					// if Session.Mobile() {

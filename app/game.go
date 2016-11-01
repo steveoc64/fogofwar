@@ -330,6 +330,42 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		Session.Navigate(url)
 	})
 
+	form.OnEvent("PlayerList", "keydown", func(evt dom.Event) {
+		k := evt.(*dom.KeyboardEvent)
+		el := evt.Target()
+		// tag := el.TagName()
+		if k.KeyCode == 13 {
+			evt.PreventDefault()
+			td := el.ParentElement()
+			if td.TagName() == "TD" {
+				thisTR := td.ParentElement()
+				thisTBODY := thisTR.ParentElement()
+				nextTR := thisTR.NextElementSibling()
+				if nextTR != nil {
+					nextInput := nextTR.QuerySelector(".edit__player")
+					if nextInput == nil {
+						// must be a header
+						nextTR = nextTR.NextElementSibling()
+						if nextTR == nil {
+							print("looks like we hit the end - jump back to the first field")
+							nextInput = thisTBODY.QuerySelector(".edit__player")
+						} else {
+							if nextTR.TagName() != "TR" {
+								nextInput = thisTBODY.QuerySelector(".edit__player")
+							} else {
+								nextInput = nextTR.QuerySelector(".edit__player")
+							}
+						}
+					}
+					if nextInput != nil {
+						nextInput.(*dom.HTMLInputElement).Focus()
+						nextInput.(*dom.HTMLInputElement).Select()
+					}
+				}
+			}
+		}
+	})
+
 	form.OnEvent("PlayerList", "change", func(evt dom.Event) {
 		el := evt.Target()
 		if el.TagName() == "INPUT" {
@@ -343,7 +379,6 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 					TheCmd.PlayerID = 0
 					TheCmd.PlayerName = ""
 				} else {
-					dom.GetWindow().Alert("getid ?")
 					theID := 0
 					err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
 						Channel:  Session.Channel,

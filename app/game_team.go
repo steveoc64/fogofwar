@@ -372,7 +372,11 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					case 4:
 						addMe = fmt.Sprintf("%d Guns:<br>\n", v.Guns-v.GunsLost)
 					}
-					cell.SetInnerHTML(addMe + breakLine(v.Descr))
+					if Session.SubMobile() {
+						cell.SetInnerHTML(addMe)
+					} else {
+						cell.SetInnerHTML(addMe + breakLine(v.Descr))
+					}
 				}
 
 			}

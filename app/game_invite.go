@@ -53,7 +53,12 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 		}
 
 		form := formulate.EditForm{}
-		form.New("fa-bookmark-o", "Game Invite - "+game.Name)
+		title := "Game Invite - " + game.Name
+		if game.Accepted {
+			title += " (Accepted)"
+
+		}
+		form.New("fa-bookmark-o", title)
 
 		// Layout the fields
 
@@ -92,6 +97,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 
 		form.Row(1).
 			AddCustom(1, "", "ViewUnits", "hidden")
+
 		// Add event handlers
 		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()

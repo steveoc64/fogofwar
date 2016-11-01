@@ -272,9 +272,10 @@ func ReConnect() error {
 		if lr.Result == "OK" {
 
 			if lr.Version != Session.Version {
+				Session.SynchEditGame()
 				if dom.GetWindow().Confirm(`A New Version of the software has been released.
 
-Please finish up what you are working on ASAP, and then REFRESH the page when you are ready to restart.
+Will need to quickly refresh the application now .. it will take a few seconds, and then you can get back to what you were doing.
 
 Shall I restart the app for your now (OK) ?`) {
 					js.Global.Get("location").Call("replace", "/")

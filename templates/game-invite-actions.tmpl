@@ -20,6 +20,7 @@
 			Other Players in this Game
 		</div>
 	</div>
+	{{if not .Accepted}}
 	<div class="action__item" url="Accept">
 		<div class="action__title">Accept</div>
 		<div class="action__icon"><i class="fa fa-thumbs-up fa-lg"></i></div>
@@ -27,6 +28,7 @@
 			Accept the Invite
 		</div>
 	</div>
+	{{end}}
 	<div class="action__item" url="Decline">
 		<div class="action__title">Decline</div>
 		<div class="action__icon"><i class="fa fa-thumbs-down fa-lg"></i></div>

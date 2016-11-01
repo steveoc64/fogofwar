@@ -14,12 +14,17 @@ import (
 )
 
 func Login(username string, passwd string) {
+	_Login(username, passwd, true)
+}
+
+func _Login(username string, passwd string, doNav bool) {
 
 	Session.Username = ""
 	Session.Passwd = ""
 	Session.Rank = 0
 	Session.UserID = 0
-	locstor.Clear()
+	locstor.RemoveItem("username")
+	locstor.RemoveItem("secret")
 
 	lc := &shared.LoginCredentials{
 		Username: username,
@@ -142,11 +147,13 @@ func Login(username string, passwd string) {
 		// 		}
 		// 	})
 		// }
-		Session.Navigate("/")
+		if doNav {
+			Session.Navigate("/")
+		}
 		// doc.QuerySelector(".embedly-card").Class().Remove("hidden")
 	} else {
 		print("login failed")
-		dom.GetWindow().Alert("Login Failed")
+		// dom.GetWindow().Alert("Login Failed")
 	}
 }
 
@@ -171,6 +178,8 @@ func Logout() {
 	doc.GetElementByID("faq").Class().Add("hidden")
 
 	Session.Navigate("/")
+	locstor.RemoveItem("username")
+	locstor.RemoveItem("secret")
 
 	grid1()
 

@@ -206,6 +206,9 @@ func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error 
 		where not started and g.id=$1`, data.ID).QueryStruct(retval)
 
 	if err == nil {
+		// Fill whether this player has accepted or not
+		DB.SQL(`select accepted from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&retval.Accepted)
+
 		// fill in the players on each side
 		DB.SQL(`select distinct(u.username),p.accepted
 			from game_players p

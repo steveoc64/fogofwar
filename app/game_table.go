@@ -752,7 +752,7 @@ func gameEditTable(context *router.Context) {
 				case "objective":
 					// print("click on tile in objective mode")
 					// doc.QuerySelector("#objective-fields").Class().Remove("hidden")
-					form.Get("row-3").Class().Remove("hidden")
+					form.Get(objRow).Class().Remove("hidden")
 					tName := t.GetAttribute("name")
 					if strings.HasPrefix(tName, "objective-") {
 						// Clicked on existing objective
@@ -798,7 +798,7 @@ func gameEditTable(context *router.Context) {
 		form.OnEvent("DeleteObj", "click", func(evt dom.Event) {
 			if dom.GetWindow().Confirm("Remove this Objective ?") {
 				game.RemoveObjective(currentObjX, currentObjY)
-				form.Get("row-3").Class().Add("hidden")
+				form.Get(objRow).Class().Add("hidden")
 				currentObjX = -1
 				currentObjY = -1
 				drawTiles()

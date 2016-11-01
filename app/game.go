@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/locstor"
 	"github.com/go-humble/router"
 	"github.com/steveoc64/formulate"
 	"honnef.co/go/js/dom"
@@ -44,6 +45,7 @@ func _gameChecklist(action string, actionID int, context *router.Context) {
 			return
 		}
 		game := Session.EditGame
+		locstor.SetItem("game_id", fmt.Sprintf("%d", game.ID))
 		game.InMode = "Checklist"
 		game.Mobile = Session.Mobile()
 		// print("using existing game", game)
@@ -305,6 +307,7 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 			return
 		}
 		game = Session.EditGame
+		locstor.SetItem("game_id", fmt.Sprintf("%d", game.ID))
 	}
 	game.InMode = "Players"
 	game.Mobile = Session.Mobile()

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"./shared"
 	"github.com/go-humble/locstor"
@@ -37,6 +38,7 @@ type GlobalSessionData struct {
 	MobileSensitive      bool
 	OrientationSensitive bool
 	wasMobile            bool
+	LastWidth            int
 	Orientation          string
 	wasSubmobile         bool
 	TilesChanged         bool
@@ -100,6 +102,7 @@ func (s *GlobalSessionData) Navigate(url string) {
 	}
 	// print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
+	locstor.SetItem("navigate", url)
 	s.Subscriptions = make(map[string]MessageFunction)
 	s.Context = nil
 	s.Router.Navigate(url)
@@ -113,6 +116,9 @@ func (s *GlobalSessionData) Navigate(url string) {
 }
 
 func (s *GlobalSessionData) Back() {
+	if s.TeamsChanged || s.TilesChanged {
+		s.SynchEditGame()
+	}
 	// On navigate, clear out any subscriptions on events
 	s.Subscriptions = make(map[string]MessageFunction)
 	s.Context = nil
@@ -154,6 +160,7 @@ func (s *GlobalSessionData) Resize() {
 		}
 		if s.Orientation != o {
 			print("Redraw due to orientation change")
+			dom.GetWindow().Alert("orientation change")
 			formulate.Templates(GetTemplate)
 			s.Reload(s.Context)
 		}
@@ -168,10 +175,12 @@ func (s *GlobalSessionData) Resize() {
 		if s.Mobile() != s.wasMobile {
 			doIt = true
 			print("Major Redraw due to change from mobile to non-mobile or vise versa")
+			dom.GetWindow().Alert("changed to mobile")
 		}
 		if s.SubMobile() != s.wasSubmobile {
 			doIt = true
 			print("redraw due to change of orientation only, inside mobile mode")
+			dom.GetWindow().Alert("changed to submobile")
 		}
 	}
 
@@ -193,29 +202,58 @@ func main() {
 	// print("cv", cv)
 	// doc.DocumentElement().Underlying().Call("requestFullScreen")
 
+	Session.LastWidth = dom.GetWindow().InnerWidth()
 	Session.Orientation = "Landscape"
 	if dom.GetWindow().InnerHeight() > dom.GetWindow().InnerWidth() {
 		Session.Orientation = "Portrait"
+	}
+	if Session.Mobile() {
+		Session.wasMobile = true
+	}
+	if Session.SubMobile() {
+		Session.wasSubmobile = true
 	}
 
 	js.Global.Set("resize", func() {
 		Session.Resize()
 	})
 
-	username, err := locstor.GetItem("username")
-	pw, err2 := locstor.GetItem("secret")
-	if err != nil {
-		print(err.Error())
-	} else if err2 != nil {
-		print(err2.Error())
-	} else {
-		print("u", username, "p", pw)
-		if username != "" && pw != "" {
-			Login(username, pw)
+	username, _ := locstor.GetItem("username")
+	pw, _ := locstor.GetItem("secret")
+	url, _ := locstor.GetItem("navigate")
+	game_id, _ := locstor.GetItem("game_id")
+	print("u", username, "p", pw, "url", url, "game_id", game_id)
+	if username != "" && pw != "" {
+		_Login(username, pw, false)
+		if Session.UserID != 0 {
+			if game_id != "" {
+				gid, err := strconv.Atoi(game_id)
+				if err != nil {
+					print(err.Error())
+				} else { // has a gameid on file
+					go func() {
+						err = RPC("GameRPC.Get", shared.GameRPCData{
+							Channel: Session.Channel,
+							ID:      gid,
+						}, &Session.EditGame)
+						if err == nil {
+							print("loaded game and nav to", Session.EditGame, url)
+							print("nav to ", url)
+							Session.Navigate(url)
+						}
+					}()
+				}
+			} else if url != "" {
+				print("no game set, but nav to ", url)
+				Session.Navigate(url)
+			}
+		} else { // login failed
+			print("autologin failed")
+			grid1()
+			loginForm()
 		}
-	}
-	if Session.UserID == 0 {
+	} else { // no username and passwd on file
+		print("no up on file")
 		grid1()
 	}
-
 }

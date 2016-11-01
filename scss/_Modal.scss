@@ -121,7 +121,7 @@ perspective effects (not including the modals and the overlay).
 	@media screen and (max-width: 700px) {
 		font-size: 1rem;
 		img {
-			max-height: 200px;
+			max-height: 80vh;
 			min-width: 66px;
 		}
 	}	
@@ -792,5 +792,5 @@ perspective effects (not including the modals and the overlay).
 }
 
 @media screen and (max-width: 32em) {
-	body { font-size: 75%; }
+	body { font-size: 112%; }
 }

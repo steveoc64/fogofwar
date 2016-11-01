@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"./shared"
+	"github.com/go-humble/locstor"
 	"github.com/go-humble/router"
 	"github.com/gopherjs/gopherjs/js"
 	"github.com/steveoc64/formulate"
@@ -187,7 +188,10 @@ func main() {
 	formulate.Templates(GetTemplate)
 	websocketInit()
 	initForms()
-	grid1()
+
+	// cv := js.Global.Get("codeVersion")
+	// print("cv", cv)
+	// doc.DocumentElement().Underlying().Call("requestFullScreen")
 
 	Session.Orientation = "Landscape"
 	if dom.GetWindow().InnerHeight() > dom.GetWindow().InnerWidth() {
@@ -197,5 +201,21 @@ func main() {
 	js.Global.Set("resize", func() {
 		Session.Resize()
 	})
+
+	username, err := locstor.GetItem("username")
+	pw, err2 := locstor.GetItem("secret")
+	if err != nil {
+		print(err.Error())
+	} else if err2 != nil {
+		print(err2.Error())
+	} else {
+		print("u", username, "p", pw)
+		if username != "" && pw != "" {
+			Login(username, pw)
+		}
+	}
+	if Session.UserID == 0 {
+		grid1()
+	}
 
 }

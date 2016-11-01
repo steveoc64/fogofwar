@@ -142,8 +142,9 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 
 		retval.CanStart = false
 		if !retval.Started {
+			println("NotStarted")
 			count := 0
-			DB.SQL(`select count(*) from game_cmd where game_id=$1 and cull=true`, data.ID).QueryScalar(&count)
+			DB.SQL(`select count(*) from game_cmd where game_id=$1 and cull=false`, data.ID).QueryScalar(&count)
 			if count == 0 {
 				print("no active commands")
 			} else {
@@ -152,6 +153,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 					print("no players at all")
 				}
 			}
+			println("Count=", count)
 			if count > 0 && (len(retval.RedCmd) > 0 && len(retval.BlueCmd) > 0) {
 				// there are commands defined
 				DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, data.ID).QueryScalar(&count)
@@ -161,9 +163,16 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 					if count == 0 {
 						// Everyone on the list has accepted .. so we can start
 						retval.CanStart = true
+					} else {
+						print("Case3")
 					}
+				} else {
+					print("Case2")
 				}
+			} else {
+				print("Case1")
 			}
+
 		}
 	}
 

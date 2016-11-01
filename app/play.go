@@ -136,25 +136,40 @@ func doTurnSummary(game *shared.Game) {
 		turn = fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)
 	}
 
-	html := fmt.Sprintf(`<text x=0 y=25 class="console-text text__%s text__2x">%s</text>"`, team, turn)
+	html := fmt.Sprintf(`<text x=2 y=15 class="console-text text__%s text__2x">%s</text>"`, team, turn)
 	html += "\n"
 
-	html += fmt.Sprintf(`<text x=0 y=50 class="console-text text__%s">%s</text>`,
+	html += fmt.Sprintf(`<text x=2 y=40 class="console-text text__%s">%s</text>`,
 		team, getPhaseDescription(game.Phase))
 	html += "\n"
 
+	// Victory Points
 	if game.Turn > 0 {
-		html += fmt.Sprintf(`<text x=0 y=75 class="console-text text__%s text__2x">Victory Points = %d</text>`,
-			team, game.Phase)
+		if Session.Orientation == "Portrait" {
+			html += fmt.Sprintf(`<text x=3 y=65 class="console-text text__%s text__2x">Victory Points = %d</text>`,
+				team, game.Phase)
+		} else {
+			html += fmt.Sprintf(`<text x=3 y=65 class="console-text text__%s text__2x">Victory Points = %d</text>`,
+				team, game.Phase)
+		}
 		html += "\n"
 	}
 
 	// Add a ready button
-	html += fmt.Sprintf(`<rect name=done-btn x=70 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
-	html += "\n"
-	if !game.PhaseDone {
-		html += fmt.Sprintf(`<text name=done-text x=75 y=93 class="console-text text__hand">Send Orders</text>`)
+	if Session.Orientation == "Portrait" {
+		html += fmt.Sprintf(`<rect name=done-btn x=40 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
 		html += "\n"
+		if !game.PhaseDone {
+			html += fmt.Sprintf(`<text name=done-text x=45 y=93 class="console-text text__hand">Send Orders</text>`)
+			html += "\n"
+		}
+	} else {
+		html += fmt.Sprintf(`<rect name=done-btn x=50 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
+		html += "\n"
+		if !game.PhaseDone {
+			html += fmt.Sprintf(`<text name=done-text x=55 y=93 class="console-text text__hand">Send Orders</text>`)
+			html += "\n"
+		}
 	}
 
 	g.SetInnerHTML(html)

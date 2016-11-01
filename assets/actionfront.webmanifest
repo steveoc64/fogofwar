@@ -1,0 +1,19 @@
+{
+  "short_name": "ActionFront App",
+  "name": "ActionFront Wargaming",
+  "icons": [
+    {
+      "src": "img/hi-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "img/favicon.png",
+      "sizes": "56x51",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}

@@ -8,6 +8,7 @@ import (
 
 	"regexp"
 
+	"github.com/go-humble/locstor"
 	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
@@ -18,6 +19,7 @@ func Login(username string, passwd string) {
 	Session.Passwd = ""
 	Session.Rank = 0
 	Session.UserID = 0
+	locstor.Clear()
 
 	lc := &shared.LoginCredentials{
 		Username: username,
@@ -48,6 +50,8 @@ func Login(username string, passwd string) {
 		Session.MaxPlayers = lr.MaxPlayers
 		Session.Version = lr.Version
 		print("Code Version -", lr.Version)
+		locstor.SetItem("username", username)
+		locstor.SetItem("secret", passwd)
 
 		loadRoutes(lr.Rank, lr.Routes)
 

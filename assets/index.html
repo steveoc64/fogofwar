@@ -3,12 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <!--Let browser know website is optimized for mobile-->
+    <meta name="application-name" content="ActionFront">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="description" content="Computer Moderated Wargaming with Napoleonic Horse & Musket Era Miniatures">
-
-    <link rel="icon" href="img/favicon.png" type="image/x-icon">
+    <link rel="manifest" href="actionfront.webmanifest">
+    <!-- <link rel="icon" href="img/favicon.png" type="image/x-icon"> -->
+    <link rel="icon" sizes="16x16 32x32 48x48" href="img/favicon.png">
+    <link rel="icon" sizes="512x512" href="img/hi-icon.png">
     <title>ActionFront</title>
 
     <!-- Fonts -->
@@ -106,6 +111,48 @@ s.setAttribute('data-timestamp', +new Date());
 </script>
 </body>
 
-<!-- Our Apps -->
+<!-- Our Apps, cached in localstorage 
+<script type="text/javascript">
+var codeVersion = "20161102"
+var script = document.createElement('script');
+    script.type = 'text/javascript';
+var head = document.getElementsByTagName('head')[0];
+
+function loadScript(url, callback)
+{
+  script.src = url;
+  script.onreadystatechange = callback;
+  script.onload = callback;
+  console.log("loading code from remote")
+  head.appendChild(script);
+}
+var throwTheFrankenSwitch = function() {
+  console.log("the code appears to be", script.text.substr(1,44))
+  if (typeof(Storage) !== "undefined") {
+    localStorage.appCode = script.text
+    console.log("the code is now cached")
+    eval(script.text)
+  }
+}
+var gotIt = false
+if (typeof(Storage) !== "undefined") {
+  console.log("we have localstorage")
+  if (!localStorage.appCode) {
+    console.log("no code locally - fetch from remote")
+  } else {
+    console.log("fetching code from localstorage")
+    eval(localStorage.appCode)
+    gotIt = true
+  }
+} else {
+  console.log("no localstorage")
+}
+if (!gotIt) {
+  loadScript("app.js", throwTheFrankenSwitch)
+}
+</script> -->
 <script src="app.js"></script>
+<script type="text/javascript">
+  codeVersion="02040"
+</script>
 </html>

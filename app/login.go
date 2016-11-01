@@ -225,6 +225,7 @@ func loginForm() {
 	doc.QuerySelector("#hamburger").Class().Add("hidden")
 	doc.QuerySelector("#faq").Class().Add("hidden")
 	loadTemplate("loginform", ".action-grid", nil)
+	doc.QuerySelector("#l-username").(*dom.HTMLInputElement).Focus()
 
 	doc.QuerySelector("#l-loginbtn").AddEventListener("click", false, func(evt dom.Event) {
 		// print("clickd on loginbtn")

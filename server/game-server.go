@@ -458,6 +458,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 	count := 0
 	unassignedCmd := false
 
+	game := shared.Game{}
+	DB.SQL(`select * from game where id=$1`, data.ID).QueryStruct(&game)
+
 	// Clear out the invites
 	DList := []int{}
 	RedList := []int{}
@@ -563,6 +566,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 		}
 		for _, v := range RedList {
 			a := v == conn.UserID
+			if game.Started {
+				a = true
+			}
 			_, err = DB.SQL(`insert into game_players
 				(game_id,player_id,red_team,accepted)
 				values ($1,$2,true,$3)`, data.ID, v, a).Exec()
@@ -577,6 +583,9 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 				// println("blue", v)
 				// If they are already in RedList, then just update the record
 				a := v == conn.UserID
+				if game.Started {
+					a = true
+				}
 				if IntSliceContains(RedList, v) {
 					_, err = DB.SQL(`update game_players set blue_team=true, accepted=$3
 						where game_id=$1 and player_id=$2 and red_team`,
@@ -612,6 +621,17 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			DB.SQL(`select count(*) from game_cmd where game_id=$1 and not cull and player_id=0`, data.ID).QueryScalar(&count)
 			if count > 0 {
 				unassignedCmd = true
+			}
+
+			if game.Started {
+				// Signal the playroutine that something has changed in the player settings
+				if play, ok := Plays[data.ID]; ok {
+					play <- PlayMessage{
+						Game:   data.ID,
+						OpCode: PlayersChanged,
+					}
+					println("Player", conn.Username, "has dropped out of game", data.ID)
+				}
 			}
 
 			// println("unassigned", unassignedCmd)

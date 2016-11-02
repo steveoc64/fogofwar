@@ -62,6 +62,20 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 		}
 
 		game := Session.EditGame
+		print("here with game", game)
+		if game.ID == 0 {
+			err := RPC("GameRPC.Get", shared.GameRPCData{
+				Channel:  Session.Channel,
+				ID:       id,
+				Red:      true,
+				Blue:     true,
+				GetUnits: true,
+			}, Session.EditGame)
+			if err != nil {
+				dom.GetWindow().Alert(err.Error())
+				return
+			}
+		}
 		game.InMode = "Team"
 		game.Mobile = Session.Mobile()
 		form := formulate.EditForm{}

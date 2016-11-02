@@ -12,6 +12,7 @@ import (
 type ConsolePaintData struct {
 	Game        *shared.Game
 	Orientation string
+	Hosting     bool
 }
 
 func _play(action string, id int, context *router.Context) {
@@ -55,6 +56,7 @@ func play(context *router.Context) {
 		loadTemplate("console", "main", ConsolePaintData{
 			Game:        game,
 			Orientation: Session.Orientation,
+			Hosting:     game.HostedBy == Session.UserID,
 		})
 
 		playMsg := func(action string, actionID int, context *router.Context) {
@@ -79,7 +81,25 @@ func play(context *router.Context) {
 			}
 		}
 
+		gameMsg := func(action string, actionID int, context *router.Context) {
+			if actionID == id {
+				print("Game update for this game")
+				newGame := &shared.Game{}
+				err := RPC("GameRPC.GetPlay", shared.GameRPCData{
+					Channel: Session.Channel,
+					ID:      id,
+				}, newGame)
+				if err != nil || game.ID == 0 {
+					dom.GetWindow().Alert("Exiting this game .. Bye, and thanks for Playing")
+					// dom.GetWindow().Alert("Cannot load game" + err.Error())
+					Session.Navigate("/")
+				}
+				game = newGame
+			}
+		}
+
 		Session.Subscribe("Play", playMsg, context)
+		Session.Subscribe("Game", gameMsg, context)
 
 		doTurnSummary(game)
 
@@ -99,6 +119,13 @@ func play(context *router.Context) {
 				}
 			}
 		})
+
+		if game.HostedBy == Session.UserID {
+			doc.QuerySelector("[name=hosting-users]").AddEventListener("click", false, func(evt dom.Event) {
+				print("edit users")
+				Session.Navigate(fmt.Sprintf("/game/%d/players", id))
+			})
+		}
 	}()
 }
 

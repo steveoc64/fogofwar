@@ -1,5 +1,10 @@
 <div class="grid-form console" name="console">
-<div class="console-title">{{.Game.Name}} {{.Game.Year}}</div>
+<div>
+{{if .Hosting}}
+<span>&nbsp;<i class="fa fa-user-circle-o fa-2x" name="hosting-users"></i></span>
+{{end}}
+<span class="console-title">{{.Game.Name}} {{.Game.Year}}</span>
+</div>
 <div class="console-button-bar {{if eq "Portrait" .Orientation}}console-button-bar-portrait{{end}}">
 	<input type="button" class="button button-console" value="Orders">
 	<input type="button" class="button button-console" value="Map">

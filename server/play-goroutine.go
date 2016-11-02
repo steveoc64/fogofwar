@@ -19,6 +19,7 @@ const (
 	PlayerPhaseNotDone
 	PlayerConnected
 	PlayerDisconnected
+	PlayersChanged
 )
 
 type PlayMessage struct {
@@ -296,6 +297,9 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				loadPlayerConnectionStatus(state)
 			case PlayerDisconnected:
 				fmt.Fprintf(fp, "Player %d Has Left the Game\n", m.PlayerID)
+				loadPlayerConnectionStatus(state)
+			case PlayersChanged:
+				fmt.Fprintf(fp, "Player Teams have been modified - reload")
 				loadPlayerConnectionStatus(state)
 			case PlayerPhaseDone, PlayerPhaseNotDone:
 				if m.OpCode == PlayerPhaseNotDone {

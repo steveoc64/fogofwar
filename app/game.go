@@ -311,124 +311,139 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		game = Session.EditGame
 		locstor.SetItem("game_id", fmt.Sprintf("%d", game.ID))
 	}
-	game.InMode = "Players"
-	game.Mobile = Session.Mobile()
-	form := formulate.EditForm{}
 
-	// Layout the fields
-	form.New("fa-user", "Players for Game - "+game.Name)
+	go func() {
 
-	form.Row(1).
-		AddCustom(1, "", "PlayerList", "")
+		game.InMode = "Players"
+		game.Mobile = Session.Mobile()
+		err = RPC("GameRPC.Get", shared.GameRPCData{
+			Channel:  Session.Channel,
+			ID:       id,
+			Red:      true,
+			Blue:     true,
+			GetUnits: true,
+		}, Session.EditGame)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			return
+		}
+		form := formulate.EditForm{}
 
-	// Add event handlers
-	form.CancelEvent(func(evt dom.Event) {
-		evt.PreventDefault()
-		Session.Navigate(fmt.Sprintf("/game/%d", id))
-	})
+		// Layout the fields
+		form.New("fa-user", "Players for Game - "+game.Name)
 
-	form.Render("edit-form", "main", game)
-	loadTemplate("game-edit-player", "[name=PlayerList]", game)
+		form.Row(1).
+			AddCustom(1, "", "PlayerList", "")
 
-	form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
-		print("clicked on", url)
-		Session.Navigate(url)
-	})
-
-	form.OnEvent("PlayerList", "keydown", func(evt dom.Event) {
-		k := evt.(*dom.KeyboardEvent)
-		el := evt.Target()
-		// tag := el.TagName()
-		if k.KeyCode == 13 {
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
 			evt.PreventDefault()
-			td := el.ParentElement()
-			if td.TagName() == "TD" {
-				thisTR := td.ParentElement()
-				thisTBODY := thisTR.ParentElement()
-				nextTR := thisTR.NextElementSibling()
-				if nextTR != nil {
-					nextInput := nextTR.QuerySelector(".edit__player")
-					if nextInput == nil {
-						// must be a header
-						nextTR = nextTR.NextElementSibling()
-						if nextTR == nil {
-							print("looks like we hit the end - jump back to the first field")
-							nextInput = thisTBODY.QuerySelector(".edit__player")
-						} else {
-							if nextTR.TagName() != "TR" {
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
+		})
+
+		form.Render("edit-form", "main", game)
+		loadTemplate("game-edit-player", "[name=PlayerList]", game)
+
+		form.ActionGrid("game-actions", "#action-grid", game, func(url string) {
+			print("clicked on", url)
+			Session.Navigate(url)
+		})
+
+		form.OnEvent("PlayerList", "keydown", func(evt dom.Event) {
+			k := evt.(*dom.KeyboardEvent)
+			el := evt.Target()
+			// tag := el.TagName()
+			if k.KeyCode == 13 {
+				evt.PreventDefault()
+				td := el.ParentElement()
+				if td.TagName() == "TD" {
+					thisTR := td.ParentElement()
+					thisTBODY := thisTR.ParentElement()
+					nextTR := thisTR.NextElementSibling()
+					if nextTR != nil {
+						nextInput := nextTR.QuerySelector(".edit__player")
+						if nextInput == nil {
+							// must be a header
+							nextTR = nextTR.NextElementSibling()
+							if nextTR == nil {
+								print("looks like we hit the end - jump back to the first field")
 								nextInput = thisTBODY.QuerySelector(".edit__player")
 							} else {
-								nextInput = nextTR.QuerySelector(".edit__player")
+								if nextTR.TagName() != "TR" {
+									nextInput = thisTBODY.QuerySelector(".edit__player")
+								} else {
+									nextInput = nextTR.QuerySelector(".edit__player")
+								}
 							}
 						}
-					}
-					if nextInput != nil {
-						nextInput.(*dom.HTMLInputElement).Focus()
-						nextInput.(*dom.HTMLInputElement).Select()
+						if nextInput != nil {
+							nextInput.(*dom.HTMLInputElement).Focus()
+							nextInput.(*dom.HTMLInputElement).Select()
+						}
 					}
 				}
 			}
-		}
-	})
+		})
 
-	form.OnEvent("PlayerList", "change", func(evt dom.Event) {
-		el := evt.Target()
-		if el.TagName() == "INPUT" {
-			key, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			team := el.GetAttribute("data-team")
-			thePlayer := el.(*dom.HTMLInputElement).Value
-			TheCmd := game.GetCmd(team, key)
+		form.OnEvent("PlayerList", "change", func(evt dom.Event) {
+			el := evt.Target()
+			if el.TagName() == "INPUT" {
+				key, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				team := el.GetAttribute("data-team")
+				thePlayer := el.(*dom.HTMLInputElement).Value
+				TheCmd := game.GetCmd(team, key)
 
-			go func() {
-				if thePlayer == "" {
-					TheCmd.PlayerID = 0
-					TheCmd.PlayerName = ""
-				} else {
-					theID := 0
-					err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
-						Channel:  Session.Channel,
-						Username: thePlayer,
-					}, &theID)
-					TheCmd.PlayerID = theID
-
-					if err != nil {
-						dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
-						TheCmd.PlayerName = ""
+				go func() {
+					if thePlayer == "" {
 						TheCmd.PlayerID = 0
+						TheCmd.PlayerName = ""
 					} else {
-						if TheCmd.PlayerID == 0 {
-							TheCmd.PlayerName = ""
-						} else {
-							TheCmd.PlayerName = thePlayer
-						}
-						// print("assign cmd to player", TheCmd, thePlayer)
-					}
-				}
-				// Now update the command
-				done := false
-				err := RPC("GameRPC.SetCmdPlayer", shared.GameCmdRPCData{
-					Channel:  Session.Channel,
-					ID:       key,
-					PlayerID: TheCmd.PlayerID,
-					Team:     team,
-				}, &done)
-				if err == nil {
-					// print("new player set")
-					gravatar := ""
-					err = RPC("UserRPC.GetAvatar", shared.AvatarRequest{
-						Channel:  Session.Channel,
-						Username: thePlayer,
-						Size:     64,
-					}, &gravatar)
-					if err == nil {
-						el := form.Get(fmt.Sprintf("avatar-%d", key)).(*dom.HTMLImageElement)
-						el.Src = gravatar
-					}
-				}
-			}()
-		}
-	})
+						theID := 0
+						err := RPC("UserRPC.GetIDByName", shared.UserRPCData{
+							Channel:  Session.Channel,
+							Username: thePlayer,
+						}, &theID)
+						TheCmd.PlayerID = theID
 
+						if err != nil {
+							dom.GetWindow().Alert("Sorry, that username does not exist - try again !")
+							TheCmd.PlayerName = ""
+							TheCmd.PlayerID = 0
+						} else {
+							if TheCmd.PlayerID == 0 {
+								TheCmd.PlayerName = ""
+							} else {
+								TheCmd.PlayerName = thePlayer
+							}
+							// print("assign cmd to player", TheCmd, thePlayer)
+						}
+					}
+					// Now update the command
+					done := false
+					err := RPC("GameRPC.SetCmdPlayer", shared.GameCmdRPCData{
+						Channel:  Session.Channel,
+						ID:       key,
+						PlayerID: TheCmd.PlayerID,
+						Team:     team,
+					}, &done)
+					if err == nil {
+						// print("new player set")
+						gravatar := ""
+						err = RPC("UserRPC.GetAvatar", shared.AvatarRequest{
+							Channel:  Session.Channel,
+							Username: thePlayer,
+							Size:     64,
+						}, &gravatar)
+						if err == nil {
+							el := form.Get(fmt.Sprintf("avatar-%d", key)).(*dom.HTMLImageElement)
+							el.Src = gravatar
+						}
+					}
+				}()
+			}
+		})
+
+	}()
 	// showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
 
 }

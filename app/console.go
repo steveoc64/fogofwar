@@ -9,10 +9,6 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-const SVG = "http://www.w3.org/2000/svg"
-
-const SVGStar = `<polygon xmlns="http://www.w3.org/2000/svg" fill="#fdff00" stroke="#605a00" stroke-width="15" points="150,25 179,111 269,111 197,165 223,251 150,200 77,251 103,165 31,111 121,111"/>`
-
 func play(context *router.Context) {
 	Session.Subscribe("Play", _play, context)
 	_play("Edit", 0, context)
@@ -67,13 +63,14 @@ func _play(action string, actionID int, context *router.Context) {
 				btnv := evt.Target().(*dom.HTMLInputElement).Value
 				switch btnv {
 				case "Order":
-					doOrders(game)
+					doCorpsOverview(game)
 				case "Map":
 					doMap(game)
 				case "Units":
 					doUnits(game)
 				case "Game":
-					doGameControl(game)
+					doTurnSummary(game)
+					// doGameControl(game)
 				}
 			}
 		})
@@ -117,8 +114,6 @@ func getPhaseDescription(phase int) string {
 }
 
 func doTurnSummary(game *shared.Game) {
-	// Render the orders
-
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -136,86 +131,102 @@ func doTurnSummary(game *shared.Game) {
 		turn = fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)
 	}
 
-	html := fmt.Sprintf(`<text x=2 y=15 class="console-text text__%s text__2x">%s</text>"`, team, turn)
-	html += "\n"
-
-	html += fmt.Sprintf(`<text x=2 y=40 class="console-text text__%s">%s</text>`,
-		team, getPhaseDescription(game.Phase))
-	html += "\n"
-
-	// Victory Points
+	html := svgText(2, 15, 2, team, turn)
+	html += svgText(2, 40, 1, team, getPhaseDescription(game.Phase))
 	if game.Turn > 0 {
-		if Session.Orientation == "Portrait" {
-			html += fmt.Sprintf(`<text x=3 y=65 class="console-text text__%s text__2x">Victory Points = %d</text>`,
-				team, game.Phase)
-		} else {
-			html += fmt.Sprintf(`<text x=3 y=65 class="console-text text__%s text__2x">Victory Points = %d</text>`,
-				team, game.Phase)
-		}
-		html += "\n"
+		html += svgText(3, 65, 2, team, fmt.Sprintf("Victory Points = %d", game.Phase))
 	}
-
-	// Add a ready button
-	if !game.PhaseTODO {
-		if Session.Orientation == "Portrait" {
-			html += fmt.Sprintf(`<rect name=done-btn x=40 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
-			html += "\n"
-			if !game.PhaseDone {
-				html += fmt.Sprintf(`<text name=done-text x=45 y=93 class="console-text text__hand">Send Orders</text>`)
-				html += "\n"
-			}
-		} else {
-			html += fmt.Sprintf(`<rect name=done-btn x=50 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
-			html += "\n"
-			if !game.PhaseDone {
-				html += fmt.Sprintf(`<text name=done-text x=55 y=93 class="console-text text__hand">Send Orders</text>`)
-				html += "\n"
-			}
-		}
-	}
-
-	g.SetInnerHTML(html)
 
 	dispatchOrders := func(evt dom.Event) {
-		print("dispatch orders")
-		el := evt.Target()
-		tag := el.TagName()
-		if tag == "rect" {
-			el2 := el.NextElementSibling()
-			if el2.TagName() == "text" {
-				el2.SetInnerHTML("Dispatched!")
-				c := el.Class()
-				c.Remove("text__paper")
-				c.Add("text__done")
+		game.PhaseDONE = true
+		paperButtonSet(evt, "Dispatched!")
+		go func() {
+			done := false
+			err := RPC("GameRPC.PhaseDone", shared.PhaseDoneMsg{
+				Channel: Session.Channel,
+				GameID:  game.ID,
+			}, &done)
+			if err != nil {
+				print(err.Error())
 			}
-		}
-		if tag == "text" {
-			el.SetInnerHTML("Dispatched!")
-			c := el.PreviousElementSibling().Class()
-			c.Remove("text__paper")
-			c.Add("text__done")
-		}
+		}()
 	}
 
+	// Add a send button, unless we still have things on the TODO list
 	if !game.PhaseTODO {
-		doc.QuerySelector("[name=done-btn]").AddEventListener("click", false, func(evt dom.Event) {
-			dispatchOrders(evt)
-		})
-		doc.QuerySelector("[name=done-text]").AddEventListener("click", false, func(evt dom.Event) {
-			dispatchOrders(evt)
-		})
+		html += paperButton("done", "Send Orders", 40, 85, 45, 40, 85, dispatchOrders)
 	}
+	g.SetInnerHTML(html)
+
+	if !game.PhaseTODO {
+		paperCallback("done", dispatchOrders)
+	}
+
+	// if !game.PhaseTODO {
+	// 	if Session.Orientation == "Portrait" {
+	// 		html += fmt.Sprintf(`<rect name=done-btn x=40 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
+	// 		html += "\n"
+	// 		if !game.PhaseDone {
+	// 			html += fmt.Sprintf(`<text name=done-text x=45 y=93 class="console-text text__hand">Send Orders</text>`)
+	// 			html += "\n"
+	// 		}
+	// 	} else {
+	// 		html += fmt.Sprintf(`<rect name=done-btn x=50 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
+	// 		html += "\n"
+	// 		if !game.PhaseDone {
+	// 			html += fmt.Sprintf(`<text name=done-text x=55 y=93 class="console-text text__hand">Send Orders</text>`)
+	// 			html += "\n"
+	// 		}
+	// 	}
+	// }
+
+	// if !game.PhaseTODO {
+	// 	doc.QuerySelector("[name=done-rect]").AddEventListener("click", false, func(evt dom.Event) {
+	// 		dispatchOrders(evt)
+	// 	})
+	// 	doc.QuerySelector("[name=done-text]").AddEventListener("click", false, func(evt dom.Event) {
+	// 		dispatchOrders(evt)
+	// 	})
+	// }
 
 }
 
-func doOrders(game *shared.Game) {
-	// Render the orders
-
+func doCorpsOverview(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
-	print("console", c)
 
+	// mock the act of completing the TODO list
+	game.PhaseTODO = false
+	go func() {
+		done := false
+		err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
+			Channel: Session.Channel,
+			GameID:  game.ID,
+		}, &done)
+		if err != nil {
+			print(err.Error())
+		}
+	}()
+
+	// Add a turn summary object
+	g := c.QuerySelector("[name=g-main]")
+	html := ""
+
+	// Add a buton per Red corps
+	for _, corps := range game.RedCmd {
+		print("add button for red", corps.Name)
+	}
+	// Add a buton per Blue cor
+	for _, corps := range game.BlueCmd {
+		print("add button for blue", corps.Name)
+	}
+	g.SetInnerHTML(html)
+}
+
+// Render the orders
+func doOrders(game *shared.Game) {
+	print("TODO - doOrders")
 }
 
 func doMap(game *shared.Game) {

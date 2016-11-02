@@ -14,10 +14,12 @@ const (
 	GameRewind
 	GameRestart
 	GamePause
+	PlayerPhaseDone
+	PlayerPhaseNotDone
 )
 
 type PlayMessage struct {
-	Game     *shared.Game
+	Game     int
 	PlayerID int
 	OpCode   int
 }
@@ -29,7 +31,7 @@ var Plays map[int]chan<- PlayMessage
 func InitGames() {
 	// on boot, start up a goroutine for every running game
 	println("Firing up Game Threads ...")
-	Plays := make(map[int]chan<- PlayMessage)
+	Plays = make(map[int]chan<- PlayMessage)
 	ids := []int{}
 	err := DB.SQL(`select id from game where started and not stopped`).QuerySlice(&ids)
 	if err != nil {
@@ -49,11 +51,16 @@ func StartPlay(gameID int) chan<- PlayMessage {
 	return playChannel
 }
 
+type PlayerState struct {
+	TODO bool
+	Done bool
+}
+
 type PlayState struct {
 	Game *shared.Game
 }
 
-func loadGameData(id int, retval *shared.Game) error {
+func loadGameData(id int, state PlayState) error {
 	err := DB.SQL(`select
 			g.*,u.username as host_name,u.email as host_email,
 				coalesce(p_red.reds, 0) as num_red_players,
@@ -62,7 +69,7 @@ func loadGameData(id int, retval *shared.Game) error {
 			left join users u on u.id=g.hosted_by
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
-		where g.id=$1`, id).QueryStruct(retval)
+		where g.id=$1`, id).QueryStruct(state.Game)
 	if err != nil {
 		return err
 	}
@@ -76,7 +83,7 @@ func loadGameData(id int, retval *shared.Game) error {
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
-				where g.game_id=$1 and g.red_team order by g.name`, id).QueryStructs(&retval.RedCmd)
+				where g.game_id=$1 and g.red_team order by g.name`, id).QueryStructs(&state.Game.RedCmd)
 	if err != nil {
 		return err
 	}
@@ -88,13 +95,13 @@ func loadGameData(id int, retval *shared.Game) error {
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				left join game_players p on p.game_id=$1 and p.player_id=g.player_id
-				where g.game_id=$1 and g.blue_team order by g.name`, id).QueryStructs(&retval.BlueCmd)
+				where g.game_id=$1 and g.blue_team order by g.name`, id).QueryStructs(&state.Game.BlueCmd)
 	if err != nil {
 		return err
 	}
 
 	// Get the units for each command
-	for _, v := range retval.RedCmd {
+	for _, v := range state.Game.RedCmd {
 		err = DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 			v.ID, id).QueryStructs(&v.Units)
 		if err != nil {
@@ -102,7 +109,7 @@ func loadGameData(id int, retval *shared.Game) error {
 		}
 		v.CalcTotals()
 	}
-	for _, v := range retval.BlueCmd {
+	for _, v := range state.Game.BlueCmd {
 		err = DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 			v.ID, id).QueryStructs(&v.Units)
 		if err != nil {
@@ -113,33 +120,42 @@ func loadGameData(id int, retval *shared.Game) error {
 
 	if err == nil {
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),u.id as player_id,p.accepted
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
-			order by u.username`, id).QueryStructs(&retval.RedPlayers)
+			order by u.username`, id).QueryStructs(&state.Game.RedPlayers)
+		for _, v := range state.Game.RedPlayers {
+			v.Done = false
+			v.TODO = true
+		}
 
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team
-			order by u.username`, id).QueryStructs(&retval.BluePlayers)
+			order by u.username`, id).QueryStructs(&state.Game.BluePlayers)
+		for _, v := range state.Game.BluePlayers {
+			v.Done = false
+			v.TODO = true
+		}
+
 	}
 
 	// calculate the x and y km
-	retval.CalcKm()
-	retval.CalcGrid()
-	retval.TileX = retval.GridX
-	retval.TileY = retval.GridY
+	state.Game.CalcKm()
+	state.Game.CalcGrid()
+	state.Game.TileX = state.Game.GridX
+	state.Game.TileY = state.Game.GridY
 
 	// and fetch the tiles from storage
-	err = DB.SQL(`select i,height,content,owner from tiles where game_id=$1 order by i`, id).QueryStructs(&retval.Tiles)
+	err = DB.SQL(`select i,height,content,owner from tiles where game_id=$1 order by i`, id).QueryStructs(&state.Game.Tiles)
 	if err != nil {
 		return err
 	}
 
 	// and fetch the objectives
-	err = DB.SQL(`select * from game_objective where game_id=$1`, id).QueryStructs(&retval.Objectives)
+	err = DB.SQL(`select * from game_objective where game_id=$1`, id).QueryStructs(&state.Game.Objectives)
 	return err
 }
 
@@ -229,12 +245,13 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	state := PlayState{
 		Game: &shared.Game{},
 	}
-	err = loadGameData(id, state.Game)
+	err = loadGameData(id, state)
 	if err != nil {
 		log.Printf("Error Loading Game State: %s\n", err.Error())
 		fmt.Fprintf(fp, "Error Loading Game State: %s\n", err.Error())
 		return
 	}
+
 	log.Printf("Starting Game GoRoutine for %d\n", id)
 	if !logexists {
 		fmt.Fprintf(fp, "====================================\nStart GameRoutine %s\n", getTimeStamp())
@@ -242,6 +259,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	} else {
 		fmt.Fprintf(fp, "====================================\nRe-Start GameRoutine %s\n", getTimeStamp())
 	}
+	fmt.Fprintf(fp, "Turn %d of %d, Phase %d\n", state.Game.Turn, state.Game.TurnLimit, state.Game.Phase)
 
 	for {
 		select {
@@ -250,7 +268,8 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				println("Error reading from PlayChannel")
 				return
 			}
-			fmt.Fprintf(fp, "Message: %v", m)
+			// fmt.Fprintf(fp, "%s %v\n  ", getTimeStamp(), m)
+			fmt.Fprintf(fp, "» %v\n  ", m)
 			switch m.OpCode {
 			case GameEnds:
 				fmt.Fprintf(fp, "End\n")
@@ -260,11 +279,63 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Restart\n")
 			case GameRewind:
 				fmt.Fprintf(fp, "Rewind\n")
+			case PlayerPhaseDone:
+				fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
+				playerDone(state, m.PlayerID, true)
+				if allDone(state) {
+					fmt.Fprintf(fp, "ALL DONE - phase ends\n")
+					println(".. ALL DONE - phase ends in game", state.Game.ID)
+				} else {
+					println(".. still more players to finish yet")
+				}
+			case PlayerPhaseNotDone:
+				fmt.Fprintf(fp, "Player %d is Not Done Yet\n", m.PlayerID)
+				playerDone(state, m.PlayerID, false)
+				if allDone(state) {
+					fmt.Fprintf(fp, "ALL DONE - phase ends\n")
+					println(".. ALL DONE - phase ends in game", state.Game.ID)
+				} else {
+					println(".. still more players to finish yet")
+				}
 			}
 		case <-time.After(60 * time.Second):
 
 			// print("tick", id)
 			// fmt.Fprintf(fp, "Real Time: %s\n", getTimeStamp())
+		}
+	}
+}
+
+func allDone(state PlayState) bool {
+	for _, v := range state.Game.RedPlayers {
+		if !v.Done {
+			fmt.Printf("aint done yet %v\n", v)
+			return false
+		}
+	}
+	for _, v := range state.Game.BluePlayers {
+		if !v.Done {
+			fmt.Printf("aint done yet %v\n", v)
+			return false
+		}
+	}
+	println("caint find nuthin not don")
+	return true
+}
+
+func playerDone(state PlayState, pid int, done bool) {
+	for i, v := range state.Game.RedPlayers {
+		if v.PlayerID == pid {
+			state.Game.RedPlayers[i].Done = done
+			// fmt.Printf("Before and After state %v\n%v", v, state.Game.RedPlayers[i])
+			return
+		}
+	}
+	for i, v := range state.Game.BluePlayers {
+		if v.PlayerID == pid {
+			state.Game.BluePlayers[i].Done = done
+			// fmt.Printf("Befone and After state %v\n%v", v, state.Game.BluePlayers[i])
+			return
 		}
 	}
 }

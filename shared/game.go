@@ -94,7 +94,7 @@ type Game struct {
 	Blue            bool
 	Team            string
 	CanStart        bool
-	PhaseDone       bool
+	PhaseDONE       bool
 	PhaseTODO       bool
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
@@ -155,8 +155,11 @@ type Game struct {
 }
 
 type GamePlayerData struct {
+	PlayerID int    `db:"player_id"`
 	Username string `db:"username"`
 	Accepted bool   `db:"accepted"`
+	Done     bool
+	TODO     bool
 }
 
 type GamePlayers struct {

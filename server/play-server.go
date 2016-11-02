@@ -164,3 +164,49 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 
 	return err
 }
+
+func (g *GameRPC) PhaseDone(data shared.PhaseDoneMsg, retval *bool) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	err := error(nil)
+
+	// Send message to the play-goroutine to say that this player is done
+	if play, ok := Plays[data.GameID]; ok {
+		play <- PlayMessage{
+			Game:     data.GameID,
+			PlayerID: conn.UserID,
+			OpCode:   PlayerPhaseDone,
+		}
+	} else {
+		err = errors.New("Invalid Game ID")
+	}
+
+	logger(start, "Game.PhaseDone", conn,
+		fmt.Sprintf("Game %d", data.GameID), "")
+
+	return err
+}
+
+func (g *GameRPC) PhaseNotDone(data shared.PhaseDoneMsg, retval *bool) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	err := error(nil)
+
+	// Send message to the play-goroutine to say that this player is done
+	if play, ok := Plays[data.GameID]; ok {
+		play <- PlayMessage{
+			Game:     data.GameID,
+			PlayerID: conn.UserID,
+			OpCode:   PlayerPhaseNotDone,
+		}
+	} else {
+		err = errors.New("Invalid Game ID")
+	}
+
+	logger(start, "Game.PhaseNotDone", conn,
+		fmt.Sprintf("Game %d", data.GameID), "")
+
+	return err
+}

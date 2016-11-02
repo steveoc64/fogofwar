@@ -156,19 +156,21 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	// Add a ready button
-	if Session.Orientation == "Portrait" {
-		html += fmt.Sprintf(`<rect name=done-btn x=40 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
-		html += "\n"
-		if !game.PhaseDone {
-			html += fmt.Sprintf(`<text name=done-text x=45 y=93 class="console-text text__hand">Send Orders</text>`)
+	if !game.PhaseTODO {
+		if Session.Orientation == "Portrait" {
+			html += fmt.Sprintf(`<rect name=done-btn x=40 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
 			html += "\n"
-		}
-	} else {
-		html += fmt.Sprintf(`<rect name=done-btn x=50 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
-		html += "\n"
-		if !game.PhaseDone {
-			html += fmt.Sprintf(`<text name=done-text x=55 y=93 class="console-text text__hand">Send Orders</text>`)
+			if !game.PhaseDone {
+				html += fmt.Sprintf(`<text name=done-text x=45 y=93 class="console-text text__hand">Send Orders</text>`)
+				html += "\n"
+			}
+		} else {
+			html += fmt.Sprintf(`<rect name=done-btn x=50 y=85 rx=2 ry=2 width=45 height=12 class=text__paper></rect>`)
 			html += "\n"
+			if !game.PhaseDone {
+				html += fmt.Sprintf(`<text name=done-text x=55 y=93 class="console-text text__hand">Send Orders</text>`)
+				html += "\n"
+			}
 		}
 	}
 
@@ -195,12 +197,14 @@ func doTurnSummary(game *shared.Game) {
 		}
 	}
 
-	doc.QuerySelector("[name=done-btn]").AddEventListener("click", false, func(evt dom.Event) {
-		dispatchOrders(evt)
-	})
-	doc.QuerySelector("[name=done-text]").AddEventListener("click", false, func(evt dom.Event) {
-		dispatchOrders(evt)
-	})
+	if !game.PhaseTODO {
+		doc.QuerySelector("[name=done-btn]").AddEventListener("click", false, func(evt dom.Event) {
+			dispatchOrders(evt)
+		})
+		doc.QuerySelector("[name=done-text]").AddEventListener("click", false, func(evt dom.Event) {
+			dispatchOrders(evt)
+		})
+	}
 
 }
 

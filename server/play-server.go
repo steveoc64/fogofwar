@@ -152,10 +152,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 		err2 = DB.SQL(`select * from game_objective where game_id=$1`, data.ID).QueryStructs(&retval.Objectives)
 
 		// TODO - pull in the players on this game
-
-		// Dont need the orders for each corps at this level
-		// Dont need the units for each corps at this level
-
+		retval.PhaseTODO = true
 	}
 
 	logger(start, "Game.GetPlay", conn,

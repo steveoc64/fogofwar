@@ -40,7 +40,7 @@ func InitGames() {
 		Plays[v] = StartPlay(v)
 	}
 
-	fmt.Printf("Created map of channels %d\n", Plays)
+	// fmt.Printf("Created map of channels %d\n", Plays)
 }
 
 func StartPlay(gameID int) chan<- PlayMessage {
@@ -262,7 +262,9 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Rewind\n")
 			}
 		case <-time.After(60 * time.Second):
-			fmt.Fprintf(fp, "Real Time: %s\n", getTimeStamp())
+
+			// print("tick", id)
+			// fmt.Fprintf(fp, "Real Time: %s\n", getTimeStamp())
 		}
 	}
 }

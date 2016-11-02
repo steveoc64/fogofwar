@@ -91,6 +91,10 @@ func _mainPage(action string, id int, context *router.Context) {
 
 			// formulate.MainContainer("wide-container")
 			// formInvite.Render("game-invites-list", "#main-container", &invites)
+			if doc.QuerySelector(".data-container") == nil {
+				// print("computing main when we shouldnt be .. quitting")
+				return
+			}
 			formulate.InsertDiv("game-invites", ".data-container", "#action-grid")
 			formInvite.RenderNoContainer("game-invites-list", "#game-invites", &invites)
 		}

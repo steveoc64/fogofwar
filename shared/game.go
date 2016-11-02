@@ -95,6 +95,7 @@ type Game struct {
 	Team            string
 	CanStart        bool
 	PhaseDone       bool
+	PhaseTODO       bool
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
 	HostName        string           `db:"host_name"`

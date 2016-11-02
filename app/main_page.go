@@ -59,6 +59,9 @@ func _mainPage(action string, id int, context *router.Context) {
 
 			// formulate.MainContainer("wide-container")
 			// formInvite.Render("game-invites-list", "#main-container", &invites)
+			if doc.QuerySelector(".data-container") == nil {
+				return
+			}
 			formulate.InsertDiv("progress-games", ".data-container", "#action-grid")
 			form.RenderNoContainer("game-inprogress-list", "#progress-games", &games)
 		}
@@ -164,6 +167,9 @@ func _mainPage(action string, id int, context *router.Context) {
 
 			// formulate.AppendDiv("hosted-games").Class().SetString("wide-container")
 			// formulate.AppendDiv("hosted-games")
+			if doc.QuerySelector(".data-container") == nil {
+				return
+			}
 			formulate.InsertDiv("hosted-games", ".data-container", "#action-grid")
 			form.RenderNoContainer("game-list", "#hosted-games", myGames)
 		}

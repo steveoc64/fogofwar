@@ -152,6 +152,7 @@ type Game struct {
 	RedPlayers      []GamePlayerData
 	BluePlayers     []GamePlayerData
 	Accepted        bool // Requesting player has accepted
+	VP              int
 }
 
 type GamePlayerData struct {

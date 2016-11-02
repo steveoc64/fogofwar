@@ -197,6 +197,7 @@ func main() {
 	formulate.Templates(GetTemplate)
 	websocketInit()
 	initForms()
+	// gob.RegisterName("shared.Game", shared.Game{})
 
 	// cv := js.Global.Get("codeVersion")
 	// print("cv", cv)
@@ -222,7 +223,7 @@ func main() {
 	pw, _ := locstor.GetItem("secret")
 	url, _ := locstor.GetItem("navigate")
 	game_id, _ := locstor.GetItem("game_id")
-	print("u", username, "p", pw, "url", url, "game_id", game_id)
+	// print("u", username, "p", pw, "url", url, "game_id", game_id)
 	if username != "" && pw != "" {
 		_Login(username, pw, false)
 		if Session.UserID != 0 {
@@ -238,13 +239,17 @@ func main() {
 						}, &Session.EditGame)
 						if err == nil {
 							print("loaded game and nav to", Session.EditGame, url)
-							Session.Navigate(url)
+							if url != "/" {
+								Session.Navigate(url)
+							}
 						}
 					}()
 				}
 			} else if url != "" {
-				print("no game set, but nav to ", url)
-				Session.Navigate(url)
+				// print("no game set, but nav to ", url)
+				if url != "/" {
+					Session.Navigate(url)
+				}
 			}
 		} else { // login failed
 			print("autologin failed")
@@ -252,7 +257,7 @@ func main() {
 			loginForm()
 		}
 	} else { // no username and passwd on file
-		print("no up on file")
+		// print("no up on file")
 		grid1()
 	}
 }

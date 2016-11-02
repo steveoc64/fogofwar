@@ -16,18 +16,39 @@ func svgText(x, y, s int, team, text string) string {
 	return html
 }
 
-func paperButton(name, text string, x, y, w, px, py int, callback func(dom.Event)) string {
+func paperButton(name, text string, x, y, w int, callback func(dom.Event)) string {
 	html := ""
 
 	if Session.Orientation == "Portrait" {
 		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
-			name, px, py, w)
+			name, x, y, w)
 		html += "\n"
 		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-			name, px+5, py+8, text)
+			name, x+5, y+8, text)
 		html += "\n"
 	} else {
 		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
+			name, x, y, w)
+		html += "\n"
+		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
+			name, x+5, y+8, text)
+		html += "\n"
+	}
+	return html
+}
+
+func paperDoneButton(name, text string, x, y, w int) string {
+	html := ""
+
+	if Session.Orientation == "Portrait" {
+		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
+			name, x, y, w)
+		html += "\n"
+		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
+			name, x+5, y+8, text)
+		html += "\n"
+	} else {
+		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
 			name, x, y, w)
 		html += "\n"
 		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,

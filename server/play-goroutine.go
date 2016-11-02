@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"os"
@@ -30,6 +31,7 @@ var Plays map[int]chan<- PlayMessage
 
 func InitGames() {
 	// on boot, start up a goroutine for every running game
+	gob.RegisterName("shared.Game", shared.Game{})
 	println("Firing up Game Threads ...")
 	Plays = make(map[int]chan<- PlayMessage)
 	ids := []int{}
@@ -261,6 +263,9 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	}
 	fmt.Fprintf(fp, "Turn %d of %d, Phase %d\n", state.Game.Turn, state.Game.TurnLimit, state.Game.Phase)
 
+	// Before we start, let the players know that we are back to life over here
+	sendPhaseUpdates(state, false)
+
 	for {
 		select {
 		case m, ok := <-playChannel:
@@ -269,7 +274,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				return
 			}
 			// fmt.Fprintf(fp, "%s %v\n  ", getTimeStamp(), m)
-			fmt.Fprintf(fp, "» %v\n  ", m)
+			// fmt.Fprintf(fp, "» %v\n  ", m)
 			switch m.OpCode {
 			case GameEnds:
 				fmt.Fprintf(fp, "End\n")
@@ -279,21 +284,36 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Restart\n")
 			case GameRewind:
 				fmt.Fprintf(fp, "Rewind\n")
-			case PlayerPhaseDone:
-				fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
-				playerDone(state, m.PlayerID, true)
-				if allDone(state) {
-					fmt.Fprintf(fp, "ALL DONE - phase ends\n")
-					println(".. ALL DONE - phase ends in game", state.Game.ID)
+			case PlayerPhaseDone, PlayerPhaseNotDone:
+				if m.OpCode == PlayerPhaseNotDone {
+					fmt.Fprintf(fp, "Player %d is Not Done Yet\n", m.PlayerID)
+					playerDone(state, m.PlayerID, false)
 				} else {
-					println(".. still more players to finish yet")
+					fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
+					playerDone(state, m.PlayerID, true)
 				}
-			case PlayerPhaseNotDone:
-				fmt.Fprintf(fp, "Player %d is Not Done Yet\n", m.PlayerID)
-				playerDone(state, m.PlayerID, false)
 				if allDone(state) {
-					fmt.Fprintf(fp, "ALL DONE - phase ends\n")
+					fmt.Fprintf(fp, "ALL DONE - phase %d ends\n", state.Game.Phase)
 					println(".. ALL DONE - phase ends in game", state.Game.ID)
+					newTurn := false
+					state.Game.Phase++
+					if state.Game.Phase > 6 {
+						state.Game.Phase = 1
+						state.Game.Turn++
+						newTurn = true
+					}
+					fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
+					fmt.Fprintf(fp, "Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
+					if state.Game.Turn >= state.Game.TurnLimit {
+						println("TURN Limit Reached")
+						fmt.Fprintf(fp, "TURN Limit %d Reached\n", state.Game.TurnLimit)
+					}
+					sendPhaseUpdates(state, newTurn)
+					_, err := DB.SQL(`update game set turn=$2,phase=$3 where id=$1`,
+						state.Game.ID, state.Game.Turn, state.Game.Phase).Exec()
+					if err != nil {
+						fmt.Fprintf(fp, "DB Error %s\n", err.Error())
+					}
 				} else {
 					println(".. still more players to finish yet")
 				}
@@ -306,20 +326,57 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	}
 }
 
+func sendPhaseUpdates(state PlayState, newTurn bool) {
+	println("sending phase updates")
+	for i, v := range state.Game.RedPlayers {
+		println("sent to red", v.Username)
+		if newTurn {
+			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
+			state.Game.RedPlayers[i].TODO = true
+			state.Game.RedPlayers[i].Done = false
+		} else {
+			// half the time have nothing to do
+			fmt.Printf("%d %% 2 = %d", state.Game.Phase, state.Game.Phase%2)
+			if state.Game.Phase%2 == 0 {
+				// there is stuff for us to do this phase
+				println("Red has things to do this phase")
+				state.Game.RedPlayers[i].TODO = true
+				state.Game.RedPlayers[i].Done = false
+				Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
+			} else {
+				// nothing for us this phase .. wait for everyone to finish
+				println("Red has no actions this phase")
+				state.Game.RedPlayers[i].TODO = false
+				state.Game.RedPlayers[i].Done = true
+				Connections.BroadcastPlayer(v.PlayerID, "Play", "PhaseWait", state.Game.Phase)
+			}
+		}
+	}
+	for i, v := range state.Game.BluePlayers {
+		println("sent to blue", v.Username)
+		// we always have stuff in eveny phase
+		println("blue has stuff to do this phase")
+		state.Game.BluePlayers[i].TODO = true
+		state.Game.BluePlayers[i].Done = false
+		if newTurn {
+			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
+		} else {
+			Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
+		}
+	}
+}
+
 func allDone(state PlayState) bool {
 	for _, v := range state.Game.RedPlayers {
 		if !v.Done {
-			fmt.Printf("aint done yet %v\n", v)
 			return false
 		}
 	}
 	for _, v := range state.Game.BluePlayers {
 		if !v.Done {
-			fmt.Printf("aint done yet %v\n", v)
 			return false
 		}
 	}
-	println("caint find nuthin not don")
 	return true
 }
 

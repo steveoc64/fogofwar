@@ -839,6 +839,9 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 		} else {
 			// this player is brand new to the game .. so create a new record for them
 			a := game.HostedBy == data.PlayerID
+			if game.Started {
+				a = true
+			}
 			if data.Team == "Red" {
 				DB.SQL(`insert into game_players
 				(game_id,player_id,red_team,blue_team,accepted)
@@ -872,15 +875,18 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 
 	if err == nil {
 		// see if there are any player slot left after this
-		count := 0
+		count := 0  // number of unassigned commands in this game
+		dcount := 0 // number of active commands in this game
 		DB.SQL(`select count(*) from game_cmd where game_id=$1 and player_id=0 and cull=false`, gc.GameID).QueryScalar(&count)
+		DB.SQL(`select count(*) from game_cmd where game_id=$1 and cull=false`, gc.GameID).QueryScalar(&dcount)
 		if count > 0 {
 			DB.SQL(`update game set check_players=false where id=$1`, gc.GameID).Exec()
+		} else if dcount > 0 {
+			DB.SQL(`update game set check_players=true where id=$1`, gc.GameID).Exec()
 		}
 	}
 
 	// And twiddle the game cmd details
-
 	logger(start, "Game.SetCmdPlayer", conn,
 		fmt.Sprintf("ID %d Player %d", data.ID, data.PlayerID), "")
 
@@ -903,6 +909,15 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 			conn.BroadcastPlayer(gp_old.PlayerID, "Game", "Update", gc.GameID)
 		}
 
+		if game.Started {
+			// Signal the playroutine that something has changed in the player settings
+			if play, ok := Plays[gc.GameID]; ok {
+				play <- PlayMessage{
+					Game:   gc.GameID,
+					OpCode: PlayersChanged,
+				}
+			}
+		}
 		tx.Commit()
 	}
 
@@ -966,6 +981,14 @@ func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
 
 	if err == nil {
 		*done = true
+
+		// Kick off the game goroutine if its not already there
+		if _, ok := Plays[data.ID]; ok {
+			print("GameRoutine is already running for", data.ID)
+		} else {
+			Plays[data.ID] = StartPlay(data.ID)
+		}
+
 		ids := []int{}
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&ids)
 		for _, v := range ids {

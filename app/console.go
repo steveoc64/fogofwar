@@ -18,10 +18,16 @@ type ConsolePaintData struct {
 func _play(action string, id int, context *router.Context) {
 	switch action {
 	case "Phase", "Turn":
-		if dom.GetWindow().
-			Confirm("Your Game has progressed to the next phase .. we are waiting for you. Click OK to return to Game") {
-			print("id is", id)
-			Session.Navigate(fmt.Sprintf("/play/%d", id))
+		if id == 0 {
+			if dom.GetWindow().
+				Confirm("Your Game has started ..  Click OK to join to Game") {
+				Session.Navigate(fmt.Sprintf("/play/%d", id))
+			}
+		} else {
+			if dom.GetWindow().
+				Confirm("Your Game has progressed to the next phase .. we are waiting for you. Click OK to return to Game") {
+				Session.Navigate(fmt.Sprintf("/play/%d", id))
+			}
 		}
 	}
 }

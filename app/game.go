@@ -74,21 +74,23 @@ func _gameChecklist(action string, actionID int, context *router.Context) {
 			Session.Navigate("/games")
 		})
 
-		form.DeleteEvent(func(evt dom.Event) {
-			evt.PreventDefault()
-			go func() {
-				done := false
-				err := RPC("GameRPC.Delete", shared.GameRPCData{
-					Channel: Session.Channel,
-					ID:      id,
-				}, &done)
-				if err != nil {
-					dom.GetWindow().Alert(err.Error())
-				} else {
-					Session.Navigate("/games")
-				}
-			}()
-		})
+		if !game.Started {
+			form.DeleteEvent(func(evt dom.Event) {
+				evt.PreventDefault()
+				go func() {
+					done := false
+					err := RPC("GameRPC.Delete", shared.GameRPCData{
+						Channel: Session.Channel,
+						ID:      id,
+					}, &done)
+					if err != nil {
+						dom.GetWindow().Alert(err.Error())
+					} else {
+						Session.Navigate("/games")
+					}
+				}()
+			})
+		}
 
 		// All done, so render the form
 		form.Render("edit-form", "main", game)
@@ -440,6 +442,92 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 						}
 					}
 				}()
+			}
+		})
+
+	}()
+	// showDisqus(fmt.Sprintf("game-%d", id), fmt.Sprintf("Game - %06d - %s", game.ID, game.Name))
+
+}
+
+func gameEditHosting(context *router.Context) {
+	id, err := strconv.Atoi(context.Params["id"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	go func() {
+
+		Session.EditGame = &shared.Game{}
+		err := RPC("GameRPC.Get", shared.GameRPCData{
+			Channel:  Session.Channel,
+			ID:       id,
+			Red:      true,
+			Blue:     true,
+			GetUnits: true,
+		}, Session.EditGame)
+		if err != nil {
+			dom.GetWindow().Alert(err.Error())
+			return
+		}
+		game := Session.EditGame
+
+		// Layout the fields
+		form := formulate.EditForm{}
+		form.New("fa-user", "Game In Progress Options - "+game.Name)
+
+		// Add event handlers
+		form.CancelEvent(func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate(fmt.Sprintf("/game/%d", id))
+		})
+
+		if Session.Mobile() {
+			form.Row(2).
+				AddDate(1, "Start Date", "StartDate").
+				AddDate(1, "Game Ends", "Expires")
+			form.Row(3).
+				AddNumber(1, "Year", "Year", "1").
+				AddNumber(1, "Turn", "Turn", "1").
+				AddNumber(1, "Turn Limit", "TurnLimit", "1")
+
+			form.Row(1).
+				AddInput(1, "Name", "Name")
+
+			form.Row(1).
+				AddTextarea(1, "Description", "Descr")
+
+		} else {
+			form.Row(5).
+				AddDate(1, "Start Date", "StartDate").
+				AddDate(1, "Game Ends", "Expires").
+				AddNumber(1, "Year", "Year", "1").
+				AddNumber(1, "Turn", "Turn", "1").
+				AddNumber(1, "Turn Limit", "TurnLimit", "1")
+
+			form.Row(5).
+				AddInput(1, "Name", "Name").
+				AddInput(4, "Description", "Descr")
+
+		}
+
+		form.DisplayMode = true
+		form.Render("edit-form", "main", game)
+		form.ActionGrid("game-hosting-actions", "#action-grid", game, func(url string) {
+			switch url {
+			case "Goto":
+				Session.Navigate(fmt.Sprintf("/play/%d", game.ID))
+			case "Pause":
+				print("TODO - pause the game")
+			case "Phase":
+				print("TODO - back one phase")
+			case "Turn":
+				print("TODO - back one turn")
+			case "Rewind":
+				print("TODO - back to start")
+			case "End":
+				print("TODO - end of game")
 			}
 		})
 

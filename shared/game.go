@@ -214,22 +214,25 @@ func (g *Game) GoodToGo() bool {
 
 func (g *Game) GetStatusIcon() string {
 	// print("getting status icon")
+	if g.Started {
+		return "fa fa-cog fa-spin fa-2x fa-fw"
+	}
 	if !g.CheckTable {
-		return "fa fa-table fa-lg"
+		return "fa fa-table fa-lg fa-fw"
 	}
 	if !g.CheckObjectives {
-		return "fa fa-star fa-lg"
+		return "fa fa-star fa-lg fa-fw"
 	}
 	if !g.CheckForces {
-		return "fa fa-flag fa-lg"
+		return "fa fa-flag fa-lg fa-fw"
 	}
 	if !g.CheckPlayers {
-		return "fa fa-user fa-lg"
+		return "fa fa-user fa-lg fa-fw"
 	}
 	if !g.CheckConnected {
-		return "fa fa-circle-o-notch fa-spin fa-lg"
+		return "fa fa-circle-o-notch fa-spin fa-lg fa-fw"
 	}
-	return "fa fa-check-square fa-lg"
+	return "fa fa-check-square fa-lg fa-fw"
 }
 
 func (g *Game) GetObjective(x, y int) *GameObjective {

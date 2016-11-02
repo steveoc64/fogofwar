@@ -71,6 +71,7 @@ func enableRoutes(Rank int) {
 		"game-edit-blue":      gameEditBlue,
 		"game-edit-table":     gameEditTable,
 		"game-edit-players":   gameEditPlayers,
+		"game-edit-hosting":   gameEditHosting,
 		"unit-inspection":     unitInspection,
 		"play":                play,
 	}

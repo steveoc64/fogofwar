@@ -1,12 +1,20 @@
 <div class="action-grid">
 	{{if ne .InMode "Checklist"}}
-	<div class="action__item" url="/game/{{.ID}}/checklist">
-		<div class="action__title">Game Checklist</div>
-		<div class="action__icon"><i class="fa fa-check-square-o fa-lg"></i></div>
-		<div class="action__text">
-			Checklist of items to begin Game
+		{{if .Started}}
+		<div class="action__item" url="/game/{{.ID}}/hosting">
+			<div class="action__title">Running</div>
+			<div class="action__icon"><i class="fa fa-cog fa-spin fa-2x fa-fw"></i></div>
+			<div class="action__text"></div>
 		</div>
-	</div>
+		{{else}}
+		<div class="action__item" url="/game/{{.ID}}/checklist">
+			<div class="action__title">Game Checklist</div>
+			<div class="action__icon"><i class="fa fa-check-square-o fa-lg"></i></div>
+			<div class="action__text">
+				Checklist of items to begin Game
+			</div>
+		</div>
+		{{end}}
 	{{end}}
 
 	{{if ne .InMode "Table"}}

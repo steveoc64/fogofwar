@@ -1,10 +1,22 @@
+{{if not .CanStart}}
+{{if not .Started}}
 <p>Once all the checkboxes are ticked, the Game can begin !</p>
+{{end}}
+{{end}}
+
 <div class="action-grid todo-list">
 	{{if .CanStart}}
 	<div class="action__item" url="Start">
 		<div class="action__title">START</div>
 		<div class="action__icon"><i class="fa fa-play-circle-o fa-4x"></i></div>
 		<div class="action__text"> </div>
+	</div>
+	{{end}}
+	{{if .Started}}
+	<div class="action__item" url="/game/{{.ID}}/hosting">
+		<div class="action__title">Running</div>
+		<div class="action__icon"><i class="fa fa-cog fa-spin fa-4x fa-fw"></i></div>
+		<div class="action__text"></div>
 	</div>
 	{{end}}
 	{{if .CheckTable}}

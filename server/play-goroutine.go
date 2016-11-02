@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
-
+	// "runtime/debug"
 	"../shared"
 )
 
@@ -17,6 +17,8 @@ const (
 	GamePause
 	PlayerPhaseDone
 	PlayerPhaseNotDone
+	PlayerConnected
+	PlayerDisconnected
 )
 
 type PlayMessage struct {
@@ -60,6 +62,7 @@ type PlayerState struct {
 
 type PlayState struct {
 	Game *shared.Game
+	Log  *os.File
 }
 
 func loadGameData(id int, state PlayState) error {
@@ -121,8 +124,11 @@ func loadGameData(id int, state PlayState) error {
 	}
 
 	if err == nil {
+		// We just started, so clear it all out
+		DB.SQL(`update game_players set connected=false where game_id=$1`, state.Game.ID).Exec()
+
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),u.id as player_id,p.accepted
+		DB.SQL(`select distinct(u.username),u.id as player_id,p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
@@ -132,7 +138,7 @@ func loadGameData(id int, state PlayState) error {
 			v.TODO = true
 		}
 
-		DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted
+		DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team
@@ -175,11 +181,11 @@ func dumpHeader(fp *os.File, game *shared.Game) {
 
 	fmt.Fprintf(fp, "Players:\n  Red Team: %s\n", game.RedTeam)
 	for _, v := range game.RedPlayers {
-		fmt.Fprintf(fp, "    %s\n", v.Username)
+		fmt.Fprintf(fp, "    %d %s\n", v.PlayerID, v.Username)
 	}
 	fmt.Fprintf(fp, "  Blue Team: %s\n", game.BlueTeam)
 	for _, v := range game.BluePlayers {
-		fmt.Fprintf(fp, "    %s\n", v.Username)
+		fmt.Fprintf(fp, "    %d %s\n", v.PlayerID, v.Username)
 	}
 	fmt.Fprintf(fp, "Red Commands:\n")
 	for _, v := range game.RedCmd {
@@ -245,6 +251,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	defer fp.Close()
 	// all good - spawn our state
 	state := PlayState{
+		Log:  fp,
 		Game: &shared.Game{},
 	}
 	err = loadGameData(id, state)
@@ -284,6 +291,12 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Restart\n")
 			case GameRewind:
 				fmt.Fprintf(fp, "Rewind\n")
+			case PlayerConnected:
+				fmt.Fprintf(fp, "Player %d Joins the Game\n", m.PlayerID)
+				loadPlayerConnectionStatus(state)
+			case PlayerDisconnected:
+				fmt.Fprintf(fp, "Player %d Has Left the Game\n", m.PlayerID)
+				loadPlayerConnectionStatus(state)
 			case PlayerPhaseDone, PlayerPhaseNotDone:
 				if m.OpCode == PlayerPhaseNotDone {
 					fmt.Fprintf(fp, "Player %d is Not Done Yet\n", m.PlayerID)
@@ -326,26 +339,66 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	}
 }
 
+func loadPlayerConnectionStatus(state PlayState) {
+
+	newRed := []*shared.GamePlayerData{}
+	newBlue := []*shared.GamePlayerData{}
+
+	// Completely reload the player arrays from the DB
+	DB.SQL(`select distinct(u.username),u.id as player_id,p.accepted,p.connected
+			from game_players p
+			left join users u on u.id=p.player_id
+			where p.game_id=$1 and p.red_team
+			order by u.username`, state.Game.ID).QueryStructs(&newRed)
+	for _, v := range newRed {
+		v.Done = false
+		v.TODO = true
+		for _, p := range state.Game.RedPlayers {
+			if p.PlayerID == v.PlayerID {
+				v.Done = p.Done
+				v.TODO = p.TODO
+			}
+		}
+	}
+
+	DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted,p.connected
+			from game_players p
+			left join users u on u.id=p.player_id
+			where p.game_id=$1 and p.blue_team
+			order by u.username`, state.Game.ID).QueryStructs(&newBlue)
+	for _, v := range newBlue {
+		v.Done = false
+		v.TODO = true
+		for _, p := range state.Game.BluePlayers {
+			if p.PlayerID == v.PlayerID {
+				v.Done = p.Done
+				v.TODO = p.TODO
+			}
+		}
+	}
+	state.Game.RedPlayers = newRed
+	state.Game.BluePlayers = newBlue
+}
+
 func sendPhaseUpdates(state PlayState, newTurn bool) {
-	println("sending phase updates")
+	// println("sending phase updates")
 	for i, v := range state.Game.RedPlayers {
-		println("sent to red", v.Username)
+		// println("sent to red", v.Username)
 		if newTurn {
 			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
 			state.Game.RedPlayers[i].TODO = true
 			state.Game.RedPlayers[i].Done = false
 		} else {
 			// half the time have nothing to do
-			fmt.Printf("%d %% 2 = %d", state.Game.Phase, state.Game.Phase%2)
 			if state.Game.Phase%2 == 0 {
 				// there is stuff for us to do this phase
-				println("Red has things to do this phase")
+				// println("Red has things to do this phase")
 				state.Game.RedPlayers[i].TODO = true
 				state.Game.RedPlayers[i].Done = false
 				Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
 			} else {
 				// nothing for us this phase .. wait for everyone to finish
-				println("Red has no actions this phase")
+				// println("Red has no actions this phase")
 				state.Game.RedPlayers[i].TODO = false
 				state.Game.RedPlayers[i].Done = true
 				Connections.BroadcastPlayer(v.PlayerID, "Play", "PhaseWait", state.Game.Phase)
@@ -353,9 +406,9 @@ func sendPhaseUpdates(state PlayState, newTurn bool) {
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
-		println("sent to blue", v.Username)
+		// println("sent to blue", v.Username)
 		// we always have stuff in eveny phase
-		println("blue has stuff to do this phase")
+		// println("blue has stuff to do this phase")
 		state.Game.BluePlayers[i].TODO = true
 		state.Game.BluePlayers[i].Done = false
 		if newTurn {
@@ -369,11 +422,13 @@ func sendPhaseUpdates(state PlayState, newTurn bool) {
 func allDone(state PlayState) bool {
 	for _, v := range state.Game.RedPlayers {
 		if !v.Done {
+			// println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
 			return false
 		}
 	}
 	for _, v := range state.Game.BluePlayers {
 		if !v.Done {
+			// println("blue player ", v.PlayerID, v.Username, "is not done yet", v.Done)
 			return false
 		}
 	}
@@ -384,14 +439,12 @@ func playerDone(state PlayState, pid int, done bool) {
 	for i, v := range state.Game.RedPlayers {
 		if v.PlayerID == pid {
 			state.Game.RedPlayers[i].Done = done
-			// fmt.Printf("Before and After state %v\n%v", v, state.Game.RedPlayers[i])
 			return
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
 		if v.PlayerID == pid {
 			state.Game.BluePlayers[i].Done = done
-			// fmt.Printf("Befone and After state %v\n%v", v, state.Game.BluePlayers[i])
 			return
 		}
 	}

@@ -23,6 +23,7 @@ func breakLine(s string) string {
 
 func gameEditTeam(context *router.Context) {
 	Session.Subscribe("Game", _gameEditTeam, context)
+	Session.Subscribe("Play", _play, context)
 	go _gameEditTeam("Edit", 0, context)
 }
 

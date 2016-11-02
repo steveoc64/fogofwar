@@ -14,6 +14,17 @@ type ConsolePaintData struct {
 	Orientation string
 }
 
+func _play(action string, id int, context *router.Context) {
+	switch action {
+	case "Phase", "Turn":
+		if dom.GetWindow().
+			Confirm("Your Game has progressed to the next phase .. we are waiting for you. Click OK to return to Game") {
+			print("id is", id)
+			Session.Navigate(fmt.Sprintf("/play/%d", id))
+		}
+	}
+}
+
 func play(context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
@@ -195,20 +206,21 @@ func doCorpsOverview(game *shared.Game) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
-	// mock the act of completing the TODO list
+	// mock the act of completing the TODO list, on the first phase only
 	if game.Phase == 0 {
 		game.Phase = -1
+		go func() {
+			done := false
+			err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
+				Channel: Session.Channel,
+				GameID:  game.ID,
+			}, &done)
+			if err != nil {
+				print(err.Error())
+			}
+			game.PhaseDONE = false
+		}()
 	}
-	go func() {
-		done := false
-		err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
-			Channel: Session.Channel,
-			GameID:  game.ID,
-		}, &done)
-		if err != nil {
-			print(err.Error())
-		}
-	}()
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")

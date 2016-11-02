@@ -54,13 +54,13 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 
 	if err == nil {
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
 			order by u.username`, data.ID).QueryStructs(&retval.RedPlayers)
 
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team
@@ -153,6 +153,17 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 
 		// TODO - pull in the players on this game
 		retval.PhaseTODO = true
+
+		DB.SQL(`update game_players set connected=true where game_id=$1 and player_id=$2`, data.ID, conn.UserID).Exec()
+		// and message the game thread to re-read its connection status
+		if play, ok := Plays[data.ID]; ok {
+			play <- PlayMessage{
+				Game:     data.ID,
+				PlayerID: conn.UserID,
+				OpCode:   PlayerConnected,
+			}
+			println("Player", conn.Username, "has joined game", data.ID)
+		}
 	}
 
 	logger(start, "Game.GetPlay", conn,

@@ -149,26 +149,28 @@ type Game struct {
 	VPPerTurn       int
 	RedVP           int
 	BlueVP          int
-	RedPlayers      []GamePlayerData
-	BluePlayers     []GamePlayerData
+	RedPlayers      []*GamePlayerData
+	BluePlayers     []*GamePlayerData
 	Accepted        bool // Requesting player has accepted
 	VP              int
 }
 
 type GamePlayerData struct {
-	PlayerID int    `db:"player_id"`
-	Username string `db:"username"`
-	Accepted bool   `db:"accepted"`
-	Done     bool
-	TODO     bool
+	PlayerID  int    `db:"player_id"`
+	Username  string `db:"username"`
+	Accepted  bool   `db:"accepted"`
+	Connected bool   `db:"connected"`
+	Done      bool
+	TODO      bool
 }
 
 type GamePlayers struct {
-	GameID   int  `db:"game_id"`
-	PlayerID int  `db:"player_id"`
-	RedTeam  bool `db:"red_team"`
-	BlueTeam bool `db:"blue_team"`
-	Accepted bool `db:"accepted"`
+	GameID    int  `db:"game_id"`
+	PlayerID  int  `db:"player_id"`
+	RedTeam   bool `db:"red_team"`
+	BlueTeam  bool `db:"blue_team"`
+	Accepted  bool `db:"accepted"`
+	Connected bool `db:"connected"`
 }
 
 type GameRPCData struct {
@@ -185,8 +187,8 @@ func (g *Game) GetStartDate() string {
 }
 
 type GamePlayerRow struct {
-	Red  GamePlayerData
-	Blue GamePlayerData
+	Red  *GamePlayerData
+	Blue *GamePlayerData
 }
 
 func (g *Game) GetPlayerRows() []GamePlayerRow {

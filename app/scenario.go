@@ -15,6 +15,7 @@ import (
 
 func scenarioList(context *router.Context) {
 	Session.Subscribe("Scenario", _scenarioList, context)
+	Session.Subscribe("Play", _play, context)
 	go _scenarioList("List", 0, context)
 }
 

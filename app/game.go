@@ -13,6 +13,7 @@ import (
 
 func gameChecklist(context *router.Context) {
 	Session.Subscribe("Game", _gameChecklist, context)
+	Session.Subscribe("Play", _play, context)
 	_gameChecklist("Edit", 0, context)
 }
 
@@ -279,6 +280,7 @@ func gameEditBlue(context *router.Context) {
 
 func gameEditPlayers(context *router.Context) {
 	Session.Subscribe("Game", _gameEditPlayers, context)
+	Session.Subscribe("Play", _play, context)
 	_gameEditPlayers("Edit", 0, context)
 }
 

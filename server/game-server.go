@@ -23,7 +23,7 @@ func (g *GameRPC) List(data shared.GameRPCData, retval *[]shared.Game) error {
 			left join users u on u.id=g.hosted_by
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
-		where not started and g.hosted_by=$1`, conn.UserID).QueryStructs(retval)
+		where g.hosted_by=$1`, conn.UserID).QueryStructs(retval)
 
 	logger(start, "Game.List", conn,
 		"",
@@ -210,13 +210,13 @@ func (g *GameRPC) GetInvite(data shared.GameRPCData, retval *shared.Game) error 
 		DB.SQL(`select accepted from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&retval.Accepted)
 
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
 			order by u.username`, data.ID).QueryStructs(&retval.RedPlayers)
 
-		DB.SQL(`select distinct(u.username),p.accepted
+		DB.SQL(`select distinct(u.username),p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team

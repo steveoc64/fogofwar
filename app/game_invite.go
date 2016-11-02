@@ -12,6 +12,7 @@ import (
 
 func gameInvite(context *router.Context) {
 	Session.Subscribe("Game", _gameInvite, context)
+	Session.Subscribe("Play", _play, context)
 	_gameInvite("Edit", 0, context)
 }
 

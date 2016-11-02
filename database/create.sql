@@ -369,7 +369,7 @@ create table game (
 	started  bool not null default false,
 	stopped  bool not null default false,
 	paused   bool not null default false,
-	turn int not null default 0,
+	turn int not null default 1,
 	phase int not null default 0,
 	turn_limit int not null default 12,
 	name text not null default '',
@@ -430,7 +430,8 @@ create table game_players (
 	player_id int not null,
 	red_team bool not null default false,
 	blue_team bool not null default false,
-	accepted bool not null default false
+	accepted bool not null default false,
+	connected bool not null default false
 );
 \i data/game_players.sql
 create unique index game_player_game_idx on game_players (game_id, player_id);

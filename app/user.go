@@ -14,6 +14,7 @@ import (
 func userList(context *router.Context) {
 	Session.Subscribe("User", _userList, context)
 	Session.Subscribe("Login", _userList, context)
+	Session.Subscribe("Play", _play, context)
 	_userList("Users", 0, context)
 }
 
@@ -440,6 +441,7 @@ func promoteMe(action string, id int, context *router.Context) {
 
 func userSettings(context *router.Context) {
 	Session.Subscribe("Promotion", promoteMe, context)
+	Session.Subscribe("Play", _play, context)
 	_userSettings("User", 0, context)
 }
 

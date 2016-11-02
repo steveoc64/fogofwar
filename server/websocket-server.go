@@ -279,6 +279,25 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 	// Unlogin all users on that channel, but leave their last IP Address open
 	DB.SQL(`update users set channel=0 where channel=$1`, conn.ID).Exec()
 	DB.SQL(`update login set up='f' where channel=$1 and up`, conn.ID).Exec()
+
+	// Get a list of games that they might be connected to
+	if conn.UserID != 0 {
+		ids := []int{}
+		DB.SQL(`select game_id from game_players where player_id=$1`, conn.ID).QuerySlice(&ids)
+		if len(ids) > 0 {
+			DB.SQL(`update game_players set connected=false where player_id=$1`, conn.ID).Exec()
+			for _, i := range ids {
+				if play, ok := Plays[i]; ok {
+					play <- PlayMessage{
+						Game:     i,
+						PlayerID: conn.UserID,
+						OpCode:   PlayerDisconnected,
+					}
+					println("Player", conn.Username, "has dropped out of game", i)
+				}
+			}
+		}
+	}
 	return c
 }
 
@@ -297,14 +316,17 @@ func (c *ConnectionsList) Show(header string) *ConnectionsList {
 		if conn.UserID == 0 {
 			idle = "Idle "
 		}
-		fmt.Printf("  %d:%s\t\t%s%s\n", conn.ID, theIP, idle, req.Header["User-Agent"])
+		// fmt.Printf("  %d:%s\t\t%s%s\n", conn.ID, theIP, idle, req.Header["User-Agent"])
+		fmt.Printf("  %d:%s\t\t%s", conn.ID, theIP, idle)
 
 		if conn.UserID != 0 {
-			fmt.Println("\t\t\t",
-				"User:", conn.Username, conn.UserID,
-				"Route:", conn.Route,
-				"Time:", time.Since(conn.Time))
+			// fmt.Println("\t\t\t",
+			fmt.Print(
+				"\t", conn.Username, ":", conn.UserID,
+				// "Route:", conn.Route,
+				"\t:", time.Since(conn.Time))
 		}
+		fmt.Printf("\n")
 	}
 	fmt.Println("==================================")
 	return c

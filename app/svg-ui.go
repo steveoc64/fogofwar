@@ -17,24 +17,27 @@ func svgText(x, y, s int, team, text string) string {
 	return html
 }
 
+func svgButton(dataID int, name string, x, y, w int, class, textClass, text string) string {
+	html := ""
+
+	html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=10 class=%s data-id=%d></rect>`,
+		name, x, y, w, class, dataID)
+	html += "\n"
+	html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
+		name, x+3, y+8, textClass, dataID, text)
+	html += "\n"
+	return html
+}
+
 func paperButton(name, text string, x, y, w int, callback func(dom.Event)) string {
 	html := ""
 
-	if Session.Orientation == "Portrait" {
-		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
-			name, x, y, w)
-		html += "\n"
-		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-			name, x+5, y+8, text)
-		html += "\n"
-	} else {
-		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
-			name, x, y, w)
-		html += "\n"
-		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-			name, x+5, y+8, text)
-		html += "\n"
-	}
+	html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
+		name, x, y, w)
+	html += "\n"
+	html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
+		name, x+5, y+8, text)
+	html += "\n"
 	return html
 }
 
@@ -60,7 +63,7 @@ func paperDoneButton(name, text string, x, y, w int) string {
 	return html
 }
 
-func paperCallback(name string, f func(dom.Event)) {
+func svgButtonCallback(name string, f func(dom.Event)) {
 	w := dom.GetWindow()
 	doc := w.Document()
 
@@ -91,11 +94,14 @@ func paperButtonSet(evt dom.Event, text string) {
 func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	w := dom.GetWindow()
 	doc := w.Document()
+
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
+	mr := c.QuerySelector("[name=map-rect]")
+
 	g.RemoveAttribute("transform")
 	g.SetInnerHTML("")
-	print("setting viwewbox", x, y)
+	// print("setting viewbox", x, y)
 	c.SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", x, y))
 
 	t := doc.QuerySelector(".console-title")
@@ -103,6 +109,9 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 		t.Class().Add("console-map-title")
 		t.SetInnerHTML(fmt.Sprintf("%d x %d ft Table with %d\" grids (%d x %d scale m)",
 			game.TableX, game.TableY, game.GridSize, game.KmX, game.KmY))
+		mr.SetAttribute("width", fmt.Sprintf("%d", x))
+		mr.SetAttribute("height", fmt.Sprintf("%d", y))
+		mr.Class().Remove("hidden")
 	} else {
 		t.Class().Remove("console-map-title")
 		if Session.Orientation == "Landscape" || !Session.Mobile() {
@@ -112,5 +121,7 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 			t.SetInnerHTML(fmt.Sprintf("%s %d",
 				game.Name, game.Year))
 		}
+		mr.Class().Add("hidden")
 	}
+
 }

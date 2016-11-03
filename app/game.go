@@ -492,13 +492,8 @@ func gameEditHosting(context *router.Context) {
 				AddNumber(1, "Year", "Year", "1").
 				AddNumber(1, "Turn", "Turn", "1").
 				AddNumber(1, "Turn Limit", "TurnLimit", "1")
-
 			form.Row(1).
 				AddInput(1, "Name", "Name")
-
-			form.Row(1).
-				AddTextarea(1, "Description", "Descr")
-
 		} else {
 			form.Row(5).
 				AddDate(1, "Start Date", "StartDate").
@@ -506,14 +501,14 @@ func gameEditHosting(context *router.Context) {
 				AddNumber(1, "Year", "Year", "1").
 				AddNumber(1, "Turn", "Turn", "1").
 				AddNumber(1, "Turn Limit", "TurnLimit", "1")
-
 			form.Row(5).
 				AddInput(1, "Name", "Name").
 				AddInput(4, "Description", "Descr")
 
 		}
 
-		form.DisplayMode = true
+		// form.DisplayMode = true
+
 		form.Render("edit-form", "main", game)
 		form.ActionGrid("game-hosting-actions", "#action-grid", game, func(url string) {
 			switch url {

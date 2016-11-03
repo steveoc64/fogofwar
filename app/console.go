@@ -90,6 +90,24 @@ func play(context *router.Context) {
 			}
 		}
 
+		doTurnSummary(game)
+
+		doDisplayPanel := func(mode string) {
+			consoleCurrentPanel = mode
+			consoleSetViewBox(game, 100, 100, false)
+			switch mode {
+			case "Orders":
+				doCorpsOverview(game)
+			case "Map":
+				doMap(game)
+			case "Units":
+				doUnits(game, 0)
+			case "Game":
+				doTurnSummary(game)
+			}
+		}
+		doDisplayPanel(consoleCurrentPanel)
+
 		gameMsg := func(action string, actionID int, context *router.Context) {
 			if actionID == id {
 				print("Game update for this game")
@@ -105,29 +123,12 @@ func play(context *router.Context) {
 					Session.Navigate("/")
 				}
 				game = newGame
+				doDisplayPanel(consoleCurrentPanel)
 			}
 		}
 
 		Session.Subscribe("Play", playMsg, context)
 		Session.Subscribe("Game", gameMsg, context)
-
-		doTurnSummary(game)
-
-		doDisplayPanel := func(mode string) {
-			consoleCurrentPanel = mode
-			consoleSetViewBox(game, 100, 100, false)
-			switch mode {
-			case "Orders":
-				doCorpsOverview(game)
-			case "Map":
-				doMap(game)
-			case "Units":
-				doUnits(game)
-			case "Game":
-				doTurnSummary(game)
-			}
-		}
-		doDisplayPanel(consoleCurrentPanel)
 
 		doc.QuerySelector("[name=console]").AddEventListener("click", false, func(evt dom.Event) {
 			if evt.Target().TagName() == "INPUT" {
@@ -184,8 +185,4 @@ func doCorpsOverview(game *shared.Game) {
 // Render the orders
 func doOrders(game *shared.Game) {
 	print("TODO - doOrders")
-}
-
-func doUnits(game *shared.Game) {
-	print("TODO - doUnits")
 }

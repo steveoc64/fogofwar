@@ -41,6 +41,9 @@ $tile-border-highlight: lighten(rgba(49, 35, 21, 0.9),20%)
 
 
 // Ground level
+.tile-content-clear
+  fill: url(#tile-clear)
+
 .tile-content-0-0 // clear
 
 .tile-content-0-1 // rough
@@ -101,20 +104,47 @@ $tile-border-highlight: lighten(rgba(49, 35, 21, 0.9),20%)
   
 .unitname-red
   font-family: 'Playfair Display', serif
-  font-size: .6rem
+  font-size: .4rem
   fill: url(#RedGradient)
+  stroke: black
+  stroke-width: .1px
 
 .unitname-blue
   font-family: 'Playfair Display', serif
-  font-size: .6rem
+  font-size: .4rem
   fill: url(#BlueGradient)
+  stroke: black
+  stroke-width: .1px
+ 
+.unitname-red-small
+  font-family: 'Playfair Display', serif
+  font-size: .3rem
+  fill: url(#RedGradient)
+  stroke: black
+  stroke-width: .1px
+
+.unitname-blue-small
+  font-family: 'Playfair Display', serif
+  font-size: .3rem
+  fill: url(#BlueGradient)
+  stroke: black
+  stroke-width: .1px
 
 .objective-name
   font-family: 'Playfair Display', serif
-  font-size: .5rem
+  font-size: .3rem
   fill: wheat
   text-anchor: middle
   stroke-width: .1px
+  stroke: black
+
+.objective-name-small
+  font-family: 'Playfair Display', serif
+  font-size: .2rem
+  fill: wheat
+  text-anchor: middle
+  stroke-width: .1px
+  stroke: black
 
 .satellite-bg
   background-image: url(/img/sat1a.jpg);

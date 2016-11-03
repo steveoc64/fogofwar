@@ -64,6 +64,9 @@ func _mainPage(action string, id int, context *router.Context) {
 				return
 			}
 			formulate.InsertDiv("progress-games", ".data-container", "#action-grid")
+			if doc.QuerySelector("#progress-games") == nil {
+				return
+			}
 			form.RenderNoContainer("game-inprogress-list", "#progress-games", &games)
 		}
 
@@ -100,6 +103,9 @@ func _mainPage(action string, id int, context *router.Context) {
 				return
 			}
 			formulate.InsertDiv("game-invites", ".data-container", "#action-grid")
+			if doc.QuerySelector("#game-invites") == nil {
+				return
+			}
 			formInvite.RenderNoContainer("game-invites-list", "#game-invites", &invites)
 		}
 

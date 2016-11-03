@@ -61,8 +61,8 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 			return
 		}
 
+		// print("here with game", game)
 		game := Session.EditGame
-		print("here with game", game)
 		if game.ID == 0 {
 			err := RPC("GameRPC.Get", shared.GameRPCData{
 				Channel:  Session.Channel,
@@ -75,6 +75,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				dom.GetWindow().Alert(err.Error())
 				return
 			}
+			game = Session.EditGame
 		}
 		game.InMode = "Team"
 		game.Mobile = Session.Mobile()
@@ -434,6 +435,8 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					if !form.Get("row-4").Class().Contains("hidden") {
 						form.Hide("row-4")
 						doit = false
+					} else {
+						form.Get("row-4").Class().Remove("hidden")
 					}
 				}
 				if doit {
@@ -442,7 +445,10 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					for _, v := range bbar.QuerySelectorAll(".button") {
 						if !v.Class().Contains("button-clear") {
 							v.Class().SetString("button button-outline")
+						} else {
+							print("here with clear click")
 						}
+
 					}
 					if !b.Class().Contains("button-clear") {
 						b.Class().SetString("button button-primary")

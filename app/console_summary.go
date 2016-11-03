@@ -72,23 +72,30 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
+	allTheThings := false
 	if game.Phase == 0 {
 		// special case - we are in pre-game, and we must get them to go into the orders tab first
 		// this only applies on the special pre-game stuff
 	} else {
-		if game.PhaseTODO && !game.PhaseDONE {
-			// we have things to do this phase, and we havent done them yet
-			html += paperButton("done", confirmText, 40, 85, 50, dispatchOrders)
-		}
-		if !game.PhaseTODO {
-			// there is nothing for us to do this phase, so just show the waiting button
+		if game.PhaseTODO {
+			// we have things to do this turn
+			if !game.PhaseDONE {
+				// we are yet to do all the things
+				html += paperButton("done", confirmText, 40, 85, 50, dispatchOrders)
+				allTheThings = true
+			} else {
+				// we have done all the things
+				html += paperDoneButton("done", doneText, 40, 85, 50)
+			}
+		} else {
+			// there is nothing for us this turn
 			html += paperDoneButton("done", doneText, 40, 85, 50)
 		}
 	}
 	g.SetInnerHTML(html)
 
-	if game.Phase != 0 && (game.PhaseTODO && !game.PhaseDONE) {
-		// there are things we have to do this phase, and we havent done them yet
-		paperCallback("done", dispatchOrders)
+	if allTheThings {
+		// All the things are yet to be done
+		svgButtonCallback("done", dispatchOrders)
 	}
 }

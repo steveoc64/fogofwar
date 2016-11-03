@@ -428,6 +428,13 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 		fmt.Sprintf("%d Tiles", len(data.Game.Tiles)))
 
 	if err == nil {
+		// For any players on this game list, let them know its changed
+		players := []int{}
+		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
+		fmt.Printf("players who need to know about this update %v\n", players)
+		for _, v := range players {
+			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+		}
 		*done = true
 		tx.Commit()
 	}
@@ -632,6 +639,14 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 					}
 					println("Player", conn.Username, "has dropped out of game", data.ID)
 				}
+			}
+
+			// For any players on this game list, let them know its changed
+			players := []int{}
+			DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
+			fmt.Printf("players who need to know about this update %v\n", players)
+			for _, v := range players {
+				conn.BroadcastPlayer(v, "Game", "Update", data.ID)
 			}
 
 			// println("unassigned", unassignedCmd)

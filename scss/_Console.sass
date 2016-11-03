@@ -72,6 +72,9 @@
 .text__red
   fill: rgba(130, 9, 9, 0.66)
 
+.text__small
+  font-size: 0.5rem
+  
 .text__2x
   font-size: 1rem
   stroke-width: 0.2
@@ -210,4 +213,19 @@
   background: -webkit-linear-gradient(top,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffe8', endColorstr='#d6dbbf',GradientType=0 ); /* IE6-9 */
-  
+ 
+.console-corps-button
+  stroke: black
+  stroke-width: 0.30px
+  fill: white
+  opacity: .3
+  &:hover
+    fill: white
+    opacity: .5
+    stroke-width: .4px
+
+.console-corps-button-other
+  stroke: black
+  stroke-width: 0
+  fill: white
+  opacity: .1

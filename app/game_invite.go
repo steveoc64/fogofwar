@@ -618,11 +618,11 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 					// print("clicke on the unit details")
 					unit := TheUnit
 					el := evt.Target()
-					print("clicked on a ", el.TagName())
+					// print("clicked on a ", el.TagName())
 					if el.TagName() == "INPUT" {
 						value := el.(*dom.HTMLInputElement).Value
-						print("with value", value)
-						print("on utype", unit.UType)
+						// print("with value", value)
+						// print("on utype", unit.UType)
 						switch unit.UType {
 						case 1:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")

@@ -635,17 +635,10 @@ func (u *Unit) GetSummary(corps *GameCmd) string {
 	return u.GetLongSummary(corps, true)
 }
 
-func (u *Unit) GetLongSummary(corps *GameCmd, longwinded bool) string {
-	// Loop through the Corp, and work out which units are childs of this, and sum
-	// up the total bayonets and sabres and guns
-
+func (u *Unit) GetSubunits(corps *GameCmd) []*Unit {
+	// Loop through the parent Corp, and work out which units are childs of this, and sum
+	retval := []*Unit{}
 	mode := 0
-	b := u.Bayonets
-	bl := u.BayonetsLost
-	s := u.Sabres
-	sl := u.SabresLost
-	g := u.Guns
-	gl := u.GunsLost
 	for _, v := range corps.Units {
 		switch v.UType {
 		case 1:
@@ -658,14 +651,30 @@ func (u *Unit) GetLongSummary(corps *GameCmd, longwinded bool) string {
 			}
 		default:
 			if mode == 1 {
-				b += v.Bayonets
-				bl += v.BayonetsLost
-				s += v.Sabres
-				sl += v.SabresLost
-				g += v.Guns
-				gl += v.GunsLost
+				retval = append(retval, v)
 			}
 		}
+	}
+	return retval
+}
+
+func (u *Unit) GetLongSummary(corps *GameCmd, longwinded bool) string {
+	// up the total bayonets and sabres and guns
+
+	b := u.Bayonets
+	bl := u.BayonetsLost
+	s := u.Sabres
+	sl := u.SabresLost
+	g := u.Guns
+	gl := u.GunsLost
+	subunits := u.GetSubunits(corps)
+	for _, v := range subunits {
+		b += v.Bayonets
+		bl += v.BayonetsLost
+		s += v.Sabres
+		sl += v.SabresLost
+		g += v.Guns
+		gl += v.GunsLost
 	}
 
 	if longwinded {
@@ -692,8 +701,12 @@ func (u *Unit) GetRating() string {
 	switch u.UType {
 	case 1:
 		return Lookups.CmdRating[u.Rating-1].Name
-	case 2, 3, 5:
+	case 2, 5:
 		return Lookups.UnitRating[u.Rating-1].Name
+	case 3:
+		return Lookups.UnitRating[u.CavRating-1].Name
+	case 4:
+		return Lookups.Gunnery[u.GunneryType-1].Name
 	}
 	return ""
 }

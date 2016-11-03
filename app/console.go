@@ -16,6 +16,7 @@ type ConsolePaintData struct {
 }
 
 var consoleCurrentPanel = "Game"
+var consoleGame = &shared.Game{}
 
 func _play(action string, id int, context *router.Context) {
 	switch action {
@@ -48,7 +49,6 @@ func play(context *router.Context) {
 	doc := w.Document()
 
 	go func() {
-		game := &shared.Game{}
 		// TheCmd := &shared.GameCmd{}
 		// TheUnit := &shared.Unit{}
 
@@ -56,7 +56,8 @@ func play(context *router.Context) {
 			Channel:  Session.Channel,
 			ID:       id,
 			GetUnits: true,
-		}, game)
+		}, consoleGame)
+		game := consoleGame
 		if err != nil || game.ID == 0 {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
 			Session.Navigate("/")
@@ -94,6 +95,7 @@ func play(context *router.Context) {
 
 		doDisplayPanel := func(mode string) {
 			consoleCurrentPanel = mode
+			print("in ddp", mode)
 			consoleSetViewBox(game, 100, 100, false)
 			switch mode {
 			case "Orders":
@@ -131,8 +133,9 @@ func play(context *router.Context) {
 		Session.Subscribe("Game", gameMsg, context)
 
 		doc.QuerySelector("[name=console]").AddEventListener("click", false, func(evt dom.Event) {
-			if evt.Target().TagName() == "INPUT" {
-				doDisplayPanel(evt.Target().(*dom.HTMLInputElement).Value)
+			el := evt.Target()
+			if el.TagName() == "INPUT" && el.Class().Contains("button-console") {
+				doDisplayPanel(el.(*dom.HTMLInputElement).Value)
 			}
 		})
 

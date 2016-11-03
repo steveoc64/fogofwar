@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/gopherjs/gopherjs/js"
 	"honnef.co/go/js/dom"
 )
 
@@ -20,6 +21,8 @@ func isFlipped(game *shared.Game) bool {
 	}
 	return flipped
 }
+
+var tileClicker func(*js.Object)
 
 func doMap(game *shared.Game) {
 	w := dom.GetWindow()
@@ -163,18 +166,23 @@ func doMap(game *shared.Game) {
 	}
 	scaleImages()
 
+	tileDetails := doc.QuerySelector("#tile-details")
+	tileDetails.AddEventListener("click", false, func(evt dom.Event) {
+		tileDetails.Class().Remove("md-show")
+	})
+
 	handleMapClick := func(el *dom.BasicHTMLElement) {
 		cl := el.Class()
 		html := ""
 		if cl.Contains("tile-objective") || cl.Contains("objective-name") {
 			obj, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			TheObjective := game.Objectives[obj]
+			TheObjective := consoleGame.Objectives[obj]
 			html = fmt.Sprintf("<b>Objective</b><br><i>%s</i><br>Victory Points ", TheObjective.Name)
-			if game.Red {
+			if consoleGame.Red {
 				html += fmt.Sprintf("Red: %d + %d per turn<br>",
 					TheObjective.RedVP, TheObjective.VPPerTurn)
 			}
-			if game.Blue {
+			if consoleGame.Blue {
 				html += fmt.Sprintf("Blue: %d + %d per turn",
 					TheObjective.BlueVP, TheObjective.VPPerTurn)
 			}
@@ -189,16 +197,16 @@ func doMap(game *shared.Game) {
 		} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
 			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			print("getting blue cmd", uid)
-			cmd := game.GetCmd("Blue", uid)
+			cmd := consoleGame.GetCmd("Blue", uid)
 			cmd.CalcTotals()
 			print("cmd", cmd)
-			print("game", game)
+			print("game", consoleGame)
 			html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
 				cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
 		} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			print("getting red cmd", uid)
-			cmd := game.GetCmd("Red", uid)
+			cmd := consoleGame.GetCmd("Red", uid)
 			cmd.CalcTotals()
 			html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
 				cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
@@ -241,17 +249,13 @@ func doMap(game *shared.Game) {
 
 		}
 		print(html)
-		td := doc.QuerySelector("#tile-details")
+
+		td := dom.GetWindow().Document().QuerySelector("#tile-details")
 		td.SetInnerHTML(html)
 		td.Class().Add("md-show")
 	}
 
-	tileDetails := doc.QuerySelector("#tile-details")
-	tileDetails.AddEventListener("click", false, func(evt dom.Event) {
-		tileDetails.Class().Remove("md-show")
-	})
-
-	g.AddEventListener("click", false, func(evt dom.Event) {
+	tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
 		print("clik on tile")
 		el := evt.Target()
 		tag := el.TagName()
@@ -263,6 +267,4 @@ func doMap(game *shared.Game) {
 			print("clicked on", tag)
 		}
 	})
-
-	// callback for tile clicks
 }

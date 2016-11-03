@@ -101,7 +101,7 @@ func play(context *router.Context) {
 			case "Map":
 				doMap(game)
 			case "Units":
-				doUnits(game, 0)
+				doUnits(game)
 			case "Game":
 				doTurnSummary(game)
 			}

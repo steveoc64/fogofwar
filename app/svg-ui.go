@@ -115,10 +115,10 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	} else {
 		t.Class().Remove("console-map-title")
 		if Session.Orientation == "Landscape" || !Session.Mobile() {
-			t.SetInnerHTML(fmt.Sprintf("%s %d, Turn %d of %d",
+			t.SetInnerHTML(fmt.Sprintf("%s, %d, Turn %d of %d",
 				game.Name, game.Year, game.Turn, game.TurnLimit))
 		} else {
-			t.SetInnerHTML(fmt.Sprintf("%s %d",
+			t.SetInnerHTML(fmt.Sprintf("%s, %d",
 				game.Name, game.Year))
 		}
 		mr.Class().Add("hidden")

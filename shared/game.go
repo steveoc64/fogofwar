@@ -560,6 +560,17 @@ func (f *GameCmd) Summarize() string {
 	return retval
 }
 
+func (f *GameCmd) ShortSummary() string {
+	retval := "("
+	retval += fmt.Sprintf("%d ", f.Bayonets)
+	retval += " / "
+	retval += fmt.Sprintf("%d ", f.Sabres)
+	retval += " / "
+	retval += fmt.Sprintf("%d", f.Guns)
+	retval += " )"
+	return retval
+}
+
 type Unit struct {
 	ID               int    `db:"id"`
 	GameID           int    `db:"game_id"`
@@ -616,7 +627,15 @@ type Unit struct {
 	Summary          string `db:"summary"` // derived data
 }
 
+func (u *Unit) GetShortSummary(corps *GameCmd) string {
+	return u.GetLongSummary(corps, false)
+}
+
 func (u *Unit) GetSummary(corps *GameCmd) string {
+	return u.GetLongSummary(corps, true)
+}
+
+func (u *Unit) GetLongSummary(corps *GameCmd, longwinded bool) string {
 	// Loop through the Corp, and work out which units are childs of this, and sum
 	// up the total bayonets and sabres and guns
 
@@ -649,17 +668,20 @@ func (u *Unit) GetSummary(corps *GameCmd) string {
 		}
 	}
 
-	retval := ""
-	if b > 0 {
-		retval += fmt.Sprintf("Total of %d Bayonets (%d unfit for duty)\n", b, bl)
+	if longwinded {
+		retval := ""
+		if b > 0 {
+			retval += fmt.Sprintf("Total of %d Bayonets (%d unfit for duty)\n", b, bl)
+		}
+		if s > 0 {
+			retval += fmt.Sprintf("Total of %d Sabres (%d out of action)\n", s, sl)
+		}
+		if g > 0 {
+			retval += fmt.Sprintf("Total of %d Guns (%d under repair)\n", g, gl)
+		}
+		return retval
 	}
-	if s > 0 {
-		retval += fmt.Sprintf("Total of %d Sabres (%d out of action)\n", s, sl)
-	}
-	if g > 0 {
-		retval += fmt.Sprintf("Total of %d Guns (%d under repair)\n", g, gl)
-	}
-	return retval
+	return fmt.Sprintf("(%d / %d / %d)", b-bl, s-sl, g-gl)
 }
 
 func (u *Unit) GetSitrep() string {

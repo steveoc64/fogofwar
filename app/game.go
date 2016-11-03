@@ -293,11 +293,11 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 		return
 	}
 
-	game := Session.EditGame
 	if action == "Update" {
 		if actionID != id {
 			return
 		}
+		game := &shared.Game{}
 		Session.EditGame = &shared.Game{}
 		err := RPC("GameRPC.Get", shared.GameRPCData{
 			Channel:  Session.Channel,
@@ -305,28 +305,30 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 			Red:      true,
 			Blue:     true,
 			GetUnits: true,
-		}, Session.EditGame)
+		}, &game)
 		if err != nil {
 			dom.GetWindow().Alert(err.Error())
 			return
 		}
-		game = Session.EditGame
+		Session.EditGame = game
 		locstor.SetItem("game_id", fmt.Sprintf("%d", game.ID))
 	}
 
 	go func() {
+
+		game := &shared.Game{}
 		err = RPC("GameRPC.Get", shared.GameRPCData{
 			Channel:  Session.Channel,
 			ID:       id,
 			Red:      true,
 			Blue:     true,
 			GetUnits: true,
-		}, Session.EditGame)
+		}, &game)
 		if err != nil {
 			dom.GetWindow().Alert(err.Error())
 			return
 		}
-		game = Session.EditGame
+		Session.EditGame = game
 
 		game.InMode = "Players"
 		game.Mobile = Session.Mobile()

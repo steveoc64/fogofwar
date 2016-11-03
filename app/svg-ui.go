@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"runtime/debug"
 
 	"./shared"
 	"honnef.co/go/js/dom"
@@ -95,9 +94,6 @@ func paperButtonSet(evt dom.Event, text string) {
 func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	w := dom.GetWindow()
 	doc := w.Document()
-
-	// print("in here again with ", x, y)
-	debug.PrintStack()
 
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")

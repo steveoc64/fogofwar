@@ -35,7 +35,8 @@ func doMap(game *shared.Game) {
 
 	scaleImages := func() {
 		gridInches := fmt.Sprintf("%d", game.GridSize)
-		for _, v := range []string{"rough", "woods", "building", "fort", "river", "river1", "river2", "objective"} {
+		for _, v := range []string{"rough", "woods", "building", "fort", "river", "river1", "river2", "objective",
+			"1-clear", "1-rough", "1-woods", "1-building", "1-fort"} {
 			// print("rescale", v)
 			el := doc.QuerySelector("#tile-" + v)
 			el.SetAttribute("height", gridInches)

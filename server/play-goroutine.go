@@ -12,7 +12,8 @@ import (
 
 const (
 	GameEnds = iota
-	GameRewind
+	GameRewindPhase
+	GameRewindTurn
 	GameRestart
 	GamePause
 	PlayerPhaseDone
@@ -290,8 +291,10 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Pause\n")
 			case GameRestart:
 				fmt.Fprintf(fp, "Restart\n")
-			case GameRewind:
-				fmt.Fprintf(fp, "Rewind\n")
+			case GameRewindPhase:
+				fmt.Fprintf(fp, "Rewind Phase\n")
+			case GameRewindTurn:
+				fmt.Fprintf(fp, "Rewind Turn\n")
 			case PlayerConnected:
 				fmt.Fprintf(fp, "Player %d Joins the Game\n", m.PlayerID)
 				loadPlayerConnectionStatus(state)

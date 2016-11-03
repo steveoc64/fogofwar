@@ -32,6 +32,14 @@ func (t *Tile) GetCSS() string {
 	return fmt.Sprintf("tile-content-%d-%d", t.Height, t.Content)
 }
 
+func (t *Tile) GetGameCSS() string {
+	if t.Content == TileClear && t.Height == 0 {
+		return fmt.Sprintf("tile-content-none")
+	} else {
+		return fmt.Sprintf("tile-content-%d-%d", t.Height, t.Content)
+	}
+}
+
 func (t *Tile) ApplyTerrain(mode string) {
 	// print("ApplyMode", mode, "to tile", t)
 	switch mode {

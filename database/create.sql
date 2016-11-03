@@ -404,7 +404,7 @@ create table game_objective (
 	vp_per_turn int not null default 1,
 	red_vp int not null default 20,
 	blue_vp int not null default 20,
-	current_owner int not null default 0
+	current_owner int not null default 0    -- 0 = unclaimed, -1 red, 1 blue
 );
 \i data/game_objective.sql
 create index obj_game_idx on game_objective (game_id);

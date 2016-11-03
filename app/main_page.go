@@ -172,6 +172,9 @@ func _mainPage(action string, id int, context *router.Context) {
 				return
 			}
 			formulate.InsertDiv("hosted-games", ".data-container", "#action-grid")
+			if doc.QuerySelector("#hosted-games") == nil {
+				return
+			}
 			form.RenderNoContainer("game-list", "#hosted-games", myGames)
 		}
 

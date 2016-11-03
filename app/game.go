@@ -315,9 +315,6 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 	}
 
 	go func() {
-
-		game.InMode = "Players"
-		game.Mobile = Session.Mobile()
 		err = RPC("GameRPC.Get", shared.GameRPCData{
 			Channel:  Session.Channel,
 			ID:       id,
@@ -329,6 +326,10 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 			dom.GetWindow().Alert(err.Error())
 			return
 		}
+		game = Session.EditGame
+
+		game.InMode = "Players"
+		game.Mobile = Session.Mobile()
 		form := formulate.EditForm{}
 
 		// Layout the fields

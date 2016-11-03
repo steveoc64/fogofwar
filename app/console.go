@@ -15,6 +15,8 @@ type ConsolePaintData struct {
 	Hosting     bool
 }
 
+var consoleCurrentPanel = "Game"
+
 func _play(action string, id int, context *router.Context) {
 	switch action {
 	case "Phase", "Turn":
@@ -51,8 +53,9 @@ func play(context *router.Context) {
 		// TheUnit := &shared.Unit{}
 
 		err := RPC("GameRPC.GetPlay", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
+			Channel:  Session.Channel,
+			ID:       id,
+			GetUnits: true,
 		}, game)
 		if err != nil || game.ID == 0 {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
@@ -92,8 +95,9 @@ func play(context *router.Context) {
 				print("Game update for this game")
 				newGame := &shared.Game{}
 				err := RPC("GameRPC.GetPlay", shared.GameRPCData{
-					Channel: Session.Channel,
-					ID:      id,
+					Channel:  Session.Channel,
+					ID:       id,
+					GetUnits: true,
 				}, newGame)
 				if err != nil || game.ID == 0 {
 					dom.GetWindow().Alert("Exiting this game .. Bye, and thanks for Playing")
@@ -109,20 +113,25 @@ func play(context *router.Context) {
 
 		doTurnSummary(game)
 
+		doDisplayPanel := func(mode string) {
+			consoleCurrentPanel = mode
+			consoleSetViewBox(game, 100, 100, false)
+			switch mode {
+			case "Orders":
+				doCorpsOverview(game)
+			case "Map":
+				doMap(game)
+			case "Units":
+				doUnits(game)
+			case "Game":
+				doTurnSummary(game)
+			}
+		}
+		doDisplayPanel(consoleCurrentPanel)
+
 		doc.QuerySelector("[name=console]").AddEventListener("click", false, func(evt dom.Event) {
 			if evt.Target().TagName() == "INPUT" {
-				btnv := evt.Target().(*dom.HTMLInputElement).Value
-				switch btnv {
-				case "Orders":
-					doCorpsOverview(game)
-				case "Map":
-					doMap(game)
-				case "Units":
-					doUnits(game)
-				case "Game":
-					doTurnSummary(game)
-					// doGameControl(game)
-				}
+				doDisplayPanel(evt.Target().(*dom.HTMLInputElement).Value)
 			}
 		})
 
@@ -132,20 +141,8 @@ func play(context *router.Context) {
 				Session.Navigate(fmt.Sprintf("/game/%d/players", id))
 			})
 		}
+
 	}()
-}
-
-func isFlipped(game *shared.Game) bool {
-	flipped := false
-
-	if game.Red {
-		flipped = game.RedFlip
-	} else {
-		if game.Blue {
-			flipped = game.BlueFlip
-		}
-	}
-	return flipped
 }
 
 func doCorpsOverview(game *shared.Game) {
@@ -189,14 +186,6 @@ func doOrders(game *shared.Game) {
 	print("TODO - doOrders")
 }
 
-func doMap(game *shared.Game) {
-	print("TODO - doMap")
-}
-
 func doUnits(game *shared.Game) {
 	print("TODO - doUnits")
-}
-
-func doGameControl(game *shared.Game) {
-	print("TODO - doGameControl")
 }

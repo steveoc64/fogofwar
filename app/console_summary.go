@@ -71,7 +71,7 @@ func doTurnSummary(game *shared.Game) {
 		}()
 	}
 
-	print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
+	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
 	if game.Phase == 0 {
 		// special case - we are in pre-game, and we must get them to go into the orders tab first
 		// this only applies on the special pre-game stuff

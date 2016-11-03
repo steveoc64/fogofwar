@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"./shared"
 	"honnef.co/go/js/dom"
 )
 
@@ -84,5 +85,32 @@ func paperButtonSet(evt dom.Event, text string) {
 		c := el.PreviousElementSibling().Class()
 		c.Remove("text__paper")
 		c.Add("text__done")
+	}
+}
+
+func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
+	g := c.QuerySelector("[name=g-main]")
+	g.RemoveAttribute("transform")
+	g.SetInnerHTML("")
+	print("setting viwewbox", x, y)
+	c.SetAttribute("viewBox", fmt.Sprintf("0 0 %d %d", x, y))
+
+	t := doc.QuerySelector(".console-title")
+	if MapMode {
+		t.Class().Add("console-map-title")
+		t.SetInnerHTML(fmt.Sprintf("%d x %d ft Table with %d\" grids (%d x %d scale m)",
+			game.TableX, game.TableY, game.GridSize, game.KmX, game.KmY))
+	} else {
+		t.Class().Remove("console-map-title")
+		if Session.Orientation == "Landscape" || !Session.Mobile() {
+			t.SetInnerHTML(fmt.Sprintf("%s %d, Turn %d of %d",
+				game.Name, game.Year, game.Turn, game.TurnLimit))
+		} else {
+			t.SetInnerHTML(fmt.Sprintf("%s %d",
+				game.Name, game.Year))
+		}
 	}
 }

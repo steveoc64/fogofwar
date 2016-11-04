@@ -983,7 +983,8 @@ func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
 				sabres=sabres-sabres_lost,
 				sabres_lost=0,
 				guns=guns-guns_lost,
-				guns_lost=0
+				guns_lost=0,
+				mstate=0
 				where game_id=$1`, data.ID).Exec()
 			if err != nil {
 				println(err.Error())

@@ -197,16 +197,16 @@ func doMap(game *shared.Game) {
 			}
 		} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
 			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("getting blue cmd", uid)
+			// print("getting blue cmd", uid)
 			cmd := consoleGame.GetCmd("Blue", uid)
 			cmd.CalcTotals()
-			print("cmd", cmd)
-			print("game", consoleGame)
+			// print("cmd", cmd)
+			// print("game", consoleGame)
 			html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
 				cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
 		} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("getting red cmd", uid)
+			// print("getting red cmd", uid)
 			cmd := consoleGame.GetCmd("Red", uid)
 			cmd.CalcTotals()
 			html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
@@ -249,7 +249,7 @@ func doMap(game *shared.Game) {
 			}
 
 		}
-		print(html)
+		// print(html)
 
 		td := dom.GetWindow().Document().QuerySelector("#tile-details")
 		td.SetInnerHTML(html)
@@ -257,12 +257,12 @@ func doMap(game *shared.Game) {
 	}
 
 	tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
-		print("clik on tile")
+		// print("clik on tile")
 		el := evt.Target()
 		tag := el.TagName()
 		switch tag {
 		case "rect", "RECT", "text", "TEXT":
-			print("clicked on a tile of class", el.GetAttribute("class"))
+			// print("clicked on a tile of class", el.GetAttribute("class"))
 			handleMapClick(el.(*dom.BasicHTMLElement))
 		default:
 			print("clicked on", tag)

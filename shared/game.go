@@ -625,6 +625,7 @@ type Unit struct {
 	GunsMState       int    `db:"guns_mstate"`
 	GunMaxCondition  int    `db:"gun_max_condition"`
 	Summary          string `db:"summary"` // derived data
+	MState           int    `db:"mstate"`  // 0 - pregame
 }
 
 func (u *Unit) GetShortSummary(corps *GameCmd) string {
@@ -817,6 +818,26 @@ func (u *Unit) GetSupport() string {
 	// 	return retval
 	// }
 	// return ".. and no additional support units."
+}
+
+func (u *Unit) GetMState() string {
+	switch u.MState {
+	case -1:
+		return "PreGame"
+	case 0:
+		return "Steady"
+	case 1, 2:
+		return "Disordered"
+	case 3, 4, 5, 6:
+		return "Defeated"
+	default:
+		if u.MState < 13 {
+			return "Totally Defeated"
+		} else {
+			return "Lost"
+		}
+
+	}
 }
 
 func (u *Unit) GetCondition() string {

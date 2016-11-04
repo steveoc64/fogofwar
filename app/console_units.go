@@ -39,11 +39,11 @@ func doUnits(game *shared.Game) {
 		if v.PlayerID == Session.UserID {
 			html += svgButton(v.ID, fmt.Sprintf("cmd-%d", v.ID), 0, 18+(yoffset), 100,
 				"console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(72, 25+yoffset, 0, team, v.ShortSummary())
+			html += svgText(65, 25+yoffset, 0, team, v.ShortSummary())
 		} else {
 			html += svgButton(v.ID, fmt.Sprintf("cmd-%d", v.ID), 0, 18+(yoffset), 100,
 				"console-corps-button-other", "text__"+team+" text__1x", v.Name)
-			html += svgText(72, 25+yoffset, 0, team, v.ShortSummary())
+			html += svgText(65, 25+yoffset, 0, team, v.ShortSummary())
 		}
 		yoffset += 11
 	}
@@ -103,7 +103,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 		if v.UType == 1 {
 			html += svgButton(v.ID, fmt.Sprintf("unit-%d", v.ID), 0, 18+yoffset, 100,
 				"console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(72, 25+yoffset, 0, team, v.GetShortSummary(cmd))
+			html += svgText(65, 25+yoffset, 0, team, v.GetShortSummary(cmd))
 			yoffset += 11
 		}
 	}
@@ -161,7 +161,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	for _, v := range subunits {
 		html += svgButton(v.ID, fmt.Sprintf("unit-%d", v.ID), 0, 18+yoffset, 100,
 			"console-corps-button", "text__"+team+" text__1x", v.Name)
-		html += svgText(48, 25+yoffset, 0, team, v.GetRating())
+		html += svgText(55, 25+yoffset, 0, team, v.GetRating())
 		html += svgText(80, 25+yoffset, 0, team, v.GetBases())
 		yoffset += 11
 	}
@@ -208,7 +208,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 								print("here with utype", unit.UType)
 							}
 						case 3:
-							// print("in cav with", value)
+							print("in cav with", value)
 							switch value {
 							case "Honours":
 								// print("here with Honours")
@@ -240,69 +240,3 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		doUnitsDiv(game, cmd)
 	})
 }
-
-// Click handler on the unitlist
-/*		form.OnEvent("UnitList", "click", func(evt dom.Event) {
-			td := evt.Target()
-			tag := td.TagName()
-			// print("clicked on", tag)
-			if tag == "TD" {
-				tr := td.ParentElement()
-				key, _ := strconv.Atoi(tr.GetAttribute("key"))
-				team := tr.GetAttribute("data-team")
-				// print("clicked on row with key", key)
-				unit := game.GetUnit(team, key)
-				TheUnit = unit
-				// print("unit is", unit)
-				if unit.UType == 1 {
-					unit.Summary = unit.GetSummary(TheCmd)
-				}
-				loadTemplate("unit-details", "#unit-details", unit)
-				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
-					// print("clicke on the unit details")
-					unit := TheUnit
-					el := evt.Target()
-					print("clicked on a ", el.TagName())
-					if el.TagName() == "INPUT" {
-						value := el.(*dom.HTMLInputElement).Value
-						print("with value", value)
-						print("on utype", unit.UType)
-						switch unit.UType {
-						case 1:
-							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-						case 2, 5:
-							switch value {
-							case "Valour":
-								loadTemplate("unit-valour", "[name=unitcard]", unit)
-								return
-							case "Discipline":
-								loadTemplate("unit-discipline", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							}
-						case 3:
-							// print("in cav with", value)
-							switch value {
-							case "Honours":
-								// print("here with Honours")
-								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							}
-						case 4:
-							switch value {
-							case "Gunnery Chart":
-								loadTemplate("unit-gunnery", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							}
-						}
-					} // tag input
-				})
-				doc.QuerySelector("#unit-details").Class().Add("md-show")
-			}
-		})
-*/

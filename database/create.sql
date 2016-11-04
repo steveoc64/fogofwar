@@ -411,7 +411,7 @@ create index obj_game_idx on game_objective (game_id);
 
 
 drop table if exists tiles;
-create unlogged table tiles (
+create table tiles (
 	game_id int not null,
 	i int not null,
 	height  int,
@@ -482,7 +482,7 @@ drop table if exists game_cmd_player;
 
 drop table if exists game_unit;
 drop table if exists unit;
-create unlogged table unit (
+create  table unit (
 	id serial not null primary key,
 	cmd_id int not null,
 	game_id int not null,
@@ -533,7 +533,8 @@ create unlogged table unit (
 	gunnery_type int not null default 0,
 	horse_guns bool not null default false,
 	gun_max_condition int not null default 2,
-	gun_condition int not null default 2
+	gun_condition int not null default 2,
+	mstate int not null default -1    -- -1 pregame, otherwise, num 2min turns till recovered
 );
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);

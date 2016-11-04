@@ -25,6 +25,9 @@
     {{if ne .Descr ""}}
     <li>{{.Descr}}</li>
     {{end}}
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
+    {{end}}
     <li>Summary: <br>{{.Summary}}</li>
   </ul>
   </div>
@@ -40,6 +43,9 @@
   <dir name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
+    {{end}}
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
     <li>Trained as {{.GetDrill}}</li>
     <li>In {{.GetCondition}} condition.</li>
@@ -65,6 +71,9 @@
   <div  name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
+    {{end}}
     <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
     <li>In {{.GetCondition}} condition.</li>
     {{if ne 0 .SabresLost}}
@@ -90,6 +99,9 @@
   <ul>
     {{if ne "" .Name}}
     <li>{{.Name}}
+    {{end}}
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
     {{end}}
     {{if ne "" .Nation}}
      of {{.Nation}}
@@ -118,6 +130,9 @@
   <dir name="unitcard">
   <ul>
     <li>{{.Name}} of {{.Nation}}</li>
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
+    {{end}}
     <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
     <li>Trained as {{.GetDrill}}</li>
     <li>In {{.GetCondition}} condition.</li>

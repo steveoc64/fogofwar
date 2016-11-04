@@ -19,6 +19,25 @@ const (
 	TileWater2
 )
 
+const (
+	CmdReserve int = iota
+	CmdMarchOrder
+	CmdBattleLine
+)
+
+const (
+	CommandCarryOn int = iota
+	CommandNewObjective
+	CommandHalt
+	CommandResumeMarch
+	CommandHaltMarch
+	CommandBattleLine
+	CommandReserve
+	CommandMarchOrder
+	CommandPrepare
+)
+const NumCommands = 9
+
 type Tile struct {
 	X       int `db:"x"`
 	Y       int `db:"y"`
@@ -505,6 +524,14 @@ type GameCmd struct {
 	Units         []*Unit `db:"units"`
 	VP            int     `db:"vp"`
 	Cull          bool    `db:"cull"` // Dont use in game
+	CState        int     `db:"cstate"`
+	DState        int     `db:"dstate"`
+	CX            int     `db:"cx"`
+	CY            int     `db:"cy"`
+	DX            int     `db:"dx"`
+	DY            int     `db:"dy"`
+	Wait          bool    `db:"wait"`
+	PrepDefence   bool    `db:"prep_defence"`
 	Cmdrs         int
 	Bayonets      int
 	Sabres        int
@@ -516,6 +543,41 @@ type GameCmdRPCData struct {
 	ID       int
 	PlayerID int
 	Team     string
+}
+
+var cstates = []string{"Reserve", "March Order", "Battle Line"}
+
+func (g *GameCmd) Deploying() bool {
+	return g.CState != g.DState
+}
+
+func (g *GameCmd) Moving() bool {
+	return g.CX != g.DX || g.CY != g.DY
+}
+
+func (g *GameCmd) CStateName() string {
+	return cstates[g.CState]
+}
+
+func (g *GameCmd) DStateName() string {
+	return cstates[g.DState]
+}
+
+func (g *GameCmd) CommandSummary() string {
+	retval := ""
+	if g.Deploying() {
+		retval = fmt.Sprintf("Deploying to %s", cstates[g.DState])
+	} else {
+		if g.PrepDefence {
+			return "Preparing Position"
+		}
+		if g.Moving() {
+			retval = fmt.Sprintf("En-Route in %s", cstates[g.CState])
+		} else {
+			retval = fmt.Sprintf("In %s", cstates[g.CState])
+		}
+	}
+	return retval
 }
 
 func (g *GameCmd) GetAvatar(size int) string {

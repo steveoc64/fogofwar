@@ -26,27 +26,32 @@ func doUnits(game *shared.Game) {
 	}
 
 	// Create heading with Team Name
-	html := ""
 	sz := 2
 	if len(teamName) > 18 {
 		sz = 1
 	}
-	html += svgText(0, 10, sz, team, teamName)
+	html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
+
 	// yspacing := 80 / (len(cmds) + 1) // width to use for each cmd
 	yoffset := 0
 	for _, v := range cmds {
 		v.CalcTotals()
+		html += svgG(v.ID)
 		if v.PlayerID == Session.UserID {
-			html += svgButton(v.ID, fmt.Sprintf("cmd-%d", v.ID), 0, 18+(yoffset), 100,
-				"console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(65, 25+yoffset, 0, team, v.ShortSummary())
+			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		} else {
-			html += svgButton(v.ID, fmt.Sprintf("cmd-%d", v.ID), 0, 18+(yoffset), 100,
-				"console-corps-button-other", "text__"+team+" text__1x", v.Name)
-			html += svgText(65, 25+yoffset, 0, team, v.ShortSummary())
+			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button-other", "text__"+team+" text__1x", v.Name)
+			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		}
+		html += svgEndG()
 		yoffset += 11
 	}
+	html += svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Orders Complete")
+	html += svgEndG()
 	g.SetInnerHTML(html)
 
 	// add callbacks for each corps
@@ -61,9 +66,15 @@ func doUnits(game *shared.Game) {
 		}
 	}
 
+	svgCallback(100, func(dom.Event) {
+		print("all done")
+		consolePhaseDone(game)
+	})
+
 	for _, v := range cmds {
 		if v.PlayerID == Session.UserID {
-			svgButtonCallback(fmt.Sprintf("cmd-%d", v.ID), clickCorps)
+			// svgButtonCallback(fmt.Sprintf("cmd-%d", v.ID), clickCorps)
+			svgCallback(v.ID, clickCorps)
 		}
 	}
 }
@@ -82,14 +93,16 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	}
 
 	// Create heading with Team Name
-	html := ""
 	fullName := cmd.Name + ": " + cmd.CommanderName
 	sz := 2
 	if len(fullName) > 18 {
 		sz = 1
 	}
 	// title
-	html += svgText(0, 10, sz, team, fullName)
+	html := svgG(0)
+	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), fullName)
+	html += svgEndG()
+
 	numDivs := 0
 	for _, v := range cmd.Units {
 		if v.UType == 1 {
@@ -101,36 +114,41 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	yoffset := 0
 	for _, v := range cmd.Units {
 		if v.UType == 1 {
-			html += svgButton(v.ID, fmt.Sprintf("unit-%d", v.ID), 0, 18+yoffset, 100,
-				"console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(65, 25+yoffset, 0, team, v.GetShortSummary(cmd))
+			html += svgG(v.ID)
+			html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
+			html += svgEndG()
 			yoffset += 11
 		}
 	}
+	html += svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgEndG()
 	g.SetInnerHTML(html)
 
 	// add callbacks for each div
 	clickDiv := func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		// print("clicked on div", id)
 		for _, v := range cmd.Units {
 			if v.ID == id {
-				print("unit ", v)
 				doUnitsBde(game, cmd, v)
 			}
 		}
 	}
 
+	svgCallback(100, func(evt dom.Event) {
+		print("reorg")
+	})
+
 	for _, v := range cmd.Units {
 		if v.UType == 1 {
-			svgButtonCallback(fmt.Sprintf("unit-%d", v.ID), clickDiv)
+			svgCallback(v.ID, clickDiv)
 		}
 	}
 
-	g.(*dom.BasicHTMLElement).FirstChild().AddEventListener("click", false, func(evt dom.Event) {
-		doUnits(game)
-	})
 }
 
 func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
@@ -147,22 +165,25 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	}
 
 	// Create heading with Div Name
-	html := ""
 	sz := 2
 	if len(div.Name) > 18 {
 		sz = 1
 	}
 	// title
-	html += svgText(0, 10, sz, team, div.Name)
+	html := svgG(0)
+	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), div.Name)
+	html += svgEndG()
+
 	subunits := div.GetSubunits(cmd)
 
 	// yspacing := 80 / (numDivs + 1) // width to use for each cmd
 	yoffset := 0
 	for _, v := range subunits {
-		html += svgButton(v.ID, fmt.Sprintf("unit-%d", v.ID), 0, 18+yoffset, 100,
-			"console-corps-button", "text__"+team+" text__1x", v.Name)
-		html += svgText(55, 25+yoffset, 0, team, v.GetRating())
-		html += svgText(80, 25+yoffset, 0, team, v.GetBases())
+		html += svgG(v.ID)
+		html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+		html += svgText(55, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
+		html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetBases())
+		html += svgEndG()
 		yoffset += 11
 	}
 	g.SetInnerHTML(html)
@@ -232,11 +253,12 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		}
 	}
 
-	for _, v := range subunits {
-		svgButtonCallback(fmt.Sprintf("unit-%d", v.ID), clickDiv)
-	}
-
-	g.(*dom.BasicHTMLElement).FirstChild().AddEventListener("click", false, func(evt dom.Event) {
+	svgCallback(0, func(evt dom.Event) {
 		doUnitsDiv(game, cmd)
 	})
+
+	for _, v := range subunits {
+		// svgButtonCallback(fmt.Sprintf("unit-%d", v.ID), clickDiv)
+		svgCallback(v.ID, clickDiv)
+	}
 }

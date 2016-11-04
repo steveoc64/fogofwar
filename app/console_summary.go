@@ -43,32 +43,23 @@ func doTurnSummary(game *shared.Game) {
 	html := ""
 	if game.Turn > 0 {
 		turn := fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)
-		html += svgText(2, 10, 2, team, turn)
+		html += svgText(0, 10, "text__2x text__"+team, turn)
 	}
 
-	html += svgText(2, 25, 2, team, title)
+	html += svgText(50, 25, "text__middle text__2x text__"+team, title)
 	if !game.PhaseTODO {
-		html += svgText(2, 40, 1, team, ".. nothing for us this Turn")
+		html += svgText(100, 40, "text__end text__1x text__"+team, ".. nothing for us this Turn")
 	} else {
-		html += svgText(2, 40, 1, team, phaseName)
+		html += svgText(100, 40, "text__end text__1x text__"+team, phaseName)
 	}
 	if game.Turn > 1 {
-		html += svgText(3, 70, 2, team, fmt.Sprintf("Victory Points = %d", game.VP))
+		html += svgText(50, 70, "text__middle text__2x text__"+team, fmt.Sprintf("Victory Points = %d", game.VP))
 	}
 
 	dispatchOrders := func(evt dom.Event) {
 		game.PhaseDONE = true
 		paperButtonSet(evt, doneText)
-		go func() {
-			done := false
-			err := RPC("GameRPC.PhaseDone", shared.PhaseDoneMsg{
-				Channel: Session.Channel,
-				GameID:  game.ID,
-			}, &done)
-			if err != nil {
-				print(err.Error())
-			}
-		}()
+		consolePhaseDone(game)
 	}
 
 	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
@@ -77,25 +68,36 @@ func doTurnSummary(game *shared.Game) {
 		// special case - we are in pre-game, and we must get them to go into the orders tab first
 		// this only applies on the special pre-game stuff
 	} else {
+		html += svgG(1)
 		if game.PhaseTODO {
 			// we have things to do this turn
 			if !game.PhaseDONE {
 				// we are yet to do all the things
-				html += paperButton("done", confirmText, 40, 85, 50, dispatchOrders)
+				html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+				// html += paperButton("done", confirmText, 40, 85, 50, dispatchOrders)
 				allTheThings = true
 			} else {
 				// we have done all the things
-				html += paperDoneButton("done", doneText, 40, 85, 50)
+				html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
+				// html += paperDoneButton("done", doneText, 40, 85, 50)
 			}
 		} else {
 			// there is nothing for us this turn
-			html += paperDoneButton("done", doneText, 40, 85, 50)
+			if !game.PhaseDONE {
+				// but we are busy doing something with troop orders anyway
+				html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+				allTheThings = true
+			}
+			// html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
+			// html += paperDoneButton("done", doneText, 40, 85, 50)
 		}
+		html += svgEndG()
 	}
 	g.SetInnerHTML(html)
 
 	if allTheThings {
 		// All the things are yet to be done
-		svgButtonCallback("done", dispatchOrders)
+		svgCallback(1, dispatchOrders)
+		// svgButtonCallback("done", dispatchOrders)
 	}
 }

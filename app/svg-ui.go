@@ -11,64 +11,45 @@ const SVG = "http://www.w3.org/2000/svg"
 
 // const SVGStar = `<polygon xmlns="http://www.w3.org/2000/svg" fill="#fdff00" stroke="#605a00" stroke-width="15" points="150,25 179,111 269,111 197,165 223,251 150,200 77,251 103,165 31,111 121,111"/>`
 
-func svgText(x, y, s int, team, text string) string {
-	html := fmt.Sprintf(`<text x=%d y=%d class="console-text text__%s text__%dx">%s</text>"`, x, y, team, s, text)
+var svgID int
+
+func svgG(id int) string {
+	svgID = id
+	return fmt.Sprintf("<g id=g-%d data-id=%d>", id, id)
+}
+
+func svgEndG() string {
+	svgID = 0
+	return "</g>\n"
+}
+
+func svgText(x, y int, class, text string) string {
+	html := fmt.Sprintf(`<text data-id=%d x=%d y=%d class="%s">%s</text>"`,
+		svgID, x, y, class, text)
 	html += "\n"
 	return html
 }
 
-func svgButton(dataID int, name string, x, y, w int, class, textClass, text string) string {
+func svgButton(x, y, w, h int, class, textClass, text string) string {
 	html := ""
 
-	html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=10 class=%s data-id=%d></rect>`,
-		name, x, y, w, class, dataID)
+	html += fmt.Sprintf(`<rect x=%d y=%d rx=2 ry=2 width=%d height=%d class=%s data-id=%d></rect>`,
+		x, y, w, h, class, svgID)
 	html += "\n"
-	html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
-		name, x+3, y+8, textClass, dataID, text)
-	html += "\n"
-	return html
-}
-
-func paperButton(name, text string, x, y, w int, callback func(dom.Event)) string {
-	html := ""
-
-	html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
-		name, x, y, w)
-	html += "\n"
-	html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-		name, x+5, y+8, text)
+	html += fmt.Sprintf(`<text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
+		x+3, y+8, textClass, svgID, text)
 	html += "\n"
 	return html
 }
-
-func paperDoneButton(name, text string, x, y, w int) string {
-	html := ""
-
-	if Session.Orientation == "Portrait" {
-		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
-			name, x, y, w)
-		html += "\n"
-		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-			name, x+5, y+8, text)
-		html += "\n"
-	} else {
-		html += fmt.Sprintf(`<rect name=%s-rect x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
-			name, x, y, w)
-		html += "\n"
-		html += fmt.Sprintf(`<text name=%s-text x=%d y=%d class="console-text text__hand">%s</text>`,
-			name, x+5, y+8, text)
-		html += "\n"
-	}
-
-	return html
-}
-
-func svgButtonCallback(name string, f func(dom.Event)) {
+func svgCallback(id int, f func(dom.Event)) {
 	w := dom.GetWindow()
 	doc := w.Document()
 
-	doc.QuerySelector(fmt.Sprintf("[name=%s-rect]", name)).AddEventListener("click", false, f)
-	doc.QuerySelector(fmt.Sprintf("[name=%s-text]", name)).AddEventListener("click", false, f)
+	el := doc.QuerySelector(fmt.Sprintf("#g-%d", id))
+	if el != nil {
+		el.AddEventListener("click", false, f)
+	}
+	// doc.QuerySelector(fmt.Sprintf("#g-%d", id)).AddEventListener("click", false, f)
 }
 
 func paperButtonSet(evt dom.Event, text string) {
@@ -125,4 +106,40 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 		mr.Class().Add("hidden")
 	}
 
+	svgID = 0
+
 }
+
+// func paperButton(text string, x, y, w int, callback func(dom.Event)) string {
+// 	html := ""
+
+// 	html += fmt.Sprintf(`<rect data-id=%d x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__paper></rect>`,
+// 		svgID, x, y, w)
+// 	html += "\n"
+// 	html += fmt.Sprintf(`<text data-id=%d x=%d y=%d class="console-text text__hand">%s</text>`,
+// 		svgID, x+5, y+8, text)
+// 	html += "\n"
+// 	return html
+// }
+
+// func paperDoneButton(text string, x, y, w int) string {
+// 	html := ""
+
+// 	if Session.Orientation == "Portrait" {
+// 		html += fmt.Sprintf(`<rect data-id=%d x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
+// 			svgID, x, y, w)
+// 		html += "\n"
+// 		html += fmt.Sprintf(`<text data-id=%d x=%d y=%d class="console-text text__hand">%s</text>`,
+// 			svgID, x+5, y+8, text)
+// 		html += "\n"
+// 	} else {
+// 		html += fmt.Sprintf(`<rect data-id=%d x=%d y=%d rx=2 ry=2 width=%d height=12 class=text__done></rect>`,
+// 			svgID, x, y, w)
+// 		html += "\n"
+// 		html += fmt.Sprintf(`<text data-id=%d x=%d y=%d class="console-text text__hand">%s</text>`,
+// 			svgID, x+5, y+8, text)
+// 		html += "\n"
+// 	}
+
+// 	return html
+// }

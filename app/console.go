@@ -18,6 +18,35 @@ type ConsolePaintData struct {
 var consoleCurrentPanel = "Game"
 var consoleGame = &shared.Game{}
 
+func consoleImBusy(game *shared.Game) {
+	go func() {
+		done := false
+		err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
+			Channel: Session.Channel,
+			GameID:  game.ID,
+		}, &done)
+		if err != nil {
+			print(err.Error())
+		}
+		game.PhaseDONE = false
+	}()
+}
+
+func consolePhaseDone(game *shared.Game) {
+	go func() {
+		done := false
+		err := RPC("GameRPC.PhaseDone", shared.PhaseDoneMsg{
+			Channel: Session.Channel,
+			GameID:  game.ID,
+		}, &done)
+		if err != nil {
+			print(err.Error())
+		}
+		game.PhaseDONE = true
+		doTurnSummary(game)
+	}()
+}
+
 func _play(action string, id int, context *router.Context) {
 	switch action {
 	case "Phase", "Turn":
@@ -95,11 +124,10 @@ func play(context *router.Context) {
 
 		doDisplayPanel := func(mode string) {
 			consoleCurrentPanel = mode
-			print("in ddp", mode)
 			consoleSetViewBox(game, 100, 100, false)
 			switch mode {
 			case "Orders":
-				doCorpsOverview(game)
+				doOrders(game)
 			case "Map":
 				doMap(game)
 			case "Units":
@@ -157,17 +185,7 @@ func doCorpsOverview(game *shared.Game) {
 	// mock the act of completing the TODO list, on the first phase only
 	if game.Phase == 0 {
 		game.Phase = -1
-		go func() {
-			done := false
-			err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
-				Channel: Session.Channel,
-				GameID:  game.ID,
-			}, &done)
-			if err != nil {
-				print(err.Error())
-			}
-			game.PhaseDONE = false
-		}()
+		consoleImBusy(game)
 	}
 
 	// Add a turn summary object
@@ -183,9 +201,4 @@ func doCorpsOverview(game *shared.Game) {
 		print("add button for blue", corps.Name)
 	}
 	g.SetInnerHTML(html)
-}
-
-// Render the orders
-func doOrders(game *shared.Game) {
-	print("TODO - doOrders")
 }

@@ -77,6 +77,8 @@
   font-size: 0.5rem
   
 .text__2x
+  font-family: 'Cedarville Cursive', cursive;
+  font-family: 'Playfair Display', serif
   font-size: 1rem
   stroke-width: 0.2
  
@@ -93,13 +95,27 @@
   font-family: 'Homemade Apple', cursive;
   stroke-width: 0
 
+.text__bighand
+  font-size: .6rem
+  fill: rgba(12, 10, 0, 0.81)
+  font-family: 'Homemade Apple', cursive;
+  stroke-width: 1
+
 .text__hand
-  font-family: 'Cedarville Cursive', cursive;
   font-family: 'Homemade Apple', cursive;
   stroke-width: 0
   font-size: 0.5rem
   fill: rgba(12, 10, 0, 0.81)
 
+.text__start
+  text-anchor: start 
+
+.text__end
+  text-anchor: end 
+
+.text__middle
+  text-anchor: middle 
+   
 .text__paper
   fill: rgba(212, 210, 168, 0.66)
   stroke: rgba(53, 39, 7, 0.63)
@@ -228,6 +244,39 @@
   background: linear-gradient(to bottom,  rgba(254,255,232,1) 0%,rgba(214,219,191,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#feffe8', endColorstr='#d6dbbf',GradientType=0 ); /* IE6-9 */
  
+.console-button 
+  stroke: black
+  stroke-width: .30px
+  fill: white
+  opacity: .3
+  &:hover
+    opacity: .5
+    stroke-width: .4px
+ 
+.carryon-button 
+  stroke: green
+  stroke-width: .40px
+  fill: rgba(5, 80, 62, 0.4);
+  opacity: .8
+  &:hover
+    stroke-width: .8px
+
+.reorg-button 
+  stroke: green
+  stroke-width: .40px
+  fill: rgba(50, 83, 152, 0.67)
+  opacity: .8
+  &:hover
+    stroke-width: .8px
+
+.text__carryon
+  font-size: .8rem
+  font-family: 'Cedarville Cursive', cursive;
+  font-family: 'Dancing Script', cursive;
+  font-family: 'Playfair Display', serif
+  stroke-width: .1px
+  fill: rgba(212, 208, 161, 0.66)
+
 .console-corps-button
   stroke: black
   stroke-width: 0.30px

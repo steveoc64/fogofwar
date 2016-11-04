@@ -457,7 +457,15 @@ create  table game_cmd (
 	player_id int not null default 0,
 	player_ready bool not null default 'f',
 	vp int not null default 0,
-	cull bool not null default 't'
+	cull bool not null default 't',
+	wait bool not null default false,
+	cstate int not null default 0,  -- 0 = reserve, 1 = march order, 2 = battle line
+	dstate int not null default 0,
+	cx int not null default -1,
+	cy int not null default -1,
+	dx int not null default -1,
+	dy int not null default -1,
+	prep_defence bool not null default false
 );
 \i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);

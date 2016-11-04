@@ -221,3 +221,52 @@ func (g *GameRPC) PhaseNotDone(data shared.PhaseDoneMsg, retval *bool) error {
 
 	return err
 }
+
+func (g *GameRPC) CmdOrder(data shared.CmdOrder, retval *shared.GameCmd) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	// confirm that this user can issue orders to this unit
+	player_id := 0
+	err := DB.SQL(`select player_id from game_cmd where id=$1`, data.ID).QueryScalar(&player_id)
+	if conn.UserID != player_id {
+		fmt.Printf("user %d is not in command of %d\n", conn.UserID, data.ID)
+		println(err.Error())
+		return errors.New("Insufficient Privilege")
+	}
+
+	if err == nil {
+		switch data.Command {
+		case shared.CommandCarryOn:
+			println("very good, carry on")
+		case shared.CommandNewObjective:
+			println("TODO - get new objective info and stamp on the record")
+		case shared.CommandHalt:
+			_, err = DB.SQL(`update game_cmd set wait=true where id=$1`, data.ID).Exec()
+		case shared.CommandResumeMarch:
+			_, err = DB.SQL(`update game_cmd set wait=false where id=$1`, data.ID).Exec()
+		case shared.CommandBattleLine:
+			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdBattleLine).Exec()
+		case shared.CommandReserve:
+			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdReserve).Exec()
+		case shared.CommandMarchOrder:
+			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdMarchOrder).Exec()
+		case shared.CommandPrepare:
+			_, err = DB.SQL(`update game_cmd set prep_defence=true where id=$1`, data.ID).Exec()
+		}
+	}
+
+	logger(start, "Game.CmdOrder", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%v", *retval))
+
+	if err == nil {
+		err = DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(retval)
+		if err == nil {
+			DB.SQL(`select * from unit where cmd_id=$1 order by path`, data.ID).QueryStructs(&retval.Units)
+		}
+	}
+
+	return err
+}

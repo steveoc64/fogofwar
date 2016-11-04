@@ -37,7 +37,11 @@ func doOrders(game *shared.Game) {
 	for _, v := range cmds {
 		if v.PlayerID == Session.UserID {
 			html += svgG(v.ID)
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__1x text__"+team, v.Name)
+			c := "console-corps-button"
+			if v.Deploying() {
+				c = "console-corps-button-other"
+			}
+			html += svgButton(0, 18+(yoffset), 100, 10, c, "text__1x text__"+team, v.Name)
 			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())
 			html += svgEndG()
 			yoffset += 11
@@ -89,25 +93,27 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 
 	// Create heading with Team Name
 	cs := cmd.CommandSummary()
-	if !cmd.Moving() && !cmd.Deploying() {
-		cs = cs + ", and awaiting New Orders"
-	}
-
 	html := svgG(0)
 	html += svgText(0, 10, "text__2x text__"+team, cmd.Name)
-	html += svgText(98, 18, "text__end text__1x text__"+team, cs)
-	html += svgEndG()
+	if !cmd.PrepDefence && !cmd.Moving() && !cmd.Deploying() {
+		cs = cs + ", and awaiting New Orders"
+		html += svgText(98, 18, "text__end text__0x text__"+team, cs)
+	} else {
+		html += svgText(98, 18, "text__end text__1x text__"+team, cs)
+	}
 
 	yoffset := 20
 
 	if cmd.Deploying() {
-		html += svgText(0, 30, "text__start text__hand", "With Apologies,")
+		html += svgText(0, 30, "text__start text__hand", getApology())
 		html += svgText(50, 40, "text__middle text__hand", "I am currently indisposed at present")
 		html += svgText(50, 50, "text__middle text__hand", "as the troops are busy deploying")
 		html += svgText(50, 60, "text__middle text__hand", fmt.Sprintf("from %s to %s", cmd.CStateName(), cmd.DStateName()))
 		html += svgText(90, 70, "text__end text__hand", "Regards,")
 		html += svgText(90, 80, "text__end text__bighand", cmd.CommanderName)
+		html += svgEndG()
 	} else {
+		html += svgEndG()
 		if cmd.Moving() {
 			// is moving and not deploying .. must be enroute to a new objective
 			switch cmd.CState {
@@ -213,8 +219,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			print("exec command", id, "on game cmd", cmd.ID)
 			switch id {
 			case shared.CommandCarryOn:
-				print("carry on")
-				doTurnSummary(game)
+				doOrders(game)
 			case shared.CommandNewObjective:
 				print("TODO - bring up map and mark destination objective")
 			default:
@@ -228,9 +233,10 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 					if err != nil {
 						dom.GetWindow().Alert(err.Error())
 					} else {
-						// Reload console to this page
-						print("compare these 2", cmd, newCmd)
-						doCorpsOrders(game, cmd)
+						// We are done with this Corps, so
+						// Reload console back to the Corps overview
+						*cmd = newCmd
+						doOrders(game)
 					}
 				}()
 			}
@@ -274,5 +280,50 @@ func getCarryOn() string {
 		return "For Glory!"
 	default:
 		return "Carry on"
+	}
+}
+
+func getApology() string {
+	v := rand.Intn(16)
+	print("co", v)
+	switch v {
+	case 0:
+		return "With Apologies,"
+	case 1:
+		return "Sir,"
+	case 2:
+		return "Dear Friend,"
+	case 3:
+		return "I must bring it to your attention,"
+	case 4:
+		return "Take Note,"
+	case 5:
+		return "Now Listen Here,"
+	case 6:
+		return "I must inform you,"
+	case 7:
+		return "Sacré Bleu,"
+	case 8:
+		return "Le mot impossible n'est pas français,"
+	case 9:
+		return "Avant!,"
+	case 10:
+		return "Für Gott und Vaterland,"
+	case 11:
+		return "God save the King,"
+	case 12:
+		return "Vorwärts!,"
+	case 13:
+		return "In the name of God,"
+	case 14:
+		return "For Glory!,"
+	case 15:
+		return "Not Again, surely ?,"
+	case 16:
+		return "For Goodness Sakes,"
+	case 17:
+		return "I must humbly apologize,"
+	default:
+		return "Not at this time,"
 	}
 }

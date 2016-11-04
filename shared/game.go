@@ -19,25 +19,6 @@ const (
 	TileWater2
 )
 
-const (
-	CmdReserve int = iota
-	CmdMarchOrder
-	CmdBattleLine
-)
-
-const (
-	CommandCarryOn int = iota
-	CommandNewObjective
-	CommandHalt
-	CommandResumeMarch
-	CommandHaltMarch
-	CommandBattleLine
-	CommandReserve
-	CommandMarchOrder
-	CommandPrepare
-)
-const NumCommands = 9
-
 type Tile struct {
 	X       int `db:"x"`
 	Y       int `db:"y"`
@@ -569,7 +550,7 @@ func (g *GameCmd) CommandSummary() string {
 		retval = fmt.Sprintf("Deploying to %s", cstates[g.DState])
 	} else {
 		if g.PrepDefence {
-			return "Preparing Position"
+			return "Preparing Defensive Positions"
 		}
 		if g.Moving() {
 			retval = fmt.Sprintf("En-Route in %s", cstates[g.CState])

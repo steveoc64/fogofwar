@@ -975,6 +975,13 @@ func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
 			}
 		}
 
+		// set initial location and state
+		_, err = DB.SQL(`update game_cmd set cx=start_x,cy=start_y,dx=start_x,dy=start_y where game_id=$1`,
+			data.ID).Exec()
+		if err != nil {
+			println(err)
+		}
+
 		// Apply pregame attrition
 		if err == nil {
 			_, err = DB.SQL(`update unit set

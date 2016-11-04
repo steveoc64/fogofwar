@@ -105,7 +105,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	yoffset := 20
 
 	if cmd.Deploying() {
-		html += svgText(0, 30, "text__start text__hand", getApology())
+		html += svgText(0, 30, "text__start text__hand", getApology(apologies))
 		html += svgText(50, 40, "text__middle text__hand", "I am currently indisposed at present")
 		html += svgText(50, 50, "text__middle text__hand", "as the troops are busy deploying")
 		html += svgText(50, 60, "text__middle text__hand", fmt.Sprintf("from %s to %s", cmd.CStateName(), cmd.DStateName()))
@@ -244,86 +244,35 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	}
 }
 
-func getCarryOn() string {
-	v := rand.Intn(16)
-	print("co", v)
-	switch v {
-	case 0:
-		return "So be it"
-	case 1:
-		return "As you were"
-	case 2:
-		return "Good Show"
-	case 3:
-		return "Keep it up"
-	case 4:
-		return "Very well"
-	case 5:
-		return "Make haste"
-	case 6:
-		return "Jolly Good"
-	case 7:
-		return "Sacré Bleu"
-	case 8:
-		return "Le mot impossible n'est pas français"
-	case 9:
-		return "Avant!"
-	case 10:
-		return "Für Gott und Vaterland"
-	case 11:
-		return "God save the King"
-	case 12:
-		return "Vorwärts!"
-	case 13:
-		return "Onwards!"
-	case 14:
-		return "For Glory!"
-	default:
-		return "Carry on"
-	}
+var apologies = []string{"With Apologies,",
+	"Sir,",
+	"Dear Friend,",
+	"I must bring it to your attention,",
+	"Take Note,",
+	"Now Listen Here,",
+	"I must inform you,",
+	"Sacré Bleu,",
+	"Le mot impossible n'est pas français,",
+	"Avant!,",
+	"Für Gott und Vaterland,",
+	"God save the King,",
+	"Vorwärts!,",
+	"In the name of God,",
+	"For Glory!,",
+	"Not Again, surely ?,",
+	"For Goodness Sakes,",
+	"I must humbly Apologize,",
+	"Not at this time,",
+	"This cannot be Tolerated",
+	"À chaque fou plaît sa marotte",
+	"À mauvais ouvrier point de bon outil",
+	"Charité bien ordonnée commence par soi-même",
+	"Il n'y a que la foi que sauve",
+	"Il n'y a point d'homme necessaire",
+	"Il vaut mieux qu'on dise il court-là, qu'il gît ici",
 }
 
-func getApology() string {
-	v := rand.Intn(16)
-	print("co", v)
-	switch v {
-	case 0:
-		return "With Apologies,"
-	case 1:
-		return "Sir,"
-	case 2:
-		return "Dear Friend,"
-	case 3:
-		return "I must bring it to your attention,"
-	case 4:
-		return "Take Note,"
-	case 5:
-		return "Now Listen Here,"
-	case 6:
-		return "I must inform you,"
-	case 7:
-		return "Sacré Bleu,"
-	case 8:
-		return "Le mot impossible n'est pas français,"
-	case 9:
-		return "Avant!,"
-	case 10:
-		return "Für Gott und Vaterland,"
-	case 11:
-		return "God save the King,"
-	case 12:
-		return "Vorwärts!,"
-	case 13:
-		return "In the name of God,"
-	case 14:
-		return "For Glory!,"
-	case 15:
-		return "Not Again, surely ?,"
-	case 16:
-		return "For Goodness Sakes,"
-	case 17:
-		return "I must humbly apologize,"
-	default:
-		return "Not at this time,"
-	}
+func getApology(thing []string) string {
+	v := rand.Intn(len(thing))
+	return thing[v]
 }

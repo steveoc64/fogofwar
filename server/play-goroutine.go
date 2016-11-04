@@ -320,6 +320,8 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 					if state.Game.Phase > 6 {
 						state.Game.Phase = 1
 						state.Game.Turn++
+						// Just for now, advance the state of any units adjusting state
+						DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
 						newTurn = true
 					}
 					fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)

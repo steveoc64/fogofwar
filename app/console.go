@@ -102,11 +102,22 @@ func play(context *router.Context) {
 			print("Msg", action, actionID)
 			switch action {
 			case "Turn":
-				game.Phase = 1
-				game.Turn = actionID
-				game.PhaseDONE = false
-				game.PhaseTODO = true
-				doTurnSummary(game)
+				// end of turn - get the data again
+				go func() {
+					err := RPC("GameRPC.GetPlay", shared.GameRPCData{
+						Channel:  Session.Channel,
+						ID:       id,
+						GetUnits: true,
+					}, consoleGame)
+					if err != nil {
+						print(err.Error())
+					}
+					game.Phase = 1
+					game.Turn = actionID
+					game.PhaseDONE = false
+					game.PhaseTODO = true
+					doTurnSummary(game)
+				}()
 			case "Phase":
 				game.Phase = actionID
 				game.PhaseDONE = false

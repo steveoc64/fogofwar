@@ -550,7 +550,7 @@ func (g *GameCmd) CommandSummary() string {
 		retval = fmt.Sprintf("Deploying to %s", cstates[g.DState])
 	} else {
 		if g.PrepDefence {
-			return "Preparing Defensive Positions"
+			return "Prep Defence Position"
 		}
 		if g.Moving() {
 			retval = fmt.Sprintf("En-Route in %s", cstates[g.CState])

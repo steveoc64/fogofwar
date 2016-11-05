@@ -16,7 +16,7 @@ func doGT1(game *shared.Game) {
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
-	print("phaseGT1")
+	print("phaseGT1 with", game)
 
 	team := "blue"
 	teamName := game.BlueTeam
@@ -33,6 +33,7 @@ func doGT1(game *shared.Game) {
 		sz = 1
 	}
 	html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
+	html += svgHelpBtn()
 
 	yoffset := 0
 	count := 0
@@ -69,19 +70,31 @@ func doGT1(game *shared.Game) {
 		consolePhaseDone(game)
 	})
 
+	svgCallbackQuery("#help", func(dom.Event) {
+		print("in the help cb")
+		loadTemplate("gt-move", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=gt-move]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
+	})
+
 	for _, v := range cmds {
 		if v.PlayerID == Session.UserID {
 			svgCallback(v.ID, func(evt dom.Event) {
 				el := evt.Target()
 				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				cmd := game.GetCmd(team, id)
-				max, min, gt := cmd.GTMove()
-				print("Move options for ", cmd, max, min, gt)
-				loadTemplate("gt-move", "#unit-details", v)
-				doc.QuerySelector("#unit-details").Class().Add("md-show")
-				doc.QuerySelector("[name=gt-move]").AddEventListener("click", false, func(evt dom.Event) {
-					doc.QuerySelector("#unit-details").Class().Remove("md-show")
-				})
+				print("here with id", id)
+				print("team", team)
+				print("cmd", cmd)
+				print("game", game)
+				if cmd == nil {
+					print("cmd is nil somehow")
+				} else {
+					max, min, gt := cmd.GTMove()
+					print("Move options for ", cmd, max, min, gt)
+				}
 			})
 		}
 	}

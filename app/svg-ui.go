@@ -23,6 +23,10 @@ func svgEndG() string {
 	return "</g>\n"
 }
 
+func svgHelpBtn() string {
+	return `<g id=help><circle class=help-button cx=95 cy=5 r=5></circle><text x=92 y=9 class="text__gold text__2x">?</text></g>`
+}
+
 func svgText(x, y int, class, text string) string {
 	html := fmt.Sprintf(`<text data-id=%d x=%d y=%d class="%s">%s</text>"`,
 		svgID, x, y, class, text)
@@ -41,14 +45,24 @@ func svgButton(x, y, w, h int, class, textClass, text string) string {
 	html += "\n"
 	return html
 }
-func svgCallback(id int, f func(dom.Event)) {
-	w := dom.GetWindow()
-	doc := w.Document()
 
-	el := doc.QuerySelector(fmt.Sprintf("#g-%d", id))
+func svgCallback(id int, f func(dom.Event)) {
+	el := dom.GetWindow().Document().QuerySelector(fmt.Sprintf("#g-%d", id))
 	if el != nil {
 		el.AddEventListener("click", false, f)
 	}
+	// doc.QuerySelector(fmt.Sprintf("#g-%d", id)).AddEventListener("click", false, f)
+}
+
+func svgCallbackQuery(id string, f func(dom.Event)) {
+	el := dom.GetWindow().Document().QuerySelector(id)
+	if el != nil {
+		print("adding eventlistner to the thing by name", id)
+		el.AddEventListener("click", false, f)
+	} else {
+		print("no can find the thing called", id)
+	}
+
 	// doc.QuerySelector(fmt.Sprintf("#g-%d", id)).AddEventListener("click", false, f)
 }
 

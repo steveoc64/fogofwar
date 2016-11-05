@@ -449,7 +449,7 @@ func (g *Game) GetPlayers() string {
 
 func (g *Game) GetCmd(team string, id int) *GameCmd {
 	cmds := g.RedCmd
-	if team == "Blue" {
+	if team == "Blue" || team == "blue" {
 		cmds = g.BlueCmd
 	}
 	for _, v := range cmds {
@@ -539,7 +539,7 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		return 0, 0, "Sounding the Order to Advance"
 	}
 	if g.Deploying() {
-		return 0, 0, "Re-Deploy to " + cstates[g.DState]
+		return 0, 0, "Deploy to " + cstates[g.DState]
 	}
 	if g.Moving() {
 		switch g.CState {
@@ -550,7 +550,7 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		case CmdBattleLine:
 			return 0, 0, "Formations Only"
 		case CmdBattleAdvance:
-			return 1, 0, "Advance in Line of Battle"
+			return 1, 0, "1 grid General Advance"
 		}
 	} else { // Not moving
 		switch g.CState {
@@ -561,7 +561,7 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		case CmdBattleLine:
 			return 0, 0, "Formations Only"
 		case CmdBattleAdvance:
-			return 1, 0, "1 grid in Line of Battle"
+			return 1, 0, "1 grid General Advance"
 		}
 	}
 	return 0, 0, "No Movement"

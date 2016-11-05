@@ -112,26 +112,6 @@ func doTurnSummary(game *shared.Game) {
 	}
 }
 
-func doGT1(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
-	print("phaseGT1")
-}
-
-func doGT2(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
-	print("phaseGT2")
-}
-
 func doBB(game *shared.Game) {
 	// w := dom.GetWindow()
 	// doc := w.Document()

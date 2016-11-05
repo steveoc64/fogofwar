@@ -530,6 +530,43 @@ type GameCmdRPCData struct {
 
 var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance"}
 
+// Get first GT Move - return Max move in grids open, grids other than open, and a string descrpition
+func (g *GameCmd) GTMove() (int, int, string) {
+	if g.PrepDefence {
+		return 0, 0, "Prepare Defence Positions"
+	}
+	if g.DState == CmdBattleAdvance {
+		return 0, 0, "Sounding the Order to Advance"
+	}
+	if g.Deploying() {
+		return 0, 0, "Re-Deploy to " + cstates[g.DState]
+	}
+	if g.Moving() {
+		switch g.CState {
+		case CmdReserve:
+			return 0, 0, "Rest & Reserve only"
+		case CmdMarchOrder:
+			return 3, 2, "3 grids in March Order"
+		case CmdBattleLine:
+			return 0, 0, "Formations Only"
+		case CmdBattleAdvance:
+			return 1, 0, "Advance in Line of Battle"
+		}
+	} else { // Not moving
+		switch g.CState {
+		case CmdReserve:
+			return 0, 0, "Rest / Reserve only"
+		case CmdMarchOrder:
+			return 3, 2, "3 grids in March Order"
+		case CmdBattleLine:
+			return 0, 0, "Formations Only"
+		case CmdBattleAdvance:
+			return 1, 0, "1 grid in Line of Battle"
+		}
+	}
+	return 0, 0, "No Movement"
+}
+
 func (g *GameCmd) Deploying() bool {
 	return g.CState != g.DState
 }

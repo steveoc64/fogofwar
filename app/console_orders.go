@@ -14,6 +14,32 @@ func doOrders(game *shared.Game) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	// Cant always access orders
+	switch game.Phase {
+	case shared.PhaseOrders:
+	case shared.PhaseGT1:
+		doGT1(game)
+		return
+	case shared.PhaseBB:
+		doBB(game)
+		return
+	case shared.PhaseGT2:
+		doGT2(game)
+		return
+	case shared.PhaseCommander:
+		doCommanderAction(game)
+		return
+	case shared.PhaseEngage:
+		doEngage(game)
+		return
+	case shared.PhaseTactical:
+		doTactical(game)
+		return
+	case shared.PhaseObjectives:
+		doObjectives(game)
+		return
+	}
+
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 

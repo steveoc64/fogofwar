@@ -402,32 +402,15 @@ func loadPlayerConnectionStatus(state PlayState) {
 func sendPhaseUpdates(state PlayState, newTurn bool) {
 	// println("sending phase updates")
 	for i, v := range state.Game.RedPlayers {
-		// println("sent to red", v.Username)
+		state.Game.RedPlayers[i].TODO = true
+		state.Game.RedPlayers[i].Done = false
 		if newTurn {
 			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
-			state.Game.RedPlayers[i].TODO = true
-			state.Game.RedPlayers[i].Done = false
 		} else {
-			// half the time have nothing to do
-			if state.Game.Phase%2 == 0 {
-				// there is stuff for us to do this phase
-				// println("Red has things to do this phase")
-				state.Game.RedPlayers[i].TODO = true
-				state.Game.RedPlayers[i].Done = false
-				Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
-			} else {
-				// nothing for us this phase .. wait for everyone to finish
-				// println("Red has no actions this phase")
-				state.Game.RedPlayers[i].TODO = false
-				state.Game.RedPlayers[i].Done = true
-				Connections.BroadcastPlayer(v.PlayerID, "Play", "PhaseWait", state.Game.Phase)
-			}
+			Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
-		// println("sent to blue", v.Username)
-		// we always have stuff in eveny phase
-		// println("blue has stuff to do this phase")
 		state.Game.BluePlayers[i].TODO = true
 		state.Game.BluePlayers[i].Done = false
 		if newTurn {

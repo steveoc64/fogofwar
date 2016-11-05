@@ -16,7 +16,7 @@ type ConsolePaintData struct {
 }
 
 var consoleCurrentPanel = "Game"
-var consoleGame = &shared.Game{}
+var consoleGame *shared.Game
 
 func consolePhaseBusy(game *shared.Game) {
 	go func() {
@@ -90,21 +90,24 @@ func play(context *router.Context) {
 
 	w := dom.GetWindow()
 	doc := w.Document()
+	game := consoleGame
 
 	go func() {
 		// TheCmd := &shared.GameCmd{}
 		// TheUnit := &shared.Unit{}
 
+		newGame := shared.Game{}
 		err := RPC("GameRPC.GetPlay", shared.GameRPCData{
 			Channel:  Session.Channel,
 			ID:       id,
 			GetUnits: true,
-		}, consoleGame)
-		game := consoleGame
-		if err != nil || game.ID == 0 {
+		}, &newGame)
+		if err != nil {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
 			Session.Navigate("/")
 		}
+		consoleGame = &newGame
+		game = consoleGame
 
 		loadTemplate("console", "main", ConsolePaintData{
 			Game:        game,
@@ -118,14 +121,17 @@ func play(context *router.Context) {
 			case "Turn":
 				// end of turn - get the data again
 				go func() {
+					newGame := shared.Game{}
 					err := RPC("GameRPC.GetPlay", shared.GameRPCData{
 						Channel:  Session.Channel,
 						ID:       id,
 						GetUnits: true,
-					}, consoleGame)
+					}, &newGame)
 					if err != nil {
 						print(err.Error())
 					}
+					consoleGame = &newGame
+					game = consoleGame
 					game.Phase = 1
 					game.Turn = actionID
 					game.PhaseDONE = false

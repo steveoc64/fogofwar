@@ -18,4 +18,4 @@ templates/old
 *~
 users.sql
 paypal
-paypal-server.go
+gamelog

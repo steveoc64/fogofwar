@@ -199,7 +199,9 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	for _, v := range subunits {
 		html += svgG(v.ID)
 		html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-		html += svgText(55, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
+		if len(v.Name) < 16 {
+			html += svgText(55, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
+		}
 		html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetBases())
 		html += svgEndG()
 		yoffset += 11

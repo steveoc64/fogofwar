@@ -55,6 +55,7 @@ func doOrders(game *shared.Game) {
 
 	// Create heading with Team Name
 	html := svgText(0, 10, "text__2x text__"+team, "Corps Orders")
+	html += svgHelpBtn()
 
 	yoffset := 0
 	for _, v := range cmds {
@@ -92,6 +93,14 @@ func doOrders(game *shared.Game) {
 	svgCallback(100, func(dom.Event) {
 		print("all done")
 		consolePhaseDone(game)
+	})
+
+	svgCallbackQuery("help", func(dom.Event) {
+		loadTemplate("orders-help", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=orders-help]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
 	})
 
 	for _, v := range cmds {

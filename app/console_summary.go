@@ -70,16 +70,19 @@ func doTurnSummary(game *shared.Game) {
 		// we have things to do this turn
 		if !game.PhaseDONE {
 			// we are yet to do all the things, so add a button that takes us to the page to do all the things
-			html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+			// html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+			html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__1x text__"+team, confirmText)
 			allTheThings = true
 		} else {
 			// we have done all the things
-			html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
+			// html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
+			html += svgButton(40, 85, 50, 12, "text__done", "console-text text__1x text__"+team, doneText)
 			// html += paperDoneButton("done", doneText, 40, 85, 50)
 		}
 	} else {
 		// there is nothing for us this turn
-		html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+		// html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+		html += svgButton(40, 85, 50, 12, "text__done", "console-text text__1x text__"+team, doneText)
 	}
 	html += svgEndG()
 	g.SetInnerHTML(html)
@@ -87,7 +90,7 @@ func doTurnSummary(game *shared.Game) {
 	if allTheThings {
 		// All the things are yet to be done
 		svgCallback(1, func(evt dom.Event) {
-			print("clicked on thing in phase", game.Phase)
+			// print("clicked on thing in phase", game.Phase)
 			switch game.Phase {
 			case shared.PhaseOrders:
 				doOrders(game)

@@ -18,17 +18,31 @@ type ConsolePaintData struct {
 var consoleCurrentPanel = "Game"
 var consoleGame = &shared.Game{}
 
-func consoleImBusy(game *shared.Game) {
+func consolePhaseBusy(game *shared.Game) {
 	go func() {
 		done := false
-		err := RPC("GameRPC.PhaseNotDone", shared.PhaseDoneMsg{
+		err := RPC("GameRPC.PhaseBusy", shared.PhaseDoneMsg{
 			Channel: Session.Channel,
 			GameID:  game.ID,
 		}, &done)
 		if err != nil {
 			print(err.Error())
 		}
-		game.PhaseDONE = false
+		game.PhaseBUSY = true
+	}()
+}
+
+func consolePhaseNotBusy(game *shared.Game) {
+	go func() {
+		done := false
+		err := RPC("GameRPC.PhaseNotBusy", shared.PhaseDoneMsg{
+			Channel: Session.Channel,
+			GameID:  game.ID,
+		}, &done)
+		if err != nil {
+			print(err.Error())
+		}
+		game.PhaseBUSY = false
 	}()
 }
 
@@ -186,30 +200,4 @@ func play(context *router.Context) {
 		}
 
 	}()
-}
-
-func doCorpsOverview(game *shared.Game) {
-	w := dom.GetWindow()
-	doc := w.Document()
-	c := doc.QuerySelector("[name=svg-console]")
-
-	// mock the act of completing the TODO list, on the first phase only
-	if game.Phase == 0 {
-		game.Phase = -1
-		consoleImBusy(game)
-	}
-
-	// Add a turn summary object
-	g := c.QuerySelector("[name=g-main]")
-	html := ""
-
-	// Add a buton per Red corps
-	for _, corps := range game.RedCmd {
-		print("add button for red", corps.Name)
-	}
-	// Add a buton per Blue cor
-	for _, corps := range game.BlueCmd {
-		print("add button for blue", corps.Name)
-	}
-	g.SetInnerHTML(html)
 }

@@ -13,6 +13,9 @@ func doUnits(game *shared.Game) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
@@ -47,11 +50,11 @@ func doUnits(game *shared.Game) {
 		html += svgEndG()
 		yoffset += 11
 	}
-	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
-	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Orders Complete")
-	html += svgEndG()
+	// html += svgG(100)
+	// html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	// html += "\n"
+	// html += svgText(50, 97, "text__carryon text__middle", "Orders Complete")
+	// html += svgEndG()
 	g.SetInnerHTML(html)
 
 	// add callbacks for each corps
@@ -83,6 +86,9 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -124,7 +130,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	html += svgG(100)
 	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgText(50, 97, "text__carryon text__middle", "Layout of Divisions")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
@@ -139,6 +145,9 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 		}
 	}
 
+	svgCallback(0, func(dom.Event) {
+		doUnits(game)
+	})
 	svgCallback(100, func(evt dom.Event) {
 		print("reorg")
 	})
@@ -156,6 +165,9 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
@@ -164,13 +176,19 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		team = "red"
 	}
 
+	html := svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgEndG()
+
 	// Create heading with Div Name
 	sz := 2
 	if len(div.Name) > 18 {
 		sz = 1
 	}
 	// title
-	html := svgG(0)
+	html = svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), div.Name)
 	html += svgEndG()
 
@@ -186,6 +204,11 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		html += svgEndG()
 		yoffset += 11
 	}
+	html += svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgEndG()
 	g.SetInnerHTML(html)
 
 	TheUnit := &shared.Unit{}
@@ -205,14 +228,13 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 				loadTemplate("unit-details", "#unit-details", v)
 				ud := doc.QuerySelector("#unit-details")
 				ud.Class().Add("md-show")
+				inspection := ud.QuerySelector(".inspection")
 
-				ud.AddEventListener("click", false, func(evt dom.Event) {
+				inspection.AddEventListener("click", false, func(evt dom.Event) {
 					el := evt.Target()
 					unit := TheUnit
 					if el.TagName() == "INPUT" {
 						value := el.(*dom.HTMLInputElement).Value
-						// print("with value", value)
-						// print("on utype", unit.UType)
 						switch unit.UType {
 						case 1:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")
@@ -229,10 +251,8 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 								print("here with utype", unit.UType)
 							}
 						case 3:
-							print("in cav with", value)
 							switch value {
 							case "Honours":
-								// print("here with Honours")
 								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
 								return
 							default:

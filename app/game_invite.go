@@ -615,7 +615,8 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
-				doc.QuerySelector("#unit-details").AddEventListener("click", false, func(evt dom.Event) {
+				inspection := doc.QuerySelector("#unit-details").QuerySelector(".inspection")
+				inspection.AddEventListener("click", false, func(evt dom.Event) {
 					// print("clicke on the unit details")
 					unit := TheUnit
 					el := evt.Target()

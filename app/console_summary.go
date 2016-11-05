@@ -9,20 +9,24 @@ import (
 
 func getPhaseDescription(phase int) (string, string, string, string) {
 	switch phase {
-	case 1:
-		return "GT Movement", ".. Move un-engaged units", "All Moved", "Waiting .."
-	case 2:
-		return "Bombardment", ".. Corps Level Bombardment", "Cease Fire", "Waiting .."
-	case 3:
-		return "Engage/Disengage", ".. Confirm unit contacts", "Confirm", "Waiting .."
-	case 4:
-		return "Commander Actions", ".. Corps level Commander Actions", "I am Done", "Waiting .."
-	case 5:
-		return "Tactical Engagement", ".. Resolve Tactical Engagements", "All Done", "Waiting .."
-	case 6:
-		return "Claim Objectives", ".. Confirm Status for all Objectives", "Confirm", "Waiting .."
+	case shared.PhaseOrders:
+		return "Pre Game Orders", ".. Enter Initial Orders", "Orders", "Dispatched"
+	case shared.PhaseGT1:
+		return "GT Movement", ".. Move un-engaged units", "Move", "Waiting .."
+	case shared.PhaseBB:
+		return "Bombardment", ".. Corps Level Bombardment", "Fire Missions", "Waiting .."
+	case shared.PhaseGT2:
+		return "Extra Movement", ".. Cav and Skirmisher extra Moves", "Move", "Waiting .."
+	case shared.PhaseCommander:
+		return "Commander Actions", ".. Corps level Commander Actions", "Commander Action", "Waiting .."
+	case shared.PhaseEngage:
+		return "Engage/Disengage", ".. Confirm unit contacts", "Engagements", "Waiting .."
+	case shared.PhaseTactical:
+		return "Tactical Engagement", ".. Resolve Tactical Engagements", "Tactical Action", "Waiting .."
+	case shared.PhaseObjectives:
+		return "Claim Objectives", ".. Confirm Status for all Objectives", "Objectives", "Waiting .."
 	default:
-		return "Pre Game Orders", ".. Enter Initial Orders", "Send Orders", "Dispatched"
+		return "??", "??", "??", "Waiting .."
 	}
 }
 
@@ -30,6 +34,9 @@ func doTurnSummary(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseNotBusy(game)
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -56,48 +63,118 @@ func doTurnSummary(game *shared.Game) {
 		html += svgText(50, 70, "text__middle text__2x text__"+team, fmt.Sprintf("Victory Points = %d", game.VP))
 	}
 
-	dispatchOrders := func(evt dom.Event) {
-		game.PhaseDONE = true
-		paperButtonSet(evt, doneText)
-		consolePhaseDone(game)
-	}
-
 	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
 	allTheThings := false
-	if game.Phase == 0 {
-		// special case - we are in pre-game, and we must get them to go into the orders tab first
-		// this only applies on the special pre-game stuff
-	} else {
-		html += svgG(1)
-		if game.PhaseTODO {
-			// we have things to do this turn
-			if !game.PhaseDONE {
-				// we are yet to do all the things
-				html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
-				// html += paperButton("done", confirmText, 40, 85, 50, dispatchOrders)
-				allTheThings = true
-			} else {
-				// we have done all the things
-				html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
-				// html += paperDoneButton("done", doneText, 40, 85, 50)
-			}
+	html += svgG(1)
+	if game.PhaseTODO {
+		// we have things to do this turn
+		if !game.PhaseDONE {
+			// we are yet to do all the things, so add a button that takes us to the page to do all the things
+			html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
+			allTheThings = true
 		} else {
-			// there is nothing for us this turn
-			if !game.PhaseDONE {
-				// but we are busy doing something with troop orders anyway
-				html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
-				allTheThings = true
-			}
-			// html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
+			// we have done all the things
+			html += svgButton(40, 85, 50, 12, "text__done", "console-text text__hand", doneText)
 			// html += paperDoneButton("done", doneText, 40, 85, 50)
 		}
-		html += svgEndG()
+	} else {
+		// there is nothing for us this turn
+		html += svgButton(40, 85, 50, 12, "text__paper", "console-text text__hand", confirmText)
 	}
+	html += svgEndG()
 	g.SetInnerHTML(html)
 
 	if allTheThings {
 		// All the things are yet to be done
-		svgCallback(1, dispatchOrders)
-		// svgButtonCallback("done", dispatchOrders)
+		svgCallback(1, func(evt dom.Event) {
+			print("clicked on thing in phase", game.Phase)
+			switch game.Phase {
+			case shared.PhaseOrders:
+				doOrders(game)
+			case shared.PhaseGT1:
+				doGT1(game)
+			case shared.PhaseBB:
+				doBB(game)
+			case shared.PhaseGT2:
+				doGT2(game)
+			case shared.PhaseCommander:
+				doCommanderAction(game)
+			case shared.PhaseEngage:
+				doEngage(game)
+			case shared.PhaseTactical:
+				doTactical(game)
+			case shared.PhaseObjectives:
+				doObjectives(game)
+			}
+			// paperButtonSet(evt, doneText)
+			// consolePhaseDone(game)
+		})
 	}
+}
+
+func doGT1(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseGT1")
+}
+
+func doGT2(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseGT2")
+}
+
+func doBB(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseBB")
+}
+
+func doCommanderAction(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseCommanderAction")
+}
+func doEngage(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseEngage")
+}
+func doTactical(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseTactical")
+}
+func doObjectives(game *shared.Game) {
+	// w := dom.GetWindow()
+	// doc := w.Document()
+	// c := doc.QuerySelector("[name=svg-console]")
+
+	// consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game)
+	print("phaseObjectives")
 }

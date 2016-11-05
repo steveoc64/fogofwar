@@ -17,7 +17,8 @@ const (
 	GameRestart
 	GamePause
 	PlayerPhaseDone
-	PlayerPhaseNotDone
+	PlayerPhaseBusy
+	PlayerPhaseNotBusy
 	PlayerConnected
 	PlayerDisconnected
 	PlayersChanged
@@ -138,6 +139,7 @@ func loadGameData(id int, state PlayState) error {
 		for _, v := range state.Game.RedPlayers {
 			v.Done = false
 			v.TODO = true
+			v.Busy = false
 		}
 
 		DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted,p.connected
@@ -148,6 +150,7 @@ func loadGameData(id int, state PlayState) error {
 		for _, v := range state.Game.BluePlayers {
 			v.Done = false
 			v.TODO = true
+			v.Busy = false
 		}
 
 	}
@@ -304,20 +307,19 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case PlayersChanged:
 				fmt.Fprintf(fp, "Player Teams have been modified - reload")
 				loadPlayerConnectionStatus(state)
-			case PlayerPhaseDone, PlayerPhaseNotDone:
-				if m.OpCode == PlayerPhaseNotDone {
-					fmt.Fprintf(fp, "Player %d is Not Done Yet\n", m.PlayerID)
-					playerDone(state, m.PlayerID, false)
-				} else {
-					fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
-					playerDone(state, m.PlayerID, true)
-				}
-				if allDone(state) {
+			case PlayerPhaseBusy:
+				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
+			case PlayerPhaseNotBusy:
+				// fmt.Fprintf(fp, "Player %d is free", m.PlayerID)
+			case PlayerPhaseDone:
+				fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
+				playerDone(state, m.PlayerID, true)
+				if allDone(state) && allFree(state) {
 					fmt.Fprintf(fp, "ALL DONE - phase %d ends\n", state.Game.Phase)
 					println(".. ALL DONE - phase ends in game", state.Game.ID)
 					newTurn := false
 					state.Game.Phase++
-					if state.Game.Phase > 6 {
+					if state.Game.Phase > shared.PhaseObjectives {
 						state.Game.Phase = 1
 						state.Game.Turn++
 						// Just for now, advance the state of any units adjusting state
@@ -337,7 +339,11 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 						fmt.Fprintf(fp, "DB Error %s\n", err.Error())
 					}
 				} else {
-					println(".. still more players to finish yet")
+					if allFree(state) {
+						println(".. still more players to finish yet")
+					} else {
+						println(".. some players are busy")
+					}
 				}
 			}
 		case <-time.After(60 * time.Second):
@@ -362,10 +368,12 @@ func loadPlayerConnectionStatus(state PlayState) {
 	for _, v := range newRed {
 		v.Done = false
 		v.TODO = true
+		v.Busy = false
 		for _, p := range state.Game.RedPlayers {
 			if p.PlayerID == v.PlayerID {
 				v.Done = p.Done
 				v.TODO = p.TODO
+				v.Busy = p.Busy
 			}
 		}
 	}
@@ -378,10 +386,12 @@ func loadPlayerConnectionStatus(state PlayState) {
 	for _, v := range newBlue {
 		v.Done = false
 		v.TODO = true
+		v.Busy = false
 		for _, p := range state.Game.BluePlayers {
 			if p.PlayerID == v.PlayerID {
 				v.Done = p.Done
 				v.TODO = p.TODO
+				v.Busy = p.Busy
 			}
 		}
 	}
@@ -431,13 +441,29 @@ func sendPhaseUpdates(state PlayState, newTurn bool) {
 func allDone(state PlayState) bool {
 	for _, v := range state.Game.RedPlayers {
 		if !v.Done {
-			// println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
+			println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
 			return false
 		}
 	}
 	for _, v := range state.Game.BluePlayers {
 		if !v.Done {
-			// println("blue player ", v.PlayerID, v.Username, "is not done yet", v.Done)
+			println("blue player ", v.PlayerID, v.Username, "is not done yet", v.Done)
+			return false
+		}
+	}
+	return true
+}
+
+func allFree(state PlayState) bool {
+	for _, v := range state.Game.RedPlayers {
+		if v.Busy {
+			println("red player ", v.PlayerID, v.Username, "is busy")
+			return false
+		}
+	}
+	for _, v := range state.Game.BluePlayers {
+		if v.Busy {
+			println("blue player ", v.PlayerID, v.Username, "is busy")
 			return false
 		}
 	}

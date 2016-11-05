@@ -100,14 +100,14 @@
     {{if ne "" .Name}}
     <li>{{.Name}}
     {{end}}
-    {{if ne "" .GetMState}}
-      <li>Morale: {{.GetMState}}</li>
-    {{end}}
     {{if ne "" .Nation}}
      of {{.Nation}}
     {{end}}
     {{if .HorseGuns}}
       (Horse Artillery)
+    {{end}}
+    {{if ne "" .GetMState}}
+      <li>Morale: {{.GetMState}}</li>
     {{end}}
     </li>
     <li>{{.Guns}} Guns of {{.GetGunType}} shot weight</li>

@@ -199,8 +199,8 @@ func (g *GameRPC) PhaseDone(data shared.PhaseDoneMsg, retval *bool) error {
 	return err
 }
 
-func (g *GameRPC) PhaseNotDone(data shared.PhaseDoneMsg, retval *bool) error {
-	start := time.Now()
+func (g *GameRPC) PhaseBusy(data shared.PhaseDoneMsg, retval *bool) error {
+	// start := time.Now()
 
 	conn := Connections.Get(data.Channel)
 	err := error(nil)
@@ -210,29 +210,53 @@ func (g *GameRPC) PhaseNotDone(data shared.PhaseDoneMsg, retval *bool) error {
 		play <- PlayMessage{
 			Game:     data.GameID,
 			PlayerID: conn.UserID,
-			OpCode:   PlayerPhaseNotDone,
+			OpCode:   PlayerPhaseBusy,
 		}
 	} else {
 		err = errors.New("Invalid Game ID")
 	}
 
-	logger(start, "Game.PhaseNotDone", conn,
-		fmt.Sprintf("Game %d", data.GameID), "")
+	// logger(start, "Game.PhaseBusy", conn,
+	// fmt.Sprintf("Game %d Player %d", data.GameID, conn.UserID), "")
 
 	return err
 }
 
+func (g *GameRPC) PhaseNotBusy(data shared.PhaseDoneMsg, retval *bool) error {
+	// start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	err := error(nil)
+
+	// Send message to the play-goroutine to say that this player is done
+	if play, ok := Plays[data.GameID]; ok {
+		play <- PlayMessage{
+			Game:     data.GameID,
+			PlayerID: conn.UserID,
+			OpCode:   PlayerPhaseNotBusy,
+		}
+	} else {
+		err = errors.New("Invalid Game ID")
+	}
+
+	// logger(start, "Game.PhaseNotBusy", conn,
+	// fmt.Sprintf("Game %d Player %d", data.GameID, conn.UserID), "")
+
+	return err
+}
 func (g *GameRPC) CmdOrder(data shared.CmdOrder, retval *shared.GameCmd) error {
 	start := time.Now()
 
 	conn := Connections.Get(data.Channel)
 
 	// confirm that this user can issue orders to this unit
-	player_id := 0
-	err := DB.SQL(`select player_id from game_cmd where id=$1`, data.ID).QueryScalar(&player_id)
-	if conn.UserID != player_id {
+	cmd := shared.GameCmd{}
+	err := DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(&cmd)
+	if conn.UserID != cmd.PlayerID {
 		fmt.Printf("user %d is not in command of %d\n", conn.UserID, data.ID)
-		println(err.Error())
+		if err != nil {
+			println(err.Error())
+		}
 		return errors.New("Insufficient Privilege")
 	}
 
@@ -241,25 +265,61 @@ func (g *GameRPC) CmdOrder(data shared.CmdOrder, retval *shared.GameCmd) error {
 		case shared.CommandCarryOn:
 			println("very good, carry on")
 		case shared.CommandNewObjective:
-			println("TODO - get new objective info and stamp on the record")
+			switch cmd.CState {
+			case shared.CmdMarchOrder:
+				if data.X == cmd.DX && data.Y == cmd.DY {
+					// nothing has changed then ..
+				} else {
+					if cmd.Moving() {
+						// we are already marching, and they have changed the objective en-route, so implement a delay
+						_, err = DB.SQL(`update game_cmd set wait=false, prep_defence=false,cstate=$5,dstate=$2,dx=$3,dy=$4 where id=$1`,
+							data.ID, shared.CmdMarchOrder, data.X, data.Y, shared.CmdReserve).Exec()
+					} else {
+						// we are ready to march, so start the march right away
+						_, err = DB.SQL(`update game_cmd set wait=false, prep_defence=false,dx=$3,dy=$4 where id=$1`,
+							data.ID, shared.CmdMarchOrder, data.X, data.Y, shared.CmdReserve).Exec()
+					}
+				}
+			default:
+				// set destination state to march order, and set objective, so start marching next turn
+				_, err = DB.SQL(`update game_cmd set wait=false, prep_defence=false,dstate=$2,dx=$3,dy=$4 where id=$1`,
+					data.ID, data.Command, data.X, data.Y).Exec()
+			}
 		case shared.CommandHalt:
-			_, err = DB.SQL(`update game_cmd set wait=true where id=$1`, data.ID).Exec()
+			if cmd.CState == shared.CmdBattleAdvance {
+				_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`,
+					data.ID, shared.CmdBattleLine).Exec()
+			} else {
+				_, err = DB.SQL(`update game_cmd set wait=true,prep_defence=false where id=$1`,
+					data.ID).Exec()
+			}
 		case shared.CommandResumeMarch:
-			_, err = DB.SQL(`update game_cmd set wait=false where id=$1`, data.ID).Exec()
+			_, err = DB.SQL(`update game_cmd set dstate=$2,wait=false,prep_defence=false where id=$1`,
+				data.ID, shared.CmdMarchOrder).Exec()
 		case shared.CommandBattleLine:
-			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdBattleLine).Exec()
+			_, err = DB.SQL(`update game_cmd set dstate=$2,wait=false,prep_defence=false where id=$1`,
+				data.ID, shared.CmdBattleLine).Exec()
 		case shared.CommandReserve:
-			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdReserve).Exec()
+			_, err = DB.SQL(`update game_cmd set dstate=$2,wait=false,prep_defence=false where id=$1`,
+				data.ID, shared.CmdReserve).Exec()
 		case shared.CommandMarchOrder:
-			_, err = DB.SQL(`update game_cmd set dstate=$2 where id=$1`, data.ID, shared.CmdMarchOrder).Exec()
+			_, err = DB.SQL(`update game_cmd set dstate=$2,wait=false,prep_defence=false where id=$1`,
+				data.ID, shared.CmdMarchOrder).Exec()
 		case shared.CommandPrepare:
-			_, err = DB.SQL(`update game_cmd set prep_defence=true where id=$1`, data.ID).Exec()
+			if cmd.CState == shared.CmdBattleLine {
+				_, err = DB.SQL(`update game_cmd set prep_defence=true where id=$1`, data.ID).Exec()
+			}
+		case shared.CommandAdvance:
+			if cmd.CState == shared.CmdBattleLine {
+				_, err = DB.SQL(`update game_cmd set dstate=$2,wait=false,prep_defence=false where id=$1`,
+					data.ID, shared.CmdBattleAdvance).Exec()
+			}
+
 		}
 	}
 
 	logger(start, "Game.CmdOrder", conn,
-		fmt.Sprintf("ID %d", data.ID),
-		fmt.Sprintf("%v", *retval))
+		fmt.Sprintf("Corps %d, Cmd %d, XY %d %d", data.ID, data.Command, data.X, data.Y), "")
 
 	if err == nil {
 		err = DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(retval)

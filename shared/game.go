@@ -103,6 +103,7 @@ type Game struct {
 	CanStart        bool
 	PhaseDONE       bool
 	PhaseTODO       bool
+	PhaseBUSY       bool
 	ScenarioID      int              `db:"scenario_id"`
 	HostedBy        int              `db:"hosted_by"`
 	HostName        string           `db:"host_name"`
@@ -168,6 +169,7 @@ type GamePlayerData struct {
 	Accepted  bool   `db:"accepted"`
 	Connected bool   `db:"connected"`
 	Done      bool
+	Busy      bool
 	TODO      bool
 }
 
@@ -526,7 +528,7 @@ type GameCmdRPCData struct {
 	Team     string
 }
 
-var cstates = []string{"Reserve", "March Order", "Battle Line"}
+var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance"}
 
 func (g *GameCmd) Deploying() bool {
 	return g.CState != g.DState
@@ -546,16 +548,31 @@ func (g *GameCmd) DStateName() string {
 
 func (g *GameCmd) CommandSummary() string {
 	retval := ""
+	if g.CState == CmdBattleAdvance {
+		return "Advancing in Line of Battle"
+	}
+	if g.DState == CmdBattleAdvance {
+		return "Sounding the Order to Advance"
+	}
+
 	if g.Deploying() {
-		retval = fmt.Sprintf("Deploying to %s", cstates[g.DState])
+		if g.Moving() {
+			return "Preparing to March"
+		} else {
+			return fmt.Sprintf("Deploying to %s", cstates[g.DState])
+		}
 	} else {
 		if g.PrepDefence {
 			return "Prep Defence Position"
 		}
 		if g.Moving() {
-			retval = fmt.Sprintf("En-Route in %s", cstates[g.CState])
+			if g.Wait {
+				return "Currently Halted on Route of March"
+			} else {
+				return fmt.Sprintf("En-Route in %s", cstates[g.CState])
+			}
 		} else {
-			retval = fmt.Sprintf("In %s", cstates[g.CState])
+			return fmt.Sprintf("In %s", cstates[g.CState])
 		}
 	}
 	return retval

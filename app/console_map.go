@@ -250,21 +250,21 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 	}
 
 	for i, v := range cmd {
-		if v.StartX != -1 && !v.Cull {
+		if v.CX != -1 && !v.Cull {
 			if showAllUnits || v.ID == id {
 				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
-					v.StartX*game.GridSize, v.StartY*game.GridSize, // x and y in inches
+					v.CX*game.GridSize, v.CY*game.GridSize, // x and y in inches
 					game.GridSize, game.GridSize, // width and height in inches
 					v.GetCSS(), // self-computed CSS content type
-					v.StartX, v.StartY, i, v.ID)
+					v.CX, v.CY, i, v.ID)
 			}
-			xcoord := v.StartX*game.GridSize + 1
-			ycoord := v.StartY*game.GridSize + game.GridSize - 1
+			xcoord := v.CX*game.GridSize + 1
+			ycoord := v.CY*game.GridSize + game.GridSize - 1
 			tt := ""
 			if flipped {
 				tt = fmt.Sprintf("transform=\"rotate(180 %d %d)\"",
-					v.StartX*game.GridSize+game.GridSize/2,
-					v.StartY*game.GridSize+game.GridSize/2)
+					v.CX*game.GridSize+game.GridSize/2,
+					v.CY*game.GridSize+game.GridSize/2)
 			}
 			// only show the names of my own
 			if id != 0 {

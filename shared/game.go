@@ -515,6 +515,7 @@ type GameCmd struct {
 	DY            int     `db:"dy"`
 	Wait          bool    `db:"wait"`
 	PrepDefence   bool    `db:"prep_defence"`
+	Contact       bool    `db:"contact"`
 	Cmdrs         int
 	Bayonets      int
 	Sabres        int
@@ -562,6 +563,8 @@ func (g *GameCmd) GTMove() (int, int, string) {
 			return 0, 0, "Formations Only"
 		case CmdBattleAdvance:
 			return 1, 0, "1 grid General Advance"
+		case CmdCompleteMarch:
+			return 0, 0, "Leading Bde Deployed"
 		}
 	}
 	return 0, 0, "No Movement"

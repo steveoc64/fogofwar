@@ -18,6 +18,7 @@ const (
 	CmdMarchOrder
 	CmdBattleLine
 	CmdBattleAdvance
+	CmdCompleteMarch
 )
 
 // Corps level orders
@@ -39,4 +40,11 @@ type CmdOrder struct {
 	ID      int // ID of the gamecmd
 	Command int
 	X, Y    int
+}
+
+type GTMoveData struct {
+	Channel     int
+	ID          int
+	Destination bool
+	Contact     bool
 }

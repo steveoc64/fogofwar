@@ -330,3 +330,37 @@ func (g *GameRPC) CmdOrder(data shared.CmdOrder, retval *shared.GameCmd) error {
 
 	return err
 }
+
+func (g *GameRPC) GTMove(data shared.GTMoveData, retval *shared.GameCmd) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	cmd := shared.GameCmd{}
+	err := DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(&cmd)
+	if err != nil || cmd.PlayerID != conn.UserID {
+		return errors.New("Invalid Corps Command")
+	}
+
+	max, min, gt := cmd.GTMove()
+	println("move things", max, min, gt)
+	if max > 0 {
+		if data.Destination {
+			// We have reached the destination
+			_, err = DB.SQL(`update game_cmd set cx=dx,cy=dy,dstate=$2 where id=$1`,
+				data.ID, shared.CmdCompleteMarch).Exec()
+		}
+		if data.Contact {
+			_, err = DB.SQL(`update game_cmd set contact=true,dstate=$2 where id=$1`,
+				data.ID, shared.CmdBattleLine).Exec()
+		}
+	}
+
+	logger(start, "Game.GTMove", conn,
+		fmt.Sprintf("Cmd %d Dest %v Contact %v", data.ID, data.Destination, data.Contact), "")
+
+	if err == nil {
+		DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(retval)
+	}
+
+	return err
+}

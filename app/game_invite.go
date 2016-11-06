@@ -437,7 +437,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				row.SetAttribute("data-team", team)
 
 				// Add columns depending on type
-				if v.UType == 1 {
+				if v.UType == shared.UnitDiv {
 					cell := row.InsertCell(-1)
 					cell.SetClass("compressed")
 					cell.Class().Add("highlight")
@@ -478,7 +478,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 
 					cell = row.InsertCell(-1)
 					cell.SetClass("compressed")
-					if v.UType == 4 {
+					if v.UType == shared.UnitGun {
 						cell.SetInnerHTML("Gun Crew")
 					} else {
 						cell.SetInnerHTML(Session.Lookup.UnitRating[v.Rating-1].Name)
@@ -496,11 +496,11 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 					cell.SetAttribute("name", fmt.Sprintf("descr-%d", v.ID))
 					addMe := ""
 					switch v.UType {
-					case 2:
+					case shared.UnitBde:
 						addMe = fmt.Sprintf("%d Bayonets:<br>\n", v.Bayonets-v.BayonetsLost)
-					case 3:
+					case shared.UnitCav:
 						addMe = fmt.Sprintf("%d Sabres:<br>\n", v.Sabres-v.SabresLost)
-					case 4:
+					case shared.UnitGun:
 						addMe = fmt.Sprintf("%d Guns:<br>\n", v.Guns-v.GunsLost)
 					}
 					cell.SetInnerHTML(addMe + breakLine(v.Descr))
@@ -611,7 +611,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 				unit := game.GetUnit(team, key)
 				TheUnit = unit
 				// print("unit is", unit)
-				if unit.UType == 1 {
+				if unit.UType == shared.UnitDiv {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
@@ -626,9 +626,9 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 						// print("with value", value)
 						// print("on utype", unit.UType)
 						switch unit.UType {
-						case 1:
+						case shared.UnitDiv:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-						case 2, 5:
+						case shared.UnitBde, shared.UnitSpecial:
 							switch value {
 							case "Valour":
 								loadTemplate("unit-valour", "[name=unitcard]", unit)
@@ -639,7 +639,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 							default:
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 							}
-						case 3:
+						case shared.UnitCav:
 							// print("in cav with", value)
 							switch value {
 							case "Honours":
@@ -649,7 +649,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 							default:
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 							}
-						case 4:
+						case shared.UnitGun:
 							switch value {
 							case "Gunnery Chart":
 								loadTemplate("unit-gunnery", "[name=unitcard]", unit)

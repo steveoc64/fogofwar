@@ -107,11 +107,12 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	// title
 	html := svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), fullName)
+	html += svgText(98, 15, "text__end text__0x", cmd.CommandSummary())
 	html += svgEndG()
 
 	numDivs := 0
 	for _, v := range cmd.Units {
-		if v.UType == 1 {
+		if v.UType == shared.UnitDiv {
 			numDivs++
 		}
 	}
@@ -119,7 +120,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	// yspacing := 80 / (numDivs + 1) // width to use for each cmd
 	yoffset := 0
 	for _, v := range cmd.Units {
-		if v.UType == 1 {
+		if v.UType == shared.UnitDiv {
 			html += svgG(v.ID)
 			html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
 			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
@@ -153,7 +154,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	})
 
 	for _, v := range cmd.Units {
-		if v.UType == 1 {
+		if v.UType == shared.UnitDiv {
 			svgCallback(v.ID, clickDiv)
 		}
 	}
@@ -238,9 +239,9 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 					if el.TagName() == "INPUT" {
 						value := el.(*dom.HTMLInputElement).Value
 						switch unit.UType {
-						case 1:
+						case shared.UnitDiv:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-						case 2, 5:
+						case shared.UnitBde, shared.UnitSpecial:
 							switch value {
 							case "Valour":
 								loadTemplate("unit-valour", "[name=unitcard]", unit)
@@ -252,7 +253,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 								print("here with utype", unit.UType)
 							}
-						case 3:
+						case shared.UnitCav:
 							switch value {
 							case "Honours":
 								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
@@ -260,7 +261,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 							default:
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 							}
-						case 4:
+						case shared.UnitGun:
 							switch value {
 							case "Gunnery Chart":
 								loadTemplate("unit-gunnery", "[name=unitcard]", unit)

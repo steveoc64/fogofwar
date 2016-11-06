@@ -205,7 +205,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				row.SetAttribute("key", fmt.Sprintf("%d", v.ID))
 
 				// Add columns depending on type
-				if v.UType == 1 {
+				if v.UType == shared.UnitDiv {
 					cell := row.InsertCell(-1)
 					cell.SetClass("compressed")
 					cell.Class().Add("highlight")
@@ -250,7 +250,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 									doIt = true
 									continue
 								}
-								if doIt && v.UType == 1 { // Into another Division now, so we are done
+								if doIt && v.UType == shared.UnitDiv { // Into another Division now, so we are done
 									break
 								}
 								if doIt {
@@ -296,7 +296,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 									doIt = true
 									continue
 								}
-								if doIt && v.UType == 1 { // Into another Division now, so we are done
+								if doIt && v.UType == shared.UnitDiv { // Into another Division now, so we are done
 									break
 								}
 								theCell := doc.QuerySelector(fmt.Sprintf("[name=descr-%d]", v.ID))
@@ -306,7 +306,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 									// This unit is a valid child of the selected Division
 									// Increment or decrement the losses in 1% increments
 									switch v.UType {
-									case 2:
+									case shared.UnitBde, shared.UnitSpecial:
 										r = x * (rand.Intn(6) + 1)
 										v.BayonetsLost += ((r * v.Bayonets) / 100)
 										if v.BayonetsLost < 0 {
@@ -318,7 +318,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 										theCell.SetInnerHTML(fmt.Sprintf("%d Bayonets:<br>\n%s",
 											v.Bayonets-v.BayonetsLost,
 											breakLine(v.Descr)))
-									case 3:
+									case shared.UnitCav:
 										r = x * (rand.Intn(3) + 1)
 										v.SabresLost += ((r * v.Sabres) / 100)
 										if v.SabresLost < 0 {
@@ -330,7 +330,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 										theCell.SetInnerHTML(fmt.Sprintf("%d Sabres:<br>\n%s",
 											v.Sabres-v.SabresLost,
 											breakLine(v.Descr)))
-									case 4:
+									case shared.UnitGun:
 										v.GunsLost += x
 										if v.GunsLost < 0 {
 											v.GunsLost = 0
@@ -363,7 +363,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 
 					cell = row.InsertCell(-1)
 					cell.SetClass("compressed")
-					if v.UType == 4 {
+					if v.UType == shared.UnitGun {
 						cell.SetInnerHTML("Gun Crew")
 					} else {
 						cell.SetInnerHTML(Session.Lookup.UnitRating[v.Rating-1].Name)
@@ -381,11 +381,11 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					cell.SetAttribute("name", fmt.Sprintf("descr-%d", v.ID))
 					addMe := ""
 					switch v.UType {
-					case 2:
+					case shared.UnitBde:
 						addMe = fmt.Sprintf("%d Bayonets:<br>\n", v.Bayonets-v.BayonetsLost)
-					case 3:
+					case shared.UnitCav:
 						addMe = fmt.Sprintf("%d Sabres:<br>\n", v.Sabres-v.SabresLost)
-					case 4:
+					case shared.UnitGun:
 						addMe = fmt.Sprintf("%d Guns:<br>\n", v.Guns-v.GunsLost)
 					}
 					if Session.SubMobile() {
@@ -563,7 +563,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 				// print("clicked on row with key", key)
 				unit := game.GetUnit(team, key)
 				// print("unit is", unit)
-				if unit.UType == 1 {
+				if unit.UType == shared.UnitDiv {
 					unit.Summary = unit.GetSummary(TheCmd)
 				}
 				loadTemplate("unit-details", "#unit-details", unit)
@@ -576,9 +576,9 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 					if el.TagName() == "INPUT" {
 						value := el.(*dom.HTMLInputElement).Value
 						switch unit.UType {
-						case 1:
+						case shared.UnitDiv:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-						case 2, 5:
+						case shared.UnitBde, shared.UnitSpecial:
 							switch value {
 							case "Valour":
 								loadTemplate("unit-valour", "[name=unitcard]", unit)
@@ -589,7 +589,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 							default:
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 							}
-						case 3:
+						case shared.UnitCav:
 							// print("in cav with", value)
 							switch value {
 							case "Honours":
@@ -599,7 +599,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 							default:
 								doc.QuerySelector("#unit-details").Class().Remove("md-show")
 							}
-						case 4:
+						case shared.UnitGun:
 							switch value {
 							case "Gunnery Chart":
 								loadTemplate("unit-gunnery", "[name=unitcard]", unit)

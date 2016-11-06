@@ -35,6 +35,16 @@ const (
 )
 const NumCommands = 9
 
+// Unit Types
+const (
+	UnitType int = iota
+	UnitDiv
+	UnitBde
+	UnitCav
+	UnitGun
+	UnitSpecial
+)
+
 type CmdOrder struct {
 	Channel int
 	ID      int // ID of the gamecmd

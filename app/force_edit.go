@@ -423,7 +423,7 @@ func forceEdit(context *router.Context) {
 				totalBayonets += v.Bayonets
 				totalSabres += v.Sabres
 				totalGuns += v.Guns
-				if v.UType == 1 {
+				if v.UType == shared.UnitDiv {
 					totalCmdrs += 1
 				}
 				row := tbody.InsertRow(-1)
@@ -434,7 +434,7 @@ func forceEdit(context *router.Context) {
 				if v.ID == TheUnit.ID {
 					cell.Class().Add("highlight")
 				}
-				if v.UType == 1 {
+				if v.UType == shared.UnitDiv {
 					cell.Class().Add("commander")
 					cell.SetInnerHTML(v.Name)
 				} else {
@@ -446,10 +446,10 @@ func forceEdit(context *router.Context) {
 				cell.SetClass("compressed")
 				descr := ""
 				switch v.UType {
-				case 1:
+				case shared.UnitDiv:
 					descr = v.CommanderName
 					cell.Class().Add("commander")
-				case 2, 3, 4, 5:
+				default:
 					descr = v.GetBases()
 				}
 				cell.SetInnerHTML(descr)
@@ -466,34 +466,34 @@ func forceEdit(context *router.Context) {
 		drawUnitPanel := func() {
 			// print("drawUnitPanel with TheUnit", TheUnit)
 			switch TheUnit.UType {
-			case 1: // Command
+			case shared.UnitDiv: // Command
 				swapper.Panels[1].Paint(&TheUnit)
 				swapper.Select(1)
 				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Cmd-Name")
 				}
-			case 2: // Bde
+			case shared.UnitBde: // Bde
 				// print("paint panel 2")
 				swapper.Panels[2].Paint(&TheUnit)
 				swapper.Select(2)
 				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Bde-Name")
 				}
-			case 3: // Cav
+			case shared.UnitCav: // Cav
 				// print("paint panel 2")
 				swapper.Panels[3].Paint(&TheUnit)
 				swapper.Select(3)
 				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Cav-Name")
 				}
-			case 4: // Bty
+			case shared.UnitGun: // Bty
 				// print("paint panel 2")
 				swapper.Panels[4].Paint(&TheUnit)
 				swapper.Select(4)
 				if !Session.Mobile() && canEdit {
 					form.FocusSelect("Gun-Name")
 				}
-			case 5: // Other
+			case shared.UnitSpecial: // Other
 				// print("paint panel 2")
 				swapper.Panels[5].Paint(&TheUnit)
 				swapper.Select(5)
@@ -769,7 +769,7 @@ func forceEdit(context *router.Context) {
 					RPC("ScenarioRPC.AddUnit", shared.ForceUnitRPCData{
 						Channel:    Session.Channel,
 						ID:         force.ID,
-						UType:      2,
+						UType:      shared.UnitBde,
 						ParentPath: TheUnit.Path,
 					}, &newUnit)
 					newUnit.Nation = Nation

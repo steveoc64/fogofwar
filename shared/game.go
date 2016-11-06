@@ -529,7 +529,7 @@ type GameCmdRPCData struct {
 	Team     string
 }
 
-var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance"}
+var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance", "Complete March"}
 
 // Get first GT Move - return Max move in grids open, grids other than open, and a string descrpition
 func (g *GameCmd) GTMove() (int, int, string) {
@@ -540,6 +540,9 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		return 0, 0, "Sounding the Order to Advance"
 	}
 	if g.Deploying() {
+		if g.DState == CmdCompleteMarch {
+			return 0, 0, "Completing March"
+		}
 		return 0, 0, "Deploy to " + cstates[g.DState]
 	}
 	if g.Moving() {
@@ -599,6 +602,9 @@ func (g *GameCmd) CommandSummary() string {
 		if g.Moving() {
 			return "Preparing to March"
 		} else {
+			if g.DState == CmdCompleteMarch {
+				return "Completing March"
+			}
 			return fmt.Sprintf("Deploying to %s", cstates[g.DState])
 		}
 	} else {
@@ -742,7 +748,7 @@ func (u *Unit) GetSubunits(corps *GameCmd) []*Unit {
 	mode := 0
 	for _, v := range corps.Units {
 		switch v.UType {
-		case 1:
+		case UnitDiv:
 			if mode == 1 {
 				mode = 2
 			}
@@ -800,13 +806,13 @@ func (u *Unit) GetSitrep() string {
 
 func (u *Unit) GetRating() string {
 	switch u.UType {
-	case 1:
+	case UnitDiv:
 		return Lookups.CmdRating[u.Rating-1].Name
-	case 2, 5:
+	case UnitBde, UnitSpecial:
 		return Lookups.UnitRating[u.Rating-1].Name
-	case 3:
+	case UnitCav:
 		return Lookups.UnitRating[u.CavRating-1].Name
-	case 4:
+	case UnitGun:
 		return Lookups.Gunnery[u.GunneryType-1].Name
 	}
 	return ""
@@ -814,9 +820,9 @@ func (u *Unit) GetRating() string {
 
 func (u *Unit) GetRatingData() *UnitRating {
 	switch u.UType {
-	case 1:
+	case UnitDiv:
 		return nil
-	case 2, 3, 5:
+	case UnitBde, UnitCav, UnitSpecial:
 		return &Lookups.UnitRating[u.Rating-1]
 	}
 	return nil
@@ -824,9 +830,9 @@ func (u *Unit) GetRatingData() *UnitRating {
 
 func (u *Unit) GetDrillData() *DrillType {
 	switch u.UType {
-	case 1, 3, 4:
+	case UnitDiv, UnitCav, UnitGun:
 		return nil
-	case 2, 5:
+	case UnitBde, UnitSpecial:
 		return &Lookups.DrillType[u.Drill-1]
 	}
 	return nil
@@ -834,7 +840,7 @@ func (u *Unit) GetDrillData() *DrillType {
 
 func (u *Unit) GetAppraisal() string {
 	switch u.UType {
-	case 2, 5:
+	case UnitBde, UnitSpecial:
 		d := Lookups.DrillType[u.Drill-1].Control
 		r := Lookups.UnitRating[u.Rating-1].FireBonus
 		cond := Lookups.Condition[u.Condition-1].Effect
@@ -878,7 +884,7 @@ func (u *Unit) GetCavData() *CavType {
 	switch u.UType {
 	default:
 		return nil
-	case 3:
+	case UnitCav:
 		return &Lookups.CavType[u.CavType-1]
 	}
 	return nil
@@ -891,7 +897,7 @@ func (u *Unit) GetBayonets() string {
 func (u *Unit) GetSupport() string {
 	retval := ""
 	switch u.UType {
-	case 2:
+	case UnitBde:
 		if u.LtCoy > 0 {
 			if u.EliteArms == 0 {
 				u.EliteArms = 1
@@ -918,6 +924,34 @@ func (u *Unit) GetSupport() string {
 	// 	return retval
 	// }
 	// return ".. and no additional support units."
+}
+
+func (g *GameCmd) CanBombard() bool {
+	for _, v := range g.Units {
+		if v.CanBombard(g) {
+			return true
+		}
+	}
+	return false
+}
+
+func (u *Unit) CanBombard(cmd *GameCmd) bool {
+	if u.UType != UnitGun {
+		return false
+	}
+	if u.Guns < 1 {
+		return false
+	}
+	print("unit ", u.Name, "has", u.Guns, "guns")
+	if cmd.Deploying() {
+		print("parent corps is deploying - no fire")
+		return false
+	}
+	if cmd.CState != CmdBattleLine {
+		print("parent corps is not in battle line")
+		return false
+	}
+	return true
 }
 
 func (u *Unit) GetMState() string {
@@ -1065,6 +1099,27 @@ func (u *Unit) GetBases() string {
 		}
 	}
 	return "&nbsp;" + retval
+}
+
+func (u *Unit) GetGuns() string {
+	gg := u.Guns - u.GunsLost
+	if gg < 1 {
+		return "No Guns"
+	}
+	gunType := ""
+	switch u.GunneryType {
+	case 1:
+		gunType = "12lb"
+	case 2:
+		gunType = "9lb"
+	case 3:
+		gunType = "6lb"
+	case 4:
+		gunType = "3lb"
+	case 5:
+		gunType = "Hw"
+	}
+	return fmt.Sprintf("%x guns of %s", gg, gunType)
 }
 
 type GameObjective struct {

@@ -200,4 +200,6 @@ func doGT2(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 	print("phaseGT2")
+	dom.GetWindow().Alert("all done")
+	consolePhaseDone(game)
 }

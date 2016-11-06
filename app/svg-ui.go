@@ -40,9 +40,11 @@ func svgButton(x, y, w, h int, class, textClass, text string) string {
 	html += fmt.Sprintf(`<rect x=%d y=%d rx=2 ry=2 width=%d height=%d class=%s data-id=%d></rect>`,
 		x, y, w, h, class, svgID)
 	html += "\n"
-	html += fmt.Sprintf(`<text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
-		x+3, y+8, textClass, svgID, text)
-	html += "\n"
+	if text != "" {
+		html += fmt.Sprintf(`<text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
+			x+3, y+8, textClass, svgID, text)
+		html += "\n"
+	}
 	return html
 }
 

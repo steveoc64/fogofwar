@@ -115,16 +115,6 @@ func doTurnSummary(game *shared.Game) {
 	}
 }
 
-func doBB(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
-	print("phaseBB")
-}
-
 func doCommanderAction(game *shared.Game) {
 	// w := dom.GetWindow()
 	// doc := w.Document()
@@ -133,6 +123,8 @@ func doCommanderAction(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 	print("phaseCommanderAction")
+	dom.GetWindow().Alert("all done")
+	consolePhaseDone(game)
 }
 func doEngage(game *shared.Game) {
 	// w := dom.GetWindow()
@@ -142,6 +134,8 @@ func doEngage(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 	print("phaseEngage")
+	dom.GetWindow().Alert("all done")
+	consolePhaseDone(game)
 }
 func doTactical(game *shared.Game) {
 	// w := dom.GetWindow()
@@ -151,6 +145,8 @@ func doTactical(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 	print("phaseTactical")
+	dom.GetWindow().Alert("all done")
+	consolePhaseDone(game)
 }
 func doObjectives(game *shared.Game) {
 	// w := dom.GetWindow()
@@ -160,4 +156,6 @@ func doObjectives(game *shared.Game) {
 	// consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
 	print("phaseObjectives")
+	dom.GetWindow().Alert("all done")
+	consolePhaseDone(game)
 }

@@ -55,17 +55,27 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 
 	if err == nil {
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),p.accepted,p.connected
+		DB.SQL(`select u.id as player_id,u.username,u.email,p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
 			order by u.username`, data.ID).QueryStructs(&retval.RedPlayers)
 
-		DB.SQL(`select distinct(u.username),p.accepted,p.connected
+		DB.SQL(`select u.id as player_id,u.username,u.email,p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team
 			order by u.username`, data.ID).QueryStructs(&retval.BluePlayers)
+
+		// generate avatars and clear emails
+		for i, v := range retval.RedPlayers {
+			retval.RedPlayers[i].Avatar = v.GetAvatar(32)
+			retval.RedPlayers[i].Email = ""
+		}
+		for i, v := range retval.BluePlayers {
+			retval.BluePlayers[i].Avatar = v.GetAvatar(32)
+			retval.BluePlayers[i].Email = ""
+		}
 
 		count := 0
 		DB.SQL(`select count(*)
@@ -362,6 +372,58 @@ func (g *GameRPC) GTMove(data shared.GTMoveData, retval *shared.GameCmd) error {
 	if err == nil {
 		DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(retval)
 	}
+
+	return err
+}
+
+func (g *GameRPC) Bombard(data shared.BombardData, retval *shared.Bombard) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+	data.Bombard.FirerID = conn.UserID
+
+	// Create the bombard record
+	_, err := DB.InsertInto("bombard").
+		Whitelist("game_id", "unit_id", "firer_id", "target_id", "range_max", "range_min").
+		Record(data.Bombard).
+		Exec()
+	if err != nil {
+		println(err.Error())
+	}
+
+	// Send message to the play-goroutine to add this bombard to the list
+	if play, ok := Plays[data.Bombard.GameID]; ok {
+		play <- PlayMessage{
+			Game:     data.Bombard.GameID,
+			PlayerID: conn.UserID,
+			OpCode:   BombardAdd,
+			Data:     data.Bombard,
+		}
+	} else {
+		err = errors.New("Invalid Game ID")
+	}
+
+	logger(start, "Game.Bombard", conn,
+		fmt.Sprintf("Game %d bb %v", data.Bombard.GameID, data.Bombard), "")
+
+	return err
+}
+
+func (g *GameRPC) GetUnit(data shared.GameRPCData, retval *shared.Unit) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select * from unit where id=$1`, data.ID).QueryStruct(retval)
+	if err == nil {
+		bb := &shared.Bombard{}
+		DB.SQL(`select * from bombard where unit_id=$1`, data.ID).QueryStruct(bb)
+		retval.Bombard = bb
+	}
+
+	logger(start, "Game.GetUnit", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%s", retval.Name))
 
 	return err
 }

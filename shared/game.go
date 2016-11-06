@@ -168,9 +168,18 @@ type GamePlayerData struct {
 	Username  string `db:"username"`
 	Accepted  bool   `db:"accepted"`
 	Connected bool   `db:"connected"`
+	Email     string `db:"email"`
+	Avatar    string `db:"avatar"`
 	Done      bool
 	Busy      bool
 	TODO      bool
+}
+
+func (u *GamePlayerData) GetAvatar(size int) string {
+	theEmail := strings.TrimSpace(strings.ToLower(u.Email))
+	avatar := md5.Sum([]byte(theEmail))
+	avatarURL := fmt.Sprintf("https://www.gravatar.com/avatar/%x?d=wavatar&s=%d", avatar, size)
+	return avatarURL
 }
 
 type GamePlayers struct {
@@ -732,6 +741,7 @@ type Unit struct {
 	GunMaxCondition  int    `db:"gun_max_condition"`
 	Summary          string `db:"summary"` // derived data
 	MState           int    `db:"mstate"`  // 0 - pregame
+	Bombard          *Bombard
 }
 
 func (u *Unit) GetShortSummary(corps *GameCmd) string {
@@ -942,13 +952,13 @@ func (u *Unit) CanBombard(cmd *GameCmd) bool {
 	if u.Guns < 1 {
 		return false
 	}
-	print("unit ", u.Name, "has", u.Guns, "guns")
+	// print("unit ", u.Name, "has", u.Guns, "guns")
 	if cmd.Deploying() {
-		print("parent corps is deploying - no fire")
+		// print("parent corps is deploying - no fire")
 		return false
 	}
 	if cmd.CState != CmdBattleLine {
-		print("parent corps is not in battle line")
+		// print("parent corps is not in battle line")
 		return false
 	}
 	return true
@@ -1101,6 +1111,19 @@ func (u *Unit) GetBases() string {
 	return "&nbsp;" + retval
 }
 
+func (u *Unit) GetGunRange() int {
+	if u.UType != UnitGun {
+		return 0
+	}
+	switch u.GunneryType {
+	case 1:
+		return 5
+	case 4:
+		return 2
+	default:
+		return 4
+	}
+}
 func (u *Unit) GetGuns() string {
 	gg := u.Guns - u.GunsLost
 	if gg < 1 {
@@ -1135,4 +1158,21 @@ type GameObjective struct {
 
 func (g *GameObjective) GetCSS() string {
 	return "tile-objective"
+}
+
+type Bombard struct {
+	GameID    int  `db:"game_id"`
+	ID        int  `db:"id"`
+	UnitID    int  `db:"unit_id"`
+	FirerID   int  `db:"firer_id"`
+	TargetID  int  `db:"target_id"`
+	TargetUID int  `db:"target_uid"`
+	RangeMax  int  `db:"range_max"`
+	RangeMin  int  `db:"range_min"`
+	Disputed  bool `db:"disputed"`
+}
+
+type BombardData struct {
+	Channel int
+	Bombard *Bombard
 }

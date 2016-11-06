@@ -41,7 +41,7 @@ func doOrders(game *shared.Game) {
 	}
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Orders")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -63,7 +63,7 @@ func doOrders(game *shared.Game) {
 			html += svgG(v.ID)
 			c := "console-corps-button"
 			if v.Deploying() {
-				c = "console-corps-button-other"
+				c = "console-corps-disabled"
 			}
 			html += svgButton(0, 18+(yoffset), 100, 10, c, "text__1x text__"+team, v.Name)
 			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())

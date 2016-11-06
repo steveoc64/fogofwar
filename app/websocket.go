@@ -11,9 +11,9 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/gopherjs/gopherjs/js"
-
 	"./shared"
+	"github.com/go-humble/locstor"
+	"github.com/gopherjs/gopherjs/js"
 
 	"github.com/gopherjs/websocket"
 	"honnef.co/go/js/dom"
@@ -267,7 +267,15 @@ func ReConnect() error {
 		lr := &shared.LoginReply{}
 		err = RPC("LoginRPC.Login", lc, lr)
 		if err != nil {
-			return errors.New(err.Error())
+			// Prevent runaway race of auto-logins on bad account infor
+			// - or maybe they are already logged in on another account
+			Session.Username = ""
+			Session.Passwd = ""
+			Session.UserID = 0
+			locstor.RemoveItem("username")
+			locstor.RemoveItem("secret")
+			print(err.Error())
+			return errors.New("Stop")
 		}
 		if lr.Result == "OK" {
 
@@ -317,6 +325,12 @@ func autoReload() {
 				time.Sleep(time.Second)
 				err := ReConnect()
 				if err != nil {
+					if err.Error() == "Stop" {
+						// We can only get here if the socket is back up and we tried to login
+						// again, but the server wont allow us in for whatever reason .. so
+						// stop trying
+						keepTrying = false
+					}
 					print(err.Error())
 				} else {
 					print("Reconnected on channel", Session.Channel)

@@ -17,8 +17,9 @@ type ConsolePaintData struct {
 
 var consoleCurrentPanel = "Game"
 var consoleGame *shared.Game
+var incoming = []int{}
 
-func consolePhaseBusy(game *shared.Game) {
+func consolePhaseBusy(game *shared.Game, with string) {
 	go func() {
 		done := false
 		err := RPC("GameRPC.PhaseBusy", shared.PhaseDoneMsg{
@@ -29,6 +30,7 @@ func consolePhaseBusy(game *shared.Game) {
 			print(err.Error())
 		}
 		game.PhaseBUSY = true
+		consoleCurrentPanel = with
 	}()
 }
 
@@ -91,7 +93,6 @@ func play(context *router.Context) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	game := consoleGame
-
 	go func() {
 		// TheCmd := &shared.GameCmd{}
 		// TheUnit := &shared.Unit{}
@@ -108,6 +109,10 @@ func play(context *router.Context) {
 		}
 		consoleGame = &newGame
 		game = consoleGame
+		team := "blue"
+		if game.Red {
+			team = "red"
+		}
 
 		loadTemplate("console", "main", ConsolePaintData{
 			Game:        game,
@@ -116,7 +121,7 @@ func play(context *router.Context) {
 		})
 
 		playMsg := func(action string, actionID int, context *router.Context) {
-			print("Msg", action, actionID)
+			// print("Msg", action, actionID)
 			switch action {
 			case "Turn":
 				// end of turn - get the data again
@@ -136,18 +141,60 @@ func play(context *router.Context) {
 					game.Turn = actionID
 					game.PhaseDONE = false
 					game.PhaseTODO = true
+					incoming = nil
 					doTurnSummary(game)
 				}()
 			case "Phase":
 				game.Phase = actionID
 				game.PhaseDONE = false
 				game.PhaseTODO = true
+				incoming = nil
 				doTurnSummary(game)
 			case "PhaseWait":
 				game.Phase = actionID
 				game.PhaseDONE = true
 				game.PhaseTODO = false
 				doTurnSummary(game)
+			case "Incoming":
+				print("we have incoming bombardment", actionID)
+				incoming = append(incoming, actionID)
+				game.PhaseTODO = true
+				game.PhaseDONE = false
+			case "Unit":
+				print("unit has changed", actionID)
+				go func() {
+					newUnit := shared.Unit{}
+					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
+						Channel: Session.Channel,
+						ID:      actionID,
+					}, &newUnit)
+					if err != nil {
+						print(err.Error())
+					} else {
+						// find the unit
+						oldUnit := game.GetUnit(team, actionID)
+						*oldUnit = newUnit
+					}
+				}()
+			case "BB":
+				print("Bombardment target ID has been aquired for unit", actionID)
+				go func() {
+					newUnit := shared.Unit{}
+					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
+						Channel: Session.Channel,
+						ID:      actionID,
+					}, &newUnit)
+					if err != nil {
+						print(err.Error())
+					} else {
+						// find the unit
+						oldUnit := game.GetUnit(team, actionID)
+						*oldUnit = newUnit
+						cmd := game.GetCmd(team, newUnit.CmdID)
+						// print("BB data", oldUnit.Bombard)
+						doBB2(game, cmd)
+					}
+				}()
 			}
 		}
 

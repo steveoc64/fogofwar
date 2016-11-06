@@ -15,7 +15,7 @@ func doGT1(game *shared.Game) {
 	g := c.QuerySelector("[name=g-main]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "GT1")
 	// print("phaseGT1 with", game)
 
 	team := "blue"
@@ -44,7 +44,7 @@ func doGT1(game *shared.Game) {
 		if v.PlayerID == Session.UserID {
 			html += svgG(v.ID)
 			if max == 0 {
-				html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button-other", "text__"+team+" text__1x", v.Name)
+				html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
 			} else {
 				count++
 				html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
@@ -101,7 +101,7 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 	g := c.QuerySelector("[name=g-main]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "GTCmd")
 	// print("phaseGT1 with", game)
 
 	team := "blue"
@@ -198,7 +198,7 @@ func doGT2(game *shared.Game) {
 	// c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "GT2")
 	print("phaseGT2")
 	dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)

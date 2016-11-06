@@ -33,7 +33,7 @@ func doMap(game *shared.Game) {
 	flipped := isFlipped(game)
 	html := ""
 
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Map")
 
 	consoleSetViewBox(game, game.GridX*game.GridSize, game.GridY*game.GridSize, true)
 

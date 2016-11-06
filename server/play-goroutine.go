@@ -22,12 +22,16 @@ const (
 	PlayerConnected
 	PlayerDisconnected
 	PlayersChanged
+	BombardAdd
+	BombardSetTarget
+	BombardDispute
 )
 
 type PlayMessage struct {
 	Game     int
 	PlayerID int
 	OpCode   int
+	Data     interface{}
 }
 
 // Global map of comms channels to refer to game goroutines by
@@ -64,11 +68,12 @@ type PlayerState struct {
 }
 
 type PlayState struct {
-	Game *shared.Game
-	Log  *os.File
+	Game     *shared.Game
+	Log      *os.File
+	Bombards []*shared.Bombard
 }
 
-func loadGameData(id int, state PlayState) error {
+func loadGameData(id int, state *PlayState) error {
 	err := DB.SQL(`select
 			g.*,u.username as host_name,u.email as host_email,
 				coalesce(p_red.reds, 0) as num_red_players,
@@ -131,7 +136,7 @@ func loadGameData(id int, state PlayState) error {
 		DB.SQL(`update game_players set connected=false where game_id=$1`, state.Game.ID).Exec()
 
 		// fill in the players on each side
-		DB.SQL(`select distinct(u.username),u.id as player_id,p.accepted,p.connected
+		DB.SQL(`select u.id as player_id,u.username,u.email,p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.red_team
@@ -142,7 +147,7 @@ func loadGameData(id int, state PlayState) error {
 			v.Busy = false
 		}
 
-		DB.SQL(`select distinct(u.username),u.id as player_id, p.accepted,p.connected
+		DB.SQL(`select u.id as player_id,u.username, u.email,p.accepted,p.connected
 			from game_players p
 			left join users u on u.id=p.player_id
 			where p.game_id=$1 and p.blue_team
@@ -169,6 +174,7 @@ func loadGameData(id int, state PlayState) error {
 
 	// and fetch the objectives
 	err = DB.SQL(`select * from game_objective where game_id=$1`, id).QueryStructs(&state.Game.Objectives)
+
 	return err
 }
 
@@ -255,7 +261,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	}
 	defer fp.Close()
 	// all good - spawn our state
-	state := PlayState{
+	state := &PlayState{
 		Log:  fp,
 		Game: &shared.Game{},
 	}
@@ -265,6 +271,10 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 		fmt.Fprintf(fp, "Error Loading Game State: %s\n", err.Error())
 		return
 	}
+
+	// At the start of the game goroutine, we clear out the bombards array
+	// and any other temp combat trackers
+	DB.SQL(`delete from bombard where game_id=$1`, state.Game.ID).Exec()
 
 	log.Printf("Starting Game GoRoutine for %d\n", id)
 	if !logexists {
@@ -305,46 +315,20 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fmt.Fprintf(fp, "Player %d Has Left the Game\n", m.PlayerID)
 				loadPlayerConnectionStatus(state)
 			case PlayersChanged:
-				fmt.Fprintf(fp, "Player Teams have been modified - reload")
+				fmt.Fprintf(fp, "Player Teams have been modified - reload\n")
 				loadPlayerConnectionStatus(state)
+			case BombardAdd:
+				fmt.Fprintf(fp, "Player Requests Fire Mission\n")
+				bombardAdd(state, m)
+			case BombardDispute:
+			case BombardSetTarget:
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
 			case PlayerPhaseNotBusy:
 				// fmt.Fprintf(fp, "Player %d is free", m.PlayerID)
 			case PlayerPhaseDone:
-				fmt.Fprintf(fp, "Player %d is Done\n", m.PlayerID)
-				playerDone(state, m.PlayerID, true)
-				if allDone(state) && allFree(state) {
-					fmt.Fprintf(fp, "ALL DONE - phase %d ends\n", state.Game.Phase)
-					println(".. ALL DONE - phase ends in game", state.Game.ID)
-					newTurn := false
-					state.Game.Phase++
-					if state.Game.Phase > shared.PhaseObjectives {
-						state.Game.Phase = 1
-						state.Game.Turn++
-						// Just for now, advance the state of any units adjusting state
-						DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
-						newTurn = true
-					}
-					fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
-					fmt.Fprintf(fp, "Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
-					if state.Game.Turn >= state.Game.TurnLimit {
-						println("TURN Limit Reached")
-						fmt.Fprintf(fp, "TURN Limit %d Reached\n", state.Game.TurnLimit)
-					}
-					sendPhaseUpdates(state, newTurn)
-					_, err := DB.SQL(`update game set turn=$2,phase=$3 where id=$1`,
-						state.Game.ID, state.Game.Turn, state.Game.Phase).Exec()
-					if err != nil {
-						fmt.Fprintf(fp, "DB Error %s\n", err.Error())
-					}
-				} else {
-					if allFree(state) {
-						println(".. still more players to finish yet")
-					} else {
-						println(".. some players are busy")
-					}
-				}
+				fmt.Fprintf(state.Log, "Player %d is Done\n", m.PlayerID)
+				playerPhaseDone(state, m)
 			}
 		case <-time.After(60 * time.Second):
 
@@ -354,7 +338,70 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	}
 }
 
-func loadPlayerConnectionStatus(state PlayState) {
+func bombardAdd(state *PlayState, m PlayMessage) {
+	if bb, ok := m.Data.(*shared.Bombard); ok {
+		// add to the list of bombards
+		state.Bombards = append(state.Bombards, bb)
+		// Both players are not done till this bombard is done
+		playerDone(state, bb.TargetID, false)
+		playerDone(state, bb.FirerID, false)
+
+		// Stamp the DB with the new ID of the bombardment
+		newID := len(state.Bombards)
+		fmt.Fprintf(state.Log, "Register Bombardment %d\n", newID)
+		DB.SQL(`update bombard set id=$2 where unit_id=$1`, bb.UnitID, newID).Exec()
+
+		// signal target player that they have incoming
+		Connections.BroadcastPlayer(bb.TargetID, "Play", "Incoming", newID)
+
+		// signal the firer that we have a new target identification ID for them, all they need
+		// to do is re-get the unit info
+		Connections.BroadcastPlayer(bb.FirerID, "Play", "BB", bb.UnitID)
+	}
+}
+
+func playerPhaseDone(state *PlayState, m PlayMessage) {
+	if hasBombards(state, m.PlayerID) {
+		fmt.Fprintf(state.Log, "But this player still has bombards to sort out\n")
+		return
+	}
+
+	playerDone(state, m.PlayerID, true)
+
+	if allDone(state) && allFree(state) {
+		fmt.Fprintf(state.Log, "ALL DONE - phase %d ends\n", state.Game.Phase)
+		println(".. ALL DONE - phase ends in game", state.Game.ID)
+		newTurn := false
+		state.Game.Phase++
+		if state.Game.Phase > shared.PhaseObjectives {
+			state.Game.Phase = 1
+			state.Game.Turn++
+			// Just for now, advance the state of any units adjusting state
+			DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
+			newTurn = true
+		}
+		fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
+		fmt.Fprintf(state.Log, "Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
+		if state.Game.Turn >= state.Game.TurnLimit {
+			println("TURN Limit Reached")
+			fmt.Fprintf(state.Log, "TURN Limit %d Reached\n", state.Game.TurnLimit)
+		}
+		sendPhaseUpdates(state, newTurn)
+		_, err := DB.SQL(`update game set turn=$2,phase=$3 where id=$1`,
+			state.Game.ID, state.Game.Turn, state.Game.Phase).Exec()
+		if err != nil {
+			fmt.Fprintf(state.Log, "DB Error %s\n", err.Error())
+		}
+	} else {
+		if allFree(state) {
+			println(".. still more players to finish yet")
+		} else {
+			println(".. some players are busy")
+		}
+	}
+}
+
+func loadPlayerConnectionStatus(state *PlayState) {
 
 	newRed := []*shared.GamePlayerData{}
 	newBlue := []*shared.GamePlayerData{}
@@ -399,7 +446,7 @@ func loadPlayerConnectionStatus(state PlayState) {
 	state.Game.BluePlayers = newBlue
 }
 
-func sendPhaseUpdates(state PlayState, newTurn bool) {
+func sendPhaseUpdates(state *PlayState, newTurn bool) {
 	// println("sending phase updates")
 	for i, v := range state.Game.RedPlayers {
 		state.Game.RedPlayers[i].TODO = true
@@ -421,7 +468,11 @@ func sendPhaseUpdates(state PlayState, newTurn bool) {
 	}
 }
 
-func allDone(state PlayState) bool {
+func allDone(state *PlayState) bool {
+	if len(state.Bombards) > 0 {
+		println("there are still bombards to do yet")
+		return false
+	}
 	for _, v := range state.Game.RedPlayers {
 		if !v.Done {
 			println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
@@ -437,7 +488,7 @@ func allDone(state PlayState) bool {
 	return true
 }
 
-func allFree(state PlayState) bool {
+func allFree(state *PlayState) bool {
 	for _, v := range state.Game.RedPlayers {
 		if v.Busy {
 			println("red player ", v.PlayerID, v.Username, "is busy")
@@ -453,7 +504,7 @@ func allFree(state PlayState) bool {
 	return true
 }
 
-func playerDone(state PlayState, pid int, done bool) {
+func playerDone(state *PlayState, pid int, done bool) {
 	for i, v := range state.Game.RedPlayers {
 		if v.PlayerID == pid {
 			state.Game.RedPlayers[i].Done = done
@@ -466,4 +517,26 @@ func playerDone(state PlayState, pid int, done bool) {
 			return
 		}
 	}
+}
+
+func hasBombards(state *PlayState, pid int) bool {
+	for _, v := range state.Game.RedPlayers {
+		if v.PlayerID == pid {
+			for _, b := range state.Bombards {
+				if b.TargetID == pid || b.FirerID == pid {
+					return true
+				}
+			}
+		}
+	}
+	for _, v := range state.Game.BluePlayers {
+		if v.PlayerID == pid {
+			for _, b := range state.Bombards {
+				if b.TargetID == pid || b.FirerID == pid {
+					return true
+				}
+			}
+		}
+	}
+	return false
 }

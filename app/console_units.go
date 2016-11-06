@@ -14,7 +14,7 @@ func doUnits(game *shared.Game) {
 	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Units")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -44,7 +44,7 @@ func doUnits(game *shared.Game) {
 			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
 			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		} else {
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button-other", "text__"+team+" text__1x", v.Name)
+			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
 			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		}
 		html += svgEndG()
@@ -88,7 +88,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "UnitsDiv")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -167,7 +167,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Bde")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")

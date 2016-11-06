@@ -63,7 +63,16 @@ func doTurnSummary(game *shared.Game) {
 		html += svgText(50, 70, "text__middle text__2x text__"+team, fmt.Sprintf("Victory Points = %d", game.VP))
 	}
 
-	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
+	if len(incoming) > 0 {
+		for i, v := range incoming {
+			html += fmt.Sprintf(`<g id=incoming-%d data-id=%d>
+<circle data-id=%d class=help-button cx=%d cy=%d r=5></circle>
+<text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>
+</g>`, v, v, v, i*10, 50, i*10-2, 50+2, v)
+		}
+	}
+
+	print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
 	allTheThings := false
 	html += svgG(1)
 	if game.PhaseTODO {
@@ -121,7 +130,7 @@ func doCommanderAction(game *shared.Game) {
 	// c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "CommanderAction")
 	print("phaseCommanderAction")
 	dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
@@ -132,7 +141,7 @@ func doEngage(game *shared.Game) {
 	// c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Engage")
 	print("phaseEngage")
 	dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
@@ -143,7 +152,7 @@ func doTactical(game *shared.Game) {
 	// c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Tactical")
 	print("phaseTactical")
 	dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
@@ -154,7 +163,7 @@ func doObjectives(game *shared.Game) {
 	// c := doc.QuerySelector("[name=svg-console]")
 
 	// consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game)
+	consolePhaseBusy(game, "Objectives")
 	print("phaseObjectives")
 	dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)

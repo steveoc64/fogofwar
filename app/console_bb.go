@@ -93,7 +93,7 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
-	print("phaseBB")
+	print("phaseBB2")
 
 	team := "blue"
 	if game.Red {
@@ -178,6 +178,7 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			unit := game.GetUnit(team, id)
+			print("unit", team, id, unit)
 			doBB3(game, cmd, unit)
 		})
 	}
@@ -192,11 +193,13 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game)
-	print("phaseBB")
+	print("phaseBB3", game, cmd, unit)
 
 	team := "blue"
+	enemy := game.RedPlayers
 	if game.Red {
 		team = "red"
+		enemy = game.BluePlayers
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Fire!")
@@ -210,6 +213,10 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	html += svgText(50, 97, "text__carryon text__middle", "Fire")
 	html += svgEndG()
 	g.SetInnerHTML(html)
+
+	for _, v := range enemy {
+		print("enemy", v)
+	}
 
 	svgCallback(100, func(dom.Event) {
 		print("Fire")

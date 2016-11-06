@@ -21,7 +21,8 @@ func (g *GameRPC) PlayList(data shared.GameRPCData, retval *[]shared.Game) error
 			left join users u on u.id=g.hosted_by
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
-		where started and g.id in (select game_id from game_players where player_id=$1)`, conn.UserID).QueryStructs(retval)
+		where started and g.id in (select game_id from game_players where player_id=$1)
+		order by g.name`, conn.UserID).QueryStructs(retval)
 
 	logger(start, "Game.PlayList", conn,
 		"",

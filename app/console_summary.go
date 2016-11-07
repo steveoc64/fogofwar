@@ -41,6 +41,7 @@ func doTurnSummary(game *shared.Game) {
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
+	print("doing turn summary")
 
 	team := "blue"
 	if game.Red {
@@ -48,6 +49,7 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	title, phaseName, confirmText, doneText := getPhaseDescription(game.Phase)
+	print("here with ", title, phaseName, game)
 	html := ""
 	if game.Turn > 0 {
 		turn := fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)
@@ -98,6 +100,7 @@ func doTurnSummary(game *shared.Game) {
 		html += svgButton(40, 85, 50, 12, "text__done", "console-text text__1x text__"+team, doneText)
 	}
 	html += svgEndG()
+
 	g.SetInnerHTML(html)
 
 	svgCallbackQuery("#incoming", func(evt dom.Event) {

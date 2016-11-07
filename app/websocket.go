@@ -230,6 +230,7 @@ func autoReloadFull() {
 
 func ReConnect() error {
 	Session.Channel = 0
+	Session.Subscriptions = make(map[string]MessageFunction)
 
 	wsBaseURL := getWSBaseURL()
 	// print("init websocket", wsBaseURL)
@@ -310,6 +311,7 @@ Shall I restart the app for your now (OK) ?`) {
 func autoReload() {
 
 	print("Connection has dropped !!")
+	Session.Subscriptions = make(map[string]MessageFunction)
 
 	if !isReconnecting {
 		go func() {

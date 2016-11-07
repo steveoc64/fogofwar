@@ -23,6 +23,7 @@ func _Login(username string, passwd string, doNav bool) {
 	Session.Passwd = ""
 	Session.Rank = 0
 	Session.UserID = 0
+	Session.Subscriptions = make(map[string]MessageFunction)
 	locstor.RemoveItem("username")
 	locstor.RemoveItem("secret")
 
@@ -180,7 +181,6 @@ func Logout() {
 	Session.Navigate("/")
 	locstor.RemoveItem("username")
 	locstor.RemoveItem("secret")
-
 	grid1()
 
 }

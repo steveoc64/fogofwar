@@ -372,7 +372,7 @@ func doBBReceive(game *shared.Game, id int) {
 		cmds = game.RedCmd
 	}
 
-	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Incoming!")
+	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming! (%d)", id))
 	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
 	html += svgHelpBtn()
 
@@ -387,6 +387,7 @@ func doBBReceive(game *shared.Game, id int) {
 			html += svgButton(x, y, 100, 10, "console-corps-button", "text__1x text__"+team, v.Name)
 			html += svgEndG()
 			count++
+			y += 11
 			ids = append(ids, v.ID)
 		}
 	}
@@ -429,7 +430,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int) {
 	}
 
 	html += `<g id=back>`
-	html += svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Incoming!")
+	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming! (%d)", id))
 	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
 	html += `</g>`
 	html += svgHelpBtn()

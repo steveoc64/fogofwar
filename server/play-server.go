@@ -135,6 +135,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 						v.ID, data.ID).QueryStructs(&v.Units)
 					// println("red", v.ID, data.ID, v.Units)
+					// and get any current bombards
 				}
 			}
 			if retval.Blue {
@@ -144,6 +145,32 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					// println("blue", v.ID, data.ID, v.Units)
 				}
 			}
+		}
+
+		if data.GetBombard {
+			bb := []*shared.Bombard{}
+			DB.SQL(`select * from bombard where game_id=$1`, data.ID).QueryStructs(&bb)
+			for _, v := range retval.RedCmd {
+				for _, u := range v.Units {
+					for _, b := range bb {
+						if b.UnitID == u.ID {
+							u.Bombard = b
+							break
+						}
+					}
+				}
+			}
+			for _, v := range retval.BlueCmd {
+				for _, u := range v.Units {
+					for _, b := range bb {
+						if b.UnitID == u.ID {
+							u.Bombard = b
+							break
+						}
+					}
+				}
+			}
+
 		}
 
 		// calculate the x and y km
@@ -424,6 +451,20 @@ func (g *GameRPC) GetUnit(data shared.GameRPCData, retval *shared.Unit) error {
 	logger(start, "Game.GetUnit", conn,
 		fmt.Sprintf("ID %d", data.ID),
 		fmt.Sprintf("%s", retval.Name))
+
+	return err
+}
+
+func (g *GameRPC) GetIncoming(data shared.GameRPCData, retval *[]int) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	err := DB.SQL(`select id from bombard where game_id=$1 and target_id=$2`, data.ID, conn.UserID).QuerySlice(retval)
+
+	logger(start, "Game.GetIncoming", conn,
+		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("%d incoming", len(*retval)))
 
 	return err
 }

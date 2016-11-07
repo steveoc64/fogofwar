@@ -135,27 +135,25 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
-	// add callbacks for each div
-	clickDiv := func(evt dom.Event) {
-		el := evt.Target()
-		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		for _, v := range cmd.Units {
-			if v.ID == id {
-				doUnitsBde(game, cmd, v)
-			}
-		}
-	}
-
 	svgCallback(0, func(dom.Event) {
 		doUnits(game)
 	})
+
 	svgCallback(100, func(evt dom.Event) {
 		print("reorg")
 	})
 
 	for _, v := range cmd.Units {
 		if v.UType == shared.UnitDiv {
-			svgCallback(v.ID, clickDiv)
+			svgCallback(v.ID, func(evt dom.Event) {
+				el := evt.Target()
+				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				for _, v := range cmd.Units {
+					if v.ID == id {
+						doUnitsBde(game, cmd, v)
+					}
+				}
+			})
 		}
 	}
 

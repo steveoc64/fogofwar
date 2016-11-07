@@ -89,6 +89,7 @@ func play(context *router.Context) {
 
 	Session.MobileSensitive = true
 	Session.OrientationSensitive = true
+	incoming = nil
 
 	w := dom.GetWindow()
 	doc := w.Document()
@@ -99,13 +100,22 @@ func play(context *router.Context) {
 
 		newGame := shared.Game{}
 		err := RPC("GameRPC.GetPlay", shared.GameRPCData{
-			Channel:  Session.Channel,
-			ID:       id,
-			GetUnits: true,
+			Channel:    Session.Channel,
+			ID:         id,
+			GetUnits:   true,
+			GetBombard: true,
 		}, &newGame)
 		if err != nil {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
 			Session.Navigate("/")
+		}
+		inc := []int{}
+		err = RPC("GameRPC.GetIncoming", shared.GameRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &inc)
+		if err == nil {
+			incoming = inc
 		}
 		consoleGame = &newGame
 		game = consoleGame
@@ -160,6 +170,9 @@ func play(context *router.Context) {
 				incoming = append(incoming, actionID)
 				game.PhaseTODO = true
 				game.PhaseDONE = false
+				if !game.PhaseBUSY {
+					doTurnSummary(game)
+				}
 			case "Unit":
 				print("unit has changed", actionID)
 				go func() {

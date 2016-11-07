@@ -192,12 +192,13 @@ type GamePlayers struct {
 }
 
 type GameRPCData struct {
-	Channel  int
-	ID       int
-	Red      bool
-	Blue     bool
-	GetUnits bool
-	Game     *Game
+	Channel    int
+	ID         int
+	Red        bool
+	Blue       bool
+	GetUnits   bool
+	GetBombard bool
+	Game       *Game
 }
 
 func (g *Game) GetStartDate() string {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"./shared"
 	"honnef.co/go/js/dom"
@@ -63,16 +64,19 @@ func doTurnSummary(game *shared.Game) {
 		html += svgText(50, 70, "text__middle text__2x text__"+team, fmt.Sprintf("Victory Points = %d", game.VP))
 	}
 
+	// list coins for incoming fire to be resolved
 	if len(incoming) > 0 {
+		html += `<g id=incoming>`
 		for i, v := range incoming {
 			html += fmt.Sprintf(`<g id=incoming-%d data-id=%d>
 <circle data-id=%d class=help-button cx=%d cy=%d r=5></circle>
 <text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>
-</g>`, v, v, v, i*10, 50, i*10-2, 50+2, v)
+</g>`, v, v, v, i*10, 50, v, i*10-2, 50+2, v)
 		}
+		html += `</g>`
 	}
 
-	print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
+	// print("our state", game.Turn, game.Phase, game.PhaseTODO, game.PhaseDONE)
 	allTheThings := false
 	html += svgG(1)
 	if game.PhaseTODO {
@@ -95,6 +99,14 @@ func doTurnSummary(game *shared.Game) {
 	}
 	html += svgEndG()
 	g.SetInnerHTML(html)
+
+	svgCallbackQuery("#incoming", func(evt dom.Event) {
+		el := evt.Target()
+		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+		if id > 0 {
+			doBBReceive(game, id)
+		}
+	})
 
 	if allTheThings {
 		// All the things are yet to be done

@@ -222,7 +222,7 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	html += svgHelpBtn()
 
 	html += `<g id=fire>`
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="fire-button" data-id=100></rect>`
 	html += "\n"
 	html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
 	html += svgText(50, 97, "text__carryon text__middle", "Fire")
@@ -351,5 +351,121 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 				}
 			}
 		})
+	}
+}
+
+func doBBReceive(game *shared.Game, id int) {
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
+	g := c.QuerySelector("[name=g-main]")
+	html := ""
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game, "BBReceive")
+	print("phaseBBReceive")
+
+	team := "blue"
+	cmds := game.BlueCmd
+	if game.Red {
+		team = "red"
+		cmds = game.RedCmd
+	}
+
+	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Incoming!")
+	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
+	html += svgHelpBtn()
+
+	x := 0
+	y := 20
+	count := 0
+	ids := []int{}
+	for _, v := range cmds {
+		if v.PlayerID == Session.UserID {
+			// is under my command
+			html += svgG(v.ID)
+			html += svgButton(x, y, 100, 10, "console-corps-button", "text__1x text__"+team, v.Name)
+			html += svgEndG()
+			count++
+			ids = append(ids, v.ID)
+		}
+	}
+
+	g.SetInnerHTML(html)
+
+	svgCallbackQuery("#help", func(dom.Event) {
+		loadTemplate("bombardment", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=bombardment]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
+	})
+
+	for _, v := range ids {
+		svgCallback(v, func(evt dom.Event) {
+			el := evt.Target()
+			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
+			cmd := game.GetCmd(team, uid)
+			print("click on cmd", cmd)
+			doBBReceive2(game, cmd, id)
+		})
+	}
+}
+
+func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int) {
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
+	g := c.QuerySelector("[name=g-main]")
+	html := ""
+
+	consoleSetViewBox(game, 100, 100, false)
+	consolePhaseBusy(game, "BBReceive2")
+	print("phaseBBReceive2")
+
+	team := "blue"
+	if game.Red {
+		team = "red"
+	}
+
+	html += `<g id=back>`
+	html += svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Incoming!")
+	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
+	html += `</g>`
+	html += svgHelpBtn()
+
+	yoffset := 0
+	for _, v := range cmd.Units {
+		if v.UType == shared.UnitDiv {
+			html += svgG(v.ID)
+			html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
+			html += svgEndG()
+			yoffset += 11
+		}
+	}
+	g.SetInnerHTML(html)
+
+	svgCallbackQuery("#back", func(dom.Event) {
+		doBBReceive(game, id)
+	})
+
+	svgCallbackQuery("#help", func(dom.Event) {
+		loadTemplate("bombardment", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=bombardment]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
+	})
+
+	for _, v := range cmd.Units {
+		if v.UType == shared.UnitDiv {
+			svgCallback(v.ID, func(evt dom.Event) {
+				el := evt.Target()
+				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				cmd := game.GetCmd(team, id)
+				print("click on unit", cmd)
+			})
+		}
 	}
 }

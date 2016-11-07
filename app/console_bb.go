@@ -552,6 +552,22 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 			print("done", selectedElement)
 			// TODO - signal backend that incoming bombardment hits uint X
 			// then go back to main page
+			go func() {
+				done := false
+				err := RPC("GameRPC.ComputeBombard", shared.BombardData{
+					Channel: Session.Channel,
+					GameID:  game.ID,
+					ID:      id,
+					Bombard: &shared.Bombard{
+						TargetUID: selectedElement,
+					},
+				}, &done)
+				if err != nil {
+					print(err.Error())
+				} else {
+					print("looks to be done ... wait here till the result comes back")
+				}
+			}()
 		} else {
 			print("nothing selected yet")
 		}

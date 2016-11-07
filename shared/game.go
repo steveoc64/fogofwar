@@ -753,7 +753,24 @@ func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) int {
 	println("unit", u.UType)
 	switch u.UType {
 	case UnitDiv:
-		return pts / 50
+		die := rand.Intn(60)
+		if die < pts {
+			if die < pts/2 {
+				if die < pts/8 {
+					println("Commander Killed", u.Name)
+					return 1
+				} else {
+					println("Commander Badly Wounded", u.Name)
+					return 1
+				}
+			} else {
+				println("Commander Slightly Injured", u.Name)
+				return 0
+			}
+		} else {
+			println("Commander Escapes Injury", u.Name)
+			return 0
+		}
 	case UnitBde, UnitSpecial:
 		if sk {
 			return (pts / 2) * 3
@@ -764,6 +781,21 @@ func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) int {
 	case UnitCav:
 		m = (pts / 2) * 3
 	case UnitGun:
+		if pts < 12 {
+			die := rand.Intn(10)
+			if die < 5 {
+				if die == 0 {
+					println("Ammo supply hit - Bty out of Action", u.Name)
+					return 1
+				} else {
+					println("Gun Somewhat damaged", u.Name)
+					return 0
+				}
+			} else {
+				println("Guns not damaged", u.Name)
+				return 0
+			}
+		}
 		return pts / 12
 	}
 	if col {

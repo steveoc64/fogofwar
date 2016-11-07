@@ -165,10 +165,10 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			// pick a random victim
 			victim := subUnits[rand.Intn(len(subUnits))]
 			println("Actual Victim that takes the hit:", victim.Path, victim.ID, victim.UType, victim.Name, victim.Path)
-			println("Regular troops in 3 ranks damage =", target.PtsToMen(pts, 3, false, false))
-			println("If in column damage =", target.PtsToMen(pts, 3, true, false))
-			println("If in skirmish order damage =", target.PtsToMen(pts, 3, false, true))
-			println("If in 2 ranks damage =", target.PtsToMen(pts, 2, false, false))
+			println("Regular troops in 3 ranks damage =", victim.PtsToMen(pts, 3, false, false))
+			println("If in column damage =", victim.PtsToMen(pts, 3, true, false))
+			println("If in skirmish order damage =", victim.PtsToMen(pts, 3, false, true))
+			println("If in 2 ranks damage =", victim.PtsToMen(pts, 2, false, false))
 		}
 	}
 

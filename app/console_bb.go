@@ -125,12 +125,12 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 			ids = append(ids, v.ID)
 			html += svgG(v.ID)
 			if total > 4 {
-				if v.Bombard == nil {
+				if v.Bombard == nil || v.Bombard.ID == 0 {
 					html += svgButton(x, y, 48, 15, "console-corps-button", "", "")
 				} else {
 					html += svgButton(x, y, 48, 15, "console-corps-disabled", "", "")
-					html += fmt.Sprintf(`<circle class=help-button cx=%d cy=%d r=5></circle><text x=%d y=%d class="text__gold text__2x">%d</text>`,
-						x+42, y+6, x+40, y+8, v.Bombard.ID)
+					html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=%d r=5></circle><text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>`,
+						v.ID, x+42, y+6, v.ID, x+40, y+8, v.Bombard.ID)
 				}
 				html += svgText(x+3, y+5, "text__1x text__"+team, divName)
 				html += svgText(x+3, y+10, "text__0x text__"+team, v.Name)
@@ -143,12 +143,12 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 					y += 16
 				}
 			} else {
-				if v.Bombard == nil {
+				if v.Bombard == nil || v.Bombard.ID == 0 {
 					html += svgButton(x, y, 100, 15, "console-corps-button", "", "")
 				} else {
 					html += svgButton(x, y, 100, 15, "console-corps-disabled", "", "")
-					html += fmt.Sprintf(`<circle class=help-button cx=%d cy=%d r=5></circle><text x=%d y=%d class="text__gold text__2x">%d</text>`,
-						x+65, y+8, x+63, y+10, v.Bombard.ID)
+					html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=%d r=5></circle><text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>`,
+						v.ID, x+65, y+8, v.ID, x+63, y+10, v.Bombard.ID)
 				}
 				html += svgText(x+3, y+6, "text__1x text__"+team, divName)
 				html += svgText(20+x+3, y+12, "text__middle text__0x text__"+team, v.Name)
@@ -190,7 +190,24 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			unit := game.GetUnit(team, id)
 			print("unit", team, id, unit)
-			doBB3(game, cmd, unit)
+			if unit.Bombard != nil && unit.Bombard.ID != 0 {
+				if w.Confirm("Cancel this Fire Mission ?") {
+					go func() {
+						done := false
+						err := RPC("GameRPC.CancelShot", shared.BombardData{
+							Channel: Session.Channel,
+							GameID:  game.ID,
+							ID:      unit.Bombard.ID,
+							Bombard: unit.Bombard,
+						}, &done)
+						if err != nil {
+							print(err.Error())
+						}
+					}()
+				}
+			} else {
+				doBB3(game, cmd, unit)
+			}
 		})
 	}
 }

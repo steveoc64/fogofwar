@@ -100,7 +100,7 @@ func (s *GlobalSessionData) Navigate(url string) {
 	if s.TeamsChanged || s.TilesChanged {
 		s.SynchEditGame()
 	}
-	print("Navigate to", url)
+	// print("Navigate to", url)
 	// On navigate, clear out any subscriptions on events
 	locstor.SetItem("navigate", url)
 	s.Subscriptions = make(map[string]MessageFunction)

@@ -436,6 +436,36 @@ func (g *GameRPC) Bombard(data shared.BombardData, retval *shared.Bombard) error
 	return err
 }
 
+func (g *GameRPC) CancelShot(data shared.BombardData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.SQL(`delete from bombard where id=$1`, data.ID).Exec()
+	// Send message to the play-goroutine to add this bombard to the list
+	if err == nil {
+		if play, ok := Plays[data.GameID]; ok {
+			play <- PlayMessage{
+				Game:     data.GameID,
+				PlayerID: conn.UserID,
+				OpCode:   BombardCancel,
+				Data:     data.Bombard,
+			}
+		} else {
+			err = errors.New("Invalid Game ID")
+		}
+	}
+
+	logger(start, "Game.CancelShot", conn,
+		fmt.Sprintf("Game %d ID %d", data.GameID, data.ID), "")
+
+	if err == nil {
+		*done = true
+	}
+
+	return err
+}
 func (g *GameRPC) GetUnit(data shared.GameRPCData, retval *shared.Unit) error {
 	start := time.Now()
 
@@ -501,6 +531,7 @@ func (g *GameRPC) GetIncomingBombard(data shared.BombardData, retval *string) er
 
 	return err
 }
+
 func (g *GameRPC) UnitRole(data shared.UnitRoleData, done *bool) error {
 	start := time.Now()
 

@@ -23,6 +23,7 @@ const (
 	PlayerDisconnected
 	PlayersChanged
 	BombardAdd
+	BombardCancel
 	BombardSetTarget
 	BombardDispute
 )
@@ -320,6 +321,9 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case BombardAdd:
 				fmt.Fprintf(fp, "Player Requests Fire Mission\n")
 				bombardAdd(state, m)
+			case BombardCancel:
+				fmt.Fprintf(fp, "Fire Mission Cancel\n")
+				bombardCancel(state, m)
 			case BombardDispute:
 			case BombardSetTarget:
 			case PlayerPhaseBusy:
@@ -341,13 +345,14 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 func bombardAdd(state *PlayState, m PlayMessage) {
 	if bb, ok := m.Data.(*shared.Bombard); ok {
 		// add to the list of bombards
+		newID := len(state.Bombards) + 1
+		bb.ID = newID
 		state.Bombards = append(state.Bombards, bb)
 		// Both players are not done till this bombard is done
 		playerDone(state, bb.TargetID, false)
 		playerDone(state, bb.FirerID, false)
 
 		// Stamp the DB with the new ID of the bombardment
-		newID := len(state.Bombards)
 		fmt.Fprintf(state.Log, "Register Bombardment %d\n", newID)
 		DB.SQL(`update bombard set id=$2 where unit_id=$1`, bb.UnitID, newID).Exec()
 
@@ -356,6 +361,26 @@ func bombardAdd(state *PlayState, m PlayMessage) {
 
 		// signal the firer that we have a new target identification ID for them, all they need
 		// to do is re-get the unit info
+		Connections.BroadcastPlayer(bb.FirerID, "Play", "BB", bb.UnitID)
+	}
+}
+
+func bombardCancel(state *PlayState, m PlayMessage) {
+	if bb, ok := m.Data.(*shared.Bombard); ok {
+		// find the offending bombard and cancel it
+		for i, v := range state.Bombards {
+			if v.ID == bb.ID {
+				fmt.Fprintf(state.Log, "Removing Bombardment %d\n", bb.ID)
+				state.Bombards = append(state.Bombards[:i], state.Bombards[i+1:]...)
+				break
+			}
+		}
+
+		// signal target player that they have 1 less incoming
+		Connections.BroadcastPlayer(bb.TargetID, "Play", "IncomingCancel", bb.ID)
+
+		// signal the firer that we have removed the BB, which triggers a refresh of their
+		// fire mission page
 		Connections.BroadcastPlayer(bb.FirerID, "Play", "BB", bb.UnitID)
 	}
 }
@@ -523,7 +548,8 @@ func hasBombards(state *PlayState, pid int) bool {
 	for _, v := range state.Game.RedPlayers {
 		if v.PlayerID == pid {
 			for _, b := range state.Bombards {
-				if b.TargetID == pid || b.FirerID == pid {
+				if b.ID != 0 && (b.TargetID == pid || b.FirerID == pid) {
+					println("BB", b.ID, b.TargetID, b.FirerID)
 					return true
 				}
 			}
@@ -533,6 +559,7 @@ func hasBombards(state *PlayState, pid int) bool {
 		if v.PlayerID == pid {
 			for _, b := range state.Bombards {
 				if b.TargetID == pid || b.FirerID == pid {
+					println("BB", b.ID, b.TargetID, b.FirerID)
 					return true
 				}
 			}

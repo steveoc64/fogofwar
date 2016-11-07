@@ -174,6 +174,17 @@ func play(context *router.Context) {
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}
+			case "IncomingCancel":
+				print("an incoming fire mission has been cancelled - that the Lord", actionID)
+				for i, v := range incoming {
+					if v == actionID {
+						incoming = append(incoming[:i], incoming[i+1:]...)
+						break
+					}
+				}
+				if !game.PhaseBUSY {
+					doTurnSummary(game)
+				}
 			case "Unit":
 				print("unit has changed", actionID)
 				go func() {
@@ -191,7 +202,7 @@ func play(context *router.Context) {
 					}
 				}()
 			case "BB":
-				print("Bombardment target ID has been aquired for unit", actionID)
+				print("Bombardment target ID has been aquired or dropped for unit", actionID)
 				go func() {
 					newUnit := shared.Unit{}
 					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
@@ -225,7 +236,7 @@ func play(context *router.Context) {
 			case "Units":
 				doUnits(game)
 			case "Game":
-				doTurnSummary(game)
+				consolePhaseNotBusy(game)
 			}
 		}
 		doDisplayPanel(consoleCurrentPanel)

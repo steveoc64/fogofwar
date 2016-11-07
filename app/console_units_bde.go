@@ -290,6 +290,11 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			if el.TagName() == "text" {
+				// deselect all
+				m := doc.QuerySelector("[name=g-main]")
+				for _, sel := range m.QuerySelectorAll("text") {
+					sel.Class().Remove("unit-selected")
+				}
 				el.Class().Toggle("unit-selected")
 				selectedElement = id
 			}

@@ -748,6 +748,30 @@ type Unit struct {
 	Bombard          *Bombard
 }
 
+func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) int {
+	m := 0
+	println("unit", u.UType)
+	switch u.UType {
+	case UnitDiv:
+		return pts / 50
+	case UnitBde, UnitSpecial:
+		if sk {
+			return (pts / 2) * 3
+		}
+		if ranks > 2 {
+			m = pts * 5
+		}
+	case UnitCav:
+		m = (pts / 2) * 3
+	case UnitGun:
+		return pts / 12
+	}
+	if col {
+		return (m * 125) / 100
+	}
+	return m
+}
+
 func (u *Unit) GetShortSummary(corps *GameCmd) string {
 	return u.GetLongSummary(corps, false)
 }

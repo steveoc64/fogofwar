@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"../shared"
@@ -123,18 +124,117 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 	start := time.Now()
 
 	*done = false
-
 	conn := Connections.Get(data.Channel)
 
+	target := &shared.Unit{}
+	firer := &shared.Unit{}
 	bb := &shared.Bombard{}
-	err := DB.SQL(`select * from bombard where id=$1`, data.ID).QueryStruct(bb)
+	pts := 0
+
+	subUnits := []shared.Unit{}
+
+	err := DB.SQL(`select * from unit where id=$1`, data.Bombard.TargetUID).QueryStruct(target)
+	if err != nil {
+		println(err.Error())
+	} else {
+		DB.SQL(`select * from unit where path <@ $1 and game_id=$2 and cmd_id=$3`,
+			target.Path,
+			target.GameID,
+			target.CmdID).QueryStructs(&subUnits)
+		println("Main target formation is ", target.Path)
+		err = DB.SQL(`select * from bombard where id=$1`, data.ID).QueryStruct(bb)
+		// fmt.Printf("bb %d %v\n", data.ID, *bb)
+		if err != nil {
+			println(err.Error())
+		} else {
+
+			err = DB.SQL(`select * from unit where id=$1`, bb.UnitID).QueryStruct(firer)
+			if err != nil {
+				println(err.Error())
+			}
+			guns := 0
+			gtype := 0
+			err = DB.SQL(`select guns,gunnery_type from unit where id=$1`, bb.UnitID).QueryScalar(&guns, &gtype)
+
+			// Take 1 shot at the min range, and 2 shots at the max range
+			pts = gunShotGood(guns, gtype, bb.RangeMin)
+			pts += gunShotGood(guns, gtype, bb.RangeMax)
+			pts += gunShotGood(guns, gtype, bb.RangeMax)
+			println("total damage points", pts)
+
+			// pick a random victim
+			victim := subUnits[rand.Intn(len(subUnits))]
+			println("Actual Victim that takes the hit:", victim.Path, victim.ID, victim.UType, victim.Name, victim.Path)
+			println("Regular troops in 3 ranks damage =", target.PtsToMen(pts, 3, false, false))
+			println("If in column damage =", target.PtsToMen(pts, 3, true, false))
+			println("If in skirmish order damage =", target.PtsToMen(pts, 3, false, true))
+			println("If in 2 ranks damage =", target.PtsToMen(pts, 2, false, false))
+		}
+	}
 
 	logger(start, "Game.ComputeBombard", conn,
 		fmt.Sprintf("Game %d ID %d", data.GameID, data.ID),
-		fmt.Sprintf("%v", *bb))
+		fmt.Sprintf("%d Pts damage", pts))
 
 	if err == nil {
 		*done = true
 	}
 	return err
+}
+
+type GunTables struct {
+	GunneryType int
+	Name        string
+	MaxRange    int
+	Effect      [][]int
+}
+
+func gunShotGood(guns int, gtype int, r int) int {
+	if guns < 1 {
+		return 0
+	}
+	if gtype < 1 || gtype > 5 {
+		return 0
+	}
+	if r < 1 || r > 5 {
+		return 0
+	}
+	mult := float64(guns) / 8.0
+	die := rand.Intn(6)
+	table := shotGoodEffect[gtype-1]
+	effects := table.Effect[r-1]
+	return int(float64(effects[die]) * mult)
+}
+
+var shotGoodEffect = []GunTables{
+	{1, "12lb", 5, [][]int{
+		{20, 13, 8, 13, 13, 8},
+		{14, 10, 5, 9, 9, 5},
+		{7, 5, 5, 3, 3, 3},
+		{7, 5, 5, 3, 3, 3},
+		{4, 3, 2, 3, 3, 2}}},
+	{2, "9lb", 5, [][]int{
+		{15, 11, 7, 14, 13, 9},
+		{10, 8, 5, 11, 9, 6},
+		{5, 3, 3, 4, 4, 2},
+		{4, 3, 2, 7, 3, 2},
+		{0, 1, 0, 0, 2, 0}}},
+	{3, "6lb", 4, [][]int{
+		{12, 10, 6, 16, 12, 10},
+		{8, 7, 4, 11, 8, 7},
+		{3, 2, 2, 5, 3, 2},
+		{4, 3, 2, 6, 3, 2},
+		{0, 0, 0, 0, 0, 0}}},
+	{4, "Light", 3, [][]int{
+		{8, 5, 4, 9, 8, 6},
+		{3, 2, 2, 5, 3, 2},
+		{2, 1, 0, 1, 2, 0},
+		{0, 0, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 0}}},
+	{5, "Howitzer", 4, [][]int{
+		{8, 5, 5, 6, 3, 6},
+		{8, 5, 5, 6, 3, 6},
+		{6, 4, 4, 5, 2, 5},
+		{3, 2, 2, 2, 1, 2},
+		{0, 0, 0, 0, 0, 0}}},
 }

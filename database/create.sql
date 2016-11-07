@@ -465,7 +465,8 @@ create  table game_cmd (
 	cy int not null default -1,
 	dx int not null default -1,
 	dy int not null default -1,
-	prep_defence bool not null default false
+	prep_defence bool not null default false,
+	contact bool not null default false
 );
 \i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);
@@ -542,11 +543,28 @@ create  table unit (
 	horse_guns bool not null default false,
 	gun_max_condition int not null default 2,
 	gun_condition int not null default 2,
-	mstate int not null default -1    -- -1 pregame, otherwise, num 2min turns till recovered
+	mstate int not null default -1,    -- -1 pregame, otherwise, num 2min turns till recovered
+	role int not null default 0, 
+	d_role int not null default 0,
+	orders int not null default 0
 );
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);
 create index unit_game_idx on unit (game_id);
+
+drop table if exists bombard;
+create unlogged table bombard (
+	unit_id int not null primary key,
+	id int not null default 1,
+	game_id int not null,
+	firer_id int not null,
+	target_id int not null,
+	target_uid int not null default 0,
+	range_max int not null default 0, 
+	range_min int not null default 0,
+	disputed bool not null default false
+);
+create index bombard_player on bombard (target_id);
 
 drop table if exists contact_message;
 create table contact_message (

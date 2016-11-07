@@ -1178,5 +1178,13 @@ type Bombard struct {
 
 type BombardData struct {
 	Channel int
+	GameID  int
+	ID      int
 	Bombard *Bombard
+}
+
+type UnitRoleData struct {
+	Channel int
+	ID      int
+	Role    int
 }

@@ -35,13 +35,12 @@ func doTurnSummary(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+	g := c.QuerySelector("[name=g-main]")
+	html := ""
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseNotBusy(game)
 
 	// Add a turn summary object
-	g := c.QuerySelector("[name=g-main]")
-	// print("doing turn summary")
 
 	team := "blue"
 	if game.Red {
@@ -49,8 +48,6 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	title, phaseName, confirmText, doneText := getPhaseDescription(game.Phase)
-	// print("here with ", title, phaseName, game)
-	html := ""
 	if game.Turn > 0 {
 		turn := fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)
 		html += svgText(0, 10, "text__2x text__"+team, turn)
@@ -107,7 +104,21 @@ func doTurnSummary(game *shared.Game) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 		if id > 0 {
-			doBBReceive(game, id)
+			go func() {
+				bb := ""
+				err := RPC("GameRPC.GetIncomingBombard", shared.BombardData{
+					Channel: Session.Channel,
+					GameID:  game.ID,
+					ID:      id,
+				}, &bb)
+				if err != nil {
+					print(err.Error())
+				} else {
+					print("got bb", bb)
+					doBBReceive(game, id, bb)
+				}
+
+			}()
 		}
 	})
 

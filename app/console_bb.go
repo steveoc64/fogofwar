@@ -354,7 +354,7 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	}
 }
 
-func doBBReceive(game *shared.Game, id int) {
+func doBBReceive(game *shared.Game, id int, bb string) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -373,7 +373,7 @@ func doBBReceive(game *shared.Game, id int) {
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming! (%d)", id))
-	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
+	html += svgText(0, 18, fmt.Sprintf("text__1x text__%s", team), bb)
 	html += svgHelpBtn()
 
 	x := 0
@@ -408,12 +408,12 @@ func doBBReceive(game *shared.Game, id int) {
 			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			cmd := game.GetCmd(team, uid)
 			print("click on cmd", cmd)
-			doBBReceive2(game, cmd, id)
+			doBBReceive2(game, cmd, id, bb)
 		})
 	}
 }
 
-func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int) {
+func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -421,35 +421,142 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int) {
 	html := ""
 
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "BBReceive2")
-	print("phaseBBReceive2")
+	consolePhaseBusy(game, "UnitReorg")
 
 	team := "blue"
 	if game.Red {
 		team = "red"
 	}
 
-	html += `<g id=back>`
-	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming! (%d)", id))
-	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), "Select Target Unit:")
-	html += `</g>`
+	html += svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming (%d)", id))
+	html += svgText(0, 18, "text__1x text__"+team, bb)
 	html += svgHelpBtn()
 
-	yoffset := 0
+	// draw the grid of role locations
+
+	html += `
+<g id=layout>
+<rect data-id=res x=0 y=20 width=100 height=65 class=unit-layout></rect>
+<rect data-id=adv x=30 y=20 width=40 height=15 class=unit-layout></rect>
+<rect data-id=first x=30 y=35 width=40 height=15 class=unit-layout></rect>
+<rect data-id=second x=30 y=50 width=40 height=15 class=unit-layout></rect>
+<rect data-id=left x=0 y=35 width=30 height=30 class=unit-layout></rect>
+<rect data-id=right x=70 y=35 width=30 height=30 class=unit-layout></rect>
+</g>
+`
+
+	adv := 0
+	first := 0
+	second := 0
+	right := 0
+	left := 0
+	res := 0
+	x := 0
+	y := 0
+	selectedElement := 0
+
+	// render all the things
 	for _, v := range cmd.Units {
 		if v.UType == shared.UnitDiv {
-			html += svgG(v.ID)
-			html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
-			html += svgEndG()
-			yoffset += 11
+			switch v.Role {
+			case shared.RoleReserve:
+				if (res % 2) != 0 {
+					x = 50
+				} else {
+					x = 0
+				}
+				x += 2
+				y = 70 + (res/2)*7
+
+				html += svgG(v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				res++
+			case shared.RoleAdvance:
+				x = 32
+				y = 25
+				html += svgG(v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				adv++
+			case shared.Role1:
+				x = 32
+				y = 40
+				if first == 1 {
+					x += 2
+					y += 6
+				}
+				html += svgG(v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				first++
+			case shared.Role2:
+				x = 32
+				y = 55
+				if second == 1 {
+					x += 2
+					y += 6
+				}
+				html += svgG(v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				second++
+			case shared.RoleRight:
+				x = 75
+				y = 50
+				// html += svgG(v.ID)
+				svgID = v.ID
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,80,50)>`, v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				right++
+			case shared.RoleLeft:
+				x = -5
+				y = 50
+				// html += svgG(v.ID)
+				svgID = v.ID
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+				html += svgText(x, y, "text__unit", v.Name)
+				html += svgEndG()
+				left++
+			}
 		}
 	}
+
+	html += svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Done")
+	html += svgEndG()
 	g.SetInnerHTML(html)
 
-	svgCallbackQuery("#back", func(dom.Event) {
-		doBBReceive(game, id)
+	svgCallback(100, func(dom.Event) {
+		if selectedElement != 0 {
+			print("done", selectedElement)
+			// TODO - signal backend that incoming bombardment hits uint X
+			// then go back to main page
+		} else {
+			print("nothing selected yet")
+		}
 	})
+
+	for _, v := range cmd.Units {
+		if v.UType == shared.UnitDiv {
+			svgCallback(v.ID, func(evt dom.Event) {
+				el := evt.Target()
+				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				if el.TagName() == "text" {
+					// deselect all
+					m := doc.QuerySelector("[name=g-main]")
+					for _, sel := range m.QuerySelectorAll("text") {
+						sel.Class().Remove("unit-selected")
+					}
+					el.Class().Toggle("unit-selected")
+					selectedElement = id
+				}
+			})
+		}
+	}
 
 	svgCallbackQuery("#help", func(dom.Event) {
 		loadTemplate("bombardment", "#unit-details", nil)
@@ -458,15 +565,4 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int) {
 			doc.QuerySelector("#unit-details").Class().Remove("md-show")
 		})
 	})
-
-	for _, v := range cmd.Units {
-		if v.UType == shared.UnitDiv {
-			svgCallback(v.ID, func(evt dom.Event) {
-				el := evt.Target()
-				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				cmd := game.GetCmd(team, id)
-				print("click on unit", cmd)
-			})
-		}
-	}
 }

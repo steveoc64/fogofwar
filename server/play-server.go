@@ -468,3 +468,53 @@ func (g *GameRPC) GetIncoming(data shared.GameRPCData, retval *[]int) error {
 
 	return err
 }
+
+func (g *GameRPC) GetIncomingBombard(data shared.BombardData, retval *string) error {
+	start := time.Now()
+
+	conn := Connections.Get(data.Channel)
+
+	guns := 0
+	gtype := ""
+	rmax := 0
+	rmin := 0
+	err := DB.SQL(`select u.guns,gt.name,b.range_min,b.range_max
+		from bombard b
+			left join unit u on u.id=b.unit_id
+			left join gunnery gt on gt.id=u.gunnery_type
+		where b.game_id=$1 and b.id=$2`, data.GameID, data.ID).
+		QueryScalar(&guns, &gtype, &rmin, &rmax)
+
+	str := ""
+	if err == nil && guns > 0 && gtype != "" {
+		str = fmt.Sprintf("%d Guns of %s", guns, gtype)
+		if rmax != rmin {
+			str += fmt.Sprintf(" from %d-%dm", rmin*400, rmax*400)
+		} else {
+			str += fmt.Sprintf(" at %dm", rmax*400)
+		}
+		*retval = str
+	}
+
+	logger(start, "Game.GetIncomingBombard", conn,
+		fmt.Sprintf("Game %d ID %d", data.GameID, data.ID), *retval)
+
+	return err
+}
+func (g *GameRPC) UnitRole(data shared.UnitRoleData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.SQL(`update unit set role=$2 where id=$1`, data.ID, data.Role).Exec()
+
+	logger(start, "Game.UnitRole", conn,
+		fmt.Sprintf("ID %d Role %d", data.ID, data.Role), "")
+
+	if err == nil {
+		*done = true
+	}
+
+	return err
+}

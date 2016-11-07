@@ -41,7 +41,7 @@ func doTurnSummary(game *shared.Game) {
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
-	print("doing turn summary")
+	// print("doing turn summary")
 
 	team := "blue"
 	if game.Red {
@@ -49,7 +49,7 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	title, phaseName, confirmText, doneText := getPhaseDescription(game.Phase)
-	print("here with ", title, phaseName, game)
+	// print("here with ", title, phaseName, game)
 	html := ""
 	if game.Turn > 0 {
 		turn := fmt.Sprintf("Turn %d of %d", game.Turn, game.TurnLimit)

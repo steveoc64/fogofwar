@@ -35,6 +35,8 @@ func consolePhaseBusy(game *shared.Game, with string) {
 }
 
 func consolePhaseNotBusy(game *shared.Game) {
+	// print("phase not busy", consoleCurrentPanel)
+	// debug.PrintStack()
 	go func() {
 		done := false
 		err := RPC("GameRPC.PhaseNotBusy", shared.PhaseDoneMsg{

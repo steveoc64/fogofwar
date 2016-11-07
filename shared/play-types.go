@@ -45,6 +45,25 @@ const (
 	UnitSpecial
 )
 
+// Unit Roles
+const (
+	RoleReserve int = iota
+	RoleAdvance
+	Role1
+	Role2
+	RoleRight
+	RoleLeft
+)
+
+// Unit Orders
+const (
+	OrdersReserve int = iota
+	OrdersAttack
+	OrdersDefend
+	OrdersSupport
+	OrdersWithdraw
+)
+
 type CmdOrder struct {
 	Channel int
 	ID      int // ID of the gamecmd

@@ -154,6 +154,25 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			if err != nil {
 				println(err.Error())
 			}
+
+			// Update the firer
+			firer.Ammo--
+			if firer.Ammo < 1 {
+				firer.Ammo = 0
+			}
+			DB.SQL(`update unit set ammo=$2,guns_fired=true where id=$1`, firer.ID, firer.Ammo).Exec()
+			Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{
+				Action: "Unit",
+				ID:     firer.ID,
+				Opcode: shared.UnitEventFired,
+				Unit: &shared.UnitEvent{
+					ID:          firer.ID,
+					Description: "Fired",
+					Ammo:        firer.Ammo,
+					GunsFired:   true,
+				},
+			})
+
 			guns := 0
 			gtype := 0
 			err = DB.SQL(`select guns,gunnery_type from unit where id=$1`, bb.UnitID).QueryScalar(&guns, &gtype)
@@ -189,15 +208,33 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 
 			victim := subUnits[prospects[rand.Intn(len(prospects))]]
 			pts = gunShot(guns, gtype, bb.RangeMin, true)
-			applyGunDamage(victim, targetCorps, pts)
+			event := applyGunDamage(victim, targetCorps, pts)
+			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
+				Action: "Unit",
+				ID:     victim.ID,
+				Opcode: shared.UnitEventHits,
+				Unit:   &event,
+			})
 
 			victim = subUnits[prospects[rand.Intn(len(prospects))]]
 			pts = gunShot(guns, gtype, bb.RangeMax, true)
-			applyGunDamage(victim, targetCorps, pts)
+			event = applyGunDamage(victim, targetCorps, pts)
+			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
+				Action: "Unit",
+				ID:     victim.ID,
+				Opcode: shared.UnitEventHits,
+				Unit:   &event,
+			})
 
 			victim = subUnits[prospects[rand.Intn(len(prospects))]]
 			pts = gunShot(guns, gtype, bb.RangeMax, true)
-			applyGunDamage(victim, targetCorps, pts)
+			event = applyGunDamage(victim, targetCorps, pts)
+			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
+				Action: "Unit",
+				ID:     victim.ID,
+				Opcode: shared.UnitEventHits,
+				Unit:   &event,
+			})
 
 			// pick a random victim
 			// println("Actual Victim that takes the hit:", victim.Path, victim.ID, victim.UType, victim.Name, victim.Path)
@@ -218,12 +255,57 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 	return err
 }
 
-func applyGunDamage(unit *shared.Unit, cmd *shared.GameCmd, pts int) {
+func applyGunDamage(unit *shared.Unit, cmd *shared.GameCmd, pts int) shared.UnitEvent {
 
 	inColumn := cmd.CState == shared.CmdMarchOrder
 
 	m, c, g, s := unit.PtsToMen(pts, 3, inColumn, false)
 	println("Gun Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
+
+	switch unit.UType {
+	case shared.UnitDiv:
+		unit.CommanderControl--
+		if c > 0 {
+			unit.CommanderControl = 1
+		}
+		if unit.CommanderControl < 1 {
+			unit.CommanderControl = 1
+		}
+	case shared.UnitBde, shared.UnitSpecial:
+		unit.BayonetsLost += m
+		if unit.BayonetsLost > unit.Bayonets {
+			unit.BayonetsLost = unit.Bayonets
+		}
+	case shared.UnitCav:
+		unit.SabresLost += m
+		if unit.SabresLost > unit.Sabres {
+			unit.SabresLost = unit.Sabres
+		}
+	case shared.UnitGun:
+		unit.GunsLost += g
+		if unit.GunsLost > unit.Guns {
+			unit.GunsLost = unit.Guns
+		}
+	}
+
+	DB.SQL(`update unit set
+		bayonets_lost=$2,
+		sabres_lost=$3,
+		guns_lost=$4,
+		commander_control=$5
+		where id=$1`,
+		unit.ID,
+		unit.BayonetsLost, unit.SabresLost, unit.GunsLost,
+		unit.CommanderControl).Exec()
+
+	return shared.UnitEvent{
+		ID:               unit.ID,
+		Description:      s,
+		CommanderControl: unit.CommanderControl,
+		BayonetsLost:     unit.BayonetsLost,
+		SabresLost:       unit.SabresLost,
+		GunsLost:         unit.GunsLost,
+	}
 }
 
 type GunTables struct {

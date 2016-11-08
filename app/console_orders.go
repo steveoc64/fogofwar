@@ -115,6 +115,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -318,6 +319,7 @@ func doNewObjective(game *shared.Game, cmd *shared.GameCmd) {
 	flipped := isFlipped(game)
 	html := ""
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, game.GridX*game.GridSize, game.GridY*game.GridSize, true)
 
 	if game.GridSize > 0 {

@@ -13,6 +13,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "UnitsDiv")
 
@@ -92,6 +93,7 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "UnitReorg")
 

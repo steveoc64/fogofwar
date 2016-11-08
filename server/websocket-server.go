@@ -341,16 +341,17 @@ type myServerCodec struct {
 func (c *myServerCodec) ReadRequestHeader(r *rpc.Request) error {
 
 	// fmt.Printf("doing custom RRH\n")
-	header := &shared.NetRequest{}
-	err := c.dec.Decode(header)
+	// header := &shared.NetRequest{}
+	// err := c.dec.Decode(header)
+	err := c.dec.Decode(r)
 	// fmt.Printf("decoded into %v\n", *header)
 	if err != nil {
 		log.Println("Dropped Connection:", err.Error(), ", connection:", c.conn.ID)
 		Connections.Drop(c.conn)
 		return err
 	}
-	r.ServiceMethod = header.ServiceMethod
-	r.Seq = header.Seq
+	// r.ServiceMethod = header.ServiceMethod
+	// r.Seq = header.Seq
 	c.conn.Mutex.Lock()
 	return err
 }

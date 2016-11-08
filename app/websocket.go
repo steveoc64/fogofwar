@@ -125,7 +125,6 @@ type myClientCodec struct {
 	enc     *gob.Encoder
 	encBuf  *bufio.Writer
 	inAsync bool
-	Header  *shared.NetResponse
 }
 
 func txOff() {
@@ -154,27 +153,26 @@ func rxOff() {
 func (c *myClientCodec) WriteRequest(r *rpc.Request, body interface{}) (err error) {
 	// print("rpc ->", r.ServiceMethod)
 	// print("wr")
+
+	// print("WR", r.ServiceMethod)
 	txOn = true
 	Lights()
 
 	defer txOff()
 
-	header := &shared.NetRequest{
-		ServiceMethod: r.ServiceMethod,
-		Seq:           r.Seq,
-	}
+	// header := &shared.NetRequest{
+	// 	ServiceMethod: r.ServiceMethod,
+	// 	Seq:           r.Seq,
+	// }
 
-	if err = c.enc.Encode(header); err != nil {
+	// if err = c.enc.Encode(header); err != nil {
+	if err = c.enc.Encode(r); err != nil {
 		return
 	}
 	if err = c.enc.Encode(body); err != nil {
 		return
 	}
 	return c.encBuf.Flush()
-}
-
-type MsgPayload struct {
-	Msg string
 }
 
 // Must implement to satisy the interface, but use our own header type
@@ -188,25 +186,31 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 
 	header := &shared.NetResponse{}
 	err := c.dec.Decode(header)
-	c.Header = header
-	// print("Got header", header.ServiceMethod)
+	// print("Got header", header.ServiceMethod, header.Error, header.Async)
+	// fmt.Printf("seq %d\n", header.Seq)
 	r.ServiceMethod = header.ServiceMethod
 	r.Seq = header.Seq
 	r.Error = header.Error
+	if header.Async {
+		r.Seq = 0
+	}
 
 	// print("rrh - got a header, start reading body")
 	rxOn = true
-	// Lights()
+	Lights()
 
 	// print("rpc header <-", r)
 	if err != nil {
 		// print("init header gets", err.Error())
 		// Try again, in case there is an extra msg to be gobbled
-		if err != nil && err.Error() == "extra data in buffer" {
+		if err.Error() == "extra data in buffer" {
 			err = c.dec.Decode(header)
 			// print("ReRead header", header.ServiceMethod)
 			r.ServiceMethod = header.ServiceMethod
 			r.Seq = header.Seq
+			if header.Async {
+				r.Seq = 0
+			}
 			r.Error = header.Error
 		} else {
 			print("fatal decode error", err.Error())
@@ -214,6 +218,7 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 
 		if err != nil {
 			print("rpc error", err)
+			return err
 			// force application reload
 			// go autoReload()
 		}
@@ -222,14 +227,66 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 	// if async then process the message immediately
 	if header.Async {
 		// println("looks like an Async message")
+		data := &shared.NetData{}
+		err = c.dec.Decode(data)
+		processAsync(header, data)
+		c.inAsync = false
+
 		// data := &shared.NetData{}
 		// c.ReadResponseBody(data)
-		c.inAsync = true
+		// c.inAsync = true
 		// processAsync(header, data)
 		txOn = false
-		// Lights()
+		Lights()
 	}
 	return err
+}
+
+func (c *myClientCodec) ReadResponseBody(body interface{}) error {
+
+	// print("RRB")
+	err := error(nil)
+	if body == nil {
+		// print("read with nil body async=", c.inAsync)
+		c.inAsync = false
+		return nil
+	}
+	// print("RPC response", body)
+	err = c.dec.Decode(body)
+	if err != nil {
+		if err.Error() == "extra data in buffer" {
+			// print("try to read again")
+			err = c.dec.Decode(body)
+		} else {
+			print(err.Error())
+		}
+	}
+	txOff()
+	return err
+}
+
+func (c *myClientCodec) Close() error {
+	print("calling close")
+	return c.rwc.Close()
+}
+
+func processAsync(header *shared.NetResponse, msg *shared.NetData) {
+
+	print("process async", header.ServiceMethod, msg.Action)
+
+	switch msg.Action {
+	case "Ping":
+		Session.Channel = msg.ID
+		// print("Set channel to", Session.Channel)
+	case "PingRPC.Ping":
+		// print("Keepalive")
+	default:
+		print("General Msg", msg)
+		fn := Session.Subscriptions[header.ServiceMethod]
+		if fn != nil {
+			go fn(msg.Action, msg, Session.Context)
+		}
+	}
 }
 
 func autoReloadFull() {
@@ -385,71 +442,5 @@ func autoReload() {
 			}
 			isReconnecting = false
 		}()
-	}
-}
-
-func (c *myClientCodec) ReadResponseBody(body interface{}) error {
-
-	// print("RRB")
-	err := error(nil)
-	if body == nil {
-		// print("force read with nil body", c.inAsync)
-		if c.inAsync {
-			data := &shared.NetData{}
-			err = c.dec.Decode(data)
-			processAsync(c.Header, data)
-			c.inAsync = false
-			return err
-		} else {
-			thing := ""
-			c.dec.Decode(&thing)
-		}
-		return nil
-	}
-	if c.inAsync {
-		// print("async message not nil")
-		data := &shared.NetData{}
-		err = c.dec.Decode(data)
-		processAsync(c.Header, data)
-		c.inAsync = false
-	} else {
-		// print("RPC response", body)
-		err = c.dec.Decode(body)
-		if err != nil {
-			if err.Error() == "extra data in buffer" {
-				// print("read again")
-				err = c.dec.Decode(body)
-			} else {
-				print(err.Error())
-			}
-		}
-	}
-	txOff()
-	return err
-}
-
-func (c *myClientCodec) Close() error {
-	print("calling close")
-	return c.rwc.Close()
-}
-
-func processAsync(header *shared.NetResponse, msg *shared.NetData) {
-
-	// print("processing async with method =", method)
-	// print("and body =", body)
-	// print("process async", msg.Action)
-
-	switch msg.Action {
-	case "Ping":
-		Session.Channel = msg.ID
-		// print("Set channel to", Session.Channel)
-	case "PingRPC.Ping":
-		// print("Keepalive")
-	default:
-		print("General Msg", msg)
-		fn := Session.Subscriptions[header.ServiceMethod]
-		if fn != nil {
-			go fn(msg.Action, msg, Session.Context)
-		}
 	}
 }

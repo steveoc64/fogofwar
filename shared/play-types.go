@@ -78,18 +78,32 @@ type GTMoveData struct {
 	Contact     bool
 }
 
+const (
+	UnitEventGeneral int = iota
+	UnitEventHits
+	UnitEventFired
+	UnitEventMoved
+	UnitEventAmmo
+	UnitEventMorale
+	UnitEventCondition
+)
+
 type UnitEvent struct {
-	ID          int
-	Opcode      int
-	Description string
-	Bayonets    int
-	Sabres      int
-	Guns        int
-	Commander   int
-	MState      int
-	CState      int
-	X           int
-	Y           int
+	ID               int
+	Opcode           int
+	Description      string
+	BayonetsLost     int
+	SabresLost       int
+	GunsLost         int
+	CommanderControl int
+	Condition        int
+	GunCondition     int
+	GunsFired        bool
+	Ammo             int
+	MState           int
+	CState           int
+	X                int
+	Y                int
 }
 
 // type Bombard struct {

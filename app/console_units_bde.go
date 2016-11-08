@@ -13,6 +13,8 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
+	consoleCurrentCmd = cmd
+	consoleCurrentUnit = div
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Bde")
 
@@ -144,6 +146,8 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
+	consoleCurrentCmd = cmd
+	consoleCurrentUnit = div
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "UnitReorg")
 

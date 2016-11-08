@@ -100,6 +100,7 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "GTCmd")
 	// print("phaseGT1 with", game)

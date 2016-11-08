@@ -90,6 +90,7 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
+	consoleCurrentCmd = cmd
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "BB2")
@@ -219,6 +220,9 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 	bb := shared.Bombard{}
+
+	consoleCurrentCmd = cmd
+	consoleCurrentUnit = unit
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "BB3")
@@ -437,6 +441,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
+	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "UnitReorg")
 

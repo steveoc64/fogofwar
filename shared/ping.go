@@ -9,11 +9,10 @@ package shared
 // }
 
 type NetData struct {
-	Action    string
-	ID        int
-	Opcode    uint64
-	Bombard   *Bombard
-	UnitEvent *UnitEvent
+	Action string
+	ID     int
+	Opcode int
+	Unit   *UnitEvent
 }
 
 type NetRequest struct {

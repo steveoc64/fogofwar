@@ -742,6 +742,7 @@ type Unit struct {
 	GunMaxCondition  int    `db:"gun_max_condition"`
 	Summary          string `db:"summary"` // derived data
 	MState           int    `db:"mstate"`  // 0 - pregame
+	Ammo             int    `db:"ammo"`
 	Role             int    `db:"role"`
 	DRole            int    `db:"d_role"`
 	Orders           int    `db:"orders"`
@@ -1002,6 +1003,9 @@ func (u *Unit) CanBombard(cmd *GameCmd) bool {
 		return false
 	}
 	if u.Guns < 1 {
+		return false
+	}
+	if u.GunsFired {
 		return false
 	}
 	// print("unit ", u.Name, "has", u.Guns, "guns")

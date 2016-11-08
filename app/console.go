@@ -16,6 +16,8 @@ type ConsolePaintData struct {
 }
 
 var consoleCurrentPanel = "Game"
+var consoleCurrentUnit *shared.Unit
+var consoleCurrentCmd *shared.GameCmd
 var consoleGame *shared.Game
 var incoming = []int{}
 
@@ -188,21 +190,22 @@ func play(context *router.Context) {
 					doTurnSummary(game)
 				}
 			case "Unit":
-				print("unit has changed", msg.ID)
-				go func() {
-					newUnit := shared.Unit{}
-					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
-						Channel: Session.Channel,
-						ID:      msg.ID,
-					}, &newUnit)
-					if err != nil {
-						print(err.Error())
-					} else {
-						// find the unit
-						oldUnit := game.GetUnit(team, msg.ID)
-						*oldUnit = newUnit
+				print("unit message", msg)
+				theUnit := game.GetUnit(team, msg.ID)
+				print("affecting unit", theUnit)
+				switch msg.Opcode {
+				case shared.UnitEventFired:
+					theUnit.Ammo = msg.Unit.Ammo
+					theUnit.GunsFired = msg.Unit.GunsFired
+					if consoleCurrentPanel == "BB2" {
+						doBB2(game, consoleCurrentCmd)
 					}
-				}()
+				case shared.UnitEventHits:
+					theUnit.BayonetsLost = msg.Unit.BayonetsLost
+					theUnit.SabresLost = msg.Unit.SabresLost
+					theUnit.GunsLost = msg.Unit.GunsLost
+					theUnit.CommanderControl = msg.Unit.CommanderControl
+				}
 			case "BB":
 				print("Bombardment target ID has been aquired or dropped for unit", msg.ID)
 				go func() {

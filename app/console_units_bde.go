@@ -356,7 +356,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			return
 		}
 		el := evt.Target()
-		print("selected and clicke on ", el.TagName(), el.GetAttribute("data-id"))
+		// print("selected and clicke on ", el.TagName(), el.GetAttribute("data-id"))
 		if el.TagName() == "rect" {
 			setSelected(el.GetAttribute("data-id"))
 		}

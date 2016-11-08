@@ -1012,6 +1012,52 @@ func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
 				println(err.Error())
 			}
 		}
+
+		// Generate initial roles for each Corps
+		corps := []*shared.GameCmd{}
+		DB.SQL(`select id from game_cmd where game_id=$1`, data.ID).QueryStructs(&corps)
+		for _, v := range corps {
+			units := []*shared.Unit{}
+			DB.SQL(`select id,utype from unit
+				where game_id=$1 and cmd_id=$2
+				order by path`, data.ID, v.ID).QueryStructs(&units)
+			unitrole := shared.Role1
+			divrole := shared.Role1
+			hasguns := false
+
+			for _, u := range units {
+				println("orders for ", u.ID, u.UType, u.Path)
+				switch u.UType {
+				case shared.UnitDiv:
+					DB.SQL(`update unit set role=$2 where id=$1`, u.ID, divrole).Exec()
+					println("div", u.ID, divrole)
+					divrole++
+					if divrole > shared.RoleLeft {
+						divrole = shared.RoleReserve
+					}
+					unitrole = shared.Role1
+					hasguns = false
+				case shared.UnitBde:
+					DB.SQL(`update unit set role=$2 where id=$1`, u.ID, unitrole).Exec()
+					println("bde", u.ID, unitrole)
+					unitrole++
+					if unitrole > shared.Role2 {
+						unitrole = shared.RoleReserve
+					}
+				case shared.UnitCav:
+					// stay in reserve
+				case shared.UnitGun:
+					// place them in the advance
+					if !hasguns {
+						DB.SQL(`update unit set role=$2 where id=$1`, u.ID, shared.RoleAdvance).Exec()
+						println("guns", u.ID, "advance")
+						hasguns = true
+					}
+				case shared.UnitSpecial:
+					// stay in reserve
+				}
+			}
+		}
 	}
 
 	logger(start, "Game.Start", conn,

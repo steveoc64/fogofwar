@@ -94,7 +94,7 @@ func (c *Connection) KeepAlive(sec time.Duration) {
 	c.Send("Ping", &shared.NetData{Action: "Ping", ID: c.ID})
 	c.ticker = time.NewTicker(time.Second * sec)
 	for range c.ticker.C {
-		log.Println("sending ping to client", c.ID)
+		// log.Println("sending ping to client", c.ID)
 		err := c.Send("Ping", &shared.NetData{Action: "Ping", ID: c.ID})
 		if err != nil {
 			// so remove this one from the list

@@ -73,87 +73,8 @@ func _Login(username string, passwd string, doNav bool) {
 
 		// Create the slideout menu once and for all
 		// Get the users name and set the menu option to that
-		loadTemplate("slidemenu", "#slidemenu-div", Session)
-		myName := fmt.Sprintf(`%s %s`, Session.GetRank(), Session.Username)
-		w := dom.GetWindow()
-		doc := w.Document()
-		doc.QuerySelector("#myname").SetTextContent(myName)
-		doc.QuerySelector("#hamburger").Class().Remove("hidden")
-		// doc.QuerySelector("#signin-btn").Class().Add("hidden")
-		// doc.QuerySelector("#signin-mobile").Class().Add("hidden")
-		doc.QuerySelector("#faq").Class().Add("hidden")
+		postLoginDecorate()
 
-		menu := doc.QuerySelector("#slidemenu")
-		menu.AddEventListener("click", false, func(evt dom.Event) {
-			menu.Class().Remove("cbp-spmenu-open")
-		})
-
-		if Session.Rank > 9 {
-			doc.QuerySelector("#menu-users").AddEventListener("click", false, func(evt dom.Event) {
-				evt.PreventDefault()
-				Session.Navigate("/users")
-			})
-		}
-
-		doc.QuerySelector("#menu-settings").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/settings")
-		})
-		// 	evt.PreventDefault()
-		// 	print("TODO - Campaigns")
-		// })
-		doc.QuerySelector("#menu-scenario").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/scenarios")
-		})
-		doc.QuerySelector("#menu-game").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/")
-		})
-		if Session.Rank > 1 {
-			doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
-				evt.PreventDefault()
-				Session.Navigate("/invite")
-			})
-		}
-		doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			loc := dom.GetWindow().Location()
-			dom.GetWindow().Open(loc.Origin+"/manual", "actionfront-manual", "")
-		})
-		doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			Session.Navigate("/contact")
-		})
-
-		doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
-			evt.PreventDefault()
-			el := doc.QuerySelector("#md-confirm-signout")
-			el.Class().Add("md-show")
-		})
-
-		// if el := doc.QuerySelector(".md-confirm-signout"); el != nil {
-		// 	el.AddEventListener("click", false, Logout)
-		// }
-
-		// el.AddEventListener("click", false, func(evt dom.Event) {
-		// 	doc.QuerySelector("#confirm-delete").Class().Add("md-show")
-		// })
-
-		// if el := doc.QuerySelector(".md-close-del"); el != nil {
-		// 	el.AddEventListener("click", false, func(evt dom.Event) {
-		// 		doc.QuerySelector("#confirm-delete").Class().Remove("md-show")
-		// 	})
-		// }
-
-		// if el := doc.QuerySelector("#confirm-delete"); el != nil {
-		// 	el.AddEventListener("keyup", false, func(evt dom.Event) {
-		// 		if evt.(*dom.KeyboardEvent).KeyCode == 27 {
-		// 			evt.PreventDefault()
-		// 			doc.QuerySelector("#confirm-delete").Class().Remove("md-show")
-		// 		}
-		// 	})
-		// }
 		if doNav {
 			Session.Navigate("/")
 		}
@@ -164,8 +85,78 @@ func _Login(username string, passwd string, doNav bool) {
 	}
 }
 
+func postLoginDecorate() {
+
+	// Create the slideout menu once and for all
+	// Get the users name and set the menu option to that
+	loadTemplate("slidemenu", "#slidemenu-div", Session)
+	myName := fmt.Sprintf(`%s %s`, Session.GetRank(), Session.Username)
+	w := dom.GetWindow()
+	doc := w.Document()
+	doc.QuerySelector("#myname").SetTextContent(myName)
+	doc.QuerySelector("#hamburger").Class().Remove("hidden")
+	// doc.QuerySelector("#signin-btn").Class().Add("hidden")
+	// doc.QuerySelector("#signin-mobile").Class().Add("hidden")
+	doc.QuerySelector("#faq").Class().Add("hidden")
+
+	menu := doc.QuerySelector("#slidemenu")
+	menu.AddEventListener("click", false, func(evt dom.Event) {
+		menu.Class().Remove("cbp-spmenu-open")
+	})
+
+	if Session.Rank > 9 {
+		doc.QuerySelector("#menu-users").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/users")
+		})
+	}
+
+	doc.QuerySelector("#menu-settings").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/settings")
+	})
+	// 	evt.PreventDefault()
+	// 	print("TODO - Campaigns")
+	// })
+	doc.QuerySelector("#menu-scenario").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/scenarios")
+	})
+	doc.QuerySelector("#menu-game").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/")
+	})
+	if Session.Rank > 1 {
+		doc.QuerySelector("#menu-invite").AddEventListener("click", false, func(evt dom.Event) {
+			evt.PreventDefault()
+			Session.Navigate("/invite")
+		})
+	}
+	doc.QuerySelector("#menu-manpages").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		loc := dom.GetWindow().Location()
+		dom.GetWindow().Open(loc.Origin+"/manual", "actionfront-manual", "")
+	})
+	doc.QuerySelector("#menu-contact").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		Session.Navigate("/contact")
+	})
+
+	doc.QuerySelector("#menu-signout").AddEventListener("click", false, func(evt dom.Event) {
+		evt.PreventDefault()
+		el := doc.QuerySelector("#md-confirm-signout")
+		el.Class().Add("md-show")
+	})
+}
+
 func Logout() {
 	print("log out")
+
+	locstor.RemoveItem("username")
+	locstor.RemoveItem("secret")
+	Session.Username = ""
+	Session.Passwd = ""
+	Session.UserID = 0
 
 	go func() {
 		RPC("LoginRPC.Logout", Session.Channel, nil)
@@ -185,8 +176,6 @@ func Logout() {
 	doc.GetElementByID("faq").Class().Add("hidden")
 
 	Session.Navigate("/")
-	locstor.RemoveItem("username")
-	locstor.RemoveItem("secret")
 	grid1()
 
 }

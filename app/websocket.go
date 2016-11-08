@@ -212,15 +212,12 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 				r.Seq = 0
 			}
 			r.Error = header.Error
-		} else {
-			print("fatal decode error", err.Error())
 		}
 
 		if err != nil {
-			print("rpc error", err)
-			return err
+			// print("rpc error", err)
 			// force application reload
-			// go autoReload()
+			go autoReload()
 		}
 	}
 
@@ -272,7 +269,7 @@ func (c *myClientCodec) Close() error {
 
 func processAsync(header *shared.NetResponse, msg *shared.NetData) {
 
-	print("process async", header.ServiceMethod, msg.Action)
+	// print("process async", header.ServiceMethod, msg.Action)
 
 	switch msg.Action {
 	case "Ping":
@@ -298,7 +295,7 @@ func autoReloadFull() {
 		// time.Sleep(time.Second)
 		// print("................ 2")
 		// time.Sleep(time.Second)
-		print("........... 1")
+		print("........... Reconnecting")
 		time.Sleep(time.Second)
 		print(" !! BYE !!")
 		Logout()
@@ -381,6 +378,8 @@ Shall I restart the app for your now (OK) ?`) {
 			Session.MaxScenarios = lr.MaxScenarios
 			Session.MaxPlayers = lr.MaxPlayers
 
+			postLoginDecorate()
+
 			loadRoutes(lr.Rank, lr.Routes)
 		} else {
 			return errors.New("login failed")
@@ -400,13 +399,15 @@ func autoReload() {
 			keepTrying := true
 			isReconnecting = true
 			for keepTrying {
-				print("Reconnecting in ... 3")
-				time.Sleep(time.Second)
-				print("................ 2")
-				time.Sleep(time.Second)
-				print("........... 1")
+				// print("Reconnecting in ... 3")
+				// time.Sleep(time.Second)
+				// print("................ 2")
+				// time.Sleep(time.Second)
+				// print("........... 1")
+				print("........... Reconnecting")
 				time.Sleep(time.Second)
 				err := ReConnect()
+				print("did reconnect")
 				if err != nil {
 					if err.Error() == "Stop" {
 						// We can only get here if the socket is back up and we tried to login

@@ -147,6 +147,7 @@ func play(context *router.Context) {
 					}, &newGame)
 					if err != nil {
 						print(err.Error())
+						Session.Navigate("/")
 					}
 					consoleGame = &newGame
 					game = consoleGame

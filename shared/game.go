@@ -747,6 +747,20 @@ type Unit struct {
 	DRole            int    `db:"d_role"`
 	Orders           int    `db:"orders"`
 	Bombard          *Bombard
+	History          []UnitHistory
+}
+
+type UnitHistory struct {
+	Turn             int
+	BayonetsLost     int
+	SabresLost       int
+	GunsLost         int
+	MState           int
+	CommanderControl int
+	Condition        int
+	Ammo             int
+	Role             int
+	Descrpition      string
 }
 
 func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) (int, int, int, string) {
@@ -1214,25 +1228,6 @@ type GameObjective struct {
 
 func (g *GameObjective) GetCSS() string {
 	return "tile-objective"
-}
-
-type Bombard struct {
-	GameID    int  `db:"game_id"`
-	ID        int  `db:"id"`
-	UnitID    int  `db:"unit_id"`
-	FirerID   int  `db:"firer_id"`
-	TargetID  int  `db:"target_id"`
-	TargetUID int  `db:"target_uid"`
-	RangeMax  int  `db:"range_max"`
-	RangeMin  int  `db:"range_min"`
-	Disputed  bool `db:"disputed"`
-}
-
-type BombardData struct {
-	Channel int
-	GameID  int
-	ID      int
-	Bombard *Bombard
 }
 
 type UnitRoleData struct {

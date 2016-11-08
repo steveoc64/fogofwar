@@ -96,7 +96,10 @@ func websocketInit() net.Conn {
 	rpcClient = rpc.NewClientWithCodec(client)
 
 	// Call PingRPC to burn through the message with seq = 0
-	out := &shared.AsyncMessage{}
+	out := &shared.NetRequest{
+		ServiceMethod: "Ping",
+		Seq:           0,
+	}
 	RPC("PingRPC.Ping", "init channel", out)
 
 	w := dom.GetWindow()
@@ -117,12 +120,10 @@ func websocketInit() net.Conn {
 
 // codec to encode requests and decode responses.''
 type myClientCodec struct {
-	rwc           io.ReadWriteCloser
-	dec           *gob.Decoder
-	enc           *gob.Encoder
-	encBuf        *bufio.Writer
-	serviceMethod string
-	async         bool
+	rwc    io.ReadWriteCloser
+	dec    *gob.Decoder
+	enc    *gob.Encoder
+	encBuf *bufio.Writer
 }
 
 func txOff() {
@@ -147,6 +148,7 @@ func rxOff() {
 	}()
 }
 
+// Codec must implement this to satisfy the interface, but we use our own header
 func (c *myClientCodec) WriteRequest(r *rpc.Request, body interface{}) (err error) {
 	// print("rpc ->", r.ServiceMethod)
 	// print("wr")
@@ -155,7 +157,12 @@ func (c *myClientCodec) WriteRequest(r *rpc.Request, body interface{}) (err erro
 
 	defer txOff()
 
-	if err = c.enc.Encode(r); err != nil {
+	header := &shared.NetRequest{
+		ServiceMethod: r.ServiceMethod,
+		Seq:           r.Seq,
+	}
+
+	if err = c.enc.Encode(header); err != nil {
 		return
 	}
 	if err = c.enc.Encode(body); err != nil {
@@ -168,6 +175,7 @@ type MsgPayload struct {
 	Msg string
 }
 
+// Must implement to satisy the interface, but use our own header type
 func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 
 	// print("rrh - blocking read")
@@ -175,11 +183,12 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 	// rxOn = false
 	// Lights()
 
-	c.async = false
-	c.serviceMethod = ""
-
-	// This will block untill there is something new on the socket to read
-	err := c.dec.Decode(r)
+	header := &shared.NetResponse{}
+	err := c.dec.Decode(header)
+	fmt.Printf("Got my special header %v\n", header)
+	r.ServiceMethod = header.ServiceMethod
+	r.Seq = header.Seq
+	r.Error = header.Error
 
 	// print("rrh - got a header, start reading body")
 	rxOn = true
@@ -187,24 +196,33 @@ func (c *myClientCodec) ReadResponseHeader(r *rpc.Response) error {
 
 	// print("rpc header <-", r)
 	if err != nil {
-
+		// Try again, in case there is an extra msg to be gobbled
 		if err != nil && err.Error() == "extra data in buffer" {
-			err = c.dec.Decode(r)
+			err = c.dec.Decode(header)
+			fmt.Printf("Re-Got my special header %v\n", header)
+			r.ServiceMethod = header.ServiceMethod
+			r.Seq = header.Seq
+			r.Error = header.Error
 		} else {
-			print("decode error", err.Error())
+			print("fatal decode error", err.Error())
 		}
+
 		if err != nil {
 			print("rpc error", err)
 			// force application reload
 			go autoReload()
 		}
 	}
-	if err == nil && r.Seq == 0 {
-		// print("Async update from server -", r.ServiceMethod)
-		c.async = true
-		c.serviceMethod = r.ServiceMethod
-		return nil
-		//return errors.New("Async update from server")
+
+	// if async then process the message immediately
+	if header.Async {
+		println("looks like an Async message")
+		// swallow the null body
+		c.ReadResponseBody(nil)
+		processAsync(header.Data)
+		// print("pa")
+		txOn = false
+		Lights()
 	}
 	return err
 }
@@ -250,7 +268,10 @@ func ReConnect() error {
 	rpcClient = rpc.NewClientWithCodec(client)
 
 	// Call PingRPC to burn through the message with seq = 0
-	out := &shared.AsyncMessage{}
+	out := &shared.NetRequest{
+		ServiceMethod: "Ping",
+		Seq:           0,
+	}
 	RPC("PingRPC.Ping", "init channel", out)
 
 	// Wait a sec to get the channel
@@ -366,29 +387,9 @@ func autoReload() {
 
 func (c *myClientCodec) ReadResponseBody(body interface{}) error {
 
-	if c.async {
-		// Read the response body into a string
-		msg := shared.AsyncMessage{}
-		// var b string
-		// c.dec.Decode(&b)
-		err := c.dec.Decode(&msg)
-		if err != nil {
-			print("decode error", err.Error())
-		}
-		// print("appear to be async with body of ", body)
-		// processAsync(c.serviceMethod, body)
-		processAsync(c.serviceMethod, msg)
-		// print("pa")
-		txOn = false
-		Lights()
-		return nil
-	}
-
+	fmt.Printf("about to decode body %v\n", body)
 	err := c.dec.Decode(body)
 	txOff()
-	// print("rrb")
-	// txOn = false
-	// Lights()
 	return err
 }
 
@@ -397,34 +398,23 @@ func (c *myClientCodec) Close() error {
 	return c.rwc.Close()
 }
 
-// type AsyncMessage struct {
-// 	Action string
-// 	Data   interface{}
-// }
-
-func processAsync(method string, msg shared.AsyncMessage) {
+func processAsync(msg *shared.NetData) {
 
 	// print("processing async with method =", method)
 	// print("and body =", body)
+	fmt.Printf("async msg %v\n", msg)
 
-	switch method {
+	switch msg.Action {
 	case "Ping":
 		Session.Channel = msg.ID
-		// print("Set channel to", Session.Channel)
+		print("Set channel to", Session.Channel)
 	case "PingRPC.Ping":
-		// print("Keepalive")
+		print("Keepalive")
 	default:
-		print("Msg:", method, "Action:", msg.Action, "ID:", msg.ID)
-		fn := Session.Subscriptions[method]
+		fmt.Printf("Msg: %v", *msg)
+		fn := Session.Subscriptions[msg.Action]
 		if fn != nil {
-			go fn(msg.Action, msg.ID, Session.Context)
+			go fn(msg.Action, msg, Session.Context)
 		}
 	}
 }
-
-// func Subscribe(name string, f func(*shared.AsyncMessage)) int {
-// 	// print("subscribing to ", name)
-// 	Session.Subscribe = name
-// 	Session.SFn = f
-// 	return 0
-// }

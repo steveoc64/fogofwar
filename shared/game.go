@@ -748,32 +748,27 @@ type Unit struct {
 	Bombard          *Bombard
 }
 
-func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) int {
+func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) (int, int, int, string) {
 	m := 0
-	println("unit", u.UType)
 	switch u.UType {
 	case UnitDiv:
 		die := rand.Intn(60)
 		if die < pts {
 			if die < pts/2 {
 				if die < pts/8 {
-					println("Commander Killed", u.Name)
-					return 1
+					return 1, 1, 0, "Commander Killed"
 				} else {
-					println("Commander Badly Wounded", u.Name)
-					return 1
+					return 1, 1, 0, "Commander Badly Wounded"
 				}
 			} else {
-				println("Commander Slightly Injured", u.Name)
-				return 0
+				return 0, 0, 0, "Commander Slightly Injured"
 			}
 		} else {
-			println("Commander Escapes Injury", u.Name)
-			return 0
+			return 0, 0, 0, "Commander Escapes Injury"
 		}
 	case UnitBde, UnitSpecial:
 		if sk {
-			return (pts / 2) * 3
+			return (pts / 2) * 3, 0, 0, "Skirmish Line Takes Damage"
 		}
 		if ranks > 2 {
 			m = pts * 5
@@ -785,23 +780,20 @@ func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) int {
 			die := rand.Intn(10)
 			if die < 5 {
 				if die == 0 {
-					println("Ammo supply hit - Bty out of Action", u.Name)
-					return 1
+					return 0, 0, 1, "Ammo Supply Hit - Bty out of Action"
 				} else {
-					println("Gun Somewhat damaged", u.Name)
-					return 0
+					return 0, 0, 0, "Guns Slightly Damaged"
 				}
 			} else {
-				println("Guns not damaged", u.Name)
-				return 0
+				return 0, 0, 0, "Guns Unscathed"
 			}
 		}
-		return pts / 12
+		return 0, 0, pts / 12, "Guns Destroyed"
 	}
 	if col {
-		return (m * 125) / 100
+		return (m * 125) / 100, 0, 0, "Hit in Column"
 	}
-	return m
+	return m, 0, 0, "Hit in Battle Line"
 }
 
 func (u *Unit) GetShortSummary(corps *GameCmd) string {

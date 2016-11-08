@@ -28,25 +28,27 @@ type Connection struct {
 	Time     time.Time
 	ticker   *time.Ticker
 	enc      *gob.Encoder
-	r        rpc.Response
 	Route    string
 	Routes   []string
 }
 
 // Safely send unsolicited RPC response to a connection
-func (c *Connection) Send(name string, payload interface{}) error {
+func (c *Connection) Send(name string, data *shared.NetData) error {
 	c.Mutex.Lock()
 	defer c.Mutex.Unlock()
 
-	c.r.ServiceMethod = name
-	c.r.Seq = 0
+	header := &shared.NetResponse{
+		ServiceMethod: name,
+		Seq:           0,
+		Async:         true,
+		Data:          data,
+	}
 
-	if err := c.enc.Encode(&c.r); err != nil {
-		log.Println("Header", name, err.Error())
+	if err := c.enc.Encode(header); err != nil {
+		log.Println("Header", data.Action, err.Error())
 		return err
 	}
-	if err := c.enc.Encode(payload); err != nil {
-		log.Println("Payload", payload, err.Error())
+	if err := c.enc.Encode(nil); err != nil {
 		return err
 	}
 	// log.Println("got here with", payload)
@@ -85,15 +87,11 @@ func (c *Connection) Login(username string, id int, rank int) {
 func (c *Connection) KeepAlive(sec time.Duration) {
 	// log.Println("sending ping to ", c.ID)
 
-	data := shared.AsyncMessage{
-		Action: "Ping",
-		ID:     c.ID,
-	}
-	c.Send("Ping", data)
+	c.Send("Ping", &shared.NetData{ID: c.ID})
 	c.ticker = time.NewTicker(time.Second * sec)
 	for range c.ticker.C {
 		// log.Println("sending ping to client", c.ID)
-		err := c.Send("Ping", data)
+		err := c.Send("Ping", &shared.NetData{ID: c.ID})
 		if err != nil {
 			log.Println("Send error on", c.ID, err.Error())
 		}
@@ -101,52 +99,37 @@ func (c *Connection) KeepAlive(sec time.Duration) {
 }
 
 // Send an async message to everyone but this connection
-func (c *Connection) Broadcast(name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *Connection) Broadcast(name string, data *shared.NetData) {
 
 	// TODO - IGNORE any connections that are in a Game ... which are
 	// connections that will be chatty enough, so we dont need to create
 	// unnecessary netword traffic
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID != 0 {
-			log.Println("broadcast", name, action, id, "»", v.ID)
+			log.Println("broadcast", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
 }
 
 // Send an async message to everyone but this connection, if they are admin
-func (c *Connection) BroadcastAdmin(name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *Connection) BroadcastAdmin(name string, data *shared.NetData) {
 
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID != 0 && v.Rank > 9 {
-			log.Println("broadcastAdmin", name, action, id, "»", v.ID)
+			log.Println("broadcastAdmin", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
 }
 
 // Send an async message to a specific player on all connections but this one
-func (c *Connection) BroadcastPlayer(playerID int, name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *Connection) BroadcastPlayer(playerID int, name string, data *shared.NetData) {
 
 	// println("broadcastPlayer", playerID, name, action)
 	for _, v := range Connections.cmap {
 		if v != c && v.UserID == playerID {
-			log.Println("broadcastPlayer", name, action, id, "»", v.ID)
+			log.Println("broadcastPlayer", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
@@ -170,48 +153,33 @@ func (c *ConnectionsList) Keys() []int {
 }
 
 // Send an async message to everyone that is connected
-func (c *ConnectionsList) BroadcastAll(name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *ConnectionsList) BroadcastAll(name string, data *shared.NetData) {
 
 	for _, v := range c.cmap {
 		if v.UserID != 0 {
-			log.Println("BroadcastAll", name, action, id, "»", v.ID)
+			log.Println("BroadcastAll", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
 }
 
 // Send an async message to all admins that are connected
-func (c *ConnectionsList) BroadcastAdmin(name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *ConnectionsList) BroadcastAdmin(name string, data *shared.NetData) {
 
 	for _, v := range c.cmap {
 		if v.UserID != 0 && v.Rank > 9 {
-			log.Println("BroadcastAdmin", name, action, id, "»", v.ID)
+			log.Println("BroadcastAdmin", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
 }
 
 // Send an async message to all admins that are connected
-func (c *ConnectionsList) BroadcastPlayer(playerID int, name string, action string, id int) {
-
-	data := shared.AsyncMessage{
-		Action: action,
-		ID:     id,
-	}
+func (c *ConnectionsList) BroadcastPlayer(playerID int, name string, data *shared.NetData) {
 
 	for _, v := range c.cmap {
 		if v.UserID == playerID {
-			log.Println("BroadcastPlayer", name, action, id, "»", v.ID)
+			log.Println("BroadcastPlayer", name, data.Action, data.ID, "»", v.ID)
 			go v.Send(name, data)
 		}
 	}
@@ -271,7 +239,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 		}
 	}
 
-	c.BroadcastAdmin("Login", "Drop", conn.ID)
+	c.BroadcastAdmin("Login", &shared.NetData{Action: "Drop", ID: conn.ID})
 
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()
@@ -365,11 +333,15 @@ type myServerCodec struct {
 
 // On receiving a new header, lock the connection until the whole RPC call has finished
 func (c *myServerCodec) ReadRequestHeader(r *rpc.Request) error {
-	err := c.dec.Decode(r)
+
+	header := &shared.NetRequest{}
+	err := c.dec.Decode(header)
 	if err != nil {
 		log.Println("Dropped Connection:", err.Error(), ", connection:", c.conn.ID)
 		Connections.Drop(c.conn)
 	}
+	r.ServiceMethod = header.ServiceMethod
+	r.Seq = header.Seq
 	c.conn.Mutex.Lock()
 	return err
 }
@@ -378,11 +350,17 @@ func (c *myServerCodec) ReadRequestBody(body interface{}) error {
 	return c.dec.Decode(body)
 }
 
+// func (c *myServerCodec) WriteResponse(r *rpc.Response, body interface{}) (err error) {
 func (c *myServerCodec) WriteResponse(r *rpc.Response, body interface{}) (err error) {
 	// as soon as we are done, unlock the connection Mutex
 	defer c.conn.Mutex.Unlock()
 
-	if err = c.enc.Encode(r); err != nil {
+	header := &shared.NetResponse{
+		ServiceMethod: r.ServiceMethod,
+		Seq:           r.Seq,
+		Error:         r.Error,
+	}
+	if err = c.enc.Encode(header); err != nil {
 		if c.encBuf.Flush() == nil {
 			// Gob couldn't encode the header. Should not happen, so if it does,
 			// shut down the connection to signal that the connection is broken.

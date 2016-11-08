@@ -78,6 +78,20 @@ type GTMoveData struct {
 	Contact     bool
 }
 
+type UnitEvent struct {
+	ID          int
+	Opcode      int
+	Description string
+	Bayonets    int
+	Sabres      int
+	Guns        int
+	Commander   int
+	MState      int
+	CState      int
+	X           int
+	Y           int
+}
+
 // type Bombard struct {
 // 	UnitID    int
 // 	FirerID   int

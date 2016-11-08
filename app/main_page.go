@@ -12,10 +12,10 @@ import (
 func mainPage(context *router.Context) {
 	Session.Subscribe("Game", _mainPage, context)
 	Session.Subscribe("Play", _play, context)
-	go _mainPage("Main", 0, context)
+	go _mainPage("Main", nil, context)
 }
 
-func _mainPage(action string, id int, context *router.Context) {
+func _mainPage(action string, msg *shared.NetData, context *router.Context) {
 
 	switch action {
 	case "Main", "Invite", "Update", "Start", "Stop":

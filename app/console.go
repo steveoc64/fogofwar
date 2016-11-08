@@ -64,18 +64,18 @@ func consolePhaseDone(game *shared.Game) {
 	}()
 }
 
-func _play(action string, id int, context *router.Context) {
+func _play(action string, msg *shared.NetData, context *router.Context) {
 	switch action {
 	case "Phase", "Turn":
-		if id == 0 {
+		if msg.ID == 0 {
 			if dom.GetWindow().
 				Confirm("Your Game has started ..  Click OK to join to Game") {
-				Session.Navigate(fmt.Sprintf("/play/%d", id))
+				Session.Navigate(fmt.Sprintf("/play/%d", msg.ID))
 			}
 		} else {
 			if dom.GetWindow().
 				Confirm("Your Game has progressed to the next phase .. we are waiting for you. Click OK to return to Game") {
-				Session.Navigate(fmt.Sprintf("/play/%d", id))
+				Session.Navigate(fmt.Sprintf("/play/%d", msg.ID))
 			}
 		}
 	}
@@ -131,7 +131,7 @@ func play(context *router.Context) {
 			Hosting:     game.HostedBy == Session.UserID,
 		})
 
-		playMsg := func(action string, actionID int, context *router.Context) {
+		playMsg := func(action string, msg *shared.NetData, context *router.Context) {
 			// print("Msg", action, actionID)
 			switch action {
 			case "Turn":
@@ -149,35 +149,37 @@ func play(context *router.Context) {
 					consoleGame = &newGame
 					game = consoleGame
 					game.Phase = 1
-					game.Turn = actionID
+					game.Turn = msg.ID
 					game.PhaseDONE = false
 					game.PhaseTODO = true
 					incoming = nil
 					doTurnSummary(game)
 				}()
 			case "Phase":
-				game.Phase = actionID
+				game.Phase = msg.ID
 				game.PhaseDONE = false
 				game.PhaseTODO = true
 				incoming = nil
 				doTurnSummary(game)
 			case "PhaseWait":
-				game.Phase = actionID
+				game.Phase = msg.ID
 				game.PhaseDONE = true
 				game.PhaseTODO = false
 				doTurnSummary(game)
 			case "Incoming":
-				print("we have incoming bombardment", actionID)
-				incoming = append(incoming, actionID)
+				// TODO - rewrite this to use the attached data in the message
+				print("we have incoming bombardment", msg.ID)
+				incoming = append(incoming, msg.ID)
 				game.PhaseTODO = true
 				game.PhaseDONE = false
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}
 			case "IncomingCancel":
-				print("an incoming fire mission has been cancelled - that the Lord", actionID)
+
+				print("an incoming fire mission has been cancelled - that the Lord", msg.ID)
 				for i, v := range incoming {
-					if v == actionID {
+					if v == msg.ID {
 						incoming = append(incoming[:i], incoming[i+1:]...)
 						break
 					}
@@ -186,34 +188,34 @@ func play(context *router.Context) {
 					doTurnSummary(game)
 				}
 			case "Unit":
-				print("unit has changed", actionID)
+				print("unit has changed", msg.ID)
 				go func() {
 					newUnit := shared.Unit{}
 					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
 						Channel: Session.Channel,
-						ID:      actionID,
+						ID:      msg.ID,
 					}, &newUnit)
 					if err != nil {
 						print(err.Error())
 					} else {
 						// find the unit
-						oldUnit := game.GetUnit(team, actionID)
+						oldUnit := game.GetUnit(team, msg.ID)
 						*oldUnit = newUnit
 					}
 				}()
 			case "BB":
-				print("Bombardment target ID has been aquired or dropped for unit", actionID)
+				print("Bombardment target ID has been aquired or dropped for unit", msg.ID)
 				go func() {
 					newUnit := shared.Unit{}
 					err := RPC("GameRPC.GetUnit", shared.GameRPCData{
 						Channel: Session.Channel,
-						ID:      actionID,
+						ID:      msg.ID,
 					}, &newUnit)
 					if err != nil {
 						print(err.Error())
 					} else {
 						// find the unit
-						oldUnit := game.GetUnit(team, actionID)
+						oldUnit := game.GetUnit(team, msg.ID)
 						*oldUnit = newUnit
 						cmd := game.GetCmd(team, newUnit.CmdID)
 						// print("BB data", oldUnit.Bombard)
@@ -241,8 +243,8 @@ func play(context *router.Context) {
 		}
 		doDisplayPanel(consoleCurrentPanel)
 
-		gameMsg := func(action string, actionID int, context *router.Context) {
-			if actionID == id {
+		gameMsg := func(action string, msg *shared.NetData, context *router.Context) {
+			if msg.ID == id {
 				print("Game update for this game")
 				newGame := &shared.Game{}
 				err := RPC("GameRPC.GetPlay", shared.GameRPCData{

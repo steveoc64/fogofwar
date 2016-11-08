@@ -15,10 +15,10 @@ func userList(context *router.Context) {
 	Session.Subscribe("User", _userList, context)
 	Session.Subscribe("Login", _userList, context)
 	Session.Subscribe("Play", _play, context)
-	_userList("Users", 0, context)
+	_userList("Users", nil, context)
 }
 
-func _userList(action string, id int, context *router.Context) {
+func _userList(action string, msg *shared.NetData, context *router.Context) {
 
 	go func() {
 		users := []shared.User{}
@@ -381,10 +381,10 @@ func userAdd(context *router.Context) {
 func usersOnline(context *router.Context) {
 	Session.Subscribe("login", _usersOnline, context)
 	Session.Subscribe("nav", _usersOnline, context)
-	go _usersOnline("show", 1, context)
+	go _usersOnline("show", nil, context)
 }
 
-func _usersOnline(action string, id int, context *router.Context) {
+func _usersOnline(action string, msg *shared.NetData, context *router.Context) {
 
 	users := []shared.UserOnline{}
 	RPC("LoginRPC.UsersOnline", Session.Channel, &users)
@@ -426,15 +426,15 @@ func _usersOnline(action string, id int, context *router.Context) {
 
 }
 
-func promoteMe(action string, id int, context *router.Context) {
-	print("Promoting Rank to", id, "with", action)
+func promoteMe(action string, msg *shared.NetData, context *router.Context) {
+	print("Promoting Rank to", msg.ID, "with", action)
 	Session.Subscriptions = make(map[string]MessageFunction)
 
 	go func() {
 		// Login again to get a fresh new set of things
 		RPC("LoginRPC.Logout", Session.Channel, nil)
 		Login(Session.Username, Session.Passwd)
-		_userSettings("User", 0, context)
+		_userSettings("User", nil, context)
 	}()
 
 }
@@ -442,10 +442,10 @@ func promoteMe(action string, id int, context *router.Context) {
 func userSettings(context *router.Context) {
 	Session.Subscribe("Promotion", promoteMe, context)
 	Session.Subscribe("Play", _play, context)
-	_userSettings("User", 0, context)
+	_userSettings("User", nil, context)
 }
 
-func _userSettings(action string, id int, context *router.Context) {
+func _userSettings(action string, msg *shared.NetData, context *router.Context) {
 
 	go func() {
 		Session.MobileSensitive = true

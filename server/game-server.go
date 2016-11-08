@@ -70,6 +70,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
 		where g.id=$1`, data.ID).QueryStruct(retval)
+	fmt.Printf("Got %v\n", *retval)
 
 	retval.CanStart = false
 	if err == nil {
@@ -78,6 +79,8 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 		// exists in the invite lists (either red of blue)
 		if retval.HostedBy != conn.UserID {
 			count := 0
+			fmt.Printf("conn %v\n", conn)
+			fmt.Printf("select count(*) from game_players where game_id=%d and player_id=%d\n", data.ID, conn.UserID)
 			DB.SQL(`select count(*) from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&count)
 			if count == 0 {
 				return errors.New("Insufficient Privilege")
@@ -443,7 +446,9 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
 		fmt.Printf("players who need to know about this update %v\n", players)
 		for _, v := range players {
-			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{
+				Action: "Update",
+				ID:     data.ID})
 		}
 		*done = true
 		tx.Commit()
@@ -578,7 +583,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 				// println("player is in the AList", v)
 			} else {
 				// println("player is in the DList", v)
-				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+				conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Invite", ID: data.ID})
 			}
 		}
 		for _, v := range RedList {
@@ -593,7 +598,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 				println(err.Error())
 				break
 			}
-			conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Invite", ID: data.ID})
 		}
 		if err == nil {
 			for _, v := range BlueList {
@@ -616,7 +621,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 					println(err.Error())
 					break
 				}
-				conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+				conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Invite", ID: data.ID})
 			}
 		}
 
@@ -656,7 +661,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 			DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
 			fmt.Printf("players who need to know about this update %v\n", players)
 			for _, v := range players {
-				conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+				conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Update", ID: data.ID})
 			}
 
 			// println("unassigned", unassignedCmd)
@@ -704,7 +709,7 @@ func (g *GameRPC) Delete(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`delete from unit where game_id=$1`, data.ID).Exec()
 
 		for _, v := range DList {
-			conn.BroadcastPlayer(v, "Game", "Invite", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Invite", ID: data.ID})
 		}
 	}
 
@@ -748,7 +753,7 @@ func (g *GameRPC) Update(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
 		fmt.Printf("players who need to know about this update %v\n", players)
 		for _, v := range players {
-			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Update", ID: data.ID})
 		}
 	}
 
@@ -787,7 +792,7 @@ func (g *GameRPC) DeclineInvite(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
 		fmt.Printf("players who need to know about this update %v\n", players)
 		for _, v := range players {
-			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Update", ID: data.ID})
 		}
 		tx.Commit()
 	}
@@ -822,7 +827,7 @@ func (g *GameRPC) AcceptInvite(data shared.GameRPCData, done *bool) error {
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&players)
 		fmt.Printf("players who need to know about this update %v\n", players)
 		for _, v := range players {
-			conn.BroadcastPlayer(v, "Game", "Update", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Update", ID: data.ID})
 		}
 	}
 	return err
@@ -926,12 +931,12 @@ func (g *GameRPC) SetCmdPlayer(data shared.GameCmdRPCData, done *bool) error {
 			if v == gp_old.PlayerID {
 				doneOld = true
 			}
-			conn.BroadcastPlayer(v, "Game", "Update", gc.GameID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Update", ID: gc.GameID})
 		}
 
 		// The player has been dropped entirely - so let them know as well
 		if gp_old.PlayerID != 0 && !doneOld {
-			conn.BroadcastPlayer(gp_old.PlayerID, "Game", "Update", gc.GameID)
+			conn.BroadcastPlayer(gp_old.PlayerID, "Game", &shared.NetData{Action: "Update", ID: gc.GameID})
 		}
 
 		if game.Started {
@@ -1025,7 +1030,7 @@ func (g *GameRPC) Start(data shared.GameRPCData, done *bool) error {
 		ids := []int{}
 		DB.SQL(`select player_id from game_players where game_id=$1`, data.ID).QuerySlice(&ids)
 		for _, v := range ids {
-			conn.BroadcastPlayer(v, "Game", "Start", data.ID)
+			conn.BroadcastPlayer(v, "Game", &shared.NetData{Action: "Start", ID: data.ID})
 		}
 		tx.Commit()
 	}

@@ -167,7 +167,7 @@ func (c *ScenarioRPC) Unlock(data shared.ScenarioRPCData, done *bool) error {
 	}
 	if err == nil {
 		*done = true
-		conn.Broadcast("Scenario", "Unlock", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Unlock", ID: data.ID})
 	}
 
 	logger(start, "Scenario.Unlock", conn,
@@ -189,7 +189,7 @@ func (c *ScenarioRPC) Lock(data shared.ScenarioRPCData, done *bool) error {
 
 	if err == nil {
 		*done = true
-		conn.Broadcast("Scenario", "Unlock", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Unlock", ID: data.ID})
 	}
 
 	logger(start, "Scenario.Lock", conn,
@@ -213,7 +213,7 @@ func (c *ScenarioRPC) Accept(data shared.ScenarioRPCData, done *bool) error {
 
 	if err == nil {
 		*done = true
-		conn.Broadcast("Scenario", "Unlock", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Unlock", ID: data.ID})
 	}
 
 	logger(start, "Scenario.Accept", conn,
@@ -251,7 +251,7 @@ func (c *ScenarioRPC) Update(data shared.ScenarioRPCData, retval *shared.Scenari
 			Limit(1).
 			QueryStruct(retval)
 
-		conn.Broadcast("Scenario", "Change", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Change", ID: data.ID})
 	}
 
 	logger(start, "Scenario.Update", conn,
@@ -340,7 +340,7 @@ func (s *ScenarioRPC) Insert(data shared.ScenarioRPCData, retval *shared.Scenari
 		fmt.Sprintf("%d", id))
 
 	if err == nil {
-		conn.Broadcast("Scenario", "Insert", id)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Insert", ID: id})
 	}
 
 	return err
@@ -907,7 +907,7 @@ func (s *ScenarioRPC) Delete(data shared.ScenarioRPCData, done *bool) error {
 		"")
 
 	if err == nil {
-		conn.Broadcast("Scenario", "Deleted", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Deleted", ID: data.ID})
 	}
 
 	return err
@@ -989,7 +989,7 @@ func (s *ScenarioRPC) Fork(data shared.ScenarioRPCData, newID *int) error {
 		fmt.Sprintf("ID %d", data.ID), "")
 
 	if err == nil {
-		conn.Broadcast("Scenario", "Fork", data.ID)
+		conn.Broadcast("Scenario", &shared.NetData{Action: "Fork", ID: data.ID})
 	}
 
 	return err
@@ -1087,7 +1087,7 @@ func (s *ScenarioRPC) CreateGame(data shared.ScenarioRPCData, newID *int) error 
 		fmt.Sprintf("Game %d", *newID))
 
 	if err == nil {
-		conn.Broadcast("Game", "New", *newID)
+		conn.Broadcast("Game", &shared.NetData{Action: "New", ID: *newID})
 	}
 
 	return err

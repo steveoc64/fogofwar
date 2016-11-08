@@ -12,7 +12,7 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-type MessageFunction func(string, int, *router.Context)
+type MessageFunction func(string, *shared.NetData, *router.Context)
 
 type GlobalSessionData struct {
 	Version              string

@@ -62,7 +62,7 @@ func ppgood(c echo.Context) error {
 		}
 
 		// signal the user to have a new rank
-		Connections.BroadcastPlayer(userID, "Promotion", "Success", newRank)
+		Connections.BroadcastPlayer(userID, "Promotion", &shared.NetData{Action: "Success", ID: newRank})
 
 		return c.File("public/promotion.html")
 	} else {

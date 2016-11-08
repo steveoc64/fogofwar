@@ -105,7 +105,11 @@ func (g *GameRPC) GetIncomingBombard(data shared.BombardData, retval *string) er
 
 	str := ""
 	if err == nil && guns > 0 && gtype != "" {
-		str = fmt.Sprintf("%d Guns of %s", guns, gtype)
+		if guns < 9 {
+			str = fmt.Sprintf("a Bty of %s", gtype)
+		} else {
+			str = fmt.Sprintf("Massed Btys of %s", gtype)
+		}
 		if rmax != rmin {
 			str += fmt.Sprintf(" from %d-%dm", rmin*400, rmax*400)
 		} else {
@@ -127,13 +131,16 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 	conn := Connections.Get(data.Channel)
 
 	target := &shared.Unit{}
+	targetCorps := &shared.GameCmd{}
 	firer := &shared.Unit{}
 	bb := &shared.Bombard{}
 	pts := 0
 
-	subUnits := []shared.Unit{}
+	subUnits := []*shared.Unit{}
 
 	err := DB.SQL(`select * from unit where id=$1`, data.Bombard.TargetUID).QueryStruct(target)
+	DB.SQL(`select * from game_cmd where id=$1`, target.CmdID).QueryStruct(targetCorps)
+	// println("Target Corps", targetCorps.Name, targetCorps.CState)
 	if err != nil {
 		println(err.Error())
 	} else {
@@ -150,13 +157,6 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			guns := 0
 			gtype := 0
 			err = DB.SQL(`select guns,gunnery_type from unit where id=$1`, bb.UnitID).QueryScalar(&guns, &gtype)
-
-			// Take 1 shot at the min range, and 2 shots at the max range
-			pts = gunShot(guns, gtype, bb.RangeMin, true)
-			pts += gunShot(guns, gtype, bb.RangeMax, true)
-			pts += gunShot(guns, gtype, bb.RangeMax, true)
-			// println("total damage points", pts)
-
 			DB.SQL(`select * from unit where path <@ $1 and game_id=$2 and cmd_id=$3`,
 				target.Path,
 				target.GameID,
@@ -182,7 +182,22 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 					prospects = append(prospects, ii)
 				}
 			}
-			victim := subUnits[rand.Intn(len(prospects))]
+
+			// Take 1 shot at the min range, and 2 shots at the max range
+			inColumn := targetCorps.CState == shared.CmdMarchOrder
+			fmt.Printf("Target in march order %v\n", inColumn)
+
+			victim := subUnits[prospects[rand.Intn(len(prospects))]]
+			pts = gunShot(guns, gtype, bb.RangeMin, true)
+			applyGunDamage(victim, targetCorps, pts)
+
+			victim = subUnits[prospects[rand.Intn(len(prospects))]]
+			pts = gunShot(guns, gtype, bb.RangeMax, true)
+			applyGunDamage(victim, targetCorps, pts)
+
+			victim = subUnits[prospects[rand.Intn(len(prospects))]]
+			pts = gunShot(guns, gtype, bb.RangeMax, true)
+			applyGunDamage(victim, targetCorps, pts)
 
 			// pick a random victim
 			// println("Actual Victim that takes the hit:", victim.Path, victim.ID, victim.UType, victim.Name, victim.Path)
@@ -201,6 +216,14 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 		*done = true
 	}
 	return err
+}
+
+func applyGunDamage(unit *shared.Unit, cmd *shared.GameCmd, pts int) {
+
+	inColumn := cmd.CState == shared.CmdMarchOrder
+
+	m, c, g, s := unit.PtsToMen(pts, 3, inColumn, false)
+	println("Gun Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
 }
 
 type GunTables struct {

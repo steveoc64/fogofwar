@@ -24,10 +24,10 @@ func breakLine(s string) string {
 func gameEditTeam(context *router.Context) {
 	Session.Subscribe("Game", _gameEditTeam, context)
 	Session.Subscribe("Play", _play, context)
-	go _gameEditTeam("Edit", 0, context)
+	go _gameEditTeam("Edit", nil, context)
 }
 
-func _gameEditTeam(action string, actionID int, context *router.Context) {
+func _gameEditTeam(action string, msg *shared.NetData, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -42,7 +42,7 @@ func _gameEditTeam(action string, actionID int, context *router.Context) {
 
 		switch action {
 		case "Update":
-			if id == actionID {
+			if id == msg.ID {
 				Session.EditGame = &shared.Game{}
 				err := RPC("GameRPC.Get", shared.GameRPCData{
 					Channel:  Session.Channel,

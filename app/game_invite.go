@@ -13,10 +13,10 @@ import (
 func gameInvite(context *router.Context) {
 	Session.Subscribe("Game", _gameInvite, context)
 	Session.Subscribe("Play", _play, context)
-	_gameInvite("Edit", 0, context)
+	_gameInvite("Edit", nil, context)
 }
 
-func _gameInvite(action string, actionID int, context *router.Context) {
+func _gameInvite(action string, msg *shared.NetData, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -25,7 +25,7 @@ func _gameInvite(action string, actionID int, context *router.Context) {
 
 	switch action {
 	case "Update":
-		if actionID != id {
+		if msg.ID != id {
 			// not for us
 			return
 		}

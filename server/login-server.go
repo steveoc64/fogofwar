@@ -29,7 +29,7 @@ func (l *LoginRPC) Nav(data shared.Nav, r *string) error {
 	*r = conn.Route
 	println("\n----------------------------------")
 	log.Printf("%s:%s -> %s\n", conn.Username, conn.GetRank(), conn.Route)
-	conn.BroadcastAdmin("Nav", data.Route, data.Channel)
+	conn.BroadcastAdmin("Nav", &shared.NetData{Action: data.Route, ID: data.Channel})
 	return nil
 }
 
@@ -152,7 +152,7 @@ Please logout from the other machine if you want to use this one instead.`)
 				lr.Disqus = Config.Disqus && res.Disqus
 				conn.Login(lc.Username, res.ID, res.Rank)
 				Connections.Show("connections after new login")
-				conn.BroadcastAdmin("Login", "Login", lr.ID)
+				conn.BroadcastAdmin("Login", &shared.NetData{Action: "Login", ID: lr.ID})
 
 				// Create a login record
 				req := conn.Socket.Request()

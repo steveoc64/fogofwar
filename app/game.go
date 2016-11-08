@@ -14,10 +14,10 @@ import (
 func gameChecklist(context *router.Context) {
 	Session.Subscribe("Game", _gameChecklist, context)
 	Session.Subscribe("Play", _play, context)
-	_gameChecklist("Edit", 0, context)
+	_gameChecklist("Edit", nil, context)
 }
 
-func _gameChecklist(action string, actionID int, context *router.Context) {
+func _gameChecklist(action string, msg *shared.NetData, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -26,7 +26,7 @@ func _gameChecklist(action string, actionID int, context *router.Context) {
 
 	switch action {
 	case "Update":
-		if actionID != id {
+		if msg.ID != id {
 			return
 		}
 		break
@@ -283,10 +283,10 @@ func gameEditBlue(context *router.Context) {
 func gameEditPlayers(context *router.Context) {
 	Session.Subscribe("Game", _gameEditPlayers, context)
 	Session.Subscribe("Play", _play, context)
-	_gameEditPlayers("Edit", 0, context)
+	_gameEditPlayers("Edit", nil, context)
 }
 
-func _gameEditPlayers(action string, actionID int, context *router.Context) {
+func _gameEditPlayers(action string, msg *shared.NetData, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -294,7 +294,7 @@ func _gameEditPlayers(action string, actionID int, context *router.Context) {
 	}
 
 	if action == "Update" {
-		if actionID != id {
+		if msg.ID != id {
 			return
 		}
 		game := &shared.Game{}

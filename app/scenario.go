@@ -16,10 +16,10 @@ import (
 func scenarioList(context *router.Context) {
 	Session.Subscribe("Scenario", _scenarioList, context)
 	Session.Subscribe("Play", _play, context)
-	go _scenarioList("List", 0, context)
+	go _scenarioList("List", nil, context)
 }
 
-func _scenarioList(action string, id int, context *router.Context) {
+func _scenarioList(action string, msg *shared.NetData, context *router.Context) {
 
 	print("Here with action", action)
 
@@ -131,10 +131,10 @@ func scenarioAdd(context *router.Context) {
 
 func scenarioEdit(context *router.Context) {
 	Session.Subscribe("Scenario", _scenarioEdit, context)
-	go _scenarioEdit("Edit", 0, context)
+	go _scenarioEdit("Edit", nil, context)
 }
 
-func _scenarioEdit(action string, recnum int, context *router.Context) {
+func _scenarioEdit(action string, msg *shared.NetData, context *router.Context) {
 	id, err := strconv.Atoi(context.Params["id"])
 	if err != nil {
 		print(err.Error())
@@ -145,7 +145,7 @@ func _scenarioEdit(action string, recnum int, context *router.Context) {
 	case "Edit":
 		break
 	case "Change", "Unlock":
-		if recnum != id {
+		if msg.ID != id {
 			return
 		} else {
 			print("scenario has changed ? reload it")

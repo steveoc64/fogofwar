@@ -357,11 +357,11 @@ func bombardAdd(state *PlayState, m PlayMessage) {
 		DB.SQL(`update bombard set id=$2 where unit_id=$1`, bb.UnitID, newID).Exec()
 
 		// signal target player that they have incoming
-		Connections.BroadcastPlayer(bb.TargetID, "Play", "Incoming", newID)
+		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{Action: "Incoming", ID: newID})
 
 		// signal the firer that we have a new target identification ID for them, all they need
 		// to do is re-get the unit info
-		Connections.BroadcastPlayer(bb.FirerID, "Play", "BB", bb.UnitID)
+		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{Action: "BB", ID: bb.UnitID})
 	}
 }
 
@@ -377,11 +377,11 @@ func bombardCancel(state *PlayState, m PlayMessage) {
 		}
 
 		// signal target player that they have 1 less incoming
-		Connections.BroadcastPlayer(bb.TargetID, "Play", "IncomingCancel", bb.ID)
+		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{Action: "IncomingCancel", ID: bb.ID})
 
 		// signal the firer that we have removed the BB, which triggers a refresh of their
 		// fire mission page
-		Connections.BroadcastPlayer(bb.FirerID, "Play", "BB", bb.UnitID)
+		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{Action: "BB", ID: bb.UnitID})
 	}
 }
 
@@ -477,18 +477,18 @@ func sendPhaseUpdates(state *PlayState, newTurn bool) {
 		state.Game.RedPlayers[i].TODO = true
 		state.Game.RedPlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase})
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
 		state.Game.BluePlayers[i].TODO = true
 		state.Game.BluePlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", "Turn", state.Game.Turn)
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", "Phase", state.Game.Phase)
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase})
 		}
 	}
 }

@@ -46,12 +46,13 @@
     {{if ne "" .GetMState}}
       <li>Morale: {{.GetMState}}</li>
     {{end}}
-    <li>{{.Bayonets}} {{.GetRating}} Bayonets</li>
+    <li>{{.Bayonets}} {{.GetRating}} Bayonets
+    {{if ne 0 .BayonetsLost}}
+     .. with {{.BayonetsLost}} men currently unfit for duty.
+    {{end}}
+    </li>
     <li>Trained as {{.GetDrill}}</li>
     <li>In {{.GetCondition}} condition.</li>
-    {{if ne 0 .BayonetsLost}}
-    <li>.. with {{.BayonetsLost}} men currently unfit for duty.</li>
-    {{end}}
     {{if ne "" .GetSupport}}
     <li>{{.GetSupport}}</li>
     {{end}}
@@ -75,10 +76,10 @@
       <li>Morale: {{.GetMState}}</li>
     {{end}}
     <li>{{.Sabres}} Sabres of {{.GetCavRating}} {{.GetCavType}}</li>
-    <li>In {{.GetCondition}} condition.</li>
     {{if ne 0 .SabresLost}}
     <li>.. with {{.SabresLost}} Sabres sadly unavailable for battle.</li>
     {{end}}
+    <li>In {{.GetCondition}} condition.</li>
     {{if ne "" .GetSupport}}
     <li>{{.GetSupport}}</li>
     {{end}}

@@ -1027,11 +1027,11 @@ func (u *Unit) CanBombard(cmd *GameCmd) bool {
 		// print("parent corps is deploying - no fire")
 		return false
 	}
-	if cmd.CState != CmdBattleLine {
-		// print("parent corps is not in battle line")
-		return false
+	switch cmd.CState {
+	case CmdBattleLine, CmdCompleteMarch, CmdBattleAdvance:
+		return true
 	}
-	return true
+	return false
 }
 
 func (u *Unit) GetMState() string {
@@ -1094,6 +1094,12 @@ func (u *Unit) GetBases() string {
 		} else {
 			retval += " ½Bn"
 		}
+		if u.BayonetsLost > 1 {
+			retval += "*"
+			if u.BayonetsLost > 300 {
+				retval += "*"
+			}
+		}
 	}
 
 	x := u.LtCoy + u.JgCoy
@@ -1114,6 +1120,12 @@ func (u *Unit) GetBases() string {
 			}
 		} else {
 			retval += " ½Sqn"
+		}
+		if u.SabresLost > 1 {
+			retval += "*"
+			if u.SabresLost > 60 {
+				retval += "*"
+			}
 		}
 	}
 	if gg > 0 {
@@ -1176,6 +1188,12 @@ func (u *Unit) GetBases() string {
 				retval += " and"
 			}
 			retval += " a" + gunType + addGun
+		}
+		if u.GunsLost > 1 {
+			retval += "*"
+			if u.GunsLost > 3 {
+				retval += "*"
+			}
 		}
 	}
 	return "&nbsp;" + retval

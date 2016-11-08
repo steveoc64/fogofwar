@@ -17,6 +17,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	consoleCurrentUnit = div
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Bde")
+	subunits := div.GetSubunits(cmd)
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -40,9 +41,18 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	// title
 	html = svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), div.Name)
+	gothits := false
+	for _, v := range subunits {
+		if v.BayonetsLost > 0 || v.SabresLost > 0 || v.GunsLost > 0 {
+			html += svgText(10, 16, "text__0x", ".. Units with * have some Hits")
+			gothits = true
+			break
+		}
+	}
+	if !gothits {
+		html += svgText(10, 16, "text__0x", "All units at Full Strength")
+	}
 	html += svgEndG()
-
-	subunits := div.GetSubunits(cmd)
 
 	// yspacing := 80 / (numDivs + 1) // width to use for each cmd
 	yoffset := 0

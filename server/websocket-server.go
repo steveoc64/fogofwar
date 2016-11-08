@@ -41,17 +41,21 @@ func (c *Connection) Send(name string, data *shared.NetData) error {
 		ServiceMethod: name,
 		Seq:           0,
 		Async:         true,
-		Data:          data,
 	}
 
 	if err := c.enc.Encode(header); err != nil {
 		log.Println("Header", data.Action, err.Error())
+		Connections.Drop(c)
 		return err
 	}
-	if err := c.enc.Encode(nil); err != nil {
+	if err := c.enc.Encode(data); err != nil {
+		log.Println("Payload", data, err.Error())
+		Connections.Drop(c)
 		return err
 	}
-	// log.Println("got here with", payload)
+	// if err := c.enc.Encode(""); err != nil {
+	// return err
+	// }
 	return nil
 }
 
@@ -85,15 +89,17 @@ func (c *Connection) Login(username string, id int, rank int) {
 
 // Constantly Ping the Backend
 func (c *Connection) KeepAlive(sec time.Duration) {
-	// log.Println("sending ping to ", c.ID)
+	log.Println("init ping to", c.ID)
 
-	c.Send("Ping", &shared.NetData{ID: c.ID})
+	c.Send("Ping", &shared.NetData{Action: "Ping", ID: c.ID})
 	c.ticker = time.NewTicker(time.Second * sec)
 	for range c.ticker.C {
-		// log.Println("sending ping to client", c.ID)
-		err := c.Send("Ping", &shared.NetData{ID: c.ID})
+		log.Println("sending ping to client", c.ID)
+		err := c.Send("Ping", &shared.NetData{Action: "Ping", ID: c.ID})
 		if err != nil {
+			// so remove this one from the list
 			log.Println("Send error on", c.ID, err.Error())
+			return
 		}
 	}
 }
@@ -239,7 +245,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 		}
 	}
 
-	c.BroadcastAdmin("Login", &shared.NetData{Action: "Drop", ID: conn.ID})
+	// c.BroadcastAdmin("Login", &shared.NetData{Action: "Drop", ID: conn.ID})
 
 	// Remove any Rank 0 account that is tied to this channel
 	DB.SQL(`delete from users where rank=0 and channel=$1`, conn.ID).Exec()
@@ -334,11 +340,14 @@ type myServerCodec struct {
 // On receiving a new header, lock the connection until the whole RPC call has finished
 func (c *myServerCodec) ReadRequestHeader(r *rpc.Request) error {
 
+	// fmt.Printf("doing custom RRH\n")
 	header := &shared.NetRequest{}
 	err := c.dec.Decode(header)
+	// fmt.Printf("decoded into %v\n", *header)
 	if err != nil {
 		log.Println("Dropped Connection:", err.Error(), ", connection:", c.conn.ID)
 		Connections.Drop(c.conn)
+		return err
 	}
 	r.ServiceMethod = header.ServiceMethod
 	r.Seq = header.Seq
@@ -359,6 +368,7 @@ func (c *myServerCodec) WriteResponse(r *rpc.Response, body interface{}) (err er
 		ServiceMethod: r.ServiceMethod,
 		Seq:           r.Seq,
 		Error:         r.Error,
+		Async:         false,
 	}
 	if err = c.enc.Encode(header); err != nil {
 		if c.encBuf.Flush() == nil {
@@ -369,6 +379,8 @@ func (c *myServerCodec) WriteResponse(r *rpc.Response, body interface{}) (err er
 		}
 		return
 	}
+	// println("send the header out", header)
+	// println("sending the body", body)
 	if err = c.enc.Encode(body); err != nil {
 		if c.encBuf.Flush() == nil {
 			// Was a gob problem encoding the body but the header has been written.

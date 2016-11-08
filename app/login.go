@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"./shared"
 	"github.com/steveoc64/formulate"
@@ -26,6 +27,11 @@ func _Login(username string, passwd string, doNav bool) {
 	Session.Subscriptions = make(map[string]MessageFunction)
 	locstor.RemoveItem("username")
 	locstor.RemoveItem("secret")
+
+	for Session.Channel == 0 {
+		print(".")
+		time.Sleep(100 * time.Millisecond)
+	}
 
 	lc := &shared.LoginCredentials{
 		Username: username,

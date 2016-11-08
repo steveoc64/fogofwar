@@ -223,7 +223,7 @@ func main() {
 	pw, _ := locstor.GetItem("secret")
 	url, _ := locstor.GetItem("navigate")
 	game_id, _ := locstor.GetItem("game_id")
-	// print("u", username, "p", pw, "url", url, "game_id", game_id)
+	print("u", username, "p", pw, "url", url, "game_id", game_id)
 	if username != "" && pw != "" {
 		_Login(username, pw, false)
 		if Session.UserID != 0 {

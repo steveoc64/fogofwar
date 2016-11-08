@@ -19,15 +19,11 @@ type NetData struct {
 type NetRequest struct {
 	ServiceMethod string
 	Seq           uint64
-
-	Data *NetData
 }
 
 type NetResponse struct {
 	ServiceMethod string
 	Seq           uint64
 	Error         string
-
-	Async bool
-	Data  *NetData
+	Async         bool
 }

@@ -14,6 +14,7 @@ var LastRPC struct {
 
 func RPC(r string, dataIN interface{}, dataOUT interface{}) error {
 	start := time.Now()
+	// print("RPC", r)
 	err := rpcClient.Call(r, dataIN, dataOUT)
 	d := fmt.Sprintf("%s", time.Since(start))
 	fmt.Printf("» %-30s %10s\n", r, d)

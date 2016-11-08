@@ -70,7 +70,7 @@ func (g *GameRPC) Get(data shared.GameRPCData, retval *shared.Game) error {
 	 		left join (select game_id, count(*) as reds from game_players where red_team group by 1) p_red on p_red.game_id=g.id
 	 		left join (select game_id, count(*) as blues from game_players where blue_team group by 1) p_blue on p_blue.game_id=g.id
 		where g.id=$1`, data.ID).QueryStruct(retval)
-	fmt.Printf("Got %v\n", *retval)
+	// fmt.Printf("Got %v\n", *retval)
 
 	retval.CanStart = false
 	if err == nil {
@@ -406,7 +406,7 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 				for _, v := range data.Game.RedCmd {
 					if v.StartX != -1 && v.StartY != -1 {
 						_, err = DB.SQL(`update game_cmd
-							set start_x=$3,start_y=$4
+							set start_x=$3,start_y=$4,cx=$3,cy=$4,dx=$3,dy=$4
 							where game_id=$1 and id=$2 and red_team`, data.ID, v.ID, v.StartX, v.StartY).Exec()
 					}
 					if err != nil {
@@ -422,7 +422,7 @@ func (g *GameRPC) SaveTiles(data shared.GameRPCData, done *bool) error {
 				for _, v := range data.Game.BlueCmd {
 					if v.StartX != -1 && v.StartY != -1 {
 						_, err = DB.SQL(`update game_cmd
-							set start_x=$3,start_y=$4
+							set start_x=$3,start_y=$4,cx=$3,cy=$4,dx=$3,dy=$4
 							where game_id=$1 and id=$2 and blue_team`, data.ID, v.ID, v.StartX, v.StartY).Exec()
 					}
 					if err != nil {

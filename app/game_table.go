@@ -174,7 +174,7 @@ func gameEditTable(context *router.Context) {
 				objRow = "row-5"
 			}
 		}
-		print("objRow", objRow)
+		// print("objRow", objRow)
 		form.Get(objRow).Class().Add("hidden")
 
 		// Scroll to the map
@@ -351,7 +351,7 @@ func gameEditTable(context *router.Context) {
 				team := btn.GetAttribute("data-team")
 				id, _ := strconv.Atoi(btn.GetAttribute("data-id"))
 				TheCmd = game.GetCmd(team, id)
-				print("selected Cmd", team, id, TheCmd)
+				// print("selected Cmd", team, id, TheCmd)
 				btn.Class().SetString("button button-primary")
 				scrollToMap()
 			})
@@ -744,9 +744,9 @@ func gameEditTable(context *router.Context) {
 					tClass.Add(theTile.GetCSS())
 					changed = true
 				case "red", "blue":
-					print("clicked on unit tile", i, TheCmd)
-					tName := t.GetAttribute("name")
-					print("tile name", tName)
+					// print("clicked on unit tile", i, TheCmd)
+					// tName := t.GetAttribute("name")
+					// print("tile name", tName)
 					TheCmd.StartX = theTile.X
 					TheCmd.StartY = theTile.Y
 					drawTiles()
@@ -763,7 +763,7 @@ func gameEditTable(context *router.Context) {
 						} else {
 							// print("looks like a valid objective", i)
 							TheObj = game.Objectives[i]
-							print("which gives", TheObj)
+							// print("which gives", TheObj)
 							setObjectiveFields(TheObj)
 						}
 					} else {

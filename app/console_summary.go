@@ -35,6 +35,9 @@ func doTurnSummary(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+	if c == nil {
+		Session.Navigate("/")
+	}
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
@@ -150,17 +153,6 @@ func doTurnSummary(game *shared.Game) {
 	}
 }
 
-func doCommanderAction(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "CommanderAction")
-	print("phaseCommanderAction")
-	dom.GetWindow().Alert("all done")
-	consolePhaseDone(game)
-}
 func doEngage(game *shared.Game) {
 	// w := dom.GetWindow()
 	// doc := w.Document()

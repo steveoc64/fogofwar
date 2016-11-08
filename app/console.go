@@ -229,7 +229,8 @@ func play(context *router.Context) {
 			}
 		}
 
-		doTurnSummary(game)
+		consolePhaseNotBusy(game)
+		// doTurnSummary(game)
 
 		doDisplayPanel := func(mode string) {
 			consoleCurrentPanel = mode

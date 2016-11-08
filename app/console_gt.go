@@ -194,13 +194,74 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 }
 
 func doGT2(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
+	g := c.QuerySelector("[name=g-main]")
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "GT2")
-	print("phaseGT2")
-	dom.GetWindow().Alert("all done")
-	consolePhaseDone(game)
+	// print("phaseGT1 with", game)
+
+	team := "blue"
+	teamName := game.BlueTeam
+	cmds := game.BlueCmd
+	if game.Red {
+		team = "red"
+		teamName = game.RedTeam
+		cmds = game.RedCmd
+	}
+
+	// Create heading with Team Name
+	sz := 2
+	if len(teamName) > 18 {
+		sz = 1
+	}
+	html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
+	html += svgHelpBtn()
+
+	yoffset := 0
+	count := 0
+	for _, v := range cmds {
+		// max, min, gt := v.GTMove()
+		max, _, gt := v.GTMove()
+		// print("unit", v.ID, "can move", max, min, gt)
+		if v.PlayerID == Session.UserID {
+			html += svgG(v.ID)
+			if max == 0 {
+				html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
+			} else {
+				count++
+				html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			}
+			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, gt)
+			html += svgEndG()
+			yoffset += 11
+		}
+	}
+	if count > 0 {
+		html += svgText(0, 16, "text__1x text__"+team, "Any Cav here can move 2 grids:")
+	} else {
+		html += svgText(0, 16, "text__1x text__"+team, "No Movement this Turn ...")
+	}
+	html += svgG(100)
+	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += "\n"
+	html += svgText(50, 97, "text__carryon text__middle", "Movement Complete")
+	html += svgEndG()
+	html += svgText(0, 80, "text__0x", ".. any other Cavalry 1 grid, any Skirmishers ½ grid")
+	g.SetInnerHTML(html)
+
+	svgCallback(100, func(dom.Event) {
+		print("all done")
+		consolePhaseDone(game)
+	})
+
+	svgCallbackQuery("#help", func(dom.Event) {
+		loadTemplate("gt-move", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=gt-move]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
+	})
 }

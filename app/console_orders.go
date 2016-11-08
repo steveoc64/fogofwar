@@ -10,13 +10,10 @@ import (
 )
 
 func doOrders(game *shared.Game) {
-	w := dom.GetWindow()
-	doc := w.Document()
-	c := doc.QuerySelector("[name=svg-console]")
-
 	// Cant always access orders
 	switch game.Phase {
 	case shared.PhaseOrders:
+		doPreGameOrders(game)
 	case shared.PhaseGT1:
 		doGT1(game)
 		return
@@ -39,6 +36,13 @@ func doOrders(game *shared.Game) {
 		doObjectives(game)
 		return
 	}
+	doPreGameOrders(game)
+}
+
+func doPreGameOrders(game *shared.Game) {
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Orders")
@@ -84,7 +88,7 @@ func doOrders(game *shared.Game) {
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 		print("clicked on corps", id, el.TagName())
 		for _, v := range cmds {
-			if v.ID == id {
+			if v.ID == id && v.PlayerID == Session.UserID {
 				doCorpsOrders(game, v)
 			}
 		}

@@ -701,6 +701,7 @@ type Unit struct {
 	UType            int    `db:"utype"`
 	CmdLevel         int    `db:"cmd_level"`
 	Drill            int    `db:"drill"`
+	Formation        int    `db:"formation"`
 	Bayonets         int    `db:"bayonets"`
 	SmallArms        int    `db:"small_arms"`
 	EliteArms        int    `db:"elite_arms"`
@@ -715,15 +716,10 @@ type Unit struct {
 	HorseGuns        bool   `db:"horse_guns"`
 	GunneryType      int    `db:"gunnery_type"`
 	GunCondition     int    `db:"gun_condition"`
-	TableSecton      int    `db:"table_section"`
-	DeployTo         int    `db:"deploy_to"`
-	GTFormation      int    `db:"gt_formation"`
 	SKOut            bool   `db:"sk_out"`
 	Woods            bool   `db:"woods"`
 	Rough            bool   `db:"rough"`
 	Cover            bool   `db:"cover"`
-	RFlank           bool   `db:"rflank"`
-	LFlank           bool   `db:"lflank"`
 	HasSupport       bool   `db:"has_support"`
 	BayonetsLost     int    `db:"bayonets_lost"`
 	BayonetsMState   int    `db:"bayonets_mstate"`
@@ -761,6 +757,10 @@ type UnitHistory struct {
 	Ammo             int
 	Role             int
 	Descrpition      string
+}
+
+func (u *Unit) InColumn() bool {
+	return false
 }
 
 func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) (int, int, int, string) {

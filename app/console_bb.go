@@ -22,7 +22,7 @@ func doBB(game *shared.Game) {
 		consoleSetViewBox(game, 100, 100, false)
 	}
 	consolePhaseBusy(game, "BB")
-	print("phaseBB")
+	// print("phaseBB")
 
 	team := "blue"
 	cmds := game.BlueCmd
@@ -40,9 +40,9 @@ func doBB(game *shared.Game) {
 	count := 0
 	ids := []int{}
 	for _, v := range cmds {
-		print("check bb", v.PlayerID, Session.UserID)
+		// print("check bb", v.PlayerID, Session.UserID)
 		if v.PlayerID == Session.UserID {
-			print("got", v)
+			// print("got", v)
 			// is under my command
 			if v.CanBombard() {
 				html += svgG(v.ID)
@@ -60,14 +60,14 @@ func doBB(game *shared.Game) {
 	if count == 0 {
 		html += svgText(xx/2, 97, "text__carryon text__middle", "Nothing to Fire")
 	} else {
-		html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
+		html += fmt.Sprintf(`<image xlink:href=/img/bombardment.png x=%d y=0 height=15 width=50></image>`, xx-60)
 		html += svgText(xx/2, 97, "text__carryon text__middle", "Cease Fire")
 	}
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		print("cease fire")
+		// print("cease fire")
 		consolePhaseDone(game)
 	})
 
@@ -84,7 +84,7 @@ func doBB(game *shared.Game) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			cmd := game.GetCmd(team, id)
-			print("click on cmd", cmd)
+			// print("click on cmd", cmd)
 			doBB2(game, cmd)
 		})
 	}
@@ -174,12 +174,12 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += "\n"
 	if count == 0 {
 		html += svgText(xx/2, 97, "text__carryon text__middle", "Nothing to Fire")
 	} else {
-		html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
+		html += fmt.Sprintf(`<image xlink:href=/img/bombardment.png x=%d y=0 height=15 width=50></image>`, xx-60)
 		html += svgText(xx/2, 97, "text__carryon text__middle", "Cease Fire")
 	}
 	html += svgEndG()
@@ -202,7 +202,7 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			unit := game.GetUnit(team, id)
-			print("unit", team, id, unit)
+			// print("unit", team, id, unit)
 			if unit.Bombard != nil && unit.Bombard.ID != 0 {
 				if w.Confirm("Cancel this Fire Mission ?") {
 					go func() {
@@ -260,21 +260,20 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	html += svgHelpBtn()
 
 	html += `<g id=fire>`
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="fire-button" data-id=100></rect>`
-	html += "\n"
-	html += fmt.Sprintf(`<image xlink:href=/img/bombardment.png x=%d y=0 height=15 width=50></image>`, xx/2-10)
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="fire-button" data-id=100></rect>`, xx)
+	html += fmt.Sprintf(`<image xlink:href=/img/bombardment.png x=%d y=0 height=15 width=50></image>`, xx-60)
 	html += svgText(xx/2, 97, "text__carryon text__middle", "Fire")
 	html += `</g>`
 
 	y := 30
 	x := 0
 	for _, v := range enemy {
-		print("enemy", enemy)
+		// print("enemy", enemy)
 		html += svgG(v.PlayerID)
 		// html += svgText(x+10, y, "text__2x text__"+enemyTeam, v.Username)
 		html += svgButton(x, y, xx/2-1, 10, "console-corps-button", "text__1x text__"+enemyTeam, v.Username)
-		html += fmt.Sprintf(`<image xlink:href=%s x=%d y=%d height=8 width=8></image>`, v.Avatar, x+30, y+1)
-		html += svgTick(fmt.Sprintf("select-%d", v.PlayerID), "tick hidden", x+38, y, 10)
+		html += fmt.Sprintf(`<image xlink:href=%s x=%d y=%d height=8 width=8></image>`, v.Avatar, x+(xx/2)-20, y+1)
+		html += svgTick(fmt.Sprintf("select-%d", v.PlayerID), "tick hidden", x+(xx/2)-12, y, 10)
 		html += svgEndG()
 		if x == 0 {
 			x = xx / 2
@@ -285,21 +284,21 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	}
 
 	maxRange := unit.GetGunRange()
-	html += svgText(0, 74, "text__0x", "Range:")
+	html += svgText(20, 74, "text__0x", "Range:")
 	html += `<g id=range>`
 	x = 0
 	if maxRange > 0 {
-		rangeBands := 100 / maxRange
+		rangeBands := (xx - 40) / maxRange
 		for r := 1; r <= maxRange; r++ {
 			html += fmt.Sprintf(`<rect data-id=%d x=%d y=75 width=%d height=11 class=range-bands></rect>`,
-				r, (r-1)*rangeBands, rangeBands)
-			html += svgText(r*rangeBands-1, 74, "text__0x text__tiny text_end", fmt.Sprintf("%dm", r*400))
+				r, (r-1)*rangeBands+20, rangeBands)
+			html += svgText((r*rangeBands-1)+20, 74, "text__0x text__tiny text_end", fmt.Sprintf("%dm", r*400))
 		}
 	}
 	html += `</g>`
 
 	// add a gun model on top of the range band
-	html += `<image xlink:href=/img/gun.png x=-5 y=76 height=12 width=12></image>`
+	html += `<image xlink:href=/img/gun.png x=7 y=73 height=16 width=16></image>`
 	g.SetInnerHTML(html)
 
 	svgCallbackQuery("#fire", func(dom.Event) {
@@ -406,7 +405,7 @@ func doBBReceive(game *shared.Game, id int, bb string) {
 		consoleSetViewBox(game, 100, 100, false)
 	}
 	consolePhaseBusy(game, "BBReceive")
-	print("phaseBBReceive")
+	// print("phaseBBReceive")
 
 	team := "blue"
 	cmds := game.BlueCmd
@@ -618,7 +617,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 
 	svgCallback(100, func(dom.Event) {
 		if selectedElement != 0 {
-			print("done", selectedElement)
+			// print("done", selectedElement)
 			// TODO - signal backend that incoming bombardment hits uint X
 			// then go back to main page
 			go func() {

@@ -163,23 +163,26 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 
 	svgCallback(100, func(dom.Event) {
 		print("all done")
-		go func() {
-			newCmd := shared.GameCmd{}
-			destination := !doc.QuerySelector("#destination").Class().Contains("hidden")
-			contact := !doc.QuerySelector("#contact").Class().Contains("hidden")
-			err := RPC("GameRPC.GTMove", shared.GTMoveData{
-				Channel:     Session.Channel,
-				ID:          cmd.ID,
-				Destination: destination,
-				Contact:     contact,
-			}, &newCmd)
-			if err == nil {
-				print("got back new cmd", newCmd)
-				cmd.CX = newCmd.CX
-				cmd.CY = newCmd.CY
-				cmd.DState = newCmd.DState
-			}
-		}()
+		if max > 1 {
+			go func() {
+				newCmd := shared.GameCmd{}
+
+				destination := !doc.QuerySelector("#destination").Class().Contains("hidden")
+				contact := !doc.QuerySelector("#contact").Class().Contains("hidden")
+				err := RPC("GameRPC.GTMove", shared.GTMoveData{
+					Channel:     Session.Channel,
+					ID:          cmd.ID,
+					Destination: destination,
+					Contact:     contact,
+				}, &newCmd)
+				if err == nil {
+					print("got back new cmd", newCmd)
+					cmd.CX = newCmd.CX
+					cmd.CY = newCmd.CY
+					cmd.DState = newCmd.DState
+				}
+			}()
+		}
 		consolePhaseDone(game)
 	})
 

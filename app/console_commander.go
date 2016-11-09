@@ -40,6 +40,7 @@ func doCommanderAction(game *shared.Game) {
 	// }
 	// html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
 	html := svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Commander Actions")
+	html += svgHelpBtn()
 
 	// yspacing := 80 / (len(cmds) + 1) // width to use for each cmd
 	yoffset := 0
@@ -85,6 +86,14 @@ func doCommanderAction(game *shared.Game) {
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
 		consolePhaseDone(game)
+	})
+
+	svgCallbackQuery("#help", func(dom.Event) {
+		loadTemplate("commander-actions", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=commander-actions]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
 	})
 
 	for _, v := range cmds {

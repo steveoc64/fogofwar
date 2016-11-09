@@ -24,6 +24,9 @@ func svgEndG() string {
 }
 
 func svgHelpBtn() string {
+	if Session.Orientation == "Landscape" {
+		return `<g id=help><circle class=help-button cx=143 cy=5 r=5></circle><text x=140 y=9 class="text__gold text__2x">?</text></g>`
+	}
 	return `<g id=help><circle class=help-button cx=95 cy=5 r=5></circle><text x=92 y=9 class="text__gold text__2x">?</text></g>`
 }
 

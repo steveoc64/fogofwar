@@ -219,7 +219,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 				PlayerID: conn.UserID,
 				OpCode:   PlayerConnected,
 			}
-			println("Player", conn.Username, "has joined game", data.ID)
+			// println("Player", conn.Username, "has joined game", data.ID)
 		}
 	}
 

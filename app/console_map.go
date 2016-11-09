@@ -81,21 +81,27 @@ func doMap(game *shared.Game) {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				// print("getting blue cmd", uid)
 				cmd := consoleGame.GetCmd("Blue", uid)
-				cmd.CalcTotals()
 				// print("cmd", cmd)
 				// print("game", consoleGame)
-				html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
-					cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
+				if cmd.IsEnemy(game) {
+					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
+						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
+				} else {
+					cmd.CalcTotals()
+					html = fmt.Sprintf("<b>Friendly Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>%s<br>\n",
+						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize(), cmd.CommandSummary())
+				}
 			} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				// print("getting red cmd", uid)
 				cmd := consoleGame.GetCmd("Red", uid)
-				cmd.CalcTotals()
-				html = fmt.Sprintf("<b>Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>\n",
-					cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize())
-
-				if cmd.PlayerID == Session.UserID {
-					html += cmd.CommandSummary()
+				if cmd.IsEnemy(game) {
+					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
+						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
+				} else {
+					cmd.CalcTotals()
+					html = fmt.Sprintf("<b>Friendly Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>%s<br>\n",
+						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize(), cmd.CommandSummary())
 				}
 			} else {
 				html = ""
@@ -244,6 +250,8 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 		cmd = game.BlueCmd
 	}
 	html := ""
+
+	// print("computing map for", team, cmd)
 
 	coord := func(i int) int {
 		return (i * game.GridSize) + (game.GridSize / 2)

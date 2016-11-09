@@ -526,6 +526,7 @@ type GameCmd struct {
 	Wait          bool    `db:"wait"`
 	PrepDefence   bool    `db:"prep_defence"`
 	Contact       bool    `db:"contact"`
+	Seen          bool    `db:"seen"`
 	Cmdrs         int
 	Bayonets      int
 	Sabres        int
@@ -537,6 +538,17 @@ type GameCmdRPCData struct {
 	ID       int
 	PlayerID int
 	Team     string
+}
+
+func (g *GameCmd) IsEnemy(game *Game) bool {
+
+	if !game.Red && g.RedTeam {
+		return true
+	}
+	if !game.Blue && g.BlueTeam {
+		return true
+	}
+	return false
 }
 
 var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance", "Completing March"}

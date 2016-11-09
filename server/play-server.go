@@ -40,7 +40,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 	c1 := 0
 	DB.SQL(`select count(*) from game_players where game_id=$1 and player_id=$2`, data.ID, conn.UserID).QueryScalar(&c1)
 	if c1 == 0 {
-		return errors.New("Insufficient Privilege")
+		return errors.New(fmt.Sprintf("Insufficient Privilege %d %d", data.ID, conn.UserID))
 	}
 
 	err := DB.SQL(`select
@@ -117,7 +117,17 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
+		} else {
+			// get seen enemies but not their units
+			DB.SQL(`select
+				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.red_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
+
 		if retval.Blue {
 			DB.SQL(`select
 				g.*,
@@ -126,6 +136,15 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
+		} else {
+			// get seen enemies, but not there units
+			DB.SQL(`select
+				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
+					coalesce(u.username,'') as player_name,
+					coalesce(u.email,'') as player_email
+				from game_cmd g
+				left join users u on u.id=g.player_id
+				where g.game_id=$1 and g.blue_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
 
 		// If the GetUnits flag was set, then get all the units for each of the commands as well

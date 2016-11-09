@@ -20,20 +20,21 @@ func doCommanderAction(game *shared.Game) {
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	teamName := game.BlueTeam
+	// teamName := game.BlueTeam
 	cmds := game.BlueCmd
 	if game.Red {
 		team = "red"
-		teamName = game.RedTeam
+		// teamName = game.RedTeam
 		cmds = game.RedCmd
 	}
 
 	// Create heading with Team Name
-	sz := 2
-	if len(teamName) > 18 {
-		sz = 1
-	}
-	html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
+	// sz := 2
+	// if len(teamName) > 18 {
+	// 	sz = 1
+	// }
+	// html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
+	html := svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Commander Actions")
 
 	// yspacing := 80 / (len(cmds) + 1) // width to use for each cmd
 	yoffset := 0
@@ -60,7 +61,7 @@ func doCommanderAction(game *shared.Game) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		print("all done")
+		// print("all done")
 		consolePhaseDone(game)
 	})
 
@@ -68,7 +69,7 @@ func doCommanderAction(game *shared.Game) {
 	clickCorps := func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		print("clicked on corps", id)
+		// print("clicked on corps", id)
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
 				doCorpsOrders(game, v)
@@ -77,7 +78,7 @@ func doCommanderAction(game *shared.Game) {
 	}
 
 	svgCallback(100, func(dom.Event) {
-		print("all done")
+		// print("all done")
 		consolePhaseDone(game)
 	})
 

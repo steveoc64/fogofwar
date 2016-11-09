@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os/exec"
 	"time"
@@ -32,6 +33,7 @@ var DB *runner.DB
 func main() {
 
 	start := time.Now()
+	rand.Seed(time.Now().UTC().UnixNano())
 
 	initVCode()
 	Config = LoadConfig()

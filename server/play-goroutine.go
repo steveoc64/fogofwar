@@ -401,16 +401,23 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 		fmt.Fprintf(state.Log, "ALL DONE - phase %d ends\n", state.Game.Phase)
 		println(".. ALL DONE - phase ends in game", state.Game.ID)
 		newTurn := false
+
+		// At end of GT movement phase, calc vision
+		if state.Game.Phase == shared.PhaseGT1 {
+			calcVision(state.Game)
+		}
 		state.Game.Phase++
 		if state.Game.Phase > shared.PhaseObjectives {
 			state.Game.Phase = 1
 			state.Game.Turn++
+			calcVision(state.Game)
 			// Just for now, advance the state of any units adjusting state
 			DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
 			DB.SQL(`update game_cmd set dstate=$2 where game_id=$1 and cstate=$3`,
 				state.Game.ID, shared.CmdBattleLine, shared.CmdCompleteMarch).Exec()
 			DB.SQL(`update unit set guns_fired=false where game_id=$1`, state.Game.ID).Exec()
 			newTurn = true
+
 		}
 		fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
 		fmt.Fprintf(state.Log, "Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)

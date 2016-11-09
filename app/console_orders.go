@@ -95,7 +95,7 @@ func doPreGameOrders(game *shared.Game) {
 	}
 
 	svgCallback(100, func(dom.Event) {
-		print("all done")
+		// print("all done")
 		consolePhaseDone(game)
 	})
 
@@ -141,8 +141,8 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	}
 
 	yoffset := 20
-	print("cmd", cmd)
-	print("deploying", cmd.Deploying())
+	// print("cmd", cmd)
+	// print("deploying", cmd.Deploying())
 
 	if cmd.Deploying() {
 		html += svgText(0, 30, "text__start text__hand", getSalutation(Salutations))
@@ -154,8 +154,8 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 		html += svgEndG()
 	} else {
 		html += svgEndG()
-		print("moving", cmd.Moving())
-		print("state", cmd.CState)
+		// print("moving", cmd.Moving())
+		// print("state", cmd.CState)
 		if cmd.Moving() {
 			// is moving and not deploying .. must be enroute to a new objective
 			switch cmd.CState {
@@ -207,7 +207,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			}
 		} else {
 			// is not deploying and not moving .. can take any number of new orders
-			print("not moving, cstate is", cmd.CState)
+			// print("not moving, cstate is", cmd.CState)
 			switch cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandCarryOn)
@@ -273,7 +273,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdBattleAdvance:
-				print("not dep, not move, but have cmdadvance")
+				// print("not dep, not move, but have cmdadvance")
 				html += svgG(shared.CommandCarryOn)
 				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue Advance ...")
 				html += svgEndG()

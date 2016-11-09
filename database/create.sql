@@ -466,7 +466,8 @@ create  table game_cmd (
 	dx int not null default -1,
 	dy int not null default -1,
 	prep_defence bool not null default false,
-	contact bool not null default false
+	contact bool not null default false,
+	seen bool not null default false
 );
 \i data/game_cmd.sql
 create index game_cmd_game_idx on game_cmd (game_id);
@@ -505,14 +506,11 @@ create  table unit (
 	condition int not null default 2,
 	cmd_level int not null default 1,
 	drill int not null default 1,
-	deploy_to int not null default 1, -- 0 advance, 1st Line, 2nd Line, 3 Left Flnk, 4 R Flnk, 5..6.. Reserve lines
-	gt_formation int not null default 1,  
+	formation int not null default 0,
 	sk_out bool not null default false,
 	woods bool not null default false,
 	rough bool not null default false,
 	cover bool not null default false,
-	rflank bool not null default false,
-	lflank bool not null default false,
 	has_support bool not null default false,
 	bayonets int not null default 0,
 	bayonets_lost int not null default 0,
@@ -546,7 +544,8 @@ create  table unit (
 	mstate int not null default -1,    -- -1 pregame, otherwise, num 2min turns till recovered
 	role int not null default 0, 
 	d_role int not null default 0,
-	orders int not null default 0
+	orders int not null default 0,
+	ammo int not null default 12
 );
 \i data/unit.sql
 create index unit_cmd_idx on unit (cmd_id);

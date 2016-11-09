@@ -15,7 +15,13 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 
 	consoleCurrentCmd = cmd
 	consoleCurrentUnit = div
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "Bde")
 	subunits := div.GetSubunits(cmd)
 
@@ -28,9 +34,9 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	}
 
 	html := svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Organise Brigades")
 	html += svgEndG()
 
 	// Create heading with Div Name
@@ -44,7 +50,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	gothits := false
 	for _, v := range subunits {
 		if v.BayonetsLost > 0 || v.SabresLost > 0 || v.GunsLost > 0 {
-			html += svgText(10, 16, "text__0x", ".. Units with * have some Hits")
+			html += svgText(10, 16, "text__0x", ".. Units with * have some hits")
 			gothits = true
 			break
 		}
@@ -58,18 +64,18 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	yoffset := 0
 	for _, v := range subunits {
 		html += svgG(v.ID)
-		html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+		html += svgButton(0, 18+yoffset, xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
 		if len(v.Name) < 16 {
-			html += svgText(55, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
+			html += svgText(xx/2+5, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
 		}
-		html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetBases())
+		html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.GetBases())
 		html += svgEndG()
 		yoffset += 11
 	}
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Organise Brigades")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Organise Brigades")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
@@ -158,7 +164,13 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 
 	consoleCurrentCmd = cmd
 	consoleCurrentUnit = div
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "UnitReorg")
 
 	team := "blue"
@@ -172,7 +184,19 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 
 	// draw the grid of role locations
 
-	html += `
+	if Session.Orientation == "Landscape" {
+		html += `
+<g id=layout>
+<rect data-id=res x=0 y=20 width=150 height=65 class=unit-layout></rect>
+<rect data-id=adv x=50 y=20 width=50 height=15 class=unit-layout></rect>
+<rect data-id=first x=50 y=35 width=50 height=15 class=unit-layout></rect>
+<rect data-id=second x=50 y=50 width=50 height=15 class=unit-layout></rect>
+<rect data-id=left x=0 y=35 width=50 height=30 class=unit-layout></rect>
+<rect data-id=right x=100 y=35 width=50 height=30 class=unit-layout></rect>
+</g>
+`
+	} else {
+		html += `
 <g id=layout>
 <rect data-id=res x=0 y=20 width=100 height=65 class=unit-layout></rect>
 <rect data-id=adv x=30 y=20 width=40 height=15 class=unit-layout></rect>
@@ -182,6 +206,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 <rect data-id=right x=70 y=35 width=30 height=30 class=unit-layout></rect>
 </g>
 `
+	}
 
 	// Draw in the unit in the various fwd roles
 	totaladv := 0
@@ -227,7 +252,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		switch v.Role {
 		case shared.RoleReserve:
 			if (res % 2) != 0 {
-				x = 50
+				x = xx / 2
 			} else {
 				x = 0
 			}
@@ -240,6 +265,9 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			res++
 		case shared.RoleAdvance:
 			x = 32
+			if Session.Orientation == "Landscape" {
+				x = 52
+			}
 			y = 25
 			html += svgG(v.ID)
 			html += svgText(x, y, "text__unit", v.Name)
@@ -247,6 +275,9 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			adv++
 		case shared.Role1:
 			x = 32
+			if Session.Orientation == "Landscape" {
+				x = 52
+			}
 			y = 40
 			if first == 1 {
 				x += 2
@@ -258,6 +289,9 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			first++
 		case shared.Role2:
 			x = 32
+			if Session.Orientation == "Landscape" {
+				x = 52
+			}
 			y = 55
 			if second == 1 {
 				x += 2
@@ -269,19 +303,33 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 			second++
 		case shared.RoleRight:
 			x = 75
+			if Session.Orientation == "Landscape" {
+				x = 102
+			}
 			y = 50
 			// html += svgG(v.ID)
 			svgID = v.ID
-			html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,80,50)>`, v.ID)
+			if Session.Orientation == "Landscape" {
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,105,50)>`, v.ID)
+			} else {
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,70,30)>`, v.ID)
+			}
 			html += svgText(x, y, "text__unit", v.Name)
 			html += svgEndG()
 			right++
 		case shared.RoleLeft:
 			x = -5
+			if Session.Orientation == "Landscape" {
+				x = 0
+			}
 			y = 50
 			// html += svgG(v.ID)
 			svgID = v.ID
-			html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+			if Session.Orientation == "Landscape" {
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+			} else {
+				html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,30,30)>`, v.ID)
+			}
 			html += svgText(x, y, "text__unit", v.Name)
 			html += svgEndG()
 			left++
@@ -289,9 +337,9 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Done")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 

@@ -15,7 +15,6 @@ func doGT1(game *shared.Game) {
 	g := c.QuerySelector("[name=g-main]")
 
 	xx := 100
-
 	if Session.Orientation == "Landscape" {
 		consoleSetViewBox(game, 150, 100, false)
 		xx = 150

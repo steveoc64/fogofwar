@@ -14,8 +14,13 @@ func doBB(game *shared.Game) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "BB")
 	print("phaseBB")
 
@@ -41,7 +46,7 @@ func doBB(game *shared.Game) {
 			// is under my command
 			if v.CanBombard() {
 				html += svgG(v.ID)
-				html += svgButton(x, y, 100, 10, "console-corps-button", "text__1x text__"+team, v.Name)
+				html += svgButton(x, y, xx, 10, "console-corps-button", "text__1x text__"+team, v.Name)
 				html += svgEndG()
 				count++
 				ids = append(ids, v.ID)
@@ -50,13 +55,13 @@ func doBB(game *shared.Game) {
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += "\n"
 	if count == 0 {
-		html += svgText(50, 97, "text__carryon text__middle", "Nothing to Fire")
+		html += svgText(xx/2, 97, "text__carryon text__middle", "Nothing to Fire")
 	} else {
 		html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
-		html += svgText(50, 97, "text__carryon text__middle", "Cease Fire")
+		html += svgText(xx/2, 97, "text__carryon text__middle", "Cease Fire")
 	}
 	html += svgEndG()
 	g.SetInnerHTML(html)
@@ -93,8 +98,13 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 	consoleCurrentCmd = cmd
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "BB2")
 	// print("phaseBB2")
 
@@ -129,33 +139,33 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 			html += svgG(v.ID)
 			if total > 4 {
 				if v.Bombard == nil || v.Bombard.ID == 0 {
-					html += svgButton(x, y, 48, 15, "console-corps-button", "", "")
+					html += svgButton(x, y, xx/2, 15, "console-corps-button", "", "")
 				} else {
-					html += svgButton(x, y, 48, 15, "console-corps-disabled", "", "")
+					html += svgButton(x, y, xx/2, 15, "console-corps-disabled", "", "")
 					html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=%d r=5></circle><text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>`,
-						v.ID, x+42, y+6, v.ID, x+40, y+8, v.Bombard.ID)
+						v.ID, xx/2-8, y+6, v.ID, xx/2-10, y+8, v.Bombard.ID)
 				}
 				html += svgText(x+3, y+5, "text__1x text__"+team, divName)
 				html += svgText(x+3, y+10, "text__0x text__"+team, v.Name)
-				html += svgText(x+46, y+13, "text__end text__0x text__tiny", v.GetGuns())
+				html += svgText(xx/2-4, y+13, "text__end text__0x text__tiny", v.GetGuns())
 				html += svgEndG()
 				if x == 0 {
-					x = 50
+					x = xx / 2
 				} else {
 					x = 0
 					y += 16
 				}
 			} else {
 				if v.Bombard == nil || v.Bombard.ID == 0 {
-					html += svgButton(x, y, 100, 15, "console-corps-button", "", "")
+					html += svgButton(x, y, xx, 15, "console-corps-button", "", "")
 				} else {
-					html += svgButton(x, y, 100, 15, "console-corps-disabled", "", "")
+					html += svgButton(x, y, xx, 15, "console-corps-disabled", "", "")
 					html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=%d r=5></circle><text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>`,
-						v.ID, x+65, y+8, v.ID, x+63, y+10, v.Bombard.ID)
+						v.ID, xx/2+15, y+8, v.ID, xx/2+13, y+10, v.Bombard.ID)
 				}
 				html += svgText(x+3, y+6, "text__1x text__"+team, divName)
 				html += svgText(20+x+3, y+12, "text__middle text__0x text__"+team, v.Name)
-				html += svgText(98, y+9, "text__end text__0x", v.GetGuns())
+				html += svgText(xx-2, y+9, "text__end text__0x", v.GetGuns())
 				html += svgEndG()
 				y += 16
 			}
@@ -167,10 +177,10 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
 	html += "\n"
 	if count == 0 {
-		html += svgText(50, 97, "text__carryon text__middle", "Nothing to Fire")
+		html += svgText(xx/2, 97, "text__carryon text__middle", "Nothing to Fire")
 	} else {
 		html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
-		html += svgText(50, 97, "text__carryon text__middle", "Cease Fire")
+		html += svgText(xx/2, 97, "text__carryon text__middle", "Cease Fire")
 	}
 	html += svgEndG()
 	g.SetInnerHTML(html)
@@ -225,8 +235,13 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 
 	consoleCurrentCmd = cmd
 	consoleCurrentUnit = unit
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "BB3")
 	// print("phaseBB3", game, cmd, unit)
 
@@ -247,8 +262,8 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	html += `<g id=fire>`
 	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="fire-button" data-id=100></rect>`
 	html += "\n"
-	html += `<image xlink:href=/img/bombardment.png x=40 y=0 height=15 width=50></image>`
-	html += svgText(50, 97, "text__carryon text__middle", "Fire")
+	html += fmt.Sprintf(`<image xlink:href=/img/bombardment.png x=%d y=0 height=15 width=50></image>`, xx/2-10)
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Fire")
 	html += `</g>`
 
 	y := 30
@@ -257,12 +272,12 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 		print("enemy", enemy)
 		html += svgG(v.PlayerID)
 		// html += svgText(x+10, y, "text__2x text__"+enemyTeam, v.Username)
-		html += svgButton(x, y, 49, 10, "console-corps-button", "text__1x text__"+enemyTeam, v.Username)
+		html += svgButton(x, y, xx/2-1, 10, "console-corps-button", "text__1x text__"+enemyTeam, v.Username)
 		html += fmt.Sprintf(`<image xlink:href=%s x=%d y=%d height=8 width=8></image>`, v.Avatar, x+30, y+1)
 		html += svgTick(fmt.Sprintf("select-%d", v.PlayerID), "tick hidden", x+38, y, 10)
 		html += svgEndG()
 		if x == 0 {
-			x = 50
+			x = xx / 2
 		} else {
 			x = 0
 			y += 12
@@ -383,8 +398,13 @@ func doBBReceive(game *shared.Game, id int, bb string) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "BBReceive")
 	print("phaseBBReceive")
 
@@ -407,7 +427,7 @@ func doBBReceive(game *shared.Game, id int, bb string) {
 		if v.PlayerID == Session.UserID {
 			// is under my command
 			html += svgG(v.ID)
-			html += svgButton(x, y, 100, 10, "console-corps-button", "text__1x text__"+team, v.Name)
+			html += svgButton(x, y, xx, 10, "console-corps-button", "text__1x text__"+team, v.Name)
 			html += svgEndG()
 			count++
 			y += 11
@@ -442,9 +462,14 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
-
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consoleCurrentCmd = cmd
-	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "BBReceive2")
 
 	team := "blue"
@@ -458,7 +483,20 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 
 	// draw the grid of role locations
 
-	html += `
+	if Session.Orientation == "Landscape" {
+		html += `
+<g id=layout>
+<rect data-id=res x=0 y=20 width=150 height=65 class=unit-layout></rect>
+<rect data-id=adv x=50 y=20 width=50 height=15 class=unit-layout></rect>
+<rect data-id=first x=50 y=35 width=50 height=15 class=unit-layout></rect>
+<rect data-id=second x=50 y=50 width=50 height=15 class=unit-layout></rect>
+<rect data-id=left x=0 y=35 width=50 height=30 class=unit-layout></rect>
+<rect data-id=right x=100 y=35 width=50 height=30 class=unit-layout></rect>
+</g>
+`
+	} else {
+
+		html += `
 <g id=layout>
 <rect data-id=res x=0 y=20 width=100 height=65 class=unit-layout></rect>
 <rect data-id=adv x=30 y=20 width=40 height=15 class=unit-layout></rect>
@@ -468,6 +506,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 <rect data-id=right x=70 y=35 width=30 height=30 class=unit-layout></rect>
 </g>
 `
+	}
 
 	adv := 0
 	first := 0
@@ -485,7 +524,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 			switch v.Role {
 			case shared.RoleReserve:
 				if (res % 2) != 0 {
-					x = 50
+					x = xx / 2
 				} else {
 					x = 0
 				}
@@ -498,6 +537,9 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				res++
 			case shared.RoleAdvance:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 25
 				html += svgG(v.ID)
 				html += svgText(x, y, "text__unit", v.Name)
@@ -505,6 +547,9 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				adv++
 			case shared.Role1:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 40
 				if first == 1 {
 					x += 2
@@ -516,6 +561,9 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				first++
 			case shared.Role2:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 55
 				if second == 1 {
 					x += 2
@@ -527,19 +575,33 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				second++
 			case shared.RoleRight:
 				x = 75
+				if Session.Orientation == "Landscape" {
+					x = 102
+				}
 				y = 50
 				// html += svgG(v.ID)
 				svgID = v.ID
-				html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,80,50)>`, v.ID)
+				if Session.Orientation == "Landscape" {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,105,50)>`, v.ID)
+				} else {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,80,50)>`, v.ID)
+				}
 				html += svgText(x, y, "text__unit", v.Name)
 				html += svgEndG()
 				right++
 			case shared.RoleLeft:
 				x = -5
+				if Session.Orientation == "Landscape" {
+					x = 0
+				}
 				y = 50
 				// html += svgG(v.ID)
 				svgID = v.ID
-				html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+				if Session.Orientation == "Landscape" {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+				} else {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+				}
 				html += svgText(x, y, "text__unit", v.Name)
 				html += svgEndG()
 				left++
@@ -548,9 +610,9 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Done")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 

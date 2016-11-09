@@ -12,8 +12,13 @@ func doUnits(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "Units")
 
 	// Add a turn summary object
@@ -41,11 +46,11 @@ func doUnits(game *shared.Game) {
 		v.CalcTotals()
 		html += svgG(v.ID)
 		if v.PlayerID == Session.UserID {
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
+			html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		} else {
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
+			html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.ShortSummary())
 		}
 		html += svgEndG()
 		yoffset += 11

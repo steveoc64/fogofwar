@@ -14,7 +14,13 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleCurrentCmd = cmd
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "UnitsDiv")
 
 	// Add a turn summary object
@@ -34,7 +40,7 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	// title
 	html := svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), fullName)
-	html += svgText(98, 15, "text__end text__0x", cmd.CommandSummary())
+	html += svgText(xx-2, 15, "text__end text__0x", cmd.CommandSummary())
 	html += svgEndG()
 
 	numDivs := 0
@@ -49,16 +55,16 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	for _, v := range cmd.Units {
 		if v.UType == shared.UnitDiv {
 			html += svgG(v.ID)
-			html += svgButton(0, 18+yoffset, 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
+			html += svgButton(0, 18+yoffset, xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
 			html += svgEndG()
 			yoffset += 11
 		}
 	}
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Division Orders")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Division Orders")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
@@ -94,7 +100,13 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 	html := ""
 
 	consoleCurrentCmd = cmd
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "UnitReorg")
 
 	team := "blue"
@@ -107,7 +119,19 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 
 	// draw the grid of role locations
 
-	html += `
+	if Session.Orientation == "Landscape" {
+		html += `
+<g id=layout>
+<rect data-id=res x=0 y=20 width=150 height=65 class=unit-layout></rect>
+<rect data-id=adv x=50 y=20 width=50 height=15 class=unit-layout></rect>
+<rect data-id=first x=50 y=35 width=50 height=15 class=unit-layout></rect>
+<rect data-id=second x=50 y=50 width=50 height=15 class=unit-layout></rect>
+<rect data-id=left x=0 y=35 width=50 height=30 class=unit-layout></rect>
+<rect data-id=right x=100 y=35 width=50 height=30 class=unit-layout></rect>
+</g>
+`
+	} else {
+		html += `
 <g id=layout>
 <rect data-id=res x=0 y=20 width=100 height=65 class=unit-layout></rect>
 <rect data-id=adv x=30 y=20 width=40 height=15 class=unit-layout></rect>
@@ -117,6 +141,7 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 <rect data-id=right x=70 y=35 width=30 height=30 class=unit-layout></rect>
 </g>
 `
+	}
 
 	// Draw in the unit in the various fwd roles
 	totaladv := 0
@@ -163,7 +188,7 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 			switch v.Role {
 			case shared.RoleReserve:
 				if (res % 2) != 0 {
-					x = 50
+					x = xx / 2
 				} else {
 					x = 0
 				}
@@ -176,6 +201,9 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 				res++
 			case shared.RoleAdvance:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 25
 				html += svgG(v.ID)
 				html += svgText(x, y, "text__unit", v.Name)
@@ -183,6 +211,9 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 				adv++
 			case shared.Role1:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 40
 				if first == 1 {
 					x += 2
@@ -194,6 +225,9 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 				first++
 			case shared.Role2:
 				x = 32
+				if Session.Orientation == "Landscape" {
+					x = 52
+				}
 				y = 55
 				if second == 1 {
 					x += 2
@@ -205,19 +239,33 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 				second++
 			case shared.RoleRight:
 				x = 75
-				y = 50
+				if Session.Orientation == "Landscape" {
+					x = 102
+				}
+				y = 40
 				// html += svgG(v.ID)
 				svgID = v.ID
-				html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,80,50)>`, v.ID)
+				if Session.Orientation == "Landscape" {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,105,50)>`, v.ID)
+				} else {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(33,70,30)>`, v.ID)
+				}
 				html += svgText(x, y, "text__unit", v.Name)
 				html += svgEndG()
 				right++
 			case shared.RoleLeft:
 				x = -5
-				y = 50
+				if Session.Orientation == "Landscape" {
+					x = 0
+				}
+				y = 40
 				// html += svgG(v.ID)
 				svgID = v.ID
-				html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,50)>`, v.ID)
+				if Session.Orientation == "Landscape" {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,20,40)>`, v.ID)
+				} else {
+					html += fmt.Sprintf(`<g id=g-%d transform=rotate(-33,30,30)>`, v.ID)
+				}
 				html += svgText(x, y, "text__unit", v.Name)
 				html += svgEndG()
 				left++
@@ -226,9 +274,9 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="reorg-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="reorg-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Done")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 

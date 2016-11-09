@@ -12,8 +12,13 @@ func doCommanderAction(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "Units")
 
 	// Add a turn summary object
@@ -42,20 +47,20 @@ func doCommanderAction(game *shared.Game) {
 		v.CalcTotals()
 		html += svgG(v.ID)
 		if v.PlayerID == Session.UserID {
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.CommanderName)
+			html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.CommanderName)
 		} else {
-			html += svgButton(0, 18+(yoffset), 100, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.CommanderName)
+			html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.CommanderName)
 		}
 		html += svgEndG()
 		yoffset += 11
 	}
 
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "All Done")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "All Done")
 	html += svgEndG()
 	html += svgText(0, 15, "text__0x", ".. Move Commanders up to 2 grids & issue New Orders.")
 	g.SetInnerHTML(html)

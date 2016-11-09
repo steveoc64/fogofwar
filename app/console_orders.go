@@ -43,8 +43,13 @@ func doPreGameOrders(game *shared.Game) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
-
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	consolePhaseBusy(game, "Orders")
 
 	// Add a turn summary object
@@ -69,16 +74,16 @@ func doPreGameOrders(game *shared.Game) {
 			if v.Deploying() {
 				c = "console-corps-disabled"
 			}
-			html += svgButton(0, 18+(yoffset), 100, 10, c, "text__1x text__"+team, v.Name)
-			html += svgText(98, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())
+			html += svgButton(0, 18+(yoffset), xx, 10, c, "text__1x text__"+team, v.Name)
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())
 			html += svgEndG()
 			yoffset += 11
 		}
 	}
 	html += svgG(100)
-	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Orders Complete")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Orders Complete")
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
@@ -120,7 +125,13 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 
 	consoleCurrentCmd = cmd
-	consoleSetViewBox(game, 100, 100, false)
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
@@ -135,9 +146,9 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	html += svgText(0, 10, "text__2x text__"+team, cmd.Name)
 	if !cmd.PrepDefence && !cmd.Moving() && !cmd.Deploying() && cmd.CState != shared.CmdCompleteMarch {
 		cs = cs + ", and awaiting New Orders, Sir"
-		html += svgText(98, 18, "text__end text__0x text__"+team, cs)
+		html += svgText(xx-2, 18, "text__end text__0x text__"+team, cs)
 	} else {
-		html += svgText(98, 18, "text__end text__1x text__"+team, cs)
+		html += svgText(xx-2, 18, "text__end text__1x text__"+team, cs)
 	}
 
 	yoffset := 20
@@ -146,11 +157,11 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 
 	if cmd.Deploying() {
 		html += svgText(0, 30, "text__start text__hand", getSalutation(Salutations))
-		html += svgText(50, 40, "text__middle text__hand", "I am currently indisposed at")
-		html += svgText(50, 50, "text__middle text__hand", "present as the troops are busy")
-		html += svgText(50, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", cmd.DStateName()))
-		html += svgText(90, 70, "text__end text__hand", "Regards,")
-		html += svgText(90, 80, "text__end text__bighand", cmd.CommanderName)
+		html += svgText(xx/2, 40, "text__middle text__hand", "I am currently indisposed at")
+		html += svgText(xx/2, 50, "text__middle text__hand", "present as the troops are busy")
+		html += svgText(xx/2, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", cmd.DStateName()))
+		html += svgText(xx-20, 70, "text__end text__hand", "Regards,")
+		html += svgText(xx-20, 80, "text__end text__bighand", cmd.CommanderName)
 		html += svgEndG()
 	} else {
 		html += svgEndG()
@@ -161,47 +172,47 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			switch cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandResumeMarch)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Resume March")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Resume March")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandNewObjective)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "March to New Objective")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "March to New Objective")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandBattleLine)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdMarchOrder:
 				if !cmd.Wait {
 					html += svgG(shared.CommandCarryOn)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue March ...")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue March ...")
 					html += svgEndG()
 					yoffset += 11
 					html += svgG(shared.CommandHalt)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Halt & Await Further Orders ...")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Halt & Await Further Orders ...")
 					html += svgEndG()
 					yoffset += 11
 				} else {
 					html += svgG(shared.CommandCarryOn)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Keep Waiting ...")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Keep Waiting ...")
 					html += svgEndG()
 					yoffset += 11
 					html += svgG(shared.CommandResumeMarch)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Resume March")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Resume March")
 					html += svgEndG()
 					yoffset += 11
 					html += svgG(shared.CommandReserve)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Reserve")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to Reserve")
 					html += svgEndG()
 					yoffset += 11
 				}
 				html += svgG(shared.CommandNewObjective)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "March to New Objective")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "March to New Objective")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandBattleLine)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
 				html += svgEndG()
 				yoffset += 11
 			}
@@ -211,75 +222,75 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			switch cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandCarryOn)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue ...")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue ...")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandNewObjective)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "March to New Objective")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "March to New Objective")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandMarchOrder)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to March Order")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to March Order")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandBattleLine)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdMarchOrder, shared.CmdCompleteMarch:
 				html += svgG(shared.CommandCarryOn)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandNewObjective)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "March to New Objective")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "March to New Objective")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandBattleLine)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandReserve)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Reserve")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Reserve")
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdBattleLine:
 				html += svgG(shared.CommandCarryOn)
 				if cmd.PrepDefence {
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue Defence Preparations ...")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue Defence Preparations ...")
 				} else {
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
 				}
 				html += svgEndG()
 				yoffset += 11
 
 				html += svgG(shared.CommandAdvance)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "General Advance in Line of Battle")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "General Advance in Line of Battle")
 				html += svgEndG()
 				yoffset += 11
 
 				if !cmd.PrepDefence {
 					html += svgG(shared.CommandPrepare)
-					html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Prepare Defensive Positions")
+					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Prepare Defensive Positions")
 					html += svgEndG()
 					yoffset += 11
 				}
 				html += svgG(shared.CommandMarchOrder)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to March Order")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Deploy to March Order")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandReserve)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Reserve")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Reserve")
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdBattleAdvance:
 				// print("not dep, not move, but have cmdadvance")
 				html += svgG(shared.CommandCarryOn)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue Advance ...")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue Advance ...")
 				html += svgEndG()
 				yoffset += 11
 				html += svgG(shared.CommandBattleLine)
-				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Halt the General Advance")
+				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Halt the General Advance")
 				html += svgEndG()
 				yoffset += 11
 			}

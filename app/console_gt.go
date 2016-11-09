@@ -169,21 +169,23 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 		consolePhaseDone(game)
 	})
 
-	svgCallback(1, func(dom.Event) {
-		print("click at destination")
-		el := doc.QuerySelector("#destination")
-		if el != nil {
-			el.Class().Toggle("hidden")
-		}
-	})
+	if max > 1 {
+		svgCallback(1, func(dom.Event) {
+			print("click at destination")
+			el := doc.QuerySelector("#destination")
+			if el != nil {
+				el.Class().Toggle("hidden")
+			}
+		})
 
-	svgCallback(2, func(dom.Event) {
-		print("click on enemy contact")
-		el := doc.QuerySelector("#contact")
-		if el != nil {
-			el.Class().Toggle("hidden")
-		}
-	})
+		svgCallback(2, func(dom.Event) {
+			print("click on enemy contact")
+			el := doc.QuerySelector("#contact")
+			if el != nil {
+				el.Class().Toggle("hidden")
+			}
+		})
+	}
 
 	svgCallbackQuery("#help", func(dom.Event) {
 		loadTemplate("gt-move", "#unit-details", nil)

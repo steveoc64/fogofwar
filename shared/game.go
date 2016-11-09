@@ -539,19 +539,19 @@ type GameCmdRPCData struct {
 	Team     string
 }
 
-var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance", "Complete March"}
+var cstates = []string{"Reserve", "March Order", "Battle Line", "General Advance", "Completing March"}
 
 // Get first GT Move - return Max move in grids open, grids other than open, and a string descrpition
 func (g *GameCmd) GTMove() (int, int, string) {
 	if g.PrepDefence {
 		return 0, 0, "Prepare Defence Positions"
 	}
-	if g.DState == CmdBattleAdvance {
-		return 0, 0, "Sounding the Order to Advance"
+	if g.CState != CmdBattleAdvance && g.DState == CmdBattleAdvance {
+		return 0, 0, "Preparing to Advance"
 	}
 	if g.Deploying() {
 		if g.DState == CmdCompleteMarch {
-			return 0, 0, "Completing March"
+			return 0, 0, "Deploy Lead Bde Only"
 		}
 		return 0, 0, "Deploy to " + cstates[g.DState]
 	}
@@ -562,7 +562,7 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		case CmdMarchOrder:
 			return 3, 2, "3 grids in March Order"
 		case CmdBattleLine:
-			return 0, 0, "Formations Only"
+			return 0, 0, "Adjust Formations Only"
 		case CmdBattleAdvance:
 			return 1, 0, "1 grid General Advance"
 		}
@@ -573,11 +573,11 @@ func (g *GameCmd) GTMove() (int, int, string) {
 		case CmdMarchOrder:
 			return 3, 2, "3 grids in March Order"
 		case CmdBattleLine:
-			return 0, 0, "Formations Only"
+			return 0, 0, "Adjust Formations Only"
 		case CmdBattleAdvance:
 			return 1, 0, "1 grid General Advance"
 		case CmdCompleteMarch:
-			return 0, 0, "Leading Bde Deployed"
+			return 0, 0, "Deploy Lead Bde Only"
 		}
 	}
 	return 0, 0, "No Movement"
@@ -607,14 +607,14 @@ func (g *GameCmd) CommandSummary() string {
 	if g.DState == CmdBattleAdvance {
 		return "Sounding the Order to Advance"
 	}
+	if g.DState == CmdCompleteMarch {
+		return "Lead Bde Deployed .. Completing March"
+	}
 
 	if g.Deploying() {
 		if g.Moving() {
 			return "Preparing to March"
 		} else {
-			if g.DState == CmdCompleteMarch {
-				return "Completing March"
-			}
 			return fmt.Sprintf("Deploying to %s", cstates[g.DState])
 		}
 	} else {
@@ -1031,6 +1031,7 @@ func (u *Unit) CanBombard(cmd *GameCmd) bool {
 	case CmdBattleLine, CmdCompleteMarch, CmdBattleAdvance:
 		return true
 	}
+	print("cant fire coz")
 	return false
 }
 

@@ -388,8 +388,8 @@ func (g *GameRPC) GTMove(data shared.GTMoveData, retval *shared.GameCmd) error {
 				data.ID, shared.CmdCompleteMarch).Exec()
 		}
 		if data.Contact {
-			_, err = DB.SQL(`update game_cmd set contact=true,dstate=$2 where id=$1`,
-				data.ID, shared.CmdBattleLine).Exec()
+			_, err = DB.SQL(`update game_cmd set contact=true,cstate=$3,dstate=$2,condition=condition+1 where id=$1`,
+				data.ID, shared.CmdBattleLine, shared.CmdCompleteMarch).Exec()
 		}
 	}
 

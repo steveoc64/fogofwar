@@ -278,7 +278,7 @@ func processAsync(header *shared.NetResponse, msg *shared.NetData) {
 	case "PingRPC.Ping":
 		// print("Keepalive")
 	default:
-		print("General Msg", msg)
+		// print("General Msg", msg)
 		fn := Session.Subscriptions[header.ServiceMethod]
 		if fn != nil {
 			go fn(msg.Action, msg, Session.Context)

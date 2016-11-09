@@ -236,6 +236,16 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 				Unit:   &event,
 			})
 
+			if play, ok := Plays[data.GameID]; ok {
+				play <- PlayMessage{
+					Game:     data.GameID,
+					PlayerID: conn.UserID,
+					OpCode:   BombardDone,
+					Data:     bb,
+				}
+			} else {
+				err = errors.New("Invalid Game ID")
+			}
 			// pick a random victim
 			// println("Actual Victim that takes the hit:", victim.Path, victim.ID, victim.UType, victim.Name, victim.Path)
 			// println("Regular troops in 3 ranks damage =", victim.PtsToMen(pts, 3, false, false))

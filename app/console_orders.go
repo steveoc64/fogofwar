@@ -133,7 +133,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	cs := cmd.CommandSummary()
 	html := svgG(100)
 	html += svgText(0, 10, "text__2x text__"+team, cmd.Name)
-	if !cmd.PrepDefence && !cmd.Moving() && !cmd.Deploying() {
+	if !cmd.PrepDefence && !cmd.Moving() && !cmd.Deploying() && cmd.CState != shared.CmdCompleteMarch {
 		cs = cs + ", and awaiting New Orders, Sir"
 		html += svgText(98, 18, "text__end text__0x text__"+team, cs)
 	} else {
@@ -146,9 +146,9 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 
 	if cmd.Deploying() {
 		html += svgText(0, 30, "text__start text__hand", getSalutation(Salutations))
-		html += svgText(50, 40, "text__middle text__hand", "I am currently indisposed at present")
-		html += svgText(50, 50, "text__middle text__hand", "as the troops are busy deploying")
-		html += svgText(50, 60, "text__middle text__hand", fmt.Sprintf("from %s to %s", cmd.CStateName(), cmd.DStateName()))
+		html += svgText(50, 40, "text__middle text__hand", "I am currently indisposed at")
+		html += svgText(50, 50, "text__middle text__hand", "present as the troops are busy")
+		html += svgText(50, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", cmd.DStateName()))
 		html += svgText(90, 70, "text__end text__hand", "Regards,")
 		html += svgText(90, 80, "text__end text__bighand", cmd.CommanderName)
 		html += svgEndG()
@@ -207,6 +207,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			}
 		} else {
 			// is not deploying and not moving .. can take any number of new orders
+			print("not moving, cstate is", cmd.CState)
 			switch cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandCarryOn)
@@ -225,7 +226,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Deploy to Battle Line")
 				html += svgEndG()
 				yoffset += 11
-			case shared.CmdMarchOrder:
+			case shared.CmdMarchOrder, shared.CmdCompleteMarch:
 				html += svgG(shared.CommandCarryOn)
 				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
 				html += svgEndG()
@@ -271,6 +272,16 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Reserve")
 				html += svgEndG()
 				yoffset += 11
+			case shared.CmdBattleAdvance:
+				print("not dep, not move, but have cmdadvance")
+				html += svgG(shared.CommandCarryOn)
+				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Continue Advance ...")
+				html += svgEndG()
+				yoffset += 11
+				html += svgG(shared.CommandBattleLine)
+				html += svgButton(0, yoffset, 100, 10, "console-button", "text__1x text__"+team, "Halt the General Advance")
+				html += svgEndG()
+				yoffset += 11
 			}
 		}
 
@@ -288,7 +299,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 		svgCallback(i, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("exec command", id, "on game cmd", cmd.ID)
+			// print("exec command", id, "on game cmd", cmd.ID)
 			switch id {
 			case shared.CommandNewObjective:
 				doNewObjective(game, cmd)
@@ -407,12 +418,12 @@ func doNewObjective(game *shared.Game, cmd *shared.GameCmd) {
 		el := evt.Target()
 		tag := el.TagName()
 
-		print("clik on tile", tag)
+		// print("clik on tile", tag)
 		switch tag {
 		case "rect", "RECT", "text", "TEXT":
 			handleMapClick(el.(*dom.BasicHTMLElement))
 		default:
-			print("clicked on", tag)
+			// print("clicked on", tag)
 		}
 	})
 }

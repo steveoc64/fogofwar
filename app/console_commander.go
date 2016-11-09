@@ -54,9 +54,9 @@ func doCommanderAction(game *shared.Game) {
 	html += svgG(100)
 	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
 	html += "\n"
-	html += svgText(50, 97, "text__carryon text__middle", "Movement Complete")
+	html += svgText(50, 97, "text__carryon text__middle", "All Done")
 	html += svgEndG()
-	html += svgText(0, 86, "text__0x", ".. Move any Corps Commander 2 grids")
+	html += svgText(0, 15, "text__0x", ".. Move Commanders up to 2 grids & issue New Orders.")
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
@@ -64,13 +64,11 @@ func doCommanderAction(game *shared.Game) {
 		consolePhaseDone(game)
 	})
 
-	g.SetInnerHTML(html)
-
 	// add callbacks for each corps
 	clickCorps := func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		// print("clicked on corps", id)
+		print("clicked on corps", id)
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
 				doCorpsOrders(game, v)

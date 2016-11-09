@@ -24,8 +24,8 @@ const (
 	PlayersChanged
 	BombardAdd
 	BombardCancel
+	BombardDone
 	BombardSetTarget
-	BombardDispute
 )
 
 type PlayMessage struct {
@@ -321,10 +321,12 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case BombardAdd:
 				fmt.Fprintf(fp, "Player Requests Fire Mission\n")
 				bombardAdd(state, m)
+			case BombardDone:
+				fmt.Fprintf(fp, "Fire Mission Complete\n")
+				bombardDone(state, m)
 			case BombardCancel:
 				fmt.Fprintf(fp, "Fire Mission Cancel\n")
-				bombardCancel(state, m)
-			case BombardDispute:
+				bombardDone(state, m)
 			case BombardSetTarget:
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
@@ -365,12 +367,13 @@ func bombardAdd(state *PlayState, m PlayMessage) {
 	}
 }
 
-func bombardCancel(state *PlayState, m PlayMessage) {
+func bombardDone(state *PlayState, m PlayMessage) {
 	if bb, ok := m.Data.(*shared.Bombard); ok {
+		fmt.Printf("BB is %d %v\n", bb.ID, bb)
 		// find the offending bombard and cancel it
 		for i, v := range state.Bombards {
 			if v.ID == bb.ID {
-				fmt.Fprintf(state.Log, "Removing Bombardment %d\n", bb.ID)
+				fmt.Fprintf(state.Log, "Done Bombardment %d\n", bb.ID)
 				state.Bombards = append(state.Bombards[:i], state.Bombards[i+1:]...)
 				break
 			}
@@ -379,10 +382,11 @@ func bombardCancel(state *PlayState, m PlayMessage) {
 		// signal target player that they have 1 less incoming
 		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{Action: "IncomingCancel", ID: bb.ID})
 
-		// signal the firer that we have removed the BB, which triggers a refresh of their
+		// signal the firer that we are done with the BB, which triggers a refresh of their
 		// fire mission page
 		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{Action: "BB", ID: bb.UnitID})
 	}
+
 }
 
 func playerPhaseDone(state *PlayState, m PlayMessage) {
@@ -403,6 +407,9 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 			state.Game.Turn++
 			// Just for now, advance the state of any units adjusting state
 			DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
+			DB.SQL(`update game_cmd set dstate=$2 where game_id=$1 and cstate=$3`,
+				state.Game.ID, shared.CmdBattleLine, shared.CmdCompleteMarch).Exec()
+			DB.SQL(`update unit set guns_fired=false where game_id=$1`, state.Game.ID).Exec()
 			newTurn = true
 		}
 		fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)

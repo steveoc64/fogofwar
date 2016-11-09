@@ -13,13 +13,17 @@ func getPhaseDescription(phase int) (string, string, string, string) {
 	case shared.PhaseOrders:
 		return "Pre Game Orders", ".. Enter Initial Orders", "Orders", "Dispatched"
 	case shared.PhaseGT1:
-		return "GT Movement", ".. Move un-engaged units", "Move", "Waiting .."
+		if Session.Orientation == "Portrait" {
+			return "March Orders", ".. Move un-engaged units", "Move", "Waiting .."
+		} else {
+			return "Grand Tactical March", ".. Move un-engaged units", "Move", "Waiting .."
+		}
 	case shared.PhaseBB:
-		return "Bombardment", ".. Corps Level Bombardment", "Fire Missions", "Waiting .."
+		return "Bombardment", ".. Grand Tactical Bombardment", "Fire Missions", "Waiting .."
 	case shared.PhaseGT2:
 		return "Extra Movement", ".. Cav and Skirmisher extra Moves", "Move", "Waiting .."
 	case shared.PhaseCommander:
-		return "Commander Actions", ".. Corps level Commander Actions", "Commander Action", "Waiting .."
+		return "Commander Actions", ".. Corps Commander Actions", "Commander Action", "Waiting .."
 	case shared.PhaseEngage:
 		return "Engage/Disengage", ".. Confirm unit contacts", "Engagements", "Waiting .."
 	case shared.PhaseTactical:
@@ -161,7 +165,7 @@ func doEngage(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Engage")
 	print("phaseEngage")
-	dom.GetWindow().Alert("all done")
+	// dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
 }
 func doTactical(game *shared.Game) {
@@ -172,7 +176,7 @@ func doTactical(game *shared.Game) {
 	consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Tactical")
 	print("phaseTactical")
-	dom.GetWindow().Alert("all done")
+	// dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
 }
 func doObjectives(game *shared.Game) {
@@ -183,6 +187,6 @@ func doObjectives(game *shared.Game) {
 	// consoleSetViewBox(game, 100, 100, false)
 	consolePhaseBusy(game, "Objectives")
 	print("phaseObjectives")
-	dom.GetWindow().Alert("all done")
+	// dom.GetWindow().Alert("all done")
 	consolePhaseDone(game)
 }

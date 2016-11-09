@@ -171,7 +171,7 @@ func play(context *router.Context) {
 				doTurnSummary(game)
 			case "Incoming":
 				// TODO - rewrite this to use the attached data in the message
-				print("we have incoming bombardment", msg.ID)
+				// print("we have incoming bombardment", msg.ID, game.PhaseBUSY, game.PhaseDONE, game.PhaseTODO)
 				incoming = append(incoming, msg.ID)
 				game.PhaseTODO = true
 				game.PhaseDONE = false
@@ -179,8 +179,6 @@ func play(context *router.Context) {
 					doTurnSummary(game)
 				}
 			case "IncomingCancel":
-
-				print("an incoming fire mission has been cancelled - that the Lord", msg.ID)
 				for i, v := range incoming {
 					if v == msg.ID {
 						incoming = append(incoming[:i], incoming[i+1:]...)
@@ -190,10 +188,12 @@ func play(context *router.Context) {
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}
+				if consoleCurrentPanel == "BBReceive2" {
+					consolePhaseNotBusy(game)
+				}
 			case "Unit":
-				print("unit message", msg)
-				theUnit := game.GetUnit(team, msg.ID)
-				print("affecting unit", theUnit)
+				// print("unit message", msg.Unit.Description)
+				theUnit := game.GetUnit(team, msg.Unit.ID)
 				switch msg.Opcode {
 				case shared.UnitEventFired:
 					theUnit.Ammo = msg.Unit.Ammo
@@ -202,6 +202,7 @@ func play(context *router.Context) {
 						doBB2(game, consoleCurrentCmd)
 					}
 				case shared.UnitEventHits:
+					print("hit notification for", theUnit)
 					theUnit.BayonetsLost = msg.Unit.BayonetsLost
 					theUnit.SabresLost = msg.Unit.SabresLost
 					theUnit.GunsLost = msg.Unit.GunsLost

@@ -112,7 +112,7 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 		teamName = game.RedTeam
 	}
 	html := ""
-	max, min, gt := cmd.GTMove()
+	max, _, _ := cmd.GTMove()
 
 	// Create heading with Team Name
 	sz := 2
@@ -129,20 +129,21 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 	html += svgText(50, 97, "text__carryon text__middle", "Complete")
 	html += svgEndG()
 
-	print("move", min, max, gt)
-	html += `<image xlink:href=/img/legal-max.png x=0 y=20 height=25 width=100></image>`
+	if max > 1 {
+		html += `<image xlink:href=/img/legal-max.png x=0 y=20 height=25 width=100></image>`
 
-	html += svgG(1)
-	html += svgText(0, 55, "text__question", "At Destination ?")
-	html += `<rect class=console-check x=90 y=47 rx=2 ry=2 width=10 height=10 data-id=1></rect>`
-	html += svgTick("destination", "tick hidden", 90, 47, 10)
-	html += svgEndG()
+		html += svgG(1)
+		html += svgText(0, 55, "text__question", "At Destination ?")
+		html += `<rect class=console-check x=90 y=47 rx=2 ry=2 width=10 height=10 data-id=1></rect>`
+		html += svgTick("destination", "tick hidden", 90, 47, 10)
+		html += svgEndG()
 
-	html += svgG(2)
-	html += svgText(0, 70, "text__question", "Contact Enemy ?")
-	html += `<rect class=console-check x=90 y=62 rx=2 ry=2 width=10 height=10 data-id=2></rect>`
-	html += svgTick("contact", "tick hidden", 90, 62, 10)
-	html += svgEndG()
+		html += svgG(2)
+		html += svgText(0, 70, "text__question", "Contact Enemy ?")
+		html += `<rect class=console-check x=90 y=62 rx=2 ry=2 width=10 height=10 data-id=2></rect>`
+		html += svgTick("contact", "tick hidden", 90, 62, 10)
+		html += svgEndG()
+	}
 
 	g.SetInnerHTML(html)
 
@@ -240,16 +241,17 @@ func doGT2(game *shared.Game) {
 		}
 	}
 	if count > 0 {
-		html += svgText(0, 16, "text__1x text__"+team, "Any Cav here can move 2 grids:")
+		html += svgText(0, 16, "text__1x text__"+team, "Any Cav in listed units can move 2 grids")
+		html += svgText(0, 21, "text__0x", ".. any Cav not listed 1 grid, any Skirmishers ½ grid")
 	} else {
-		html += svgText(0, 16, "text__1x text__"+team, "No Movement this Turn ...")
+		html += svgText(0, 16, "text__0x", ".. any Cavalry unit 1 grid, any Skirmishers ½ grid")
 	}
+
 	html += svgG(100)
 	html += `<rect x=0 y=88 rx=2 ry=2 width=100 height=12 class="carryon-button" data-id=100></rect>`
 	html += "\n"
 	html += svgText(50, 97, "text__carryon text__middle", "Movement Complete")
 	html += svgEndG()
-	html += svgText(0, 80, "text__0x", ".. any other Cavalry 1 grid, any Skirmishers ½ grid")
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {

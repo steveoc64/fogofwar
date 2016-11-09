@@ -35,7 +35,9 @@ func doBB(game *shared.Game) {
 	count := 0
 	ids := []int{}
 	for _, v := range cmds {
+		print("check bb", v.PlayerID, Session.UserID)
 		if v.PlayerID == Session.UserID {
+			print("got", v)
 			// is under my command
 			if v.CanBombard() {
 				html += svgG(v.ID)
@@ -443,7 +445,7 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 
 	consoleCurrentCmd = cmd
 	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "UnitReorg")
+	consolePhaseBusy(game, "BBReceive2")
 
 	team := "blue"
 	if game.Red {
@@ -569,8 +571,8 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				}, &done)
 				if err != nil {
 					print(err.Error())
-				} else {
-					print("looks to be done ... wait here till the result comes back")
+					// } else {
+					// print("looks to be done ... wait here till the result comes back")
 				}
 			}()
 		} else {

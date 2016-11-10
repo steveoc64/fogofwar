@@ -330,8 +330,10 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case BombardSetTarget:
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
+				playerPhaseBusy(state, m, true)
 			case PlayerPhaseNotBusy:
 				// fmt.Fprintf(fp, "Player %d is free", m.PlayerID)
+				playerPhaseBusy(state, m, false)
 			case PlayerPhaseDone:
 				fmt.Fprintf(state.Log, "Player %d is Done\n", m.PlayerID)
 				playerPhaseDone(state, m)
@@ -389,6 +391,27 @@ func bombardDone(state *PlayState, m PlayMessage) {
 
 }
 
+func playerPhaseBusy(state *PlayState, m PlayMessage, busy bool) {
+	for i, v := range state.Game.RedPlayers {
+		if v.PlayerID == m.PlayerID {
+			state.Game.RedPlayers[i].Busy = busy
+			if busy {
+				state.Game.RedPlayers[i].Done = false
+			}
+			return
+		}
+	}
+	for i, v := range state.Game.BluePlayers {
+		if v.PlayerID == m.PlayerID {
+			state.Game.BluePlayers[i].Busy = busy
+			if busy {
+				state.Game.BluePlayers[i].Done = false
+			}
+			return
+		}
+	}
+}
+
 func playerPhaseDone(state *PlayState, m PlayMessage) {
 	if hasBombards(state, m.PlayerID) {
 		fmt.Fprintf(state.Log, "But this player still has bombards to sort out\n")
@@ -403,7 +426,7 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 		newTurn := false
 
 		// At end of GT movement phase, calc vision
-		if state.Game.Phase == shared.PhaseGT1 {
+		if state.Game.Phase == shared.PhaseGT {
 			calcVision(state.Game)
 		}
 		state.Game.Phase++

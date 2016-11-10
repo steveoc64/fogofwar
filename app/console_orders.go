@@ -14,27 +14,29 @@ func doOrders(game *shared.Game) {
 	switch game.Phase {
 	case shared.PhaseOrders:
 		doPreGameOrders(game)
-	case shared.PhaseGT1:
-		doGT1(game)
-		return
-	case shared.PhaseBB:
-		doBB(game)
-		return
-	case shared.PhaseGT2:
-		doGT2(game)
-		return
-	case shared.PhaseCommander:
+	default:
 		doCommanderAction(game)
-		return
-	case shared.PhaseEngage:
-		doEngage(game)
-		return
-	case shared.PhaseTactical:
-		doTactical(game)
-		return
-	case shared.PhaseObjectives:
-		doObjectives(game)
-		return
+		// case shared.PhaseGT1:
+		// 	doGT1(game)
+		// 	return
+		// case shared.PhaseBB:
+		// 	doBB(game)
+		// 	return
+		// case shared.PhaseGT2:
+		// 	doGT2(game)
+		// 	return
+		// case shared.PhaseCommander:
+		// 	doCommanderAction(game)
+		// 	return
+		// case shared.PhaseEngage:
+		// 	doEngage(game)
+		// 	return
+		// case shared.PhaseTactical:
+		// 	doTactical(game)
+		// 	return
+		// case shared.PhaseObjectives:
+		// 	doObjectives(game)
+		// 	return
 	}
 	doPreGameOrders(game)
 }
@@ -101,7 +103,7 @@ func doPreGameOrders(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseDone(game)
+		consolePhaseNotBusy(game)
 	})
 
 	svgCallbackQuery("help", func(dom.Event) {

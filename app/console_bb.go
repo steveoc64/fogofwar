@@ -68,7 +68,7 @@ func doBB(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		// print("cease fire")
-		consolePhaseDone(game)
+		consolePhaseNotBusy(game)
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {
@@ -647,13 +647,22 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 				el := evt.Target()
 				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				if el.TagName() == "text" {
-					// deselect all
-					m := doc.QuerySelector("[name=g-main]")
-					for _, sel := range m.QuerySelectorAll("text") {
-						sel.Class().Remove("unit-selected")
+					// double click to inspect unit
+					if id == selectedElement {
+						consoleSubunits = cmd.Units
+						div := game.GetUnit(team, id)
+						div.Summary = div.GetSummary(cmd)
+						print("div", div)
+						clickDiv(evt)
+					} else {
+						// deselect all
+						m := doc.QuerySelector("[name=g-main]")
+						for _, sel := range m.QuerySelectorAll("text") {
+							sel.Class().Remove("unit-selected")
+						}
+						el.Class().Toggle("unit-selected")
+						selectedElement = id
 					}
-					el.Class().Toggle("unit-selected")
-					selectedElement = id
 				}
 			})
 		}

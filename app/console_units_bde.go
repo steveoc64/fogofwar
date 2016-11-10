@@ -8,6 +8,8 @@ import (
 	"honnef.co/go/js/dom"
 )
 
+var consoleSubunits = []*shared.Unit{}
+
 func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	w := dom.GetWindow()
 	doc := w.Document()
@@ -23,7 +25,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		consoleSetViewBox(game, 100, 100, false)
 	}
 	consolePhaseBusy(game, "Bde")
-	subunits := div.GetSubunits(cmd)
+	consoleSubunits = div.GetSubunits(cmd)
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -48,7 +50,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	html = svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), div.Name)
 	gothits := false
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		if v.BayonetsLost > 0 || v.SabresLost > 0 || v.GunsLost > 0 {
 			html += svgText(10, 16, "text__0x", ".. Units with * have some hits")
 			gothits = true
@@ -62,7 +64,7 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 
 	// yspacing := 80 / (numDivs + 1) // width to use for each cmd
 	yoffset := 0
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		html += svgG(v.ID)
 		html += svgButton(0, 18+yoffset, xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
 		if len(v.Name) < 16 {
@@ -79,83 +81,83 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	html += svgEndG()
 	g.SetInnerHTML(html)
 
-	TheUnit := &shared.Unit{}
-	// var clickHandler func(*js.Object)
-
-	// add callbacks for each bde
-	clickDiv := func(evt dom.Event) {
-		el := evt.Target()
-		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		print("clicked on bde", id, "from", el.TagName())
-
-		for _, v := range subunits {
-			if v.ID == id {
-				print("unit ", v)
-				TheUnit = v
-				// doUnitCard(v)
-				loadTemplate("unit-details", "#unit-details", v)
-				ud := doc.QuerySelector("#unit-details")
-				ud.Class().Add("md-show")
-				inspection := ud.QuerySelector(".inspection")
-
-				inspection.AddEventListener("click", false, func(evt dom.Event) {
-					el := evt.Target()
-					unit := TheUnit
-					if el.TagName() == "INPUT" {
-						value := el.(*dom.HTMLInputElement).Value
-						switch unit.UType {
-						case shared.UnitDiv:
-							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-						case shared.UnitBde, shared.UnitSpecial:
-							switch value {
-							case "Valour":
-								loadTemplate("unit-valour", "[name=unitcard]", unit)
-								return
-							case "Discipline":
-								loadTemplate("unit-discipline", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-								print("here with utype", unit.UType)
-							}
-						case shared.UnitCav:
-							switch value {
-							case "Honours":
-								loadTemplate("unit-cav-details", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							}
-						case shared.UnitGun:
-							switch value {
-							case "Gunnery Chart":
-								loadTemplate("unit-gunnery", "[name=unitcard]", unit)
-								return
-							default:
-								doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							}
-						}
-					} // tag input
-				})
-			}
-		}
-	}
-
 	svgCallback(0, func(evt dom.Event) {
 		doUnitsDiv(game, cmd)
 	})
 
 	svgCallback(100, func(evt dom.Event) {
-		doUnitBdeReorg(game, cmd, div)
+		doUnitBdeReorg(game, cmd, div, false)
 	})
 
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		// svgButtonCallback(fmt.Sprintf("unit-%d", v.ID), clickDiv)
 		svgCallback(v.ID, clickDiv)
 	}
 }
 
-func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
+func clickDiv(evt dom.Event) {
+	w := dom.GetWindow()
+	doc := w.Document()
+
+	el := evt.Target()
+	id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+	print("clicked on bde", id, "from", el.TagName())
+	TheUnit := &shared.Unit{}
+
+	for _, v := range consoleSubunits {
+		if v.ID == id {
+			print("unit ", v)
+			TheUnit = v
+			// doUnitCard(v)
+			loadTemplate("unit-details", "#unit-details", v)
+			ud := doc.QuerySelector("#unit-details")
+			ud.Class().Add("md-show")
+			inspection := ud.QuerySelector(".inspection")
+
+			inspection.AddEventListener("click", false, func(evt dom.Event) {
+				el := evt.Target()
+				unit := TheUnit
+				if el.TagName() == "INPUT" {
+					value := el.(*dom.HTMLInputElement).Value
+					switch unit.UType {
+					case shared.UnitDiv:
+						doc.QuerySelector("#unit-details").Class().Remove("md-show")
+					case shared.UnitBde, shared.UnitSpecial:
+						switch value {
+						case "Valour":
+							loadTemplate("unit-valour", "[name=unitcard]", unit)
+							return
+						case "Discipline":
+							loadTemplate("unit-discipline", "[name=unitcard]", unit)
+							return
+						default:
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+							print("here with utype", unit.UType)
+						}
+					case shared.UnitCav:
+						switch value {
+						case "Honours":
+							loadTemplate("unit-cav-details", "[name=unitcard]", unit)
+							return
+						default:
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+						}
+					case shared.UnitGun:
+						switch value {
+						case "Gunnery Chart":
+							loadTemplate("unit-gunnery", "[name=unitcard]", unit)
+							return
+						default:
+							doc.QuerySelector("#unit-details").Class().Remove("md-show")
+						}
+					}
+				} // tag input
+			})
+		}
+	}
+}
+
+func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit, hq bool) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -179,7 +181,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	}
 
 	html += svgText(0, 8, fmt.Sprintf("text__1x text__%s", team), cmd.Name)
-	html += svgText(4, 16, fmt.Sprintf("text__1x text__%s", team), div.Name)
+	html += svgText(4, 16, fmt.Sprintf("text__1x text__%s", team), div.Name+" ~ "+div.GetShortSummary(cmd))
 	html += svgHelpBtn()
 
 	// draw the grid of role locations
@@ -217,10 +219,10 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	totalres := 0
 	selectedElement := 0
 
-	subunits := div.GetSubunits(cmd)
+	consoleSubunits = div.GetSubunits(cmd)
 
 	// calc the number of things in each role
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		switch v.Role {
 		case shared.RoleReserve:
 			totalres++
@@ -248,7 +250,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	y := 0
 
 	// render all the things
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		switch v.Role {
 		case shared.RoleReserve:
 			if (res % 2) != 0 {
@@ -344,28 +346,37 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		doUnitsDiv(game, cmd)
+		if hq {
+			doUnitDivReorg(game, cmd)
+		} else {
+			doUnitsDiv(game, cmd)
+		}
 	})
 
-	for _, v := range subunits {
+	for _, v := range consoleSubunits {
 		svgCallback(v.ID, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			if el.TagName() == "text" {
-				// deselect all
-				m := doc.QuerySelector("[name=g-main]")
-				for _, sel := range m.QuerySelectorAll("text") {
-					sel.Class().Remove("unit-selected")
+				// on double click, display the unit data
+				if id == selectedElement {
+					clickDiv(evt)
+				} else {
+					// deselect all
+					m := doc.QuerySelector("[name=g-main]")
+					for _, sel := range m.QuerySelectorAll("text") {
+						sel.Class().Remove("unit-selected")
+					}
+					el.Class().Toggle("unit-selected")
+					selectedElement = id
 				}
-				el.Class().Toggle("unit-selected")
-				selectedElement = id
 			}
 		})
 	}
 
 	setSelected := func(s string) {
 		// find the element
-		for _, v := range subunits {
+		for _, v := range consoleSubunits {
 			if v.ID == selectedElement {
 				doIt := false
 				switch s {
@@ -401,7 +412,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 
 				// TODO - send msg to backend with update for unit role
 				if doIt {
-					setUnitBdeRole(game, cmd, div, selectedElement, v.Role)
+					setUnitBdeRole(game, cmd, div, selectedElement, v.Role, hq)
 				}
 			}
 		}
@@ -430,7 +441,7 @@ func doUnitBdeReorg(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 	})
 }
 
-func setUnitBdeRole(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit, uid int, role int) {
+func setUnitBdeRole(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit, uid int, role int, hq bool) {
 	go func() {
 		done := false
 		err := RPC("GameRPC.UnitRole", shared.UnitRoleData{
@@ -441,7 +452,7 @@ func setUnitBdeRole(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit, ui
 		if err != nil {
 			print(err.Error())
 		} else {
-			doUnitBdeReorg(game, cmd, div)
+			doUnitBdeReorg(game, cmd, div, hq)
 		}
 	}()
 }

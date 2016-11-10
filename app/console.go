@@ -32,6 +32,7 @@ func consolePhaseBusy(game *shared.Game, with string) {
 			print(err.Error())
 		}
 		game.PhaseBUSY = true
+		game.PhaseDONE = false
 		consoleCurrentPanel = with
 	}()
 }
@@ -134,7 +135,7 @@ func play(context *router.Context) {
 		})
 
 		playMsg := func(action string, msg *shared.NetData, context *router.Context) {
-			// print("Msg", action, actionID)
+			print("Msg", action, msg)
 			switch action {
 			case "Turn":
 				// end of turn - get the data again

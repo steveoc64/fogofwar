@@ -3,11 +3,12 @@ package shared
 // Phases
 const (
 	PhaseOrders int = iota
-	PhaseGT1
-	PhaseBB
-	PhaseGT2
-	PhaseCommander
-	PhaseEngage
+	PhaseGT
+	// PhaseGT1
+	// PhaseBB
+	// PhaseGT2
+	// PhaseCommander
+	// PhaseEngage
 	PhaseTactical
 	PhaseObjectives
 )

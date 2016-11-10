@@ -291,13 +291,18 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 				el := evt.Target()
 				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				if el.TagName() == "text" {
-					// deselect all
-					m := doc.QuerySelector("[name=g-main]")
-					for _, sel := range m.QuerySelectorAll("text") {
-						sel.Class().Remove("unit-selected")
+					// if we click on an element that is already selected - treat this as a dblclick
+					if id == selectedElement {
+						doUnitBdeReorg(game, cmd, game.GetUnit(team, id), true)
+					} else {
+						// deselect all
+						m := doc.QuerySelector("[name=g-main]")
+						for _, sel := range m.QuerySelectorAll("text") {
+							sel.Class().Remove("unit-selected")
+						}
+						el.Class().Toggle("unit-selected")
+						selectedElement = id
 					}
-					el.Class().Toggle("unit-selected")
-					selectedElement = id
 				}
 			})
 		}

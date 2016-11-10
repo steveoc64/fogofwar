@@ -68,7 +68,7 @@ func doCommanderAction(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseDone(game)
+		consolePhaseNotBusy(game)
 	})
 
 	// add callbacks for each corps
@@ -85,7 +85,7 @@ func doCommanderAction(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseDone(game)
+		consolePhaseNotBusy(game)
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {

@@ -25,7 +25,9 @@ const (
 	BombardAdd
 	BombardCancel
 	BombardDone
-	BombardSetTarget
+	FightAdd
+	FightCommit
+	FightWithdraw
 )
 
 type PlayMessage struct {
@@ -72,6 +74,7 @@ type PlayState struct {
 	Game     *shared.Game
 	Log      *os.File
 	Bombards []*shared.Bombard
+	Fights   []*shared.Fight
 }
 
 func loadGameData(id int, state *PlayState) error {
@@ -273,9 +276,11 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 		return
 	}
 
-	// At the start of the game goroutine, we clear out the bombards array
+	// At the start of the game goroutine, we clear out the bombards and fight arrays
 	// and any other temp combat trackers
 	DB.SQL(`delete from bombard where game_id=$1`, state.Game.ID).Exec()
+	DB.SQL(`delete from fight where game_id=$1`, state.Game.ID).Exec()
+	DB.SQL(`delete from fight_unit where game_id=$1`, state.Game.ID).Exec()
 
 	log.Printf("Starting Game GoRoutine for %d\n", id)
 	if !logexists {
@@ -327,7 +332,12 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case BombardCancel:
 				fmt.Fprintf(fp, "Fire Mission Cancel\n")
 				bombardDone(state, m)
-			case BombardSetTarget:
+			case FightAdd:
+				fmt.Fprintf(fp, "Adding New Fight\n")
+			case FightCommit:
+				fmt.Fprintf(fp, "Commit Division to Fight\n")
+			case FightWithdraw:
+				fmt.Fprintf(fp, "Withdraw Division from Fight\n")
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
 				playerPhaseBusy(state, m, true)

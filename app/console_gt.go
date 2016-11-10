@@ -97,7 +97,11 @@ func doGT1(game *shared.Game) {
 					el := evt.Target()
 					id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 					cmd := game.GetCmd(team, id)
-					doGTCmd(game, cmd)
+					if max > 1 {
+						doGTCmd(game, cmd)
+					} else {
+						doMap(game)
+					}
 				})
 			}
 		}

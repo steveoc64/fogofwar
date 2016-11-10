@@ -113,18 +113,3 @@ type UnitEvent struct {
 	X                int
 	Y                int
 }
-
-// type Bombard struct {
-// 	UnitID    int
-// 	FirerID   int
-// 	TargetID  int
-// 	TargetUID int
-// 	RangeMax  int
-// 	RangeMin  int
-// 	Disputed  bool
-// }
-
-// type BombardData struct {
-// 	Channel int
-// 	Bombard *Bombard
-// }

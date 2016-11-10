@@ -46,6 +46,12 @@ func doMap(game *shared.Game) {
 		html += addUnitTiles(game, 0, "blue", true, false)
 
 		g.SetInnerHTML(html)
+
+		tiledet := doc.QuerySelector("#tile-details")
+		if tiledet != nil {
+			tiledet.Class().Remove("md-show")
+		}
+
 		if flipped {
 			g.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", game.TableX*6, game.TableY*6))
 		}
@@ -192,12 +198,14 @@ func doMap(game *shared.Game) {
 		}
 
 		tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
-			// print("clik on tile")
 			el := evt.Target()
 			tag := el.TagName()
+			if !el.Class().Contains("map-tile") {
+				return
+			}
 			switch tag {
 			case "rect", "RECT", "text", "TEXT":
-				// print("clicked on a tile of class", el.GetAttribute("class"))
+				print("clicked on a tile of class", el.GetAttribute("class"))
 				handleMapClick(el.(*dom.BasicHTMLElement))
 			default:
 				print("clicked on", tag)

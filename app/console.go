@@ -20,6 +20,7 @@ var consoleCurrentUnit *shared.Unit
 var consoleCurrentCmd *shared.GameCmd
 var consoleGame *shared.Game
 var incoming = []int{}
+var fights = []*shared.Fight{}
 
 func consolePhaseBusy(game *shared.Game, with string) {
 	go func() {
@@ -102,6 +103,7 @@ func play(context *router.Context) {
 		// TheCmd := &shared.GameCmd{}
 		// TheUnit := &shared.Unit{}
 
+		// Init the game state
 		newGame := shared.Game{}
 		err := RPC("GameRPC.GetPlay", shared.GameRPCData{
 			Channel:    Session.Channel,
@@ -113,13 +115,26 @@ func play(context *router.Context) {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
 			Session.Navigate("/")
 		}
+
 		inc := []int{}
+		incoming = inc
 		err = RPC("GameRPC.GetIncoming", shared.GameRPCData{
 			Channel: Session.Channel,
 			ID:      id,
 		}, &inc)
 		if err == nil {
 			incoming = inc
+		}
+
+		f := []*shared.Fight{}
+		fights = f
+		err = RPC("GameRPC.GetFights", shared.GameRPCData{
+			Channel: Session.Channel,
+			ID:      id,
+		}, &f)
+		if err == nil {
+			fights = f
+			print("fights", fights)
 		}
 		consoleGame = &newGame
 		game = consoleGame

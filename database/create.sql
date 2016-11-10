@@ -596,3 +596,18 @@ create table paypal (
 );
 create unique index paypal_payment_idx on paypal (payment_id);
 
+drop table if exists fight;
+create unlogged table fight (
+	game_id int not null default 0,
+	name text not null default '',
+	id serial not null
+);
+create unique index fight_idx on fight (game_id, id);
+
+drop table if exists fight_unit;
+create unlogged table fight_unit (
+	game_id int not null default 0,
+	id int not null default 0,
+	unit_id int not null default 0
+);
+create unique index fight_unit_idx on fight_unit (game_id, id, unit_id);

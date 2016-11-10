@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"./shared"
-	"github.com/gopherjs/gopherjs/js"
 	"honnef.co/go/js/dom"
 )
 
@@ -21,8 +20,6 @@ func isFlipped(game *shared.Game) bool {
 	}
 	return flipped
 }
-
-var tileClicker func(*js.Object)
 
 func doMap(game *shared.Game) {
 	w := dom.GetWindow()

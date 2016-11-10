@@ -180,10 +180,10 @@ func doTurnSummary(game *shared.Game) {
 	svgCallback(1, func(dom.Event) { consolePhaseDone(game) })
 	svgCallback(2, func(dom.Event) { doPreGameOrders(game) })
 	svgCallback(3, func(dom.Event) { doUnits(game) })
-	svgCallback(4, func(dom.Event) { doGT1(game) })
-	svgCallback(5, func(dom.Event) { doBB(game) })
 
 	if game.Phase == shared.PhaseGT {
+		svgCallback(4, func(dom.Event) { doGT1(game) })
+		svgCallback(5, func(dom.Event) { doBB(game) })
 		svgCallbackQuery("#help", func(dom.Event) {
 			loadTemplate("gt-move", "#unit-details", nil)
 			doc.QuerySelector("#unit-details").Class().Add("md-show")
@@ -215,6 +215,8 @@ func doTurnSummary(game *shared.Game) {
 	}
 
 	if game.Phase == shared.PhaseTactical {
+		svgCallback(6, func(dom.Event) { doNewFight(game) })
+		svgCallback(7, func(dom.Event) { doCommitFight(game) })
 		svgCallbackQuery("#help", func(dom.Event) {
 			loadTemplate("tactical-move", "#unit-details", nil)
 			doc.QuerySelector("#unit-details").Class().Add("md-show")
@@ -246,36 +248,36 @@ func doTurnSummary(game *shared.Game) {
 	}
 }
 
-func doEngage(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
+// func doEngage(game *shared.Game) {
+// 	// w := dom.GetWindow()
+// 	// doc := w.Document()
+// 	// c := doc.QuerySelector("[name=svg-console]")
 
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "Engage")
-	print("phaseEngage")
-	// dom.GetWindow().Alert("all done")
-	consolePhaseDone(game)
-}
-func doTactical(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
+// 	consoleSetViewBox(game, 100, 100, false)
+// 	consolePhaseBusy(game, "Engage")
+// 	print("phaseEngage")
+// 	// dom.GetWindow().Alert("all done")
+// 	consolePhaseDone(game)
+// }
+// func doTactical(game *shared.Game) {
+// 	// w := dom.GetWindow()
+// 	// doc := w.Document()
+// 	// c := doc.QuerySelector("[name=svg-console]")
 
-	consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "Tactical")
-	print("phaseTactical")
-	// dom.GetWindow().Alert("all done")
-	consolePhaseDone(game)
-}
-func doObjectives(game *shared.Game) {
-	// w := dom.GetWindow()
-	// doc := w.Document()
-	// c := doc.QuerySelector("[name=svg-console]")
+// 	consoleSetViewBox(game, 100, 100, false)
+// 	consolePhaseBusy(game, "Tactical")
+// 	print("phaseTactical")
+// 	// dom.GetWindow().Alert("all done")
+// 	consolePhaseDone(game)
+// }
+// func doObjectives(game *shared.Game) {
+// 	// w := dom.GetWindow()
+// 	// doc := w.Document()
+// 	// c := doc.QuerySelector("[name=svg-console]")
 
-	// consoleSetViewBox(game, 100, 100, false)
-	consolePhaseBusy(game, "Objectives")
-	print("phaseObjectives")
-	// dom.GetWindow().Alert("all done")
-	consolePhaseDone(game)
-}
+// 	// consoleSetViewBox(game, 100, 100, false)
+// 	consolePhaseBusy(game, "Objectives")
+// 	print("phaseObjectives")
+// 	// dom.GetWindow().Alert("all done")
+// 	consolePhaseDone(game)
+// }

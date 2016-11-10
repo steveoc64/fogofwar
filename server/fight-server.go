@@ -7,6 +7,39 @@ import (
 	"../shared"
 )
 
+func (g *GameRPC) NewFight(data shared.FightData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+	c := 0
+	DB.SQL(`select count(*) from fight where game_id=$1`, data.GameID).QueryScalar(&c)
+
+	if data.Fight.Name == "" {
+		// Generate a Name
+		data.Fight.Name = fmt.Sprintf("Fight %d", c+1)
+	}
+
+	_, err := DB.SQL(`insert into fight 
+		(game_id,name,rough,woods,built,fort)
+		values ($1,$2,$3,$4,$5,$6)`,
+		data.GameID,
+		data.Fight.Name,
+		data.Fight.Rough,
+		data.Fight.Woods,
+		data.Fight.Built,
+		data.Fight.Fort).Exec()
+
+	logger(start, "Game.NewFight", conn,
+		fmt.Sprintf("Game %d, %v", data.GameID, *data.Fight), "")
+
+	if err == nil {
+		*done = true
+	}
+
+	return err
+}
+
 func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) error {
 	start := time.Now()
 	print("in get fights")

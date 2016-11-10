@@ -600,7 +600,11 @@ drop table if exists fight;
 create unlogged table fight (
 	game_id int not null default 0,
 	name text not null default '',
-	id serial not null
+	id serial not null,
+	rough bool not null default false,
+	woods bool not null default false,
+	built bool not null default false,
+	fort bool not null default false
 );
 create unique index fight_idx on fight (game_id, id);
 

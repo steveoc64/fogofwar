@@ -76,7 +76,7 @@ func doUnits(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		print("all done")
-		consolePhaseDone(game)
+		consolePhaseNotBusy(game)
 	})
 
 	for _, v := range cmds {

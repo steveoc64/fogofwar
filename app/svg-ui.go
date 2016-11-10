@@ -97,6 +97,11 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	g := c.QuerySelector("[name=g-main]")
 	mr := c.QuerySelector("[name=map-rect]")
 
+	if keyGrabber != nil {
+		dom.GetWindow().RemoveEventListener("keypress", false, keyGrabber)
+		keyGrabber = nil
+	}
+
 	// print("remove tileclicker")
 	g.RemoveEventListener("click", false, tileClicker)
 	g.RemoveAttribute("transform")

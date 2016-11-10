@@ -156,7 +156,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	// print("deploying", cmd.Deploying())
 
 	if cmd.Deploying() {
-		html += svgText(0, 30, "text__start text__hand", getSalutation(Salutations))
+		html += svgText(xx/2-50, 30, "text__start text__hand", getSalutation(Salutations))
 		html += svgText(xx/2, 40, "text__middle text__hand", "I am currently indisposed at")
 		html += svgText(xx/2, 50, "text__middle text__hand", "present as the troops are busy")
 		html += svgText(xx/2, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", cmd.DStateName()))

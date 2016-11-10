@@ -32,6 +32,8 @@ func doMap(game *shared.Game) {
 	g := c.QuerySelector("[name=g-main]")
 	flipped := isFlipped(game)
 	html := ""
+	adjustCmd := &shared.GameCmd{}
+	adjusting := false
 
 	consolePhaseBusy(game, "Map")
 
@@ -57,6 +59,8 @@ func doMap(game *shared.Game) {
 		handleMapClick := func(el *dom.BasicHTMLElement) {
 			cl := el.Class()
 			html := ""
+			gx, _ := strconv.Atoi(el.GetAttribute("gx"))
+			gy, _ := strconv.Atoi(el.GetAttribute("gy"))
 			if cl.Contains("tile-objective") || cl.Contains("objective-name") {
 				obj, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				TheObjective := consoleGame.Objectives[obj]
@@ -79,10 +83,10 @@ func doMap(game *shared.Game) {
 				}
 			} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				// print("getting blue cmd", uid)
+				print("getting blue cmd", uid)
 				cmd := consoleGame.GetCmd("Blue", uid)
-				// print("cmd", cmd)
-				// print("game", consoleGame)
+				print("cmd", cmd)
+				print("game", consoleGame)
 				if cmd.IsEnemy(game) {
 					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
@@ -90,6 +94,12 @@ func doMap(game *shared.Game) {
 					cmd.CalcTotals()
 					html = fmt.Sprintf("<b>Friendly Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize(), cmd.CommandSummary())
+
+					if cmd.PlayerID == Session.UserID {
+						// Is Mine
+						html += "<h4>Click on the map to adjust the location of the Unit by 1 grid</h4>"
+						adjustCmd = cmd
+					}
 				}
 			} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
@@ -102,50 +112,83 @@ func doMap(game *shared.Game) {
 					cmd.CalcTotals()
 					html = fmt.Sprintf("<b>Friendly Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%d Commands with:<br>%s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.Cmdrs, cmd.Summarize(), cmd.CommandSummary())
+
+					if cmd.PlayerID == Session.UserID {
+						// Is Mine
+						html += "<h4>Click on the map to adjust the location of the Unit by 1 grid</h4>"
+						adjustCmd = cmd
+					}
 				}
 			} else {
-				html = ""
-				if cl.Contains("tile-content-clear") {
-					html = "<b>Clear Terrain</b><br>Full Movement<br>Good Cavalry Terrain<br>Good Effect for Artillery"
-				}
-				if cl.Contains("tile-content-0-1") {
-					html = "<b>Rough Ground</b><br>Reduced Movement<br>Bad Cavalry Terrain<br>Bad Effect for Artillery"
-				}
-				if cl.Contains("tile-content-0-2") {
-					html = "<b>Woods</b><br>Reduced Movement in Open Order only<br>Impassible for Cavalry<br>Bad Effect for Artillery"
-				}
-				if cl.Contains("tile-content-0-3") {
-					html = "<b>Built Up Area</b><br>Reduced Movement<br>Good Cover for Defence<br>Cavalry March Column Only<br>Bad Effect for Artillery"
-				}
-				if cl.Contains("tile-content-0-4") {
-					html = "<b>Fortified Position</b><br>Static Heavy Cover Defence Position<br>Cavalry of no use<br>Reduced Effect for Artillery"
-				}
-				if cl.Contains("tile-content-0-5") || cl.Contains("tile-content-0-6") || cl.Contains("tile-content-0-7") {
-					html = "<b>River</b><br>Cannot Pass<br>Bad Effect for Artillery"
-				}
+				if adjustCmd.ID != 0 {
+					// if dom.GetWindow().Confirm(fmt.Sprintf("Set unit %s position to this square ?", adjustCmd.Name)) {
+					print("move", adjustCmd.Name, gx, gy)
+					adjusting = true
+					go func() {
+						newCmd := &shared.GameCmd{}
+						err := RPC("GameRPC.MoveCmd", shared.MoveCmdData{
+							Channel: Session.Channel,
+							ID:      adjustCmd.ID,
+							X:       gx,
+							Y:       gy,
+						}, &newCmd)
+						if err != nil {
+							print(err.Error())
+						} else {
+							adjustCmd.CX = newCmd.CX
+							adjustCmd.CY = newCmd.CY
+							adjustCmd.DX = newCmd.DX
+							adjustCmd.DY = newCmd.DY
+							doMap(game)
+						}
+					}()
+					// }
+				} else {
 
-				if cl.Contains("tile-content-1-0") {
-					html = "<b>High Ground - Clear</b><br>Reduced Movement<br>Good Cavalry Terrain<br>Extended Range for Artillery"
-				}
-				if cl.Contains("tile-content-1-1") {
-					html = "<b>High Ground - Rough</b><br>Slow Movement<br>Impassible for Cavalry<br>Bad Effect for Artillery"
-				}
-				if cl.Contains("tile-content-1-2") {
-					html = "<b>High Ground - Woods</b><br>Very Difficult Going<br>Impassible for Cavalry<br>Safe from Artillery"
-				}
-				if cl.Contains("tile-content-1-3") {
-					html = "<b>High Ground - Built Up Area</b><br>Reduced Movement<br>Cavalry March Column Only<br>Bad Effect for Artillery"
-				}
-				if cl.Contains("tile-content-1-4") {
-					html = "<b>High Ground - Fortified Position</b><br>Very Strong Static Defence Position<br>Impassible for Cavalry<br>Tough work for Artillery"
+					html = ""
+					if cl.Contains("tile-content-clear") {
+						html = "<b>Clear Terrain</b><br>Full Movement<br>Good Cavalry Terrain<br>Good Effect for Artillery"
+					}
+					if cl.Contains("tile-content-0-1") {
+						html = "<b>Rough Ground</b><br>Reduced Movement<br>Bad Cavalry Terrain<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-0-2") {
+						html = "<b>Woods</b><br>Reduced Movement in Open Order only<br>Impassible for Cavalry<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-0-3") {
+						html = "<b>Built Up Area</b><br>Reduced Movement<br>Good Cover for Defence<br>Cavalry March Column Only<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-0-4") {
+						html = "<b>Fortified Position</b><br>Static Heavy Cover Defence Position<br>Cavalry of no use<br>Reduced Effect for Artillery"
+					}
+					if cl.Contains("tile-content-0-5") || cl.Contains("tile-content-0-6") || cl.Contains("tile-content-0-7") {
+						html = "<b>River</b><br>Cannot Pass<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-1-0") {
+						html = "<b>High Ground - Clear</b><br>Reduced Movement<br>Good Cavalry Terrain<br>Extended Range for Artillery"
+					}
+					if cl.Contains("tile-content-1-1") {
+						html = "<b>High Ground - Rough</b><br>Slow Movement<br>Impassible for Cavalry<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-1-2") {
+						html = "<b>High Ground - Woods</b><br>Very Difficult Going<br>Impassible for Cavalry<br>Safe from Artillery"
+					}
+					if cl.Contains("tile-content-1-3") {
+						html = "<b>High Ground - Built Up Area</b><br>Reduced Movement<br>Cavalry March Column Only<br>Bad Effect for Artillery"
+					}
+					if cl.Contains("tile-content-1-4") {
+						html = "<b>High Ground - Fortified Position</b><br>Very Strong Static Defence Position<br>Impassible for Cavalry<br>Tough work for Artillery"
+					}
 				}
 
 			}
 			// print(html)
 
-			td := dom.GetWindow().Document().QuerySelector("#tile-details")
-			td.SetInnerHTML(html)
-			td.Class().Add("md-show")
+			if !adjusting {
+				td := dom.GetWindow().Document().QuerySelector("#tile-details")
+				td.SetInnerHTML(html)
+				td.Class().Add("md-show")
+			}
 		}
 
 		tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
@@ -260,11 +303,11 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 	for i, v := range cmd {
 		if v.CX != -1 && !v.Cull {
 			if showAllUnits || v.ID == id {
-				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="red-%d" data-id="%d"/>`,
+				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="%s-%d" data-id="%d"/>`,
 					v.CX*game.GridSize, v.CY*game.GridSize, // x and y in inches
 					game.GridSize, game.GridSize, // width and height in inches
 					v.GetCSS(), // self-computed CSS content type
-					v.CX, v.CY, i, v.ID)
+					v.CX, v.CY, team, i, v.ID)
 			}
 			xcoord := v.CX*game.GridSize + 1
 			ycoord := v.CY*game.GridSize + game.GridSize - 1

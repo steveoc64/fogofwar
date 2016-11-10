@@ -78,6 +78,13 @@ type GTMoveData struct {
 	Contact     bool
 }
 
+type MoveCmdData struct {
+	Channel int
+	ID      int
+	X       int
+	Y       int
+}
+
 const (
 	UnitEventGeneral int = iota
 	UnitEventHits

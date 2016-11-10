@@ -53,12 +53,13 @@ func calcVision2(game *shared.Game, cmd *shared.GameCmd, enemy []*shared.GameCmd
 			println("to", v.Name, d1, d2)
 			if cmd.Moving() {
 				// current location is within 1-4 grids random
-				if d1 <= sq(1+rand.Intn(3)) {
+				if d1 <= sq(2+rand.Intn(3)) {
 					println("seen 1")
 					makeSeen(cmd)
 					return
 				} else {
-					if d2 < sq(2) { // within 1 grid as diagonals are 1.4 grids away
+					// check destination
+					if d2 <= sq(2) { // within 1 grid as diagonals are 1.4 grids away
 						makeSeen(cmd)
 						println("seen 2")
 						return
@@ -66,14 +67,14 @@ func calcVision2(game *shared.Game, cmd *shared.GameCmd, enemy []*shared.GameCmd
 				}
 			} else {
 				// not moving - spotted if within 1 grid, or 2 grids straight
-				if d1 <= sq(2) {
+				if d1 < sq(3) {
 					makeSeen(cmd)
 					println("seen 3")
 					return
 				}
 				tile := game.GetTileXY(cmd.CX, cmd.CY)
 				if tile.Content == shared.TileClear {
-					if d1 < 8 {
+					if d1 < 11 {
 						// is just under 3 grids distant, and we are in the open
 						makeSeen(cmd)
 						println("seen 4")

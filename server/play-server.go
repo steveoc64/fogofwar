@@ -144,7 +144,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					coalesce(u.email,'') as player_email
 				from game_cmd g
 				left join users u on u.id=g.player_id
-				where g.game_id=$1 and g.blue_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
+				where g.game_id=$1 and g.blue_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
 
 		// If the GetUnits flag was set, then get all the units for each of the commands as well
@@ -455,6 +455,62 @@ func (g *GameRPC) UnitRole(data shared.UnitRoleData, done *bool) error {
 	if err == nil {
 		*done = true
 	}
+
+	return err
+}
+
+func (g *GameRPC) MoveCmd(data shared.MoveCmdData, retval *shared.GameCmd) error {
+	start := time.Now()
+
+	absdiff := func(a, b int) int {
+		a -= b
+		if a < 0 {
+			a *= -1
+		}
+		return a
+	}
+
+	conn := Connections.Get(data.Channel)
+
+	oldCmd := &shared.GameCmd{}
+	err := DB.SQL(`select * from game_cmd where id=$1`, data.ID).QueryStruct(oldCmd)
+
+	game := &shared.Game{}
+	err = DB.SQL(`select * from game where id=$1`, oldCmd.GameID).QueryStruct(game)
+	if game.GridSize == 0 {
+		return errors.New("Invalid Grid Size for Game")
+	}
+	gx := (game.TableX * 12) / game.GridSize
+	gy := (game.TableY * 12) / game.GridSize
+
+	if data.X < 0 || data.Y < 0 || data.X >= gx || data.Y >= gy {
+		return errors.New(fmt.Sprintf("Invalid X,Y Coords %d %d", data.X, data.Y))
+	}
+
+	dx := oldCmd.DX
+	dy := oldCmd.DY
+	if oldCmd.DX == oldCmd.CX {
+		dx = data.X
+	}
+	if oldCmd.DY == oldCmd.CY {
+		dy = data.Y
+	}
+
+	if absdiff(oldCmd.CX, data.X) > 1 || absdiff(oldCmd.CY, data.Y) > 1 {
+		return errors.New("Too Far")
+	}
+
+	_, err = DB.SQL(`update game_cmd set cx=$2,cy=$3,dx=$5,dy=$6 where id=$1 and player_id=$4`,
+		data.ID, data.X, data.Y, conn.UserID, dx, dy).Exec()
+	DB.SQL(`select cx,cy,dx,dy from game_cmd where id=$1 and player_id=$2`, data.ID, conn.UserID).QueryStruct(retval)
+	if err == nil {
+		game := &shared.Game{}
+		DB.SQL(`select * from game where id=$1`, retval.GameID).QueryStruct(game)
+		calcVision(game)
+	}
+
+	logger(start, "Game.MoveCmd", conn,
+		fmt.Sprintf("ID %d -> %d,%d", data.ID, data.X, data.Y), "")
 
 	return err
 }

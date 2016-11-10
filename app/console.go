@@ -134,7 +134,6 @@ func play(context *router.Context) {
 		}, &f)
 		if err == nil {
 			fights = f
-			print("fights", fights)
 		}
 		consoleGame = &newGame
 		game = consoleGame
@@ -150,7 +149,7 @@ func play(context *router.Context) {
 		})
 
 		playMsg := func(action string, msg *shared.NetData, context *router.Context) {
-			print("Msg", action, msg)
+			// print("Msg", action, msg)
 			switch action {
 			case "Turn":
 				// end of turn - get the data again
@@ -188,7 +187,7 @@ func play(context *router.Context) {
 			case "NewFight":
 				game.PhaseDONE = false
 				f := msg.Fight
-				print("adding this one", f)
+				// print("adding this one", f)
 				fights = append(fights, &shared.Fight{
 					ID:     f.ID,
 					GameID: f.GameID,
@@ -198,7 +197,7 @@ func play(context *router.Context) {
 					Built:  f.Built,
 					Fort:   f.Fort,
 				})
-				print("fights", fights)
+				// print("fights", fights)
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}

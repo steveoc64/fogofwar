@@ -71,9 +71,13 @@ func doNewFight(game *shared.Game) {
 	html += svgEndG()
 
 	g.SetInnerHTML(html)
+
 	entryField := doc.QuerySelector("#fight-name").(*dom.BasicHTMLElement)
+	entryField.SetInnerHTML("")
 
 	allDone := func() {
+		w.RemoveEventListener("keydown", false, keyGrabber)
+		keyGrabber = nil
 		rough := !doc.QuerySelector("#rough").Class().Contains("hidden")
 		woods := !doc.QuerySelector("#woods").Class().Contains("hidden")
 		built := !doc.QuerySelector("#built").Class().Contains("hidden")
@@ -126,28 +130,24 @@ func doNewFight(game *shared.Game) {
 	})
 
 	svgCallback(200, func(dom.Event) {
-		print("clicked on rough")
 		el := doc.QuerySelector("#rough")
 		if el != nil {
 			el.Class().Toggle("hidden")
 		}
 	})
 	svgCallback(201, func(dom.Event) {
-		print("clicked on woods")
 		el := doc.QuerySelector("#woods")
 		if el != nil {
 			el.Class().Toggle("hidden")
 		}
 	})
 	svgCallback(202, func(dom.Event) {
-		print("clicked on built")
 		el := doc.QuerySelector("#built")
 		if el != nil {
 			el.Class().Toggle("hidden")
 		}
 	})
 	svgCallback(203, func(dom.Event) {
-		print("clicked on fort")
 		el := doc.QuerySelector("#fort")
 		if el != nil {
 			el.Class().Toggle("hidden")

@@ -218,9 +218,9 @@ func doTurnSummary(game *shared.Game) {
 		svgCallback(6, func(dom.Event) { doNewFight(game) })
 		svgCallback(7, func(dom.Event) { doCommitFight(game) })
 		svgCallbackQuery("#help", func(dom.Event) {
-			loadTemplate("tactical-move", "#unit-details", nil)
+			loadTemplate("fight", "#unit-details", nil)
 			doc.QuerySelector("#unit-details").Class().Add("md-show")
-			doc.QuerySelector("[name=tactical-move]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("[name=fight]").AddEventListener("click", false, func(evt dom.Event) {
 				doc.QuerySelector("#unit-details").Class().Remove("md-show")
 			})
 		})

@@ -19,7 +19,7 @@ func doNewFight(game *shared.Game) {
 	} else {
 		consoleSetViewBox(game, 100, 100, false)
 	}
-	consolePhaseBusy(game, "Units")
+	consolePhaseBusy(game, "NewFight")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -35,7 +35,10 @@ func doNewFight(game *shared.Game) {
 
 	html += `<rect class="console-corps-button" x=40 y=20 width=100 height=15></rect>`
 	html += `<text id=fight-name xml:space="preserve" class="text__2x text__black" x=40 y=30></text>`
-	html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)
+
+	if Session.Orientation == "Landscape" {
+		html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)
+	}
 	html += svgHelpBtn()
 
 	html += svgG(100)
@@ -161,9 +164,107 @@ func doNewFight(game *shared.Game) {
 			doc.QuerySelector("#unit-details").Class().Remove("md-show")
 		})
 	})
-
 }
 
-func doCommitFight(game *shared.Game) {
+func doFight(game *shared.Game, fight *shared.Fight) {
+	w := dom.GetWindow()
+	doc := w.Document()
+	c := doc.QuerySelector("[name=svg-console]")
+	html := ""
+	xx := 100
+	if Session.Orientation == "Landscape" {
+		consoleSetViewBox(game, 150, 100, false)
+		xx = 150
+	} else {
+		consoleSetViewBox(game, 100, 100, false)
+	}
+	consolePhaseBusy(game, "Fight")
+
+	// Add a turn summary object
+	g := c.QuerySelector("[name=g-main]")
+
+	team := "blue"
+	units := fight.Blue
+	if game.Red {
+		team = "red"
+		units = fight.Red
+	}
+
+	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Fight -")
+	html += svgText(40, 8, "text__1x text__"+team, fight.Name)
+
+	if Session.Orientation == "Landscape" {
+		html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)
+	}
+	html += svgHelpBtn()
+
+	html += svgG(100)
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
+	html += "\n"
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
+	html += svgEndG()
+
+	terrain := ""
+	if fight.Rough {
+		terrain += "Rough Ground"
+	}
+	if fight.Woods {
+		if terrain != "" {
+			terrain += ", "
+		}
+		terrain += "Woods"
+	}
+	if fight.Built {
+		if terrain != "" {
+			terrain += ", "
+		}
+		terrain += "Buildings"
+	}
+	if fight.Fort {
+		if terrain != "" {
+			terrain += ", "
+		}
+		terrain += "Fort"
+	}
+	if terrain == "" {
+		terrain = "Clear"
+	}
+	html += svgText(5, 18, "text__1x text__"+team, "Terrain: "+terrain)
+
+	// add a button to commit fresh units to this fight
+	html += svgG(101)
+	if Session.Orientation == "Landscape" {
+		html += svgButton(xx-50, 20, 50, 10, "console-corps-button", "text__1x text__"+team, "Commit Fresh Unit")
+	} else {
+		html += svgButton(xx-50, 10, 50, 10, "console-corps-button", "text__1x text__"+team, "Commit Fresh Unit")
+	}
+	html += svgEndG()
+
+	// Now list the units in this fight
+	y := 20
+	for _, v := range units {
+		print("adding unit", v)
+		html += svgG(v.ID)
+		html += svgButton(0, y, 100, 10, "console-corps-button", "text__1x text__"+team, "Commit Fresh Unit")
+		html += svgEndG()
+		y += 11
+	}
+
+	g.SetInnerHTML(html)
+
+	svgCallback(100, func(dom.Event) {
+		consolePhaseNotBusy(game)
+	})
+	svgCallback(101, func(dom.Event) {
+		doCommitFight(game, fight)
+	})
+
+	svgCallbackQuery("#help", func(dom.Event) {
+		loadTemplate("fight", "#unit-details", nil)
+		doc.QuerySelector("#unit-details").Class().Add("md-show")
+		doc.QuerySelector("[name=fight]").AddEventListener("click", false, func(evt dom.Event) {
+			doc.QuerySelector("#unit-details").Class().Remove("md-show")
+		})
+	})
 
 }

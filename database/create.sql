@@ -614,4 +614,4 @@ create unlogged table fight_unit (
 	id int not null default 0,
 	unit_id int not null default 0
 );
-create unique index fight_unit_idx on fight_unit (game_id, id, unit_id);
+create unique index fight_unit_idx on fight_unit (id, unit_id);

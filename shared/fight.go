@@ -20,10 +20,13 @@ type GameFight struct {
 	Woods  bool
 	Built  bool
 	Fort   bool
+	Red    []int
+	Blue   []int
 }
 
 type FightData struct {
 	Channel int
+	GameID  int
 	ID      int
 	DivID   int
 	BdeID   int

@@ -756,6 +756,7 @@ type Unit struct {
 	Orders           int    `db:"orders"`
 	Bombard          *Bombard
 	History          []UnitHistory
+	Committed        bool
 }
 
 type UnitHistory struct {

@@ -102,3 +102,25 @@ func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) err
 
 	return err
 }
+
+func (g *GameRPC) CommitToFight(data shared.FightData, done *bool) error {
+	start := time.Now()
+
+	*done = false
+	conn := Connections.Get(data.Channel)
+
+	_, err := DB.SQL(`delete from fight_unit where id=$1 and unit_id=$2`, data.ID, data.DivID).Exec()
+	if err == nil {
+		_, err = DB.SQL(`insert into fight_unit (id,game_id,unit_id) values ($1,$2,$3)`,
+			data.ID, data.GameID, data.DivID).Exec()
+	}
+
+	logger(start, "Game.CommitToFight", conn,
+		fmt.Sprintf("Game %d Fight %d Unit %d", data.GameID, data.ID, data.DivID), "")
+
+	if err == nil {
+		*done = true
+	}
+
+	return err
+}

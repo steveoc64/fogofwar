@@ -134,6 +134,21 @@ func play(context *router.Context) {
 		}, &f)
 		if err == nil {
 			fights = f
+			for _, ff := range f {
+				// mark committed for all units known to be in the fight
+				for _, v := range ff.Red {
+					u := game.GetUnit("red", v.ID)
+					if u != nil {
+						u.Committed = true
+					}
+				}
+				for _, v := range ff.Blue {
+					u := game.GetUnit("blue", v.ID)
+					if u != nil {
+						u.Committed = true
+					}
+				}
+			}
 		}
 		consoleGame = &newGame
 		game = consoleGame
@@ -188,6 +203,14 @@ func play(context *router.Context) {
 				game.PhaseDONE = false
 				f := msg.Fight
 				// print("adding this one", f)
+				reds := []*shared.Unit{}
+				blues := []*shared.Unit{}
+				for _, v := range f.Red {
+					reds = append(reds, game.GetUnit("red", v))
+				}
+				for _, v := range f.Blue {
+					blues = append(blues, game.GetUnit("blue", v))
+				}
 				fights = append(fights, &shared.Fight{
 					ID:     f.ID,
 					GameID: f.GameID,
@@ -196,8 +219,10 @@ func play(context *router.Context) {
 					Woods:  f.Woods,
 					Built:  f.Built,
 					Fort:   f.Fort,
+					Red:    reds,
+					Blue:   blues,
 				})
-				// print("fights", fights)
+				print("fights", fights)
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}

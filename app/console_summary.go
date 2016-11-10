@@ -167,11 +167,11 @@ func doTurnSummary(game *shared.Game) {
 		html += svgEndG()
 	case shared.PhaseTactical:
 		html += svgG(6)
-		html += svgButton(xx-96, 85, 30, 12, "text__paper", "console-text text__1x text__"+team, "New Fight")
+		html += svgButton(xx-64, 85, 30, 12, "text__paper", "console-text text__1x text__"+team, "New Fight")
 		html += svgEndG()
-		html += svgG(7)
-		html += svgButton(xx-64, 85, 30, 12, "text__paper", "console-text text__1x text__"+team, "Commit")
-		html += svgEndG()
+		// html += svgG(7)
+		// html += svgButton(xx-64, 85, 30, 12, "text__paper", "console-text text__1x text__"+team, "Commit")
+		// html += svgEndG()
 	case shared.PhaseObjectives:
 	}
 
@@ -216,7 +216,7 @@ func doTurnSummary(game *shared.Game) {
 
 	if game.Phase == shared.PhaseTactical {
 		svgCallback(6, func(dom.Event) { doNewFight(game) })
-		svgCallback(7, func(dom.Event) { doCommitFight(game) })
+		// svgCallback(7, func(dom.Event) { doCommitFight(game) })
 		svgCallbackQuery("#help", func(dom.Event) {
 			loadTemplate("fight", "#unit-details", nil)
 			doc.QuerySelector("#unit-details").Class().Add("md-show")
@@ -244,5 +244,16 @@ func doTurnSummary(game *shared.Game) {
 				}()
 			}
 		})
+		for _, v := range fights {
+			svgCallbackQuery(fmt.Sprintf("#fight-%d", v.ID), func(evt dom.Event) {
+				el := evt.Target()
+				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+				for _, f := range fights {
+					if id == f.ID {
+						doFight(game, f)
+					}
+				}
+			})
+		}
 	}
 }

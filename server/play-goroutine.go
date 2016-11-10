@@ -625,6 +625,13 @@ func makeGameFight(f *shared.Fight) *shared.GameFight {
 	g.Woods = f.Woods
 	g.Built = f.Built
 	g.Fort = f.Fort
+
+	for _, v := range f.Red {
+		g.Red = append(g.Red, v.ID)
+	}
+	for _, v := range f.Blue {
+		g.Blue = append(g.Blue, v.ID)
+	}
 	return g
 }
 

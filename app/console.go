@@ -185,6 +185,23 @@ func play(context *router.Context) {
 				game.PhaseDONE = true
 				game.PhaseTODO = false
 				doTurnSummary(game)
+			case "NewFight":
+				game.PhaseDONE = false
+				f := msg.Fight
+				print("adding this one", f)
+				fights = append(fights, &shared.Fight{
+					ID:     f.ID,
+					GameID: f.GameID,
+					Name:   f.Name,
+					Rough:  f.Rough,
+					Woods:  f.Woods,
+					Built:  f.Built,
+					Fort:   f.Fort,
+				})
+				print("fights", fights)
+				if !game.PhaseBUSY {
+					doTurnSummary(game)
+				}
 			case "Incoming":
 				// TODO - rewrite this to use the attached data in the message
 				// print("we have incoming bombardment", msg.ID, game.PhaseBUSY, game.PhaseDONE, game.PhaseTODO)

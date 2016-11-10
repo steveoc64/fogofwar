@@ -13,6 +13,7 @@ type NetData struct {
 	ID     int
 	Opcode int
 	Unit   *UnitEvent
+	Fight  *GameFight
 }
 
 type NetRequest struct {

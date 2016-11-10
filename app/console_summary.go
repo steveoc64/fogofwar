@@ -232,7 +232,6 @@ func doTurnSummary(game *shared.Game) {
 					fight := &shared.Fight{}
 					err := RPC("GameRPC.GetFight", shared.FightData{
 						Channel: Session.Channel,
-						GameID:  game.ID,
 						ID:      id,
 					}, &fight)
 					if err != nil {
@@ -247,37 +246,3 @@ func doTurnSummary(game *shared.Game) {
 		})
 	}
 }
-
-// func doEngage(game *shared.Game) {
-// 	// w := dom.GetWindow()
-// 	// doc := w.Document()
-// 	// c := doc.QuerySelector("[name=svg-console]")
-
-// 	consoleSetViewBox(game, 100, 100, false)
-// 	consolePhaseBusy(game, "Engage")
-// 	print("phaseEngage")
-// 	// dom.GetWindow().Alert("all done")
-// 	consolePhaseDone(game)
-// }
-// func doTactical(game *shared.Game) {
-// 	// w := dom.GetWindow()
-// 	// doc := w.Document()
-// 	// c := doc.QuerySelector("[name=svg-console]")
-
-// 	consoleSetViewBox(game, 100, 100, false)
-// 	consolePhaseBusy(game, "Tactical")
-// 	print("phaseTactical")
-// 	// dom.GetWindow().Alert("all done")
-// 	consolePhaseDone(game)
-// }
-// func doObjectives(game *shared.Game) {
-// 	// w := dom.GetWindow()
-// 	// doc := w.Document()
-// 	// c := doc.QuerySelector("[name=svg-console]")
-
-// 	// consoleSetViewBox(game, 100, 100, false)
-// 	consolePhaseBusy(game, "Objectives")
-// 	print("phaseObjectives")
-// 	// dom.GetWindow().Alert("all done")
-// 	consolePhaseDone(game)
-// }

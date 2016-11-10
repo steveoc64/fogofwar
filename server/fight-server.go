@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -13,25 +14,41 @@ func (g *GameRPC) NewFight(data shared.FightData, done *bool) error {
 	*done = false
 	conn := Connections.Get(data.Channel)
 	c := 0
-	DB.SQL(`select count(*) from fight where game_id=$1`, data.GameID).QueryScalar(&c)
+	DB.SQL(`select count(*) from fight where game_id=$1`, data.Fight.GameID).QueryScalar(&c)
 
 	if data.Fight.Name == "" {
 		// Generate a Name
 		data.Fight.Name = fmt.Sprintf("Fight %d", c+1)
 	}
 
-	_, err := DB.SQL(`insert into fight 
+	id := 0
+	err := DB.SQL(`insert into fight 
 		(game_id,name,rough,woods,built,fort)
-		values ($1,$2,$3,$4,$5,$6)`,
-		data.GameID,
+		values ($1,$2,$3,$4,$5,$6) returning id`,
+		data.Fight.GameID,
 		data.Fight.Name,
 		data.Fight.Rough,
 		data.Fight.Woods,
 		data.Fight.Built,
-		data.Fight.Fort).Exec()
+		data.Fight.Fort).QueryScalar(&id)
+	data.Fight.ID = id
+
+	if err == nil {
+		// Send message to the play-goroutine to add this bombard to the list
+		if play, ok := Plays[data.Fight.GameID]; ok {
+			play <- PlayMessage{
+				Game:     data.Fight.GameID,
+				PlayerID: conn.UserID,
+				OpCode:   FightAdd,
+				Data:     data.Fight,
+			}
+		} else {
+			err = errors.New("Invalid Game ID")
+		}
+	}
 
 	logger(start, "Game.NewFight", conn,
-		fmt.Sprintf("Game %d, %v", data.GameID, *data.Fight), "")
+		fmt.Sprintf("Game %d, %v", data.Fight.GameID, *data.Fight), "")
 
 	if err == nil {
 		*done = true
@@ -80,7 +97,7 @@ func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) err
 	}
 
 	logger(start, "Game.GetFights", conn,
-		fmt.Sprintf("ID %d", data.ID),
+		fmt.Sprintf("Game ID %d", data.ID),
 		fmt.Sprintf("%d fights", len(*retval)))
 
 	return err

@@ -1,9 +1,9 @@
 package shared
 
 type Fight struct {
+	ID     int     `db:"id"`
 	GameID int     `db:"game_id"`
 	Name   string  `db:"name"`
-	ID     int     `db:"id"`
 	Rough  bool    `db:"rough"`
 	Woods  bool    `db:"woods"`
 	Built  bool    `db:"built"`
@@ -12,11 +12,20 @@ type Fight struct {
 	Blue   []*Unit `db:"blue"`
 }
 
+type GameFight struct {
+	ID     int
+	GameID int
+	Name   string
+	Rough  bool
+	Woods  bool
+	Built  bool
+	Fort   bool
+}
+
 type FightData struct {
 	Channel int
-	GameID  int
 	ID      int
 	DivID   int
-	BdeD    int
+	BdeID   int
 	Fight   *Fight
 }

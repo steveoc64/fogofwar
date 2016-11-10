@@ -83,13 +83,13 @@ func doNewFight(game *shared.Game) {
 			done := false
 			err := RPC("GameRPC.NewFight", shared.FightData{
 				Channel: Session.Channel,
-				GameID:  game.ID,
 				Fight: &shared.Fight{
-					Name:  t,
-					Rough: rough,
-					Woods: woods,
-					Built: built,
-					Fort:  fort,
+					GameID: game.ID,
+					Name:   t,
+					Rough:  rough,
+					Woods:  woods,
+					Built:  built,
+					Fort:   fort,
 				},
 			}, &done)
 			if err != nil {

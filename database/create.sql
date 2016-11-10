@@ -598,9 +598,9 @@ create unique index paypal_payment_idx on paypal (payment_id);
 
 drop table if exists fight;
 create unlogged table fight (
+	id serial not null primary key,
 	game_id int not null default 0,
 	name text not null default '',
-	id serial not null,
 	rough bool not null default false,
 	woods bool not null default false,
 	built bool not null default false,

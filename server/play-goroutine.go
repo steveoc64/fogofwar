@@ -334,6 +334,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				bombardDone(state, m)
 			case FightAdd:
 				fmt.Fprintf(fp, "Adding New Fight\n")
+				fightAdd(state, m)
 			case FightCommit:
 				fmt.Fprintf(fp, "Commit Division to Fight\n")
 			case FightWithdraw:
@@ -613,4 +614,34 @@ func hasBombards(state *PlayState, pid int) bool {
 		}
 	}
 	return false
+}
+
+func makeGameFight(f *shared.Fight) *shared.GameFight {
+	g := &shared.GameFight{}
+	g.ID = f.ID
+	g.GameID = f.GameID
+	g.Name = f.Name
+	g.Rough = f.Rough
+	g.Woods = f.Woods
+	g.Built = f.Built
+	g.Fort = f.Fort
+	return g
+}
+
+func fightAdd(state *PlayState, m PlayMessage) {
+	if f, ok := m.Data.(*shared.Fight); ok {
+		// add to the list of fights
+		state.Fights = append(state.Fights, f)
+
+		// signal everyone that there is a new fight
+		ff := makeGameFight(f)
+		for _, v := range state.Game.RedPlayers {
+			v.Done = false
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "NewFight", ID: f.ID, Fight: ff})
+		}
+		for _, v := range state.Game.BluePlayers {
+			v.Done = false
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "NewFight", ID: f.ID, Fight: ff})
+		}
+	}
 }

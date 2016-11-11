@@ -36,6 +36,31 @@ const (
 )
 const NumCommands = 9
 
+// Tactical Actions - HQ
+const (
+	TacticalAdvance int = iota
+	TacticalWithdraw
+	TacticalResup
+	TacticalSquare
+	TacticalRightFlank
+	TacticalLeftFlank
+	TacticalFire
+	TacticalForm
+	TacticalPassageOfLines
+	TacticalSKIn
+	TacticalSKOut
+	TacticalSKAttack
+	TacticalColdSteel
+	TacticalCavCharge
+	TacticalCavFeint
+	TacticalCounterCavCharge
+	TacticalStandGround
+	TacticalCommitReserve
+	TacticalPursuit
+	TacticalNoQuarter
+	TacticalSurrender
+)
+
 // Unit Types
 const (
 	UnitType int = iota

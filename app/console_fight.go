@@ -36,7 +36,6 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		enemy = fight.Blue
 		enemyteam = "blue"
 	}
-	print("enemy", enemy, enemyteam)
 
 	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Fight -")
 	html += svgText(40, 8, "text__1x text__"+team, fight.Name)
@@ -202,9 +201,14 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("clicked on friendly unit", id)
+			// print("clicked on friendly unit", id)
 			unit := game.GetUnit(team, id)
-			print(unit)
+			switch unit.UType {
+			case shared.UnitDiv:
+				doFightHQ(game, fight, unit)
+			default:
+				doFightUnit(game, fight, unit)
+			}
 		})
 	}
 
@@ -213,9 +217,8 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("clicked on enemy unit", id)
 			unit := game.GetUnit(enemyteam, id)
-			print(unit)
+			doFightEnemy(game, fight, unit)
 		})
 	}
 

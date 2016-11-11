@@ -14,6 +14,7 @@ type NetData struct {
 	Opcode int
 	Unit   *UnitEvent
 	Fight  *GameFight
+	Cmds   *[]CmdUpdate
 }
 
 type NetRequest struct {

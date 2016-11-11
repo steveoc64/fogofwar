@@ -122,7 +122,8 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 			DB.SQL(`select
 				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
 					coalesce(u.username,'') as player_name,
-					coalesce(u.email,'') as player_email
+					coalesce(u.email,'') as player_email,
+					seen
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
@@ -141,7 +142,8 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 			DB.SQL(`select
 				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
 					coalesce(u.username,'') as player_name,
-					coalesce(u.email,'') as player_email
+					coalesce(u.email,'') as player_email,
+					seen
 				from game_cmd g
 				left join users u on u.id=g.player_id
 				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
@@ -533,9 +535,17 @@ func (g *GameRPC) MoveCmd(data shared.MoveCmdData, retval *shared.GameCmd) error
 		data.ID, data.X, data.Y, conn.UserID, dx, dy).Exec()
 	DB.SQL(`select cx,cy,dx,dy from game_cmd where id=$1 and player_id=$2`, data.ID, conn.UserID).QueryStruct(retval)
 	if err == nil {
-		game := &shared.Game{}
-		DB.SQL(`select * from game where id=$1`, retval.GameID).QueryStruct(game)
-		calcVision(game)
+		// Send message to the play-goroutine to say that things have moved
+		if err == nil {
+			if play, ok := Plays[data.GameID]; ok {
+				play <- PlayMessage{
+					Game:   data.GameID,
+					OpCode: UnitsMoved,
+				}
+			} else {
+				err = errors.New("Invalid Game ID")
+			}
+		}
 	}
 
 	logger(start, "Game.MoveCmd", conn,

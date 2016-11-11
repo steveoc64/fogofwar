@@ -141,7 +141,7 @@ func play(context *router.Context) {
 		}, &f)
 		if err == nil {
 			fights = f
-			print("got fight data", fights)
+			// print("got fight data", fights)
 			for _, ff := range f {
 				// mark committed for all units known to be in the fight
 				for _, v := range ff.Red {
@@ -195,6 +195,24 @@ func play(context *router.Context) {
 				game.PhaseDONE = false
 				game.PhaseTODO = true
 				incoming = nil
+				// The Data contains a list of cmd updates to be applied
+				if msg.Cmds != nil {
+					// print("cmdupdate array", msg.Cmds)
+					for _, v := range *msg.Cmds {
+						// print("got", v)
+						c := &shared.GameCmd{}
+						if v.RedTeam {
+							c = game.GetCmd("red", v.ID)
+						} else {
+							c = game.GetCmd("blue", v.ID)
+						}
+						if c != nil {
+							c.CX = v.CX
+							c.CY = v.CY
+							c.Seen = v.Seen
+						}
+					}
+				}
 				doTurnSummary(game)
 			case "PhaseWait":
 				game.Phase = msg.ID
@@ -224,16 +242,16 @@ func play(context *router.Context) {
 					Red:    reds,
 					Blue:   blues,
 				})
-				print("fights", fights)
+				// print("fights", fights)
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
 				}
 			case "FightUpdate":
 				f := msg.Fight
-				print("asked to update fight", msg.ID, f)
+				// print("asked to update fight", msg.ID, f)
 				for _, v := range fights {
 					if v.ID == msg.ID {
-						print("that would be this one", v)
+						// print("that would be this one", v)
 						reds := []*shared.Unit{}
 						blues := []*shared.Unit{}
 						for _, v := range f.Red {
@@ -244,14 +262,14 @@ func play(context *router.Context) {
 						}
 						v.Red = reds
 						v.Blue = blues
-						print("modified to", v)
+						// print("modified to", v)
 					}
 				}
 				if consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
 					doFight(game, consoleCurrentFight)
 				}
 			case "UnitRole":
-				print("A unit has changed role")
+				// print("A unit has changed role")
 				gotsome := false
 				for _, cmd := range game.RedCmd {
 					for _, unit := range cmd.Units {
@@ -356,7 +374,7 @@ func play(context *router.Context) {
 
 		gameMsg := func(action string, msg *shared.NetData, context *router.Context) {
 			if msg.ID == id {
-				print("Game update for this game")
+				// print("Game update for this game")
 				newGame := &shared.Game{}
 				err := RPC("GameRPC.GetPlay", shared.GameRPCData{
 					Channel:  Session.Channel,
@@ -385,7 +403,7 @@ func play(context *router.Context) {
 
 		if game.HostedBy == Session.UserID {
 			doc.QuerySelector("[name=hosting-users]").AddEventListener("click", false, func(evt dom.Event) {
-				print("edit users")
+				// print("edit users")
 				Session.Navigate(fmt.Sprintf("/game/%d/players", id))
 			})
 		}

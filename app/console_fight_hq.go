@@ -53,6 +53,9 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
 	html += svgEndG()
 
+	html += fmt.Sprintf(`<text id=outcome x=%d y=60 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome2 x=%d y=70 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+
 	terrain := ""
 	if fight.Rough {
 		terrain += "Rough Ground"
@@ -97,17 +100,23 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 		ids = append(ids, id)
 	}
 
-	addButton(shared.TacticalAdvance, "Division Advance")
-	addButton(shared.TacticalStandGround, "Stand Your Ground")
+	if unit.CommanderControl >= 3 {
+		addButton(shared.TacticalAdvance, "Division Advance")
+		addButton(shared.TacticalStandGround, "Stand Your Ground")
+	}
 
-	addButton(shared.TacticalSquare, "Form Squares")
-	addButton(shared.TacticalPassageOfLines, "Passage of Lines")
+	if unit.CommanderControl >= 4 {
+		addButton(shared.TacticalSquare, "Form Squares")
+		addButton(shared.TacticalPassageOfLines, "Passage of Lines")
+	}
 
-	addButton(shared.TacticalSKIn, "Skirmishers In")
-	addButton(shared.TacticalSKOut, "Skirmishers Out")
+	if unit.CommanderControl >= 2 {
+		addButton(shared.TacticalSKIn, "Skirmishers In")
+		addButton(shared.TacticalSKOut, "Skirmishers Out")
 
-	addButton(shared.TacticalCommitReserve, "Commit Reserve")
-	addButton(shared.TacticalResup, "Resupply")
+		addButton(shared.TacticalCommitReserve, "Commit Reserve")
+		addButton(shared.TacticalResup, "Resupply")
+	}
 
 	if Session.Orientation == "Landscape" {
 		addButton(shared.TacticalWithdraw, "Withdraw / Concede Position")
@@ -131,6 +140,34 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			print("clicked on option", id)
+			go func() {
+				outcome := &shared.FightOutcome{}
+				err := RPC("GameRPC.FightHQAction", shared.FightAction{
+					Channel: Session.Channel,
+					GameID:  game.ID,
+					Opcode:  id,
+					UnitID:  unit.ID,
+					Target:  0,
+				}, &outcome)
+				if err != nil {
+					print(err.Error())
+				} else {
+					print("got outcome", outcome)
+					for _, i := range ids {
+						el := doc.QuerySelector(fmt.Sprintf("#g-%d", i))
+						if el != nil {
+							el.Class().Add("hidden")
+						}
+					}
+					outtext := doc.QuerySelector("#outcome")
+					outtext.SetInnerHTML(outcome.Descr)
+					outtext.Class().Remove("hidden")
+					outtext2 := doc.QuerySelector("#outcome2")
+					outtext2.SetInnerHTML(outcome.Descr2)
+					outtext2.Class().Remove("hidden")
+					unit.CommanderControl = outcome.CommanderControl
+				}
+			}()
 		})
 	}
 

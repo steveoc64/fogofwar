@@ -86,10 +86,10 @@ func doMap(game *shared.Game) {
 				}
 			} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				print("getting blue cmd", uid)
+				// print("getting blue cmd", uid)
 				cmd := consoleGame.GetCmd("Blue", uid)
-				print("cmd", cmd)
-				print("game", consoleGame)
+				// print("cmd", cmd)
+				// print("game", consoleGame)
 				if cmd.IsEnemy(game) {
 					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
@@ -125,12 +125,13 @@ func doMap(game *shared.Game) {
 			} else {
 				if adjustCmd.ID != 0 {
 					// if dom.GetWindow().Confirm(fmt.Sprintf("Set unit %s position to this square ?", adjustCmd.Name)) {
-					print("move", adjustCmd.Name, gx, gy)
+					// print("move", adjustCmd.Name, gx, gy)
 					adjusting = true
 					go func() {
 						newCmd := &shared.GameCmd{}
 						err := RPC("GameRPC.MoveCmd", shared.MoveCmdData{
 							Channel: Session.Channel,
+							GameID:  game.ID,
 							ID:      adjustCmd.ID,
 							X:       gx,
 							Y:       gy,
@@ -202,10 +203,10 @@ func doMap(game *shared.Game) {
 			}
 			switch tag {
 			case "rect", "RECT", "text", "TEXT":
-				print("clicked on a tile of class", el.GetAttribute("class"))
+				// print("clicked on a tile of class", el.GetAttribute("class"))
 				handleMapClick(el.(*dom.BasicHTMLElement))
 			default:
-				print("clicked on", tag)
+				// print("clicked on", tag)
 			}
 		})
 	}
@@ -299,7 +300,7 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 	}
 	html := ""
 
-	// print("computing map for", team, cmd)
+	// print("computing map for", team, cmd, showAllUnits, showAllLabels)
 
 	coord := func(i int) int {
 		return (i * game.GridSize) + (game.GridSize / 2)
@@ -320,6 +321,7 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 
 			}
 		}
+		print("here")
 		if v.CX != -1 && !v.Cull {
 			if showAllUnits || v.ID == id {
 				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="%s-%d" data-id="%d"/>`,

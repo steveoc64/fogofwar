@@ -113,6 +113,7 @@ type GTMoveData struct {
 
 type MoveCmdData struct {
 	Channel int
+	GameID  int
 	ID      int
 	X       int
 	Y       int
@@ -144,4 +145,13 @@ type UnitEvent struct {
 	CState           int
 	X                int
 	Y                int
+}
+
+type CmdUpdate struct {
+	ID       int  `db:"id"`
+	CX       int  `db:"cx"`
+	CY       int  `db:"cy"`
+	RedTeam  bool `db:"red_team"`
+	BlueTeam bool `db:"blue_team"`
+	Seen     bool `db:"seen"`
 }

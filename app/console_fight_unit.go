@@ -59,6 +59,9 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
 	html += svgEndG()
 
+	html += fmt.Sprintf(`<text id=outcome x=%d y=60 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome2 x=%d y=70 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+
 	terrain := ""
 	if fight.Rough {
 		terrain += "Rough Ground"
@@ -105,38 +108,67 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 
 	switch unit.UType {
 	case shared.UnitBde, shared.UnitSpecial:
-		addButton(shared.TacticalAdvance, "Advance")
-		addButton(shared.TacticalStandGround, "Stand Your Ground")
+		if unit.CommanderControl >= 3 {
+			addButton(shared.TacticalAdvance, "Advance")
+			addButton(shared.TacticalStandGround, "Stand Your Ground")
+		}
 
-		addButton(shared.TacticalSKIn, "Skirmishers In")
-		addButton(shared.TacticalSKOut, "Skirmishers Out")
+		if unit.CommanderControl >= 2 {
+			if unit.SKOut {
+				addButton(shared.TacticalSKIn, "Skirmishers In")
+				addButton(shared.TacticalSKAttack, "Skirmisher Attack")
+			} else {
+				addButton(shared.TacticalSKOut, "Skirmishers Out")
+			}
+		}
 
-		addButton(shared.TacticalForm, "Fire !")
-		addButton(shared.TacticalColdSteel, "Cold Steel !")
+		if unit.CommanderControl >= 4 {
+			if unit.Ammo > 1 {
+				addButton(shared.TacticalFire, "Fire !")
+			}
+			addButton(shared.TacticalColdSteel, "Cold Steel !")
+		}
 
-		addButton(shared.TacticalForm, "Change Formation")
-		addButton(shared.TacticalWheel, "Wheel / EnFlank")
+		if unit.CommanderControl >= 5 {
+			addButton(shared.TacticalForm, "Change Formation")
+			addButton(shared.TacticalWheel, "Wheel / EnFlank")
+		}
 
 		addButton(shared.TacticalWithdraw, "Withdraw")
 		addButton(shared.TacticalSurrender, "Surrender")
 	case shared.UnitCav:
-		addButton(shared.TacticalCavCharge, "Charge !")
-		addButton(shared.TacticalCavFeint, "Fient a Charge")
+		if unit.CommanderControl >= 6 {
+			addButton(shared.TacticalCavCharge, "Charge !")
+			addButton(shared.TacticalCavFeint, "Fient a Charge")
+		}
 
-		addButton(shared.TacticalCounterCavCharge, "Counter Charge")
-		addButton(shared.TacticalStandGround, "Stand Your Ground")
+		if unit.CommanderControl >= 4 {
+			addButton(shared.TacticalCounterCavCharge, "Counter Charge")
+			addButton(shared.TacticalStandGround, "Stand Your Ground")
+		}
 
-		addButton(shared.TacticalLeftFlank, "En Flank")
-		addButton(shared.TacticalPursuit, "Pursuit !")
+		if unit.CommanderControl >= 3 {
+			addButton(shared.TacticalLeftFlank, "En Flank")
+			addButton(shared.TacticalPursuit, "Pursuit !")
+		}
 
-		addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
+		if unit.CommanderControl >= 6 {
+			addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
+		}
 		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
 	case shared.UnitGun:
-		addButton(shared.TacticalCannister, "Cannister !")
-		addButton(shared.TacticalShot, "Round Shot")
+		if unit.Ammo > 1 && unit.CommanderControl >= 2 {
+			addButton(shared.TacticalCannister, "Cannister !")
+			addButton(shared.TacticalShot, "Round Shot")
+		}
 
-		addButton(shared.TacticalLimber, "Limber Guns")
-		addButton(shared.TacticalDeployGuns, "Deploy Guns")
+		if unit.CommanderControl >= 4 {
+			if unit.GunsLimbered {
+				addButton(shared.TacticalDeployGuns, "Deploy Guns")
+			} else {
+				addButton(shared.TacticalLimber, "Limber Guns")
+			}
+		}
 
 		addButton(shared.TacticalResup, "Reload / Prepare")
 		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
@@ -148,8 +180,10 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 		doFight(game, fight)
 	})
 
-	svgCallback(unit.ID, func(dom.Event) {
-		doFight(game, fight)
+	svgCallback(unit.ID, func(evt dom.Event) {
+		consoleSubunits = append(consoleSubunits, unit)
+		clickDiv(evt)
+		// doFight(game, fight)
 	})
 
 	for _, v := range ids {
@@ -157,6 +191,35 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			print("clicked on option", id)
+			go func() {
+				outcome := &shared.FightOutcome{}
+				err := RPC("GameRPC.FightUnitAction", shared.FightAction{
+					Channel: Session.Channel,
+					GameID:  game.ID,
+					Opcode:  id,
+					UnitID:  unit.ID,
+					Target:  0,
+				}, outcome)
+				if err != nil {
+					print(err.Error())
+				} else {
+					print("got outcome", outcome)
+					for _, i := range ids {
+						el := doc.QuerySelector(fmt.Sprintf("#g-%d", i))
+						if el != nil {
+							el.Class().Add("hidden")
+						}
+					}
+					outtext := doc.QuerySelector("#outcome")
+					outtext.SetInnerHTML(outcome.Descr)
+					outtext.Class().Remove("hidden")
+					outtext2 := doc.QuerySelector("#outcome2")
+					outtext2.SetInnerHTML(outcome.Descr2)
+					outtext2.Class().Remove("hidden")
+					unit.SetOutcome(outcome)
+				}
+			}()
+
 		})
 	}
 

@@ -70,7 +70,7 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 	clickCorps := func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		print("clicked on corps", id, el.TagName())
+		// print("clicked on corps", id, el.TagName())
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
 				doCommitDiv(game, v, fight)
@@ -296,12 +296,12 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		print("done")
+		// print("done")
 		// get all selected units
 		go func() {
 			for _, el := range g.QuerySelectorAll(".unit-selected") {
 				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				print("adding in", id)
+				// print("adding in", id)
 				done := false
 				err := RPC("GameRPC.CommitToFight", shared.FightData{
 					Channel: Session.Channel,

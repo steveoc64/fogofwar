@@ -29,6 +29,7 @@ const (
 	FightCommit
 	FightWithdraw
 	UnitRole
+	UnitsMoved
 )
 
 type PlayMessage struct {
@@ -276,6 +277,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 		fmt.Fprintf(fp, "Error Loading Game State: %s\n", err.Error())
 		return
 	}
+	calcVision(state.Game)
 
 	// At the start of the game goroutine, we clear out the bombards and fight arrays
 	// and any other temp combat trackers
@@ -344,6 +346,9 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 			case UnitRole:
 				fmt.Fprintf(fp, "Unit has changed Role\n")
 				unitRole(state, m)
+			case UnitsMoved:
+				fmt.Fprintf(fp, "Unit has been manually moved\n")
+				unitMoved(state, m)
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
 				playerPhaseBusy(state, m, true)
@@ -458,7 +463,7 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 			newTurn = true
 
 		}
-		fmt.Printf("Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
+		fmt.Printf("Game %d Turn %d Phase %d Begins\n", state.Game.ID, state.Game.Turn, state.Game.Phase)
 		fmt.Fprintf(state.Log, "Turn %d Phase %d Begins\n", state.Game.Turn, state.Game.Phase)
 		if state.Game.Turn >= state.Game.TurnLimit {
 			println("TURN Limit Reached")
@@ -472,9 +477,9 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 		}
 	} else {
 		if allFree(state) {
-			println(".. still more players to finish yet")
+			// println(".. still more players to finish yet")
 		} else {
-			println(".. some players are busy")
+			// println(".. some players are busy")
 		}
 	}
 }
@@ -526,22 +531,25 @@ func loadPlayerConnectionStatus(state *PlayState) {
 
 func sendPhaseUpdates(state *PlayState, newTurn bool) {
 	// println("sending phase updates")
+	data := &[]shared.CmdUpdate{}
+	DB.SQL(`select id,cx,cy,seen,red_team,blue_team from game_cmd where game_id=$1`, state.Game.ID).QueryStructs(data)
+
 	for i, v := range state.Game.RedPlayers {
 		state.Game.RedPlayers[i].TODO = true
 		state.Game.RedPlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn, Cmds: data})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase, Cmds: data})
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
 		state.Game.BluePlayers[i].TODO = true
 		state.Game.BluePlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn, Cmds: data})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase, Cmds: data})
 		}
 	}
 }
@@ -553,13 +561,13 @@ func allDone(state *PlayState) bool {
 	}
 	for _, v := range state.Game.RedPlayers {
 		if !v.Done {
-			println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
+			// println("red player ", v.PlayerID, v.Username, "is not done yet", v.Done)
 			return false
 		}
 	}
 	for _, v := range state.Game.BluePlayers {
 		if !v.Done {
-			println("blue player ", v.PlayerID, v.Username, "is not done yet", v.Done)
+			// println("blue player ", v.PlayerID, v.Username, "is not done yet", v.Done)
 			return false
 		}
 	}
@@ -569,13 +577,13 @@ func allDone(state *PlayState) bool {
 func allFree(state *PlayState) bool {
 	for _, v := range state.Game.RedPlayers {
 		if v.Busy {
-			println("red player ", v.PlayerID, v.Username, "is busy")
+			// println("red player ", v.PlayerID, v.Username, "is busy")
 			return false
 		}
 	}
 	for _, v := range state.Game.BluePlayers {
 		if v.Busy {
-			println("blue player ", v.PlayerID, v.Username, "is busy")
+			// println("blue player ", v.PlayerID, v.Username, "is busy")
 			return false
 		}
 	}
@@ -659,7 +667,7 @@ func fightAdd(state *PlayState, m PlayMessage) {
 }
 
 func fightCommit(state *PlayState, m PlayMessage) {
-	println("adding unit to a fight")
+	// println("adding unit to a fight")
 
 	bb := func(f *shared.FightData, playerID int, theFight *shared.Fight) {
 		ff := makeGameFight(theFight)
@@ -676,19 +684,19 @@ func fightCommit(state *PlayState, m PlayMessage) {
 	}
 
 	if f, ok := m.Data.(*shared.FightData); ok {
-		fmt.Printf("passed in fightdata %v\n", f)
-		println("num fights", len(state.Fights))
+		// fmt.Printf("passed in fightdata %v\n", f)
+		// println("num fights", len(state.Fights))
 		for _, v := range state.Fights {
-			print("consider fight", v)
-			fmt.Printf("consider contents of fight %v %d %d\n", *v, v.ID, (*v).ID)
+			// print("consider fight", v)
+			// fmt.Printf("consider contents of fight %v %d %d\n", *v, v.ID, (*v).ID)
 			if v.ID == f.ID {
-				println("got fight", v.ID, v.Name, len(state.Game.RedCmd))
-				fmt.Printf("redcmd %v %d\n", state.Game.RedCmd, len(state.Game.RedCmd))
+				// println("got fight", v.ID, v.Name, len(state.Game.RedCmd))
+				// fmt.Printf("redcmd %v %d\n", state.Game.RedCmd, len(state.Game.RedCmd))
 
 				for _, redCmd := range state.Game.RedCmd {
 					for _, uu := range redCmd.Units {
 						if uu.ID == f.DivID {
-							println("found red unit", uu.ID)
+							// println("found red unit", uu.ID)
 							v.Red = append(v.Red, uu)
 							bb(f, redCmd.PlayerID, v)
 							return
@@ -699,7 +707,7 @@ func fightCommit(state *PlayState, m PlayMessage) {
 				for _, blueCmd := range state.Game.BlueCmd {
 					for _, uu := range blueCmd.Units {
 						if uu.ID == f.DivID {
-							println("found blue unit", uu.ID)
+							// println("found blue unit", uu.ID)
 							v.Blue = append(v.Blue, uu)
 							bb(f, blueCmd.PlayerID, v)
 							return
@@ -727,4 +735,8 @@ func unitRole(state *PlayState, m PlayMessage) {
 			}
 		}
 	}
+}
+
+func unitMoved(state *PlayState, m PlayMessage) {
+	calcVision(state.Game)
 }

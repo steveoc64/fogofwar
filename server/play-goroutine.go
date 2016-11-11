@@ -28,6 +28,7 @@ const (
 	FightAdd
 	FightCommit
 	FightWithdraw
+	UnitRole
 )
 
 type PlayMessage struct {
@@ -337,8 +338,12 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fightAdd(state, m)
 			case FightCommit:
 				fmt.Fprintf(fp, "Commit Division to Fight\n")
+				fightCommit(state, m)
 			case FightWithdraw:
 				fmt.Fprintf(fp, "Withdraw Division from Fight\n")
+			case UnitRole:
+				fmt.Fprintf(fp, "Unit has changed Role\n")
+				unitRole(state, m)
 			case PlayerPhaseBusy:
 				// fmt.Fprintf(fp, "Player %d is busy", m.PlayerID)
 				playerPhaseBusy(state, m, true)
@@ -649,6 +654,77 @@ func fightAdd(state *PlayState, m PlayMessage) {
 		for _, v := range state.Game.BluePlayers {
 			v.Done = false
 			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "NewFight", ID: f.ID, Fight: ff})
+		}
+	}
+}
+
+func fightCommit(state *PlayState, m PlayMessage) {
+	println("adding unit to a fight")
+
+	bb := func(f *shared.FightData, playerID int, theFight *shared.Fight) {
+		ff := makeGameFight(theFight)
+		for _, v := range state.Game.RedPlayers {
+			if v.PlayerID != playerID {
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "FightUpdate", ID: f.ID, Fight: ff})
+			}
+		}
+		for _, v := range state.Game.BluePlayers {
+			if v.PlayerID != playerID {
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "FightUpdate", ID: f.ID, Fight: ff})
+			}
+		}
+	}
+
+	if f, ok := m.Data.(*shared.FightData); ok {
+		fmt.Printf("passed in fightdata %v\n", f)
+		println("num fights", len(state.Fights))
+		for _, v := range state.Fights {
+			print("consider fight", v)
+			fmt.Printf("consider contents of fight %v %d %d\n", *v, v.ID, (*v).ID)
+			if v.ID == f.ID {
+				println("got fight", v.ID, v.Name, len(state.Game.RedCmd))
+				fmt.Printf("redcmd %v %d\n", state.Game.RedCmd, len(state.Game.RedCmd))
+
+				for _, redCmd := range state.Game.RedCmd {
+					for _, uu := range redCmd.Units {
+						if uu.ID == f.DivID {
+							println("found red unit", uu.ID)
+							v.Red = append(v.Red, uu)
+							bb(f, redCmd.PlayerID, v)
+							return
+						}
+					}
+				} // for all red corps in the game
+
+				for _, blueCmd := range state.Game.BlueCmd {
+					for _, uu := range blueCmd.Units {
+						if uu.ID == f.DivID {
+							println("found blue unit", uu.ID)
+							v.Blue = append(v.Blue, uu)
+							bb(f, blueCmd.PlayerID, v)
+							return
+						}
+					}
+				}
+			}
+		}
+	} else {
+		println("couldnt convert m.Data to fightdata")
+	}
+
+}
+
+func unitRole(state *PlayState, m PlayMessage) {
+	if u, ok := m.Data.(*shared.Unit); ok {
+		for _, v := range state.Game.RedPlayers {
+			if v.PlayerID != m.PlayerID {
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "UnitRole", ID: u.ID, Opcode: u.Role})
+			}
+		}
+		for _, v := range state.Game.BluePlayers {
+			if v.PlayerID != m.PlayerID {
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "UnitRole", ID: u.ID, Opcode: u.Role})
+			}
 		}
 	}
 }

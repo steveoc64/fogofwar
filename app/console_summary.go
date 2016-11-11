@@ -96,7 +96,7 @@ func doTurnSummary(game *shared.Game) {
 				html += fmt.Sprintf(`<g id=incoming-%d data-id=%d>
 <circle data-id=%d class=help-button cx=%d cy=%d r=5></circle>
 <text data-id=%d x=%d y=%d class="text__gold text__2x">%d</text>
-</g>`, v, v, v, i*10, 50, v, i*10-2, 50+2, v)
+</g>`, v, v, v, i*10+10, 50, v, i*10+8, 50+2, v)
 			}
 			html += `</g>`
 		}

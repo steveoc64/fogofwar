@@ -40,12 +40,16 @@ func svgText(x, y int, class, text string) string {
 func svgButton(x, y, w, h int, class, textClass, text string) string {
 	html := ""
 
+	txty := y + h - 3
+	if h < 8 {
+		txty++
+	}
 	html += fmt.Sprintf(`<rect x=%d y=%d rx=2 ry=2 width=%d height=%d class=%s data-id=%d></rect>`,
 		x, y, w, h, class, svgID)
 	html += "\n"
 	if text != "" {
 		html += fmt.Sprintf(`<text x=%d y=%d class="console-text %s" data-id=%d>%s</text>`,
-			x+3, y+8, textClass, svgID, text)
+			x+3, txty, textClass, svgID, text)
 		html += "\n"
 	}
 	return html

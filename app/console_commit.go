@@ -19,6 +19,7 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 	} else {
 		consoleSetViewBox(game, 100, 100, false)
 	}
+	consoleCurrentFight = fight
 	consolePhaseBusy(game, "CommitFight")
 
 	// Add a turn summary object
@@ -44,7 +45,6 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 		if v.PlayerID == Session.UserID {
 			html += svgG(v.ID)
 			c := "console-corps-disabled"
-			print("adding cmd", v.CState, v)
 			switch v.CState {
 			case shared.CmdBattleLine, shared.CmdBattleAdvance, shared.CmdCompleteMarch:
 				c = "console-corps-button"
@@ -106,6 +106,7 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	html := ""
 
 	consoleCurrentCmd = cmd
+	consoleCurrentFight = fight
 	xx := 100
 	if Session.Orientation == "Landscape" {
 		consoleSetViewBox(game, 150, 100, false)
@@ -320,8 +321,8 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 					}
 				}
 			}
+			doFight(game, fight)
 		}()
-		doFight(game, fight)
 	})
 
 	for _, v := range cmd.Units {

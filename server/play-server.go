@@ -148,6 +148,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 		}
 
 		// If the GetUnits flag was set, then get all the units for each of the commands as well
+		// and also get the enemy units for now ...
 		if data.GetUnits {
 			if retval.Red {
 				for _, v := range retval.RedCmd {
@@ -156,12 +157,26 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					// println("red", v.ID, data.ID, v.Units)
 					// and get any current bombards
 				}
+				for _, v := range retval.BlueCmd {
+					DB.SQL(`select id,game_id,cmd_id,path,name,commander_name,nation,utype,cmd_level,bayonets,
+						lt_coy,jg_coy,rifles,sabres,cav_type,guns,horse_guns,gunnery_type,sk_out,woods,rough,cover,
+						guns_fired,guns_moved,guns_limbered,role
+						from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
+				}
 			}
 			if retval.Blue {
 				for _, v := range retval.BlueCmd {
 					DB.SQL(`select * from unit where cmd_id=$1 and game_id=$2 order by path`,
 						v.ID, data.ID).QueryStructs(&v.Units)
 					// println("blue", v.ID, data.ID, v.Units)
+				}
+				for _, v := range retval.RedCmd {
+					DB.SQL(`select id,game_id,cmd_id,path,name,commander_name,nation,utype,cmd_level,bayonets,
+						lt_coy,jg_coy,rifles,sabres,cav_type,guns,horse_guns,gunnery_type,sk_out,woods,rough,cover,
+						guns_fired,guns_moved,guns_limbered,role
+						from unit where cmd_id=$1 and game_id=$2 order by path`,
+						v.ID, data.ID).QueryStructs(&v.Units)
 				}
 			}
 		}
@@ -448,6 +463,20 @@ func (g *GameRPC) UnitRole(data shared.UnitRoleData, done *bool) error {
 	conn := Connections.Get(data.Channel)
 
 	_, err := DB.SQL(`update unit set role=$2 where id=$1`, data.ID, data.Role).Exec()
+
+	// Send message to the play-goroutine to say that this unit has changed roles
+	if err == nil {
+		if play, ok := Plays[data.GameID]; ok {
+			play <- PlayMessage{
+				Game:     data.GameID,
+				PlayerID: conn.UserID,
+				OpCode:   UnitRole,
+				Data:     &shared.Unit{ID: data.ID, Role: data.Role},
+			}
+		} else {
+			err = errors.New("Invalid Game ID")
+		}
+	}
 
 	logger(start, "Game.UnitRole", conn,
 		fmt.Sprintf("ID %d Role %d", data.ID, data.Role), "")

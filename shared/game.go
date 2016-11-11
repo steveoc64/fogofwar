@@ -473,6 +473,7 @@ func (g *Game) GetCmd(team string, id int) *GameCmd {
 func (g *Game) GetUnit(team string, id int) *Unit {
 	// is it red ?
 	cmds := g.RedCmd
+
 	if team == "Blue" || team == "blue" {
 		cmds = g.BlueCmd
 	} else if team == "" {
@@ -1266,4 +1267,5 @@ type UnitRoleData struct {
 	Channel int
 	ID      int
 	Role    int
+	GameID  int
 }

@@ -383,6 +383,7 @@ func setUnitDivRole(game *shared.Game, cmd *shared.GameCmd, uid int, role int) {
 		done := false
 		err := RPC("GameRPC.UnitRole", shared.UnitRoleData{
 			Channel: Session.Channel,
+			GameID:  game.ID,
 			ID:      uid,
 			Role:    role,
 		}, &done)

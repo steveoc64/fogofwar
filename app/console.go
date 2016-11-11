@@ -18,6 +18,7 @@ type ConsolePaintData struct {
 var consoleCurrentPanel = "Game"
 var consoleCurrentUnit *shared.Unit
 var consoleCurrentCmd *shared.GameCmd
+var consoleCurrentFight *shared.Fight
 var consoleGame *shared.Game
 var incoming = []int{}
 var fights = []*shared.Fight{}
@@ -115,6 +116,12 @@ func play(context *router.Context) {
 			dom.GetWindow().Alert("Cannot load game" + err.Error())
 			Session.Navigate("/")
 		}
+		consoleGame = &newGame
+		game = consoleGame
+		team := "blue"
+		if game.Red {
+			team = "red"
+		}
 
 		inc := []int{}
 		incoming = inc
@@ -134,6 +141,7 @@ func play(context *router.Context) {
 		}, &f)
 		if err == nil {
 			fights = f
+			print("got fight data", fights)
 			for _, ff := range f {
 				// mark committed for all units known to be in the fight
 				for _, v := range ff.Red {
@@ -149,12 +157,6 @@ func play(context *router.Context) {
 					}
 				}
 			}
-		}
-		consoleGame = &newGame
-		game = consoleGame
-		team := "blue"
-		if game.Red {
-			team = "red"
 		}
 
 		loadTemplate("console", "main", ConsolePaintData{
@@ -225,6 +227,52 @@ func play(context *router.Context) {
 				print("fights", fights)
 				if !game.PhaseBUSY {
 					doTurnSummary(game)
+				}
+			case "FightUpdate":
+				f := msg.Fight
+				print("asked to update fight", msg.ID, f)
+				for _, v := range fights {
+					if v.ID == msg.ID {
+						print("that would be this one", v)
+						reds := []*shared.Unit{}
+						blues := []*shared.Unit{}
+						for _, v := range f.Red {
+							reds = append(reds, game.GetUnit("red", v))
+						}
+						for _, v := range f.Blue {
+							blues = append(blues, game.GetUnit("blue", v))
+						}
+						v.Red = reds
+						v.Blue = blues
+						print("modified to", v)
+					}
+				}
+				if consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
+					doFight(game, consoleCurrentFight)
+				}
+			case "UnitRole":
+				print("A unit has changed role")
+				gotsome := false
+				for _, cmd := range game.RedCmd {
+					for _, unit := range cmd.Units {
+						if unit.ID == msg.ID {
+							gotsome = true
+							unit.Role = msg.Opcode
+							break
+						}
+					}
+				}
+				for _, cmd := range game.BlueCmd {
+					for _, unit := range cmd.Units {
+						if unit.ID == msg.ID {
+							gotsome = true
+							unit.Role = msg.Opcode
+							break
+						}
+					}
+				}
+				if gotsome && consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
+					doFight(game, consoleCurrentFight)
 				}
 			case "Incoming":
 				// TODO - rewrite this to use the attached data in the message

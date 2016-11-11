@@ -77,14 +77,14 @@ func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) err
 		return false
 	}
 
-	for _, v := range *retval {
+	for i, v := range *retval {
 		// Get the red units involved
 		ids := []int{}
 		reds := []*shared.Unit{}
 		blues := []*shared.Unit{}
-		unit := &shared.Unit{}
 		DB.SQL(`select unit_id from fight_unit where game_id=$1 and id=$2`, data.ID, v.ID).QuerySlice(&ids)
 		for _, uid := range ids {
+			unit := &shared.Unit{}
 			DB.SQL(`select * from unit where id=$1`, uid).QueryStruct(unit)
 			if isRed(unit) {
 				reds = append(reds, unit)
@@ -92,8 +92,8 @@ func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) err
 				blues = append(blues, unit)
 			}
 		}
-		v.Red = reds
-		v.Blue = blues
+		(*retval)[i].Red = reds
+		(*retval)[i].Blue = blues
 	}
 
 	logger(start, "Game.GetFights", conn,
@@ -113,6 +113,20 @@ func (g *GameRPC) CommitToFight(data shared.FightData, done *bool) error {
 	if err == nil {
 		_, err = DB.SQL(`insert into fight_unit (id,game_id,unit_id) values ($1,$2,$3)`,
 			data.ID, data.GameID, data.DivID).Exec()
+	}
+
+	if err == nil {
+		// Send message to the play-goroutine to add this bombard to the list
+		if play, ok := Plays[data.GameID]; ok {
+			play <- PlayMessage{
+				Game:     data.GameID,
+				PlayerID: conn.UserID,
+				OpCode:   FightCommit,
+				Data:     &data,
+			}
+		} else {
+			err = errors.New("Invalid Game ID")
+		}
 	}
 
 	logger(start, "Game.CommitToFight", conn,

@@ -196,9 +196,10 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	// render all the things
 	for _, v := range cmd.Units {
 		if v.UType == shared.UnitDiv {
+			print("rendering", v.Name, v.Committed)
 			addclass := ""
 			if v.Committed {
-				addclass = " selected"
+				addclass = " committed"
 			}
 			switch v.Role {
 			case shared.RoleReserve:
@@ -331,7 +332,9 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 				el := evt.Target()
 				// id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				if el.TagName() == "text" {
-					el.Class().Toggle("unit-selected")
+					if !el.Class().Contains("committed") {
+						el.Class().Toggle("unit-selected")
+					}
 				}
 			})
 		}

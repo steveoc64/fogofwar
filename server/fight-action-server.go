@@ -219,8 +219,9 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 					DB.SQL(`update unit set sabres_charged=$2 where id=$1`, unit.ID, outcome.SabresCharged).Exec()
 				}
 			case shared.TacticalTakeGuns:
-				pts = 4
-				outcome.Descr = "TODO - need to add this feature yet"
+				pts = 1
+				outcome.Descr = "Cavalry can attack any within 1 grid"
+				outcome.Descr2 = ".. otherwise Move 1 grid"
 			case shared.TacticalWithdraw:
 				pts = 1
 				outcome.Descr = "Cavalry Retire up to 2 grids, back to reserve"
@@ -238,15 +239,24 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 			case shared.TacticalLimber:
 				pts = 2
 				outcome.Descr = "Guns Limber Up"
+				outcome.GunsLimbered = true
+				DB.SQL(`update unit set guns_limbered=true where id=$1`, unit.ID).Exec()
 			case shared.TacticalDeployGuns:
 				pts = 3
 				outcome.Descr = "Guns Deployed"
+				outcome.GunsLimbered = false
+				DB.SQL(`update unit set guns_limbered=false where id=$1`, unit.ID).Exec()
 			case shared.TacticalResup:
 				pts = 1
+				outcome.Ammo++
 				outcome.Descr = "Resupply and Restock Ammo"
+				DB.SQL(`update unit set ammo=$2 where id=$1`, unit.ID, outcome.Ammo).Exec()
 			case shared.TacticalWithdraw:
 				pts = 1
 				outcome.Descr = "Unit Withdraws to Reserve"
+				outcome.GunsLimbered = true
+				outcome.Role = shared.RoleReserve
+				DB.SQL(`update unit set gun_limbered=true, role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
 			}
 		}
 

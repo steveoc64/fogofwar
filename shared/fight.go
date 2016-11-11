@@ -136,3 +136,40 @@ func (u *FightOutcome) MapFromUnit(o *Unit) {
 	u.Role = o.Role
 	u.Committed = o.Committed
 }
+
+func (u *Unit) GetFightingDescription() string {
+	retval := ""
+
+	print("gfd", u)
+
+	switch u.Role {
+	case RoleAdvance:
+		retval = "in Advance"
+	case Role1:
+		retval = "1st Line"
+	case Role2:
+		retval = "2nd Line"
+	case RoleLeft:
+		retval = "Left Flank"
+	case RoleRight:
+		retval = "Right Flank"
+	case RoleReserve:
+		return ""
+	}
+
+	switch u.UType {
+	case UnitBde, UnitSpecial:
+		if u.SKOut {
+			retval += ", Skirmishers out"
+		}
+	case UnitCav:
+		if u.SabresCharged < 1 {
+			retval += ", horses are fresh"
+		}
+	case UnitGun:
+		if u.GunsLimbered {
+			retval += ", Limbered"
+		}
+	}
+	return retval
+}

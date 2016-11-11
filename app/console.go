@@ -169,7 +169,7 @@ func play(context *router.Context) {
 			// print("Msg", action, msg)
 			switch action {
 			case "Turn":
-				// end of turn - get the data again
+				// end of turn - get the data all over again
 				go func() {
 					newGame := shared.Game{}
 					err := RPC("GameRPC.GetPlay", shared.GameRPCData{
@@ -255,10 +255,14 @@ func play(context *router.Context) {
 						reds := []*shared.Unit{}
 						blues := []*shared.Unit{}
 						for _, v := range f.Red {
-							reds = append(reds, game.GetUnit("red", v))
+							u := game.GetUnit("red", v)
+							u.Committed = true
+							reds = append(reds, u)
 						}
 						for _, v := range f.Blue {
-							blues = append(blues, game.GetUnit("blue", v))
+							u := game.GetUnit("blue", v)
+							u.Committed = true
+							blues = append(blues, u)
 						}
 						v.Red = reds
 						v.Blue = blues

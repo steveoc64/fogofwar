@@ -459,7 +459,11 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 			DB.SQL(`update game_cmd set cstate=dstate where game_id=$1`, state.Game.ID).Exec()
 			DB.SQL(`update game_cmd set dstate=$2 where game_id=$1 and cstate=$3`,
 				state.Game.ID, shared.CmdBattleLine, shared.CmdCompleteMarch).Exec()
-			DB.SQL(`update unit set guns_fired=false where game_id=$1`, state.Game.ID).Exec()
+			DB.SQL(`update unit set
+				guns_fired=false,
+				ammo=least(ammo+(random()*3)-1,10),
+				commander_control=least(commander_control+(random()*3)-1,10)
+				where game_id=$1`, state.Game.ID).Exec()
 			newTurn = true
 
 		}

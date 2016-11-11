@@ -16,7 +16,7 @@ func getPhaseDescription(phase int) (string, string) {
 	case shared.PhaseGT:
 		return "Grand Tactical Phase", ".. March Moves, Orders, Bombardment"
 	case shared.PhaseTactical:
-		return "Tactical Phase", ""
+		return "Tactical Phase", "Tactical Actions"
 	case shared.PhaseObjectives:
 		return "Objectives Phase", ".. Claim Objectives, Rally Troops"
 		// case shared.PhaseGT1:

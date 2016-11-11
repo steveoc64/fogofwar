@@ -54,6 +54,8 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, ttl)
 	html += svgEndG()
 
+	html += svgText(xx, 20, "text__end text__0x", unit.GetFightingDescription())
+
 	html += svgG(100)
 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += svgText(xx/2, 97, "text__carryon text__middle", "Done")
@@ -203,7 +205,7 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 				if err != nil {
 					print(err.Error())
 				} else {
-					print("got outcome", outcome)
+					// print("got outcome", outcome)
 					for _, i := range ids {
 						el := doc.QuerySelector(fmt.Sprintf("#g-%d", i))
 						if el != nil {

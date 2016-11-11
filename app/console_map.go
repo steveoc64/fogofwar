@@ -306,6 +306,20 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 	}
 
 	for i, v := range cmd {
+		if !v.Seen {
+			if team == "blue" {
+				if !game.Blue {
+					// This is an enemy unit which is hidden - so dont display it
+					continue
+				}
+			} else {
+				if !game.Red {
+					// enemy unit which is hidden
+					continue
+				}
+
+			}
+		}
 		if v.CX != -1 && !v.Cull {
 			if showAllUnits || v.ID == id {
 				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="%s-%d" data-id="%d"/>`,

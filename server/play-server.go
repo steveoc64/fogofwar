@@ -125,7 +125,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					coalesce(u.email,'') as player_email
 				from game_cmd g
 				left join users u on u.id=g.player_id
-				where g.game_id=$1 and g.red_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
+				where g.game_id=$1 and g.red_team order by g.name`, data.ID).QueryStructs(&retval.RedCmd)
 		}
 
 		if retval.Blue {
@@ -144,7 +144,7 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 					coalesce(u.email,'') as player_email
 				from game_cmd g
 				left join users u on u.id=g.player_id
-				where g.game_id=$1 and g.blue_team and g.seen order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
+				where g.game_id=$1 and g.blue_team order by g.name`, data.ID).QueryStructs(&retval.BlueCmd)
 		}
 
 		// If the GetUnits flag was set, then get all the units for each of the commands as well

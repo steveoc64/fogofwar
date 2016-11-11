@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	"./shared"
 	"honnef.co/go/js/dom"
@@ -82,6 +83,9 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 	}
 	html += svgText(5, 18, "text__1x text__"+team, "Terrain: "+terrain)
 
+	tags := []int{}
+	etags := []int{}
+
 	// Now list the bdes in this fight, on our side
 	left := 0
 	right := 0
@@ -117,14 +121,25 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 				y = baseline + (left * 6) + 3
 				left++
 			}
-			print("unit", u, x, y)
+			// print("unit", u, x, y)
 			if y > 0 && u.UType != shared.UnitDiv {
 				html += svgG(u.ID)
 				// html += svgText(x, y, "text__middle text__1x text__"+team, v.Name)
 				html += svgButton(x, y, xx/3, 6, "console-corps-button", "text__1x text__"+team, u.Name)
 				html += svgEndG()
+				tags = append(tags, u.ID)
 			}
 		}
+	}
+
+	// Add our DHQs
+	hqs := 0
+	for _, v := range units {
+		html += svgG(v.ID)
+		html += svgHQ(v.ID, (xx/5)*(hqs+1), 80, v.CommanderControl, v.Name)
+		html += svgEndG()
+		hqs++
+		tags = append(tags, v.ID)
 	}
 
 	// now list the enemy units committed to the fight, but only if we have something committed as well
@@ -133,7 +148,7 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		right = 0
 		center = 0
 		advance = 0
-		baseline = 30
+		baseline = 25
 		for _, v := range enemy {
 			subs := v.GetSubunits(game.GetCmd(enemyteam, v.CmdID))
 			for _, u := range subs {
@@ -161,12 +176,12 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 					y = baseline + (left * -6) - 3
 					left++
 				}
-				print("unit", u, x, y)
 				if y > 0 && u.UType != shared.UnitDiv {
 					html += svgG(u.ID)
 					// html += svgText(x, y, "text__middle text__1x text__"+team, v.Name)
 					html += svgButton(x, y, xx/3, 6, "console-corps-button", "text__1x text__"+enemyteam, u.Name)
 					html += svgEndG()
+					etags = append(etags, u.ID)
 				}
 			}
 		}
@@ -181,6 +196,28 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 	svgCallback(101, func(dom.Event) {
 		doCommitFight(game, fight)
 	})
+
+	// add callbacks for our units
+	for _, v := range tags {
+		svgCallback(v, func(evt dom.Event) {
+			el := evt.Target()
+			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+			print("clicked on friendly unit", id)
+			unit := game.GetUnit(team, id)
+			print(unit)
+		})
+	}
+
+	// and the enemy units
+	for _, v := range etags {
+		svgCallback(v, func(evt dom.Event) {
+			el := evt.Target()
+			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+			print("clicked on enemy unit", id)
+			unit := game.GetUnit(enemyteam, id)
+			print(unit)
+		})
+	}
 
 	svgCallbackQuery("#help", func(dom.Event) {
 		loadTemplate("fight", "#unit-details", nil)

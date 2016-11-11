@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"./shared"
 	"honnef.co/go/js/dom"
@@ -29,6 +30,38 @@ func svgHelpBtn() string {
 	}
 	return `<g id=help><circle class=help-button cx=95 cy=5 r=5></circle><text x=92 y=9 class="text__gold text__2x">?</text></g>`
 }
+
+func svgHQ(id int, x, y int, points int, name string) string {
+
+	control := float64(points) / 12.0 // how much of a half circle
+	// print("half circle sweep of", control)
+	// print("sin offset", math.Sin(math.Pi*control)*5.0)
+	// print("cos offset", math.Cos(math.Pi*control)*5.0)
+	finalX := float64(x) - math.Cos(math.Pi*control)*5.0
+	finalY := float64(y) - math.Sin(math.Pi*control)*5.0
+
+	return fmt.Sprintf(`<circle class=help-button cx=%d cy=%d r=6 data-id=%d></circle>
+<path d="M %d %d L %d %d A 5 5 0 0 1 %f %f" fill="rgba(20,100,200,.4)" data-id=%d></path>
+<text x=%d y=%d class="text__middle text__1x text__gold" data-id=%d>%s<text>`,
+		x, y, id,
+		x, y, x-5, y,
+		finalX, finalY, id,
+		x, y+4, id, name)
+
+}
+
+//calculate x,y coordinates of the point on the circle to draw the arc to.
+// 	var x = Math.cos((2 * Math.PI)/(100/value));
+// 	var y = Math.sin((2 * Math.PI)/(100/value));
+
+// 	//should the arc go the long way round?
+// 	var longArc = (value <= 50) ? 0 : 1;
+
+// 	//d is a string that describes the path of the slice.
+// 	var d = "M" + radius + "," + radius + " L" + radius + "," + 0 + ", A" + radius + "," + radius +
+// " 0 " + longArc + ",1 " + (radius + y*radius) + "," + (radius - x*radius) + " z";
+// 	this.pie.slice.setAttribute('d', d);
+// }
 
 func svgText(x, y int, class, text string) string {
 	html := fmt.Sprintf(`<text data-id=%d x=%d y=%d class="%s">%s</text>"`,

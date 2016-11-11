@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"./shared"
 	"honnef.co/go/js/dom"
@@ -70,7 +71,9 @@ func doUnitsBde(game *shared.Game, cmd *shared.GameCmd, div *shared.Unit) {
 		if len(v.Name) < 16 {
 			html += svgText(xx/2+5, 25+yoffset, "text__0x text__middle text__"+team, v.GetRating())
 		}
-		html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.GetBases())
+		bases := v.GetBases()
+		bases = strings.Replace(bases, "<br>\n", " / ", -1)
+		html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, bases)
 		html += svgEndG()
 		yoffset += 11
 	}
@@ -101,12 +104,12 @@ func clickDiv(evt dom.Event) {
 
 	el := evt.Target()
 	id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-	print("clicked on bde", id, "from", el.TagName())
+	// print("clicked on bde", id, "from", el.TagName())
 	TheUnit := &shared.Unit{}
 
 	for _, v := range consoleSubunits {
 		if v.ID == id {
-			print("unit ", v)
+			// print("unit ", v)
 			TheUnit = v
 			// doUnitCard(v)
 			loadTemplate("unit-details", "#unit-details", v)
@@ -132,7 +135,6 @@ func clickDiv(evt dom.Event) {
 							return
 						default:
 							doc.QuerySelector("#unit-details").Class().Remove("md-show")
-							print("here with utype", unit.UType)
 						}
 					case shared.UnitCav:
 						switch value {

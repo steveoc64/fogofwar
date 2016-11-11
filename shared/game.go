@@ -777,6 +777,24 @@ func (u *Unit) InColumn() bool {
 	return false
 }
 
+func (u *Unit) GetParentDiv(cmd *GameCmd) *Unit {
+
+	if u.UType == UnitDiv {
+		return u
+	}
+
+	lastDiv := &Unit{}
+	for _, v := range cmd.Units {
+		if v.UType == UnitDiv {
+			lastDiv = v
+		}
+		if v.ID == u.ID {
+			return lastDiv
+		}
+	}
+	return nil
+}
+
 func (u *Unit) PtsToMen(pts int, ranks int, col bool, sk bool) (int, int, int, string) {
 	m := 0
 	switch u.UType {

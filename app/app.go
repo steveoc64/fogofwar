@@ -134,7 +134,7 @@ func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *r
 
 func (s *GlobalSessionData) Reload(context *router.Context) {
 	if context == nil {
-		print("reload to ", s.URL)
+		// print("reload to ", s.URL)
 		s.Router.Navigate(s.URL)
 	} else {
 		s.Router.Navigate(context.Path)
@@ -159,7 +159,7 @@ func (s *GlobalSessionData) Resize() {
 			s.Orientation = "Portrait"
 		}
 		if s.Orientation != o {
-			print("Redraw due to orientation change")
+			// print("Redraw due to orientation change")
 			// dom.GetWindow().Alert("orientation change")
 			formulate.Templates(GetTemplate)
 			s.Reload(s.Context)
@@ -169,17 +169,17 @@ func (s *GlobalSessionData) Resize() {
 	doIt := false
 	if s.RedrawOnResize {
 		doIt = true
-		print("Redraw due to resize")
+		// print("Redraw due to resize")
 	}
 	if !doIt && s.MobileSensitive {
 		if s.Mobile() != s.wasMobile {
 			doIt = true
-			print("Major Redraw due to change from mobile to non-mobile or vise versa")
+			// print("Major Redraw due to change from mobile to non-mobile or vise versa")
 			// dom.GetWindow().Alert("changed to mobile")
 		}
 		if s.SubMobile() != s.wasSubmobile {
 			doIt = true
-			print("redraw due to change of orientation only, inside mobile mode")
+			// print("redraw due to change of orientation only, inside mobile mode")
 			// dom.GetWindow().Alert("changed to submobile")
 		}
 	}
@@ -238,7 +238,7 @@ func main() {
 							ID:      gid,
 						}, &Session.EditGame)
 						if err == nil {
-							print("loaded game and nav to", Session.EditGame, url)
+							// print("loaded game and nav to", Session.EditGame, url)
 							if url != "/" {
 								Session.Navigate(url)
 							}
@@ -252,7 +252,7 @@ func main() {
 				}
 			}
 		} else { // login failed
-			print("autologin failed")
+			// print("autologin failed")
 			grid1()
 			loginForm()
 		}

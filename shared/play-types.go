@@ -44,6 +44,8 @@ const (
 	TacticalSquare
 	TacticalRightFlank
 	TacticalLeftFlank
+	TacticalFlank
+	TacticalWheel
 	TacticalFire
 	TacticalForm
 	TacticalPassageOfLines
@@ -59,6 +61,11 @@ const (
 	TacticalPursuit
 	TacticalNoQuarter
 	TacticalSurrender
+	TacticalTakeGuns
+	TacticalCannister
+	TacticalShot
+	TacticalLimber
+	TacticalDeployGuns
 )
 
 // Unit Types

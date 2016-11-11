@@ -8,11 +8,7 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-func doFightEnemy(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
-	print("TODO - doFightEnemy")
-}
-
-func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
+func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -44,8 +40,18 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgHelpBtn()
 
 	// Add ourself
+	myCorps := game.GetCmd(team, unit.CmdID)
+	cmdr := unit.GetParentDiv(myCorps)
+	// html += svgG(cmdr.ID)
+	// html += svgHQ(cmdr.ID, xx/2, 15, cmdr.CommanderControl, cmdr.Name)
+	// html += svgEndG()
+
+	ttl := unit.Name
+	if Session.Orientation == "Landscape" {
+		ttl = cmdr.Name + " - " + unit.Name
+	}
 	html += svgG(unit.ID)
-	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, unit.Name)
+	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, ttl)
 	html += svgEndG()
 
 	html += svgG(100)
@@ -78,7 +84,7 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	if terrain == "" {
 		terrain = "Clear"
 	}
-	html += svgText(5, 18, "text__1x text__"+team, "Terrain: "+terrain)
+	html += svgText(5, 18, "text__1x text__"+team, terrain)
 
 	yoffset := 30
 	xoffset := 0
@@ -97,24 +103,44 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 		ids = append(ids, id)
 	}
 
-	addButton(shared.TacticalAdvance, "Division Advance")
-	addButton(shared.TacticalStandGround, "Stand Your Ground")
+	switch unit.UType {
+	case shared.UnitBde, shared.UnitSpecial:
+		addButton(shared.TacticalAdvance, "Advance")
+		addButton(shared.TacticalStandGround, "Stand Your Ground")
 
-	addButton(shared.TacticalSquare, "Form Squares")
-	addButton(shared.TacticalPassageOfLines, "Passage of Lines")
+		addButton(shared.TacticalSKIn, "Skirmishers In")
+		addButton(shared.TacticalSKOut, "Skirmishers Out")
 
-	addButton(shared.TacticalSKIn, "Skirmishers In")
-	addButton(shared.TacticalSKOut, "Skirmishers Out")
+		addButton(shared.TacticalForm, "Fire !")
+		addButton(shared.TacticalColdSteel, "Cold Steel !")
 
-	addButton(shared.TacticalCommitReserve, "Commit Reserve")
-	addButton(shared.TacticalResup, "Resupply")
+		addButton(shared.TacticalForm, "Change Formation")
+		addButton(shared.TacticalWheel, "Wheel / EnFlank")
 
-	if Session.Orientation == "Landscape" {
-		addButton(shared.TacticalWithdraw, "Withdraw / Concede Position")
-	} else {
-		addButton(shared.TacticalWithdraw, "Withdraw/Concede")
+		addButton(shared.TacticalWithdraw, "Withdraw")
+		addButton(shared.TacticalSurrender, "Surrender")
+	case shared.UnitCav:
+		addButton(shared.TacticalCavCharge, "Charge !")
+		addButton(shared.TacticalCavFeint, "Fient a Charge")
+
+		addButton(shared.TacticalCounterCavCharge, "Counter Charge")
+		addButton(shared.TacticalStandGround, "Stand Your Ground")
+
+		addButton(shared.TacticalLeftFlank, "En Flank")
+		addButton(shared.TacticalPursuit, "Pursuit !")
+
+		addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
+		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
+	case shared.UnitGun:
+		addButton(shared.TacticalCannister, "Cannister !")
+		addButton(shared.TacticalShot, "Round Shot")
+
+		addButton(shared.TacticalLimber, "Limber Guns")
+		addButton(shared.TacticalDeployGuns, "Deploy Guns")
+
+		addButton(shared.TacticalResup, "Reload / Prepare")
+		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
 	}
-	addButton(shared.TacticalSurrender, "Surrender")
 
 	g.SetInnerHTML(html)
 
@@ -133,6 +159,10 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 			print("clicked on option", id)
 		})
 	}
+
+	// svgCallback(cmdr.ID, func(dom.Event) {
+	// 	doFightHQ(game, fight, cmdr)
+	// })
 
 	svgCallbackQuery("#help", func(dom.Event) {
 		loadTemplate("fight", "#unit-details", nil)

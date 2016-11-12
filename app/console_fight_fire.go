@@ -194,13 +194,12 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	}
 	basesSelected := basesMax
 	html += svgText(18, 62, "text__end text__0x text__black", "Bases")
-	html += svgText(18, 68, "text__end text__0x text__black", "Firing")
-	plural := ""
+	html += svgText(18, 67, "text__end text__0x text__black", "Firing")
+	bnames := []string{"½ Bn", "Full Bn", "3 Bases", "4-6 Bases"}
 	for ii := 1; ii <= basesMax; ii++ {
-		html += svgText(5+ii*20, 64, "text__0x text__black", fmt.Sprintf("%d base%s", ii, plural))
+		html += svgText(10+ii*20, 64, "text__middle text__0x text__black", bnames[ii-1])
 		html += fmt.Sprintf(`<rect data-id=%d x=%d y=58 width=20 height=11 rx=2 ry=2 class="range-selected console-check"></rect>`,
 			ii, ii*20)
-		plural = "s"
 	}
 	html += `</g>`
 

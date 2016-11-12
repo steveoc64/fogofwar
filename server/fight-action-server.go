@@ -232,34 +232,48 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 						for ii := 0; ii < data.Bases; ii++ {
 							hitpoints += musketShot(unit, data.Range, !goodEffect)
 						}
-						outcome.Descr2 = fmt.Sprintf("%d points of damage", hitpoints)
-						println("muskets do ", hitpoints)
-						// event := applyTacticalGunShot(victim, false, pts)
-						if hitpoints > 3 {
-							eff := hitpoints / data.Bases
-							if eff > 10 {
-								if eff > 20 {
-									outcome.Descr2 = ".. Massive Devastation"
+						if unit.Guns-unit.GunsLost > 0 {
+							// has attached guns - throw them into the mix !!
+							grange := 0
+							if data.Range > 1 {
+								grange = 1
+							}
+							println("Adding a dash of cannister from the Battalion guns at gun range", grange)
+							hitpoints += cannisterShot(unit.Guns, unit.GunneryType, grange, goodEffect)
+						}
+						event := applyTacticalSmallArmsFire(victim, false, hitpoints)
+						fmt.Printf("event %v\n", event)
+
+						if !unit.BayonetsFired {
+							outcome.Descr2 = fmt.Sprintf("%d points of damage", hitpoints)
+							println("muskets do ", hitpoints)
+							// event := applyTacticalGunShot(victim, false, pts)
+							if hitpoints > 3 {
+								eff := hitpoints / data.Bases
+								if eff > 10 {
+									if eff > 20 {
+										outcome.Descr2 = ".. Massive Devastation"
+									} else {
+										outcome.Descr2 = ".. Most Effective"
+									}
 								} else {
-									outcome.Descr2 = ".. Most Effective"
+									outcome.Descr2 = ".. Somewhat Effective"
 								}
 							} else {
-								outcome.Descr2 = ".. Somewhat Effective"
+								outcome.Descr2 = ".. Not overly Effective"
 							}
-						} else {
-							outcome.Descr2 = ".. Not overly Effective"
 						}
-						// // get player who owns the target unit, and let them know the bad news
-						// TargetPlayerID := 0
-						// DB.SQL(`select c.player_id from unit u left join game_cmd c on c.id=u.cmd_id where u.id=$1`,
-						// 	data.Target).QueryScalar(&TargetPlayerID)
+						// get player who owns the target unit, and let them know the bad news
+						TargetPlayerID := 0
+						DB.SQL(`select c.player_id from unit u left join game_cmd c on c.id=u.cmd_id where u.id=$1`,
+							data.Target).QueryScalar(&TargetPlayerID)
 
-						// Connections.BroadcastPlayer(TargetPlayerID, "Play", &shared.NetData{
-						// 	Action: "Unit",
-						// 	ID:     victim.ID,
-						// 	Opcode: shared.UnitEventHits,
-						// 	Unit:   &event,
-						// })
+						Connections.BroadcastPlayer(TargetPlayerID, "Play", &shared.NetData{
+							Action: "Unit",
+							ID:     victim.ID,
+							Opcode: shared.UnitEventHits,
+							Unit:   &event,
+						})
 					}
 				}
 			case shared.TacticalColdSteel:
@@ -387,10 +401,11 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 						println("range", data.Range)
 						hitpoints := 0
 						goodEffect := data.Terrain == 0
+						useGuns := unit.Guns - unit.GunsLost
 						if data.Opcode == shared.TacticalCannister {
-							hitpoints = cannisterShot(unit.Guns, unit.GunneryType, data.Range, goodEffect)
+							hitpoints = cannisterShot(useGuns, unit.GunneryType, data.Range, goodEffect)
 						} else {
-							hitpoints = gunShot(unit.Guns, unit.GunneryType, data.Range, goodEffect)
+							hitpoints = gunShot(useGuns, unit.GunneryType, data.Range, goodEffect)
 						}
 						event := applyTacticalGunShot(victim, false, hitpoints)
 

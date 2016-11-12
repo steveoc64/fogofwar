@@ -1115,6 +1115,10 @@ func (u *Unit) GetArms() string {
 	return Lookups.SmallArms[u.SmallArms-1].Name
 }
 
+func (u *Unit) GetBasesClean() string {
+	return strings.Replace(u.GetBases(), `<br>`, "", -1)
+}
+
 func (u *Unit) GetBases() string {
 	retval := ""
 	bb := u.Bayonets - u.BayonetsLost
@@ -1233,7 +1237,7 @@ func (u *Unit) GetBases() string {
 			}
 		}
 	}
-	return "&nbsp;" + retval
+	return retval
 }
 
 func (u *Unit) GetGunRange() int {

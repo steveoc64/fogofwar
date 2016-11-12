@@ -346,6 +346,9 @@ func gunShot(guns int, gtype int, r int, good bool) int {
 	effects := table.Effect[r-1]
 	println("gunfactors", mult, die)
 	println("e", effects[die])
+	println("ee", float64(effects[die]))
+	println("eee", float64(effects[die])*mult)
+	println("e2", int(float64(effects[die])*mult))
 	return int(float64(effects[die]) * mult)
 }
 

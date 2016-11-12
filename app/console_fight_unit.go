@@ -124,22 +124,23 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	}
 
 	// drill := unit.GetDrillData()
-	if unit.MState > 0 || unit.CommanderControl < 4 {
-		if unit.MState < 4 {
-			addButton(shared.TacticalStandGround, "Stand Your Ground")
-			if unit.SKOut {
-				addButton(shared.TacticalSKIn, "Skirmishers In")
-			} else {
-				if unit.Drill != 1 {
-					addButton(shared.TacticalSKOut, "Skirmishers Out")
+
+	switch unit.UType {
+	case shared.UnitBde, shared.UnitSpecial:
+		if unit.MState > 0 || unit.CommanderControl < 4 {
+			if unit.MState < 4 {
+				addButton(shared.TacticalStandGround, "Stand Your Ground")
+				if unit.SKOut {
+					addButton(shared.TacticalSKIn, "Skirmishers In")
+				} else {
+					if unit.Drill != 1 {
+						addButton(shared.TacticalSKOut, "Skirmishers Out")
+					}
 				}
 			}
-		}
-		addButton(shared.TacticalWithdraw, "Withdraw")
-		addButton(shared.TacticalSurrender, "Surrender")
-	} else {
-		switch unit.UType {
-		case shared.UnitBde, shared.UnitSpecial:
+			addButton(shared.TacticalWithdraw, "Withdraw")
+			addButton(shared.TacticalSurrender, "Surrender")
+		} else {
 			if unit.Formation == shared.FormationMarchCol {
 				addButton(shared.TacticalAdvance, "Advance")
 				if unit.SKOut {
@@ -195,43 +196,43 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 				addButton(shared.TacticalWithdraw, "Withdraw")
 				addButton(shared.TacticalSurrender, "Surrender")
 			}
-		case shared.UnitCav:
-			if unit.CommanderControl >= 6 {
-				addButton(shared.TacticalCavCharge, "Charge !")
-				addButton(shared.TacticalCavFeint, "Fient a Charge")
-			}
-
-			if unit.CommanderControl >= 4 {
-				addButton(shared.TacticalCounterCavCharge, "Counter Charge")
-				addButton(shared.TacticalStandGround, "Stand Your Ground")
-			}
-
-			if unit.CommanderControl >= 3 {
-				addButton(shared.TacticalLeftFlank, "En Flank")
-				addButton(shared.TacticalPursuit, "Pursuit !")
-			}
-
-			if unit.CommanderControl >= 6 {
-				addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
-			}
-			addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
-		case shared.UnitGun:
-			if unit.Ammo > 1 && unit.CommanderControl >= 2 {
-				addButton(shared.TacticalCannister, "Cannister !")
-				addButton(shared.TacticalShot, "Round Shot")
-			}
-
-			if unit.CommanderControl >= 4 {
-				if unit.GunsLimbered {
-					addButton(shared.TacticalDeployGuns, "Deploy Guns")
-				} else {
-					addButton(shared.TacticalLimber, "Limber Guns")
-				}
-			}
-
-			addButton(shared.TacticalResup, "Reload / Prepare")
-			addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
 		}
+	case shared.UnitCav:
+		if unit.CommanderControl >= 6 {
+			addButton(shared.TacticalCavCharge, "Charge !")
+			addButton(shared.TacticalCavFeint, "Fient a Charge")
+		}
+
+		if unit.CommanderControl >= 4 {
+			addButton(shared.TacticalCounterCavCharge, "Counter Charge")
+			addButton(shared.TacticalStandGround, "Stand Your Ground")
+		}
+
+		if unit.CommanderControl >= 3 {
+			addButton(shared.TacticalLeftFlank, "En Flank")
+			addButton(shared.TacticalPursuit, "Pursuit !")
+		}
+
+		if unit.CommanderControl >= 6 {
+			addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
+		}
+		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
+	case shared.UnitGun:
+		if unit.Ammo > 1 && unit.CommanderControl >= 2 {
+			addButton(shared.TacticalCannister, "Cannister !")
+			addButton(shared.TacticalShot, "Round Shot")
+		}
+
+		if unit.CommanderControl >= 4 {
+			if unit.GunsLimbered {
+				addButton(shared.TacticalDeployGuns, "Deploy Guns")
+			} else {
+				addButton(shared.TacticalLimber, "Limber Guns")
+			}
+		}
+
+		addButton(shared.TacticalResup, "Reload / Prepare")
+		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
 	}
 
 	g.SetInnerHTML(html)

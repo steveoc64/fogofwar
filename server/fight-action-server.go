@@ -229,7 +229,6 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 						println("bases", data.Bases)
 						hitpoints := 0
 						goodEffect := data.Terrain == 0
-						// bases := (unit.Bayonets + 200) / 450
 						for ii := 0; ii < data.Bases; ii++ {
 							hitpoints += musketShot(unit, data.Range, !goodEffect)
 						}
@@ -393,7 +392,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 						} else {
 							hitpoints = gunShot(unit.Guns, unit.GunneryType, data.Range, goodEffect)
 						}
-						event := applyTacticalGunShot(victim, false, pts)
+						event := applyTacticalGunShot(victim, false, hitpoints)
 
 						if goodEffect {
 							if hitpoints > 3 {
@@ -528,13 +527,106 @@ func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.Uni
 		}
 	}
 
-	if cannister && rand.Intn(2) == 0 {
+	if cannister && rand.Intn(3) == 0 {
 		unit.MState++
-	} else if rand.Intn(3) == 0 {
+	} else if rand.Intn(12-unit.Rating) == 0 {
 		unit.MState++
 	}
 
-	if rand.Intn(4) == 0 {
+	if rand.Intn(12-unit.Rating) == 0 {
+		unit.Condition++
+		if unit.Condition > 5 {
+			unit.Condition = 5
+		}
+	}
+
+	DB.SQL(`update unit set
+		bayonets_lost=$2,
+		sabres_lost=$3,
+		guns_lost=$4,
+		commander_control=$5,
+		mstate=$6,
+		condition=$7
+		where id=$1`,
+		unit.ID,
+		unit.BayonetsLost, unit.SabresLost, unit.GunsLost,
+		unit.CommanderControl,
+		unit.MState,
+		unit.Condition).Exec()
+
+	return shared.UnitEvent{
+		ID:               unit.ID,
+		Description:      s,
+		CommanderControl: unit.CommanderControl,
+		BayonetsLost:     unit.BayonetsLost,
+		SabresLost:       unit.SabresLost,
+		GunsLost:         unit.GunsLost,
+		MState:           unit.MState,
+	}
+}
+
+func applyTacticalSmallArmsFire(unit *shared.Unit, skirmishFire bool, pts int) shared.UnitEvent {
+
+	inColumn := false
+	ranks := 3
+	sk := false
+	switch unit.Formation {
+	case shared.FormationOpenOrder:
+		sk = true
+	case shared.FormationLines:
+		inColumn = false
+		ranks = 3
+	case shared.FormationLine,
+		shared.FormationMixed:
+		inColumn = false
+		if unit.Drill >= 7 {
+			ranks = 2
+		}
+	case shared.FormationMarchCol,
+		shared.FormationAttCol,
+		shared.FormationCloseCol,
+		shared.FormationSquare,
+		shared.FormationMob:
+		inColumn = true
+	}
+	if unit.SKOut {
+		sk = true
+	}
+
+	m, c, g, s := unit.PtsToMen(pts, ranks, inColumn, sk)
+	println("SmallArms Damage ", pts, ranks, inColumn, sk, unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
+
+	switch unit.UType {
+	case shared.UnitDiv:
+		unit.CommanderControl--
+		if c > 0 {
+			unit.CommanderControl = 1
+		}
+		if unit.CommanderControl < 1 {
+			unit.CommanderControl = 1
+		}
+	case shared.UnitBde, shared.UnitSpecial:
+		unit.BayonetsLost += m
+		if unit.BayonetsLost > unit.Bayonets {
+			unit.BayonetsLost = unit.Bayonets
+		}
+	case shared.UnitCav:
+		unit.SabresLost += m
+		if unit.SabresLost > unit.Sabres {
+			unit.SabresLost = unit.Sabres
+		}
+	case shared.UnitGun:
+		unit.GunsLost += g
+		if unit.GunsLost > unit.Guns {
+			unit.GunsLost = unit.Guns
+		}
+	}
+
+	if rand.Intn(11-unit.Rating) == 0 {
+		unit.MState++
+	}
+
+	if rand.Intn(16-unit.Rating) == 0 {
 		unit.Condition++
 		if unit.Condition > 5 {
 			unit.Condition = 5

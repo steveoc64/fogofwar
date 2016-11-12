@@ -73,8 +73,8 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	html += svgText(15, 97, "text__carryon text__middle", "Cancel")
 	html += svgEndG()
 
-	html += fmt.Sprintf(`<text id=outcome x=%d y=40 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
-	html += fmt.Sprintf(`<text id=outcome2 x=%d y=50 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome x=%d y=30 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome2 x=%d y=40 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
 
 	terrain := ""
 	if fight.Rough {
@@ -181,21 +181,27 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	html += `<image xlink:href=/img/firingline.png x=7 y=73 height=16 width=16></image>`
 
 	html += svgG(1)
-	html += svgText(20, 50, "text__question", "Clear Shot ?")
-	html += `<rect class=console-check x=70 y=42 rx=2 ry=2 width=10 height=10 data-id=1></rect>`
-	html += svgTick("clear-shot", "tick hidden", 70, 42, 10)
+	html += svgText(20, 55, "text__question", "Clear Shot ?")
+	html += `<rect class=console-check x=70 y=47 rx=2 ry=2 width=10 height=10 data-id=1></rect>`
+	html += svgTick("clear-shot", "tick hidden", 70, 47, 10)
 	html += svgEndG()
 
 	html += `<g id=bases>`
-	html += svgText(20, 64, "text__1x", "1")
-	html += svgText(40, 64, "text__1x", "2")
-	html += svgText(60, 64, "text__1x", "3")
-	html += svgText(80, 64, "text__1x", "4")
-	html += svgText(0, 64, "text__1x", "Bases")
-	html += `<rect data-id=1 x=20 y=65 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=2 x=40 y=65 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=3 x=60 y=65 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=3 x=80 y=65 width=20 height=11 class=range-bands></rect>`
+
+	basesMax := (((unit.Bayonets - unit.BayonetsLost) + 200) / 450)
+	if basesMax > 4 {
+		basesMax = 4
+	}
+	basesSelected := basesMax
+	html += svgText(18, 62, "text__end text__0x text__black", "Bases")
+	html += svgText(18, 68, "text__end text__0x text__black", "Firing")
+	plural := ""
+	for ii := 1; ii <= basesMax; ii++ {
+		html += svgText(5+ii*20, 64, "text__0x text__black", fmt.Sprintf("%d base%s", ii, plural))
+		html += fmt.Sprintf(`<rect data-id=%d x=%d y=58 width=20 height=11 rx=2 ry=2 class="range-selected console-check"></rect>`,
+			ii, ii*20)
+		plural = "s"
+	}
 	html += `</g>`
 
 	g.SetInnerHTML(html)
@@ -209,7 +215,6 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 
 	selectedEnemy := 0
 	isDone := false
-	basesSelected := 0
 
 	svgCallback(102, func(dom.Event) {
 		doFight(game, fight)
@@ -228,6 +233,8 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 		}
 		if selectedEnemy == 0 {
 			print("select enemy first")
+		} else if basesSelected == 0 {
+			print("choose bases firing")
 		} else {
 			theRange := 100
 			for i, v := range doc.QuerySelector("#range").QuerySelectorAll("rect") {
@@ -313,15 +320,13 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	svgCallbackQuery("#bases", func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		for _, rb := range doc.QuerySelector("#bases").QuerySelectorAll("rect") {
-			rb.Class().Remove("range-selected")
-		}
-		// print("range is set to", id)
-		if id > 0 {
-			el.Class().Toggle("range-selected")
-			basesSelected = id
-		} else {
-			print("no range on this item")
+		basesSelected = id
+		for i, rb := range doc.QuerySelector("#bases").QuerySelectorAll("rect") {
+			if i < id {
+				rb.Class().Add("range-selected")
+			} else {
+				rb.Class().Remove("range-selected")
+			}
 		}
 	})
 

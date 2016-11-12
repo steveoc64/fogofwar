@@ -7,6 +7,8 @@ import (
 	"../shared"
 )
 
+var fnames = []string{"March Order", "Open Order", "Line", "Supporting Lines", "Mixed Order", "Attack Column", "Close Column", "Square", "Mob"}
+
 func (g *GameRPC) FightHQAction(data shared.FightAction, retval *shared.FightOutcome) error {
 	start := time.Now()
 
@@ -86,20 +88,31 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 	outcome := &shared.FightOutcome{}
 	outcome.MapFromUnit(unit)
 
+	drill := &shared.DrillType{}
+	DB.SQL(`select * from drill where id=$1`, unit.Drill).QueryStruct(drill)
+	fmt.Printf("drill %v\n", drill)
 	if err == nil {
 
 		switch unit.UType {
 		case shared.UnitBde, shared.UnitSpecial:
 			switch data.Opcode {
 			case shared.TacticalAdvance:
+				if drill.Oblique {
+					outcome.Descr2 = "+/- ½Bn Base Width to the Oblique"
+				}
 				switch outcome.Role {
 				case shared.RoleAdvance:
 					pts = 2
+					if drill.Speed > 2 {
+						pts = 1
+					}
 					outcome.Descr = "Unit advances ½ grid ahead of the main line"
 				case shared.Role1:
 					pts = 1
 					outcome.Descr = "All units in 1st and 2nd line advance ½ grid"
-					outcome.Descr2 = "Supporting units and flanks keep pace"
+					if outcome.Descr2 == "" {
+						outcome.Descr2 = "Supporting units and flanks keep pace"
+					}
 				case shared.Role2:
 					pts = 2
 					outcome.Descr = "Unit advances into 1st Line"
@@ -143,9 +156,13 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 				outcome.Descr = "Unit advances to contact enemy within same grid"
 				// TODO - must pass in complete contact info to resolve the fight
 			case shared.TacticalForm:
-				pts = 2
+				pts = 5 - drill.Speed
 				outcome.Descr = "Unit Changes Formation"
-				// TODO - must pass in info about formation to change into
+				if data.Target >= 0 && data.Target < len(fnames) {
+					outcome.Descr2 = "to " + fnames[data.Target]
+				}
+				outcome.Formation = data.Target
+				DB.SQL(`update unit set formation=$2 where id=$1`, unit.ID, outcome.Formation).Exec()
 			case shared.TacticalWheel:
 				pts = 2
 				outcome.Descr = "Unit Executes wheel within same grid"
@@ -154,6 +171,9 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 				switch outcome.Role {
 				case shared.RoleAdvance:
 					pts = 3
+					if drill.Speed > 2 {
+						pts = 2
+					}
 					outcome.Descr = "Unit falls back up to 2 grids to reserve"
 					outcome.Role = shared.RoleReserve
 					DB.SQL(`update unit set role=$2 where id=$1`, unit.ID, outcome.Role).Exec()

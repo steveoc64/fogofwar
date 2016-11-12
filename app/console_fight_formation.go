@@ -8,7 +8,15 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
+var fnames = []string{"March Order", "Open Order", "Line", "Supporting Lines", "Mixed Order", "Attack Column", "Close Column", "Square", "Mob"}
+
+func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
+}
+
+func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
+}
+
+func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -54,8 +62,7 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, ttl)
 	html += svgEndG()
 
-	html += svgText(xx, 29, "text__end text__0x", unit.GetFightingDescription())
-	html += svgText(xx/2, 25, "text__middle text__1x text__gold", fnames[unit.Formation])
+	html += svgText(xx, 20, "text__end text__0x", unit.GetFightingDescription())
 
 	html += svgG(100)
 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
@@ -109,74 +116,47 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 		ids = append(ids, id)
 	}
 
-	switch unit.UType {
-	case shared.UnitBde, shared.UnitSpecial:
-		if unit.CommanderControl >= 3 {
-			addButton(shared.TacticalAdvance, "Advance")
-			addButton(shared.TacticalStandGround, "Stand Your Ground")
-		}
+	drill := unit.GetDrillData()
 
-		if unit.CommanderControl >= 2 {
-			if unit.SKOut {
-				addButton(shared.TacticalSKIn, "Skirmishers In")
-				addButton(shared.TacticalSKAttack, "Skirmisher Attack")
-			} else {
-				addButton(shared.TacticalSKOut, "Skirmishers Out")
-			}
-		}
-
-		if unit.CommanderControl >= 4 {
-			if unit.Ammo > 1 {
-				addButton(shared.TacticalFire, "Fire !")
-			}
-			addButton(shared.TacticalColdSteel, "Cold Steel !")
-		}
-
-		if unit.CommanderControl >= 5 {
-			addButton(shared.TacticalForm, "Change Formation")
-			addButton(shared.TacticalWheel, "Wheel / EnFlank")
-		}
-
-		addButton(shared.TacticalWithdraw, "Withdraw")
-		addButton(shared.TacticalSurrender, "Surrender")
-	case shared.UnitCav:
-		if unit.CommanderControl >= 6 {
-			addButton(shared.TacticalCavCharge, "Charge !")
-			addButton(shared.TacticalCavFeint, "Fient a Charge")
-		}
-
-		if unit.CommanderControl >= 4 {
-			addButton(shared.TacticalCounterCavCharge, "Counter Charge")
-			addButton(shared.TacticalStandGround, "Stand Your Ground")
-		}
-
-		if unit.CommanderControl >= 3 {
-			addButton(shared.TacticalLeftFlank, "En Flank")
-			addButton(shared.TacticalPursuit, "Pursuit !")
-		}
-
-		if unit.CommanderControl >= 6 {
-			addButton(shared.TacticalTakeGuns, "Take Enemy Guns")
-		}
-		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
-	case shared.UnitGun:
-		if unit.Ammo > 1 && unit.CommanderControl >= 2 {
-			addButton(shared.TacticalCannister, "Cannister !")
-			addButton(shared.TacticalShot, "Round Shot")
-		}
-
-		if unit.CommanderControl >= 4 {
-			if unit.GunsLimbered {
-				addButton(shared.TacticalDeployGuns, "Deploy Guns")
-			} else {
-				addButton(shared.TacticalLimber, "Limber Guns")
-			}
-		}
-
-		addButton(shared.TacticalResup, "Reload / Prepare")
-		addButton(shared.TacticalWithdraw, "Withdraw to Reserve")
+	drillDesc := fmt.Sprintf(".. in %d Ranks", drill.Ranks)
+	if drill.Flankers {
+		drillDesc += ", with Flank Companies"
 	}
+	if drill.EliteCoy {
+		drillDesc += ", with Voltigeur & Grenadier Companies"
+	}
+	if drill.ThirdRank {
+		drillDesc += ",  3rd Rank for skirmish line"
+	}
+	html += svgText(xx/2, 78, "text__middle text__1x text__gold", drill.Name)
+	html += svgText(xx/2, 85, "text__middle text__1x text__gold", drillDesc)
 
+	html += svgText(xx/2, 25, "text__middle text__1x text__gold", fnames[unit.Formation])
+
+	if drill.OpenOrder {
+		addButton(shared.FormationOpenOrder, "Open Order")
+	}
+	if drill.Line {
+		addButton(shared.FormationLine, "Form Line")
+	}
+	if drill.Lines {
+		addButton(shared.FormationLines, "Supporting Lines")
+	}
+	if drill.Mixed {
+		addButton(shared.FormationMixed, "Mixed Order")
+	}
+	if drill.AttCol {
+		addButton(shared.FormationAttCol, "Attack Column")
+	}
+	if drill.CloseCol {
+		addButton(shared.FormationCloseCol, "Closed Column")
+	}
+	if drill.Square {
+		addButton(shared.FormationSquare, "Square")
+	}
+	if drill.Mob {
+		addButton(shared.FormationMob, "Mob")
+	}
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
@@ -194,44 +174,34 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			print("clicked on option", id)
-			switch id {
-			case shared.TacticalForm:
-				doFightFormation(game, fight, unit)
-			case shared.TacticalFire:
-				doFightFire(game, fight, unit)
-			case shared.TacticalColdSteel:
-				doFightColdSteel(game, fight, unit)
-			default:
-				go func() {
-					outcome := &shared.FightOutcome{}
-					err := RPC("GameRPC.FightUnitAction", shared.FightAction{
-						Channel: Session.Channel,
-						GameID:  game.ID,
-						Opcode:  id,
-						UnitID:  unit.ID,
-						Target:  0,
-					}, outcome)
-					if err != nil {
-						print(err.Error())
-					} else {
-						// print("got outcome", outcome)
-						for _, i := range ids {
-							el := doc.QuerySelector(fmt.Sprintf("#g-%d", i))
-							if el != nil {
-								el.Class().Add("hidden")
-							}
+			go func() {
+				outcome := &shared.FightOutcome{}
+				err := RPC("GameRPC.FightUnitAction", shared.FightAction{
+					Channel: Session.Channel,
+					GameID:  game.ID,
+					Opcode:  shared.TacticalForm,
+					UnitID:  unit.ID,
+					Target:  id,
+				}, outcome)
+				if err != nil {
+					print(err.Error())
+				} else {
+					// print("got outcome", outcome)
+					for _, i := range ids {
+						el := doc.QuerySelector(fmt.Sprintf("#g-%d", i))
+						if el != nil {
+							el.Class().Add("hidden")
 						}
-						outtext := doc.QuerySelector("#outcome")
-						outtext.SetInnerHTML(outcome.Descr)
-						outtext.Class().Remove("hidden")
-						outtext2 := doc.QuerySelector("#outcome2")
-						outtext2.SetInnerHTML(outcome.Descr2)
-						outtext2.Class().Remove("hidden")
-						unit.SetOutcome(outcome)
 					}
-				}()
-			}
-
+					outtext := doc.QuerySelector("#outcome")
+					outtext.SetInnerHTML(outcome.Descr)
+					outtext.Class().Remove("hidden")
+					outtext2 := doc.QuerySelector("#outcome2")
+					outtext2.SetInnerHTML(outcome.Descr2)
+					outtext2.Class().Remove("hidden")
+					unit.SetOutcome(outcome)
+				}
+			}()
 		})
 	}
 

@@ -88,6 +88,20 @@ const (
 	RoleLeft
 )
 
+// Drill Formations
+
+const (
+	FormationMarchCol int = iota
+	FormationOpenOrder
+	FormationLine
+	FormationLines
+	FormationMixed
+	FormationAttCol
+	FormationCloseCol
+	FormationSquare
+	FormationMob
+)
+
 // Unit Orders
 const (
 	OrdersReserve int = iota

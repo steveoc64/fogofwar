@@ -144,7 +144,7 @@ func (u *Unit) GetFightingDescription() string {
 
 	switch u.Role {
 	case RoleAdvance:
-		retval = "in Advance"
+		retval = "in Advance Party"
 	case Role1:
 		retval = "1st Line"
 	case Role2:

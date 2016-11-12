@@ -30,6 +30,8 @@ var DB *runner.DB
 
 // var MailChannel chan *gomail.Message
 
+// var Lookups shared.LookupTable
+
 func main() {
 
 	start := time.Now()
@@ -107,6 +109,8 @@ func main() {
 
 	// Connect to the database
 	DB = db.Init(Config.DataSourceName)
+
+	// Lookups = getLookupTable()
 
 	// Clear all channel data in the database
 	DB.SQL(`update users set channel=0`).Exec()

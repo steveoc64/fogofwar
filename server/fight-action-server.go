@@ -250,14 +250,14 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 							// event := applyTacticalGunShot(victim, false, pts)
 							if hitpoints > 3 {
 								eff := hitpoints / data.Bases
-								if eff > 10 {
-									if eff > 20 {
-										outcome.Descr2 = ".. Massive Devastation"
+								if eff > 15 {
+									if eff > 25 {
+										outcome.Descr2 = ".. A Murderous Volley"
 									} else {
 										outcome.Descr2 = ".. Most Effective"
 									}
 								} else {
-									outcome.Descr2 = ".. Somewhat Effective"
+									outcome.Descr2 = ".. Quite Effective"
 								}
 							} else {
 								outcome.Descr2 = ".. Not overly Effective"
@@ -413,7 +413,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 							if hitpoints > 3 {
 								if hitpoints > 10 {
 									if hitpoints > 20 {
-										outcome.Descr2 = ".. Massive Devastation"
+										outcome.Descr2 = ".. Strikes an Annihilating Blow"
 									} else {
 										outcome.Descr2 = ".. Most Effective"
 									}

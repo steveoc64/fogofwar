@@ -8,7 +8,7 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shotType int) {
+func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -35,12 +35,11 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 		enemyteam = "blue"
 	}
 
-	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Fight -")
-	html += svgText(40, 8, "text__1x text__"+team, fight.Name)
+	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Cold Steel")
+	html += `<g id=fight-name>`
+	html += svgText(xx-20, 8, "text__end text__1x text__"+team, fight.Name)
+	html += `</g>`
 
-	if Session.Orientation == "Landscape" {
-		html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)
-	}
 	html += svgHelpBtn()
 
 	// Add ourself
@@ -58,15 +57,13 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, ttl)
 	html += svgEndG()
 
-	html += svgText(xx, 20, "text__end text__0x", unit.GetFightingDescription())
-
 	// html += svgG(101)
 	// html += svgText(xx/2, 50, "text__middle text__1x text__"+enemyteam, "Choose Target Unit")
 	// html += svgEndG()
 
 	html += svgG(100)
 	html += fmt.Sprintf(`<rect x=30 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx-30)
-	html += svgText(xx/2, 97, "text__carryon text__middle", "Fire")
+	html += svgText(xx/2, 97, "text__carryon text__middle", "Attack !")
 	html += svgEndG()
 	html += svgG(102)
 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=30 height=12 class="reorg-button" data-id=100></rect>`, xx)
@@ -101,9 +98,13 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 	if terrain == "" {
 		terrain = "Clear"
 	}
+	html += `<g id=terrain>`
 	html += svgText(5, 18, "text__1x text__"+team, terrain)
+	html += `</g>`
 
 	drill := unit.GetDrillData()
+	ratingData := unit.GetRatingData()
+	print("ratingData", ratingData)
 
 	drillDesc := fmt.Sprintf(".. in %d Ranks", drill.Ranks)
 	if drill.Flankers {
@@ -122,6 +123,7 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 
 	// Show the enemy units in range for selection
 
+	html += `<g id=select-enemy>`
 	left := 0
 	right := 0
 	center := 0
@@ -165,52 +167,81 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 		}
 	}
 
-	html += `<g id=range>`
-	html += svgText(20, 74, "text__0x", "Range:")
-	html += svgText(40, 74, "text__0x", `100p`)
-	html += svgText(60, 74, "text__0x", `200p`)
-	html += svgText(80, 74, "text__0x", `300p`)
-	html += svgText(100, 74, "text__0x", `400p`)
-	html += `<rect data-id=1 x=20 y=75 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=2 x=40 y=75 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=3 x=60 y=75 width=20 height=11 class=range-bands></rect>`
-	html += `<rect data-id=4 x=80 y=75 width=20 height=11 class=range-bands></rect>`
+	html += svgText(xx/2, 60, "text__2x text__gold text__middle", "Select Enemy Unit")
 	html += `</g>`
 
-	// add a gun model on top of the range band
-	html += `<image xlink:href=/img/firingline.png x=7 y=73 height=16 width=16></image>`
+	html += `<g id=range class=hidden>`
+	html += svgText(12, 28, "text__end text__0x", "Range:")
+	html += svgText(7, 40, "text__end text__0x", `100p`)
+	html += svgText(7, 50, "text__end text__0x", `200p`)
+	html += svgText(7, 60, "text__end text__0x", `300p`)
+	html += svgText(7, 70, "text__end text__0x", `400p`)
+	html += `<rect data-id=1 x=7 y=30 width=15 height=10 class=range-bands></rect>`
+	html += `<rect data-id=2 x=7 y=40 width=15 height=10 class=range-bands></rect>`
+	html += `<rect data-id=3 x=7 y=50 width=15 height=10 class=range-bands></rect>`
+	html += `<rect data-id=4 x=7 y=60 width=15 height=10 class=range-bands></rect>`
+	html += `</g>`
 
-	html += svgG(1)
-	html += svgText(20, 55, "text__question", "Clear Shot ?")
-	html += `<rect class=console-check x=70 y=47 rx=2 ry=2 width=10 height=10 data-id=1></rect>`
-	html += svgTick("clear-shot", "tick hidden", 70, 47, 10)
-	html += svgEndG()
-
-	html += `<g id=bases>`
+	html += `<g id=bases class=hidden>`
 
 	basesMax := (((unit.Bayonets - unit.BayonetsLost) + 200) / 450)
-	if basesMax > 4 {
-		basesMax = 4
+	if basesMax > 8 {
+		basesMax = 8
 	}
 	basesSelected := basesMax
-	html += svgText(18, 62, "text__end text__0x text__black", "Bases")
-	html += svgText(18, 67, "text__end text__0x text__black", "Firing")
-	bnames := []string{"½ Bn", "Full Bn", "3 Bases", "4-6 Bases"}
-	for ii := 1; ii <= basesMax; ii++ {
-		html += svgText(10+ii*20, 64, "text__middle text__0x text__black", bnames[ii-1])
-		html += fmt.Sprintf(`<rect data-id=%d x=%d y=58 width=20 height=11 rx=2 ry=2 class="range-selected console-check"></rect>`,
-			ii, ii*20)
+	html += svgText(xx/2, 87, "text__middle text__0x text__black", "Attacker Bases")
+	html += svgText(xx, 87, "text__end text__0x", unit.GetFightingDescription())
+	mb := ""
+	if ratingData.MeleeBonus >= 0 {
+		mb = "+"
 	}
+	html += svgText(xx, 70, "text__end text__1x text__"+team, fmt.Sprintf("Melee Bonus %s%d", mb, ratingData.MeleeBonus))
+	bwidth := xx / 8
+	basesMax = 8
+	for ii := 0; ii < basesMax; ii++ {
+		html += fmt.Sprintf(`<rect data-id=%d x=%d y=73 width=%d height=11 rx=2 ry=2 class="console-check"></rect>`,
+			ii+1, ii*bwidth, bwidth)
+		svgID = ii + 1
+		html += svgText(ii*bwidth+bwidth/2, 79, "text__middle text__0x text__black", fmt.Sprintf("%d", ii+1))
+	}
+
+	// draw SK buttons
+	html += svgText(30, 60, "text__0x text__black", "Skirmishers")
+	for ii := 0; ii < 8; ii++ {
+		html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=67 cy=5 r=5 class=unit-selected></circle>`,
+			11+ii, 30+ii*10)
+		svgID = ii + 11
+		html += svgText(30+ii*10, 67, "text__middle text__0x text__black", fmt.Sprintf("%d", ii+1))
+	}
+
 	html += `</g>`
 
-	g.SetInnerHTML(html)
+	html += `<g id=ebases class=hidden>`
+	ebasesMax := (((unit.Bayonets - unit.BayonetsLost) + 200) / 450)
+	if ebasesMax > 8 {
+		ebasesMax = 8
+	}
+	ebasesSelected := basesMax
+	html += svgText(xx/2, 12, "text__middle text__0x text__black", "Defender Bases")
+	basesMax = 8
+	for ii := 0; ii < basesMax; ii++ {
+		html += fmt.Sprintf(`<rect data-id=%d x=%d y=13 width=%d height=11 rx=2 ry=2 class="console-check"></rect>`,
+			ii+1, ii*bwidth, bwidth)
+		svgID = ii + 1
+		html += svgText(ii*bwidth+bwidth/2, 19, "text__middle text__0x text__black", fmt.Sprintf("%d", ii+1))
+	}
 
-	svgCallback(1, func(dom.Event) {
-		el := doc.QuerySelector("#clear-shot")
-		if el != nil {
-			el.Class().Toggle("hidden")
-		}
-	})
+	// draw SK buttons
+	html += svgText(30, 40, "text__0x text__black", "Skirmishers")
+	for ii := 0; ii < 8; ii++ {
+		html += fmt.Sprintf(`<circle data-id=%d class=help-button cx=%d cy=30 cy=5 r=5></circle>`, 11+ii, 30+ii*10)
+		svgID = ii + 11
+		html += svgText(30+ii*10, 32, "text__middle text__0x text__black", fmt.Sprintf("%d", ii+1))
+	}
+	html += `</g>`
+	svgID = 0
+
+	g.SetInnerHTML(html)
 
 	selectedEnemy := 0
 	isDone := false
@@ -233,7 +264,9 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 		if selectedEnemy == 0 {
 			print("select enemy first")
 		} else if basesSelected == 0 {
-			print("choose bases firing")
+			print("choose bases attacking")
+		} else if ebasesSelected == 0 {
+			print("choose enemy bases as well")
 		} else {
 			theRange := 100
 			for i, v := range doc.QuerySelector("#range").QuerySelectorAll("rect") {
@@ -246,7 +279,7 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 				print("select range first")
 				return
 			}
-			print("Fire")
+			print("Attack")
 			go func() {
 				outcome := &shared.FightOutcome{}
 				terrain := 0
@@ -294,36 +327,80 @@ func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shot
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			selectedEnemy = id
-			for _, enemy := range g.QuerySelectorAll(".unit-selected") {
-				enemy.Class().Remove("unit-selected")
-			}
-			doc.QuerySelector(fmt.Sprintf("#g-%d", id)).QuerySelector("rect").Class().Add("unit-selected")
+			enemyUnit := game.GetUnit(enemyteam, id)
+			print("enemy unit", enemyUnit)
+			doc.QuerySelector("#select-enemy").Class().Add("hidden")
+			doc.QuerySelector("#terrain").Class().Add("hidden")
+			doc.QuerySelector(fmt.Sprintf("#g-%d", unit.ID)).Class().Add("hidden")
+			doc.QuerySelector("#range").Class().Remove("hidden")
+			doc.QuerySelector("#bases").Class().Remove("hidden")
+			doc.QuerySelector("#ebases").Class().Remove("hidden")
+			doc.QuerySelector("#fight-name").
+				QuerySelector("text").
+				SetInnerHTML(fmt.Sprintf("%s vs %s", unit.Name, enemyUnit.Name))
+
 		})
 	}
 
 	svgCallbackQuery("#range", func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		for _, rb := range doc.QuerySelector("#range").QuerySelectorAll("rect") {
-			rb.Class().Remove("range-selected")
-		}
-		// print("range is set to", id)
-		if id > 0 {
-			el.Class().Toggle("range-selected")
-		} else {
-			print("no range on this item")
+		for i, rb := range doc.QuerySelector("#range").QuerySelectorAll("rect") {
+			if i < id {
+				rb.Class().Add("range-selected")
+			} else {
+				rb.Class().Remove("range-selected")
+			}
 		}
 	})
 
 	svgCallbackQuery("#bases", func(evt dom.Event) {
 		el := evt.Target()
 		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-		basesSelected = id
-		for i, rb := range doc.QuerySelector("#bases").QuerySelectorAll("rect") {
-			if i < id {
-				rb.Class().Add("range-selected")
-			} else {
-				rb.Class().Remove("range-selected")
+		if id < 10 {
+			basesSelected = id
+			selstring := team + "-unit-selected"
+			for i, rb := range doc.QuerySelector("#bases").QuerySelectorAll("rect") {
+				if i < id {
+					rb.Class().Add(selstring)
+				} else {
+					rb.Class().Remove(selstring)
+				}
+			}
+		} else {
+			newid := id - 10
+			for i, rb := range doc.QuerySelector("#bases").QuerySelectorAll("circle") {
+				if i < newid {
+					rb.Class().Add("sk-selected")
+				} else {
+					rb.Class().Remove("sk-selected")
+				}
+			}
+		}
+	})
+
+	svgCallbackQuery("#ebases", func(evt dom.Event) {
+		el := evt.Target()
+		id, _ := strconv.Atoi(el.GetAttribute("data-id"))
+		print("id", id)
+		if id < 10 {
+			ebasesSelected = id
+			selstring := enemyteam + "-unit-selected"
+			for i, rb := range doc.QuerySelector("#ebases").QuerySelectorAll("rect") {
+				if i < id {
+					rb.Class().Add(selstring)
+				} else {
+					rb.Class().Remove(selstring)
+				}
+			}
+		} else {
+			newid := id - 10
+			for i, rb := range doc.QuerySelector("#ebases").QuerySelectorAll("circle") {
+				if i < newid {
+					rb.Class().Add("sk-selected")
+				} else {
+					rb.Class().Remove("sk-selected")
+				}
 			}
 		}
 	})

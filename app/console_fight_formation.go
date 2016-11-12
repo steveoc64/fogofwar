@@ -10,9 +10,6 @@ import (
 
 var fnames = []string{"March Order", "Open Order", "Line", "Supporting Lines", "Mixed Order", "Attack Column", "Close Column", "Square", "Mob"}
 
-func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
-}
-
 func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	w := dom.GetWindow()
 	doc := w.Document()

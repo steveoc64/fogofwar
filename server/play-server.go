@@ -120,7 +120,8 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 		} else {
 			// get seen enemies but not their units
 			DB.SQL(`select
-				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
+				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,
+				g.cstate,g.dstate,
 					coalesce(u.username,'') as player_name,
 					coalesce(u.email,'') as player_email,
 					seen
@@ -140,7 +141,8 @@ func (g *GameRPC) GetPlay(data shared.GameRPCData, retval *shared.Game) error {
 		} else {
 			// get seen enemies, but not there units
 			DB.SQL(`select
-				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,g.cstate,g.dstate,
+				g.id, g.commander_name,g.name,g.cx,g.cy,g.dx,g.dy,g.red_team,g.blue_team,g.nation,
+				g.cstate,g.dstate,
 					coalesce(u.username,'') as player_name,
 					coalesce(u.email,'') as player_email,
 					seen

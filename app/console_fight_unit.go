@@ -251,7 +251,7 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			print("clicked on option", id)
+			// print("clicked on option", id)
 			switch id {
 			case shared.TacticalForm:
 				doFightFormation(game, fight, unit)

@@ -279,6 +279,29 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 			case shared.TacticalColdSteel:
 				pts = 2
 				outcome.Descr = "Unit advances to contact enemy within same grid"
+				fmt.Printf("data %v\n", data)
+
+				unit := &shared.Unit{}
+				target := &shared.Unit{}
+				urating := 0
+				trating := 0
+				DB.SQL(`select * from unit where id=$1`, data.UnitID).QueryStruct(unit)
+				DB.SQL(`select * from unit where id=$1`, data.Target).QueryStruct(target)
+				DB.SQL(`select r.melee_bonus from unit u
+					left join rating r on r.id=u.rating where u.id=$1`, data.UnitID).QueryScalar(&urating)
+				DB.SQL(`select r.melee_bonus from unit u
+					left join rating r on r.id=u.rating where u.id=$1`, data.Target).QueryScalar(&trating)
+
+				if data.Skirmishers > 0 {
+					if data.TargetSkirmishers > 0 {
+						println("SK vs SK")
+						bonus := urating - trating
+						advantag, odds := getOdds(data.Skirmishers, data.TargetSkirmishers, bonus)
+						println("Odds", advantage, odds)
+						outcome.Descr = "Skirmish Attack Odds"
+						outcome.Descr2 = odds
+					}
+				}
 				// TODO - must pass in complete contact info to resolve the fight
 			case shared.TacticalForm:
 				pts = 5 - drill.Speed
@@ -670,5 +693,54 @@ func applyTacticalSmallArmsFire(unit *shared.Unit, skirmishFire bool, pts int) s
 		SabresLost:       unit.SabresLost,
 		GunsLost:         unit.GunsLost,
 		MState:           unit.MState,
+	}
+}
+
+var dicename = []string{"1:1", "3:2", "2:1", "3:1", "4:1", "5:1"}
+
+var odds_table = []string{
+	"dtrDTR",
+	" drDTR",
+	"rrTDDR",
+	"r  TDR",
+	"r RDTD",
+	"rDTRDT",
+}
+
+func getOdds(a, d int, bonus int) (bool, string) {
+	ratio = float64(a) / float64(d)
+	println("ratio", ratio, a, d, bonus)
+	dice := 1
+	if ratio >= 5.0 {
+		dice = 6
+	} else if ratio >= 4.0 {
+		dice = 5
+	} else if ratio >= 3.0 {
+		dice = 4
+	} else if ratio >= 2.0 {
+		dice = 3
+	} else if ratio >= 1.5 {
+		dice = 2
+	} else if ratio <= 1.0/1.5 {
+		dice = -2
+	} else if ratio <= 1.0/2.0 {
+		dice = -3
+	} else if ratio <= 1.0/3.0 {
+		dice = -4
+	} else if ratio <= 1.0/4.0 {
+		dice = -5
+	} else if ratio <= 1.0/5.0 {
+		dice = -6
+	}
+	println("raw dice", dice)
+	dice += bonus
+	println("after bonus", dice)
+	if dice > 0 {
+		println("dice", dicename[dice-1], "to attackers advantage")
+		return odds_table[dice-1]
+	}
+	if dice < 0 {
+		println("dice", dicename[-1*dice-1], "to defenders advantage")
+		return odds_table[-1*dice-1]
 	}
 }

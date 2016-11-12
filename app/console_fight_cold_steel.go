@@ -70,8 +70,8 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 	html += svgText(15, 97, "text__carryon text__middle", "Cancel")
 	html += svgEndG()
 
-	html += fmt.Sprintf(`<text id=outcome x=%d y=30 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
-	html += fmt.Sprintf(`<text id=outcome2 x=%d y=40 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome x=%d y=45 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome2 x=%d y=55 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
 
 	terrain := ""
 	if fight.Rough {
@@ -241,10 +241,52 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 	html += `</g>`
 	svgID = 0
 
+	html += `<g id=defender-options class=hidden>`
+
+	html += svgG(1)
+	html += svgText(xx-10, 30, "text__0x text__end", "Lt Cover")
+	html += fmt.Sprintf(`<rect class=console-check x=%d y=25 rx=2 ry=2 width=8 height=8 data-id=1></rect>`, xx-8)
+	html += svgTick("1", "tick hidden", xx-8, 26, 8)
+	html += svgEndG()
+
+	html += svgG(2)
+	html += svgText(xx-10, 40, "text__0x text__end", "Woods")
+	html += fmt.Sprintf(`<rect class=console-check x=%d y=35 rx=2 ry=2 width=8 height=8 data-id=2></rect>`, xx-8)
+	html += svgTick("2", "tick hidden", xx-8, 36, 8)
+	html += svgEndG()
+
+	html += svgG(3)
+	html += svgText(xx-10, 50, "text__0x text__end", "Built Area")
+	html += fmt.Sprintf(`<rect class=console-check x=%d y=45 rx=2 ry=2 width=8 height=8 data-id=3></rect>`, xx-8)
+	html += svgTick("3", "tick hidden", xx-8, 46, 8)
+	html += svgEndG()
+
+	html += svgG(4)
+	html += svgText(xx-10, 60, "text__0x text__end", "Fortified")
+	html += fmt.Sprintf(`<rect class=console-check x=%d y=55 rx=2 ry=2 width=8 height=8 data-id=4></rect>`, xx-8)
+	html += svgTick("4", "tick hidden", xx-8, 56, 8)
+	html += svgEndG()
+
+	html += svgEndG()
+
 	g.SetInnerHTML(html)
 
 	selectedEnemy := 0
 	isDone := false
+
+	// tickmap := []string{"lt-cover", "woods", "built", "fort"}
+	svgCallbackQuery("#defender-options", func(evt dom.Event) {
+		el := evt.Target()
+		id := el.GetAttribute("data-id")
+		// act as a radio toggle button
+		for _, v := range doc.QuerySelector("#defender-options").QuerySelectorAll(".tick") {
+			if v.ID() == id {
+				v.Class().Toggle("hidden")
+			} else {
+				v.Class().Add("hidden")
+			}
+		}
+	})
 
 	svgCallback(102, func(dom.Event) {
 		doFight(game, fight)
@@ -283,19 +325,32 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 			go func() {
 				outcome := &shared.FightOutcome{}
 				terrain := 0
-				if doc.QuerySelector("#clear-shot").Class().Contains("hidden") {
-					terrain = 1
+				for i, tt := range g.QuerySelector("#defender-options").QuerySelectorAll(".tick") {
+					if !tt.Class().Contains("hidden") {
+						terrain = i + 1
+						break
+					}
 				}
+
+				// calc the skirmishers
+				skirmishers := len(doc.QuerySelector("#bases").QuerySelectorAll(".sk-selected"))
+				print("sk", skirmishers)
+				eskirmishers := len(doc.QuerySelector("#ebases").QuerySelectorAll(".sk-selected"))
+				print("esk", eskirmishers)
+
 				err := RPC("GameRPC.FightUnitAction", shared.FightAction{
-					Channel: Session.Channel,
-					GameID:  game.ID,
-					FightID: fight.ID,
-					Opcode:  shared.TacticalFire,
-					UnitID:  unit.ID,
-					Bases:   basesSelected,
-					Terrain: terrain,
-					Range:   theRange + 1,
-					Target:  selectedEnemy,
+					Channel:           Session.Channel,
+					GameID:            game.ID,
+					FightID:           fight.ID,
+					Opcode:            shared.TacticalColdSteel,
+					UnitID:            unit.ID,
+					Bases:             basesSelected,
+					TargetBases:       ebasesSelected,
+					Terrain:           terrain,
+					Skirmishers:       skirmishers,
+					TargetSkirmishers: eskirmishers,
+					Range:             theRange + 1,
+					Target:            selectedEnemy,
 				}, outcome)
 				if err != nil {
 					print(err.Error())
@@ -335,6 +390,7 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 			doc.QuerySelector("#range").Class().Remove("hidden")
 			doc.QuerySelector("#bases").Class().Remove("hidden")
 			doc.QuerySelector("#ebases").Class().Remove("hidden")
+			doc.QuerySelector("#defender-options").Class().Remove("hidden")
 			doc.QuerySelector("#fight-name").
 				QuerySelector("text").
 				SetInnerHTML(fmt.Sprintf("%s vs %s", unit.Name, enemyUnit.Name))
@@ -371,7 +427,11 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 			newid := id - 10
 			for i, rb := range doc.QuerySelector("#bases").QuerySelectorAll("circle") {
 				if i < newid {
-					rb.Class().Add("sk-selected")
+					if newid == 1 {
+						rb.Class().Toggle("sk-selected")
+					} else {
+						rb.Class().Add("sk-selected")
+					}
 				} else {
 					rb.Class().Remove("sk-selected")
 				}
@@ -397,7 +457,11 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 			newid := id - 10
 			for i, rb := range doc.QuerySelector("#ebases").QuerySelectorAll("circle") {
 				if i < newid {
-					rb.Class().Add("sk-selected")
+					if newid == 1 {
+						rb.Class().Toggle("sk-selected")
+					} else {
+						rb.Class().Add("sk-selected")
+					}
 				} else {
 					rb.Class().Remove("sk-selected")
 				}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 
 	"../shared"
@@ -90,7 +91,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 
 	drill := &shared.DrillType{}
 	DB.SQL(`select * from drill where id=$1`, unit.Drill).QueryStruct(drill)
-	fmt.Printf("drill %v\n", drill)
+	// fmt.Printf("drill %v\n", drill)
 	if err == nil {
 
 		switch unit.UType {
@@ -250,12 +251,51 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 			}
 		case shared.UnitGun:
 			switch data.Opcode {
-			case shared.TacticalCannister:
-				pts = 1
-				outcome.Descr = "Fires Cannister"
-			case shared.TacticalShot:
-				pts = 1
-				outcome.Descr = "Fires Roundshot"
+			case shared.TacticalShot, shared.TacticalCannister:
+				if outcome.Ammo < 2 {
+					outcome.Descr = "Guns are out of Ammo .. no effective fire"
+				} else {
+					pts = 1
+					shotter := "Round Shot"
+					if data.Opcode == shared.TacticalCannister {
+						shotter = "Cannister"
+						outcome.Ammo--
+					}
+					if data.Terrain == 0 {
+						outcome.Descr = fmt.Sprintf("Fires %s To Good Effect", shotter)
+					} else {
+						outcome.Descr = fmt.Sprintf("Fires %s blindly at the Target", shotter)
+					}
+					outcome.Ammo-- // Note - if cannister, total decrement = 2
+					outcome.GunsFired = true
+					DB.SQL(`update unit set ammo=$2,guns_fired=true where id=$1`, unit.ID, outcome.Ammo).Exec()
+
+					victim := &shared.Unit{}
+					err = DB.SQL(`select * from unit where id=$1`, data.Target).QueryStruct(victim)
+					if err == nil {
+						println("terrain", data.Terrain)
+						println("range", data.Range)
+						pts := 0
+						if data.Opcode == shared.TacticalCannister {
+							pts = cannisterShot(unit.Guns, unit.GunneryType, data.Range, data.Terrain == 0)
+						} else {
+							pts = gunShot(unit.Guns, unit.GunneryType, data.Range, data.Terrain == 0)
+						}
+						event := applyTacticalGunShot(victim, false, pts)
+
+						// get player who owns the target unit, and let them know the bad news
+						TargetPlayerID := 0
+						DB.SQL(`select c.player_id from unit u left join game_cmd c on c.id=u.cmd_id where u.id=$1`,
+							data.Target).QueryScalar(&TargetPlayerID)
+
+						Connections.BroadcastPlayer(TargetPlayerID, "Play", &shared.NetData{
+							Action: "Unit",
+							ID:     victim.ID,
+							Opcode: shared.UnitEventHits,
+							Unit:   &event,
+						})
+					}
+				}
 			case shared.TacticalLimber:
 				pts = 2
 				outcome.Descr = "Guns Limber Up"
@@ -269,6 +309,9 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 			case shared.TacticalResup:
 				pts = 1
 				outcome.Ammo++
+				if outcome.Ammo > 10 {
+					outcome.Ammo = 10
+				}
 				outcome.Descr = "Resupply and Restock Ammo"
 				DB.SQL(`update unit set ammo=$2 where id=$1`, unit.ID, outcome.Ammo).Exec()
 			case shared.TacticalWithdraw:
@@ -292,9 +335,94 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 		*retval = *outcome
 	}
 
-	logger(start, "Game.FightHQAction", conn,
+	logger(start, "Game.FightUnitAction", conn,
 		fmt.Sprintf("Game %d Opcode %d Unit %d Target %d", data.GameID, data.Opcode, data.UnitID, data.Target),
 		fmt.Sprintf("Outcome"))
 
 	return err
+}
+
+func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.UnitEvent {
+
+	inColumn := false
+	ranks := 3
+	sk := false
+	switch unit.Formation {
+	case shared.FormationOpenOrder:
+		sk = true
+	case shared.FormationLines:
+		inColumn = false
+		ranks = 3
+	case shared.FormationLine,
+		shared.FormationMixed:
+		inColumn = false
+		if unit.Drill >= 7 {
+			ranks = 2
+		}
+	case shared.FormationMarchCol,
+		shared.FormationAttCol,
+		shared.FormationCloseCol,
+		shared.FormationSquare,
+		shared.FormationMob:
+		inColumn = true
+	}
+	if unit.SKOut {
+		sk = true
+	}
+
+	m, c, g, s := unit.PtsToMen(pts, ranks, inColumn, sk)
+	println("Gun Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
+
+	switch unit.UType {
+	case shared.UnitDiv:
+		unit.CommanderControl--
+		if c > 0 {
+			unit.CommanderControl = 1
+		}
+		if unit.CommanderControl < 1 {
+			unit.CommanderControl = 1
+		}
+	case shared.UnitBde, shared.UnitSpecial:
+		unit.BayonetsLost += m
+		if unit.BayonetsLost > unit.Bayonets {
+			unit.BayonetsLost = unit.Bayonets
+		}
+	case shared.UnitCav:
+		unit.SabresLost += m
+		if unit.SabresLost > unit.Sabres {
+			unit.SabresLost = unit.Sabres
+		}
+	case shared.UnitGun:
+		unit.GunsLost += g
+		if unit.GunsLost > unit.Guns {
+			unit.GunsLost = unit.Guns
+		}
+	}
+
+	if cannister {
+		unit.MState++
+	} else if rand.Intn(3) == 0 {
+		unit.MState++
+	}
+
+	DB.SQL(`update unit set
+		bayonets_lost=$2,
+		sabres_lost=$3,
+		guns_lost=$4,
+		commander_control=$5,
+		mstate=$6
+		where id=$1`,
+		unit.ID,
+		unit.BayonetsLost, unit.SabresLost, unit.GunsLost,
+		unit.CommanderControl,
+		unit.MState).Exec()
+
+	return shared.UnitEvent{
+		ID:               unit.ID,
+		Description:      s,
+		CommanderControl: unit.CommanderControl,
+		BayonetsLost:     unit.BayonetsLost,
+		SabresLost:       unit.SabresLost,
+		GunsLost:         unit.GunsLost,
+	}
 }

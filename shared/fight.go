@@ -140,8 +140,6 @@ func (u *FightOutcome) MapFromUnit(o *Unit) {
 func (u *Unit) GetFightingDescription() string {
 	retval := ""
 
-	print("gfd", u)
-
 	switch u.Role {
 	case RoleAdvance:
 		retval = "in Advance Party"

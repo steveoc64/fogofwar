@@ -181,6 +181,37 @@ func loadGameData(id int, state *PlayState) error {
 	// and fetch the objectives
 	err = DB.SQL(`select * from game_objective where game_id=$1`, id).QueryStructs(&state.Game.Objectives)
 
+	// load up the fights
+	err = DB.SQL(`select * from fight where game_id=$1`, state.Game.ID).QueryStructs(&state.Fights)
+
+	isRed := func(unit *shared.Unit) bool {
+		for _, v := range state.Game.RedCmd {
+			if v.ID == unit.CmdID {
+				return v.RedTeam
+			}
+		}
+		return false
+	}
+
+	for i, v := range state.Fights {
+		// Get the red units involved
+		ids := []int{}
+		reds := []*shared.Unit{}
+		blues := []*shared.Unit{}
+		DB.SQL(`select unit_id from fight_unit where game_id=$1 and id=$2`, state.Game.ID, v.ID).QuerySlice(&ids)
+		for _, uid := range ids {
+			unit := &shared.Unit{}
+			DB.SQL(`select * from unit where id=$1`, uid).QueryStruct(unit)
+			if isRed(unit) {
+				reds = append(reds, unit)
+			} else {
+				blues = append(blues, unit)
+			}
+		}
+		state.Fights[i].Red = reds
+		state.Fights[i].Blue = blues
+	}
+
 	return err
 }
 
@@ -282,8 +313,8 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 	// At the start of the game goroutine, we clear out the bombards and fight arrays
 	// and any other temp combat trackers
 	DB.SQL(`delete from bombard where game_id=$1`, state.Game.ID).Exec()
-	DB.SQL(`delete from fight where game_id=$1`, state.Game.ID).Exec()
-	DB.SQL(`delete from fight_unit where game_id=$1`, state.Game.ID).Exec()
+	// DB.SQL(`delete from fight where game_id=$1`, state.Game.ID).Exec()
+	// DB.SQL(`delete from fight_unit where game_id=$1`, state.Game.ID).Exec()
 
 	log.Printf("Starting Game GoRoutine for %d\n", id)
 	if !logexists {
@@ -460,9 +491,12 @@ func playerPhaseDone(state *PlayState, m PlayMessage) {
 			DB.SQL(`update game_cmd set dstate=$2 where game_id=$1 and cstate=$3`,
 				state.Game.ID, shared.CmdBattleLine, shared.CmdCompleteMarch).Exec()
 			DB.SQL(`update unit set
-				guns_fired=false,
+				guns_fired=false,bayonets_fired=false,guns_moved=false,bayonets_moved=false,
 				ammo=least(ammo+(random()*3)-1,10),
-				commander_control=least(commander_control+(random()*3)-1,10)
+				commander_control=least(commander_control+(random()*3)-1,10),
+				mstate=greatest(mstate-(random()*3),0),
+				bayonets_mstate=greatest(bayonets_mstate-(random()*3),0),
+				sabres_charged=greatest(sabres_charged-1,0)
 				where game_id=$1`, state.Game.ID).Exec()
 			newTurn = true
 

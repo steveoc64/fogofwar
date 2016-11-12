@@ -8,12 +8,7 @@ import (
 	"honnef.co/go/js/dom"
 )
 
-var fnames = []string{"March Order", "Open Order", "Line", "Supporting Lines", "Mixed Order", "Attack Column", "Close Column", "Square", "Mob"}
-
-func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
-}
-
-func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
+func doFightFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, shotType int) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -130,28 +125,28 @@ func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 
 	html += svgText(xx/2, 25, "text__middle text__1x text__gold", fnames[unit.Formation])
 
-	if drill.OpenOrder && unit.Formation != shared.FormationOpenOrder {
+	if drill.OpenOrder {
 		addButton(shared.FormationOpenOrder, "Open Order")
 	}
-	if drill.Line && unit.Formation != shared.FormationLine {
+	if drill.Line {
 		addButton(shared.FormationLine, "Form Line")
 	}
-	if drill.Lines && unit.Formation != shared.FormationLines {
+	if drill.Lines {
 		addButton(shared.FormationLines, "Supporting Lines")
 	}
-	if drill.Mixed && unit.Formation != shared.FormationMixed {
+	if drill.Mixed {
 		addButton(shared.FormationMixed, "Mixed Order")
 	}
-	if drill.AttCol && unit.Formation != shared.FormationAttCol {
+	if drill.AttCol {
 		addButton(shared.FormationAttCol, "Attack Column")
 	}
-	if drill.CloseCol && unit.Formation != shared.FormationCloseCol {
+	if drill.CloseCol {
 		addButton(shared.FormationCloseCol, "Closed Column")
 	}
-	if drill.Square && unit.Formation != shared.FormationSquare {
+	if drill.Square {
 		addButton(shared.FormationSquare, "Square")
 	}
-	if drill.Mob && unit.Formation != shared.FormationMob {
+	if drill.Mob {
 		addButton(shared.FormationMob, "Mob")
 	}
 	g.SetInnerHTML(html)

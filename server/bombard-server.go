@@ -326,6 +326,7 @@ type GunTables struct {
 }
 
 func gunShot(guns int, gtype int, r int, good bool) int {
+	println("calc shot", guns, gtype, r, good)
 	if guns < 1 {
 		return 0
 	}
@@ -342,10 +343,13 @@ func gunShot(guns int, gtype int, r int, good bool) int {
 		table = shotBadEffect[gtype-1]
 	}
 	effects := table.Effect[r-1]
+	println("gunfactors", mult, die)
+	println("e", effects[die])
 	return int(float64(effects[die]) * mult)
 }
 
 func cannisterShot(guns int, gtype int, r int, good bool) int {
+	println("calc cannister", guns, gtype, r, good)
 	if guns < 1 {
 		return 0
 	}
@@ -362,6 +366,8 @@ func cannisterShot(guns int, gtype int, r int, good bool) int {
 		table = cannisterBadEffect[gtype-1]
 	}
 	effects := table.Effect[r-1]
+	println("factors", mult, die)
+	println("e", effects[die])
 	return int(float64(effects[die]) * mult)
 }
 

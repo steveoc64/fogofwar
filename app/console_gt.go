@@ -195,7 +195,7 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 
 	if max > 1 {
 		svgCallback(1, func(dom.Event) {
-			print("click at destination")
+			// print("click at destination")
 			el := doc.QuerySelector("#destination")
 			if el != nil {
 				el.Class().Toggle("hidden")
@@ -203,7 +203,7 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 		})
 
 		svgCallback(2, func(dom.Event) {
-			print("click on enemy contact")
+			// print("click on enemy contact")
 			el := doc.QuerySelector("#contact")
 			if el != nil {
 				el.Class().Toggle("hidden")

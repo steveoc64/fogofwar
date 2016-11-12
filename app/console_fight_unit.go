@@ -42,9 +42,6 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	// Add ourself
 	myCorps := game.GetCmd(team, unit.CmdID)
 	cmdr := unit.GetParentDiv(myCorps)
-	// html += svgG(cmdr.ID)
-	// html += svgHQ(cmdr.ID, xx/2, 15, cmdr.CommanderControl, cmdr.Name)
-	// html += svgEndG()
 
 	ttl := unit.Name
 	if Session.Orientation == "Landscape" {
@@ -55,7 +52,23 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 	html += svgEndG()
 
 	html += svgText(xx, 29, "text__end text__0x", unit.GetFightingDescription())
-	html += svgText(xx/2, 25, "text__middle text__1x text__gold", fnames[unit.Formation])
+	switch unit.UType {
+	case shared.UnitBde, shared.UnitSpecial:
+		html += svgText(xx/2, 25, "text__middle text__1x text__gold", fnames[unit.Formation])
+	case shared.UnitCav:
+		if unit.SabresCharged < 3 {
+			html += svgText(xx/2, 25, "text__middle text__1x text__gold", "on Fresh Horses")
+		} else {
+			html += svgText(xx/2, 25, "text__middle text__1x text__gold", "Blown")
+		}
+	case shared.UnitGun:
+		if unit.GunsLimbered {
+			html += svgText(xx/2, 25, "text__middle text__1x text__gold", "Limbered")
+		} else {
+			html += svgText(xx/2, 25, "text__middle text__1x text__gold", "Ready to Fire")
+		}
+
+	}
 
 	html += svgG(100)
 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
@@ -197,10 +210,12 @@ func doFightUnit(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 			switch id {
 			case shared.TacticalForm:
 				doFightFormation(game, fight, unit)
-			case shared.TacticalFire:
-				doFightFire(game, fight, unit)
+			case shared.TacticalFire, shared.TacticalSKAttack:
+				doFightFire(game, fight, unit, id)
 			case shared.TacticalColdSteel:
 				doFightColdSteel(game, fight, unit)
+			case shared.TacticalCannister, shared.TacticalShot:
+				doFightGunFire(game, fight, unit, id)
 			default:
 				go func() {
 					outcome := &shared.FightOutcome{}

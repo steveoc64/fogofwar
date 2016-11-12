@@ -71,7 +71,7 @@ func doFightColdSteel(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 	html += svgEndG()
 
 	html += fmt.Sprintf(`<text id=outcome x=%d y=45 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
-	html += fmt.Sprintf(`<text id=outcome2 x=%d y=55 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
+	html += fmt.Sprintf(`<text id=outcome2 x=%d y=55 class="text__middle text__2x hidden text__%s"></text>"`, xx/2, team)
 
 	terrain := ""
 	if fight.Rough {

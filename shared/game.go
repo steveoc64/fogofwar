@@ -956,9 +956,13 @@ func (u *Unit) GetAppraisal() string {
 		if cond < 0 {
 			cond *= 2
 		}
-		c := cond + d + r + rand.Intn(3) - 1
+		c := cond + d + r + rand.Intn(3) - 1 - u.MState
 		switch c {
-		case -1, -2, -3:
+		case -5, -6:
+			return "All is surely Lost"
+		case -3, -4:
+			return "Cowards. Scoundrels, Common Dross, the lot of them !"
+		case -1, -2:
 			return "This unit is unfit for battle Sir. They must be taken out of the line, or Surrender is our only option."
 		case 0, 1, 2:
 			return "This unit, Sir, is a disgrace. A total disgrace to arms, infested with the worst sort of criminal, scoundrel and skiving laggards."

@@ -1,79 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
-	"time"
 
 	"../shared"
 )
-
-func (g *GameRPC) ComputeMusket(data shared.MusketData, done *bool) error {
-	start := time.Now()
-
-	*done = false
-	conn := Connections.Get(data.Channel)
-
-	target := &shared.Unit{}
-	firer := &shared.Unit{}
-	pts := 0
-
-	err := DB.SQL(`select * from unit where id=$1`, data.Musket.TargetUID).QueryStruct(target)
-	if err != nil {
-		println(err.Error())
-	} else {
-		err = DB.SQL(`select * from unit where id=$1`, data.Musket.UnitID).QueryStruct(firer)
-		if err != nil {
-			println(err.Error())
-		}
-
-		// Update the firer
-		firer.Ammo--
-		if firer.Ammo < 1 {
-			firer.Ammo = 0
-		}
-		DB.SQL(`update unit set ammo=$2,guns_fired=true where id=$1`, firer.ID, firer.Ammo).Exec()
-		Connections.BroadcastPlayer(data.Musket.FirerID, "Play", &shared.NetData{
-			Action: "Unit",
-			ID:     firer.ID,
-			Opcode: shared.UnitEventFired,
-			Unit: &shared.UnitEvent{
-				ID:          firer.ID,
-				Description: "Fired",
-				Ammo:        firer.Ammo,
-				GunsFired:   true,
-			},
-		})
-
-		// Take 1 shot at the given range
-		bases := 2
-		cover := false
-		pts = musketShot(firer, bases, data.Musket.Paces, cover)
-		event := applyMusketDamage(target, pts)
-		Connections.BroadcastPlayer(data.Musket.TargetID, "Play", &shared.NetData{
-			Action: "Unit",
-			ID:     target.ID,
-			Opcode: shared.UnitEventHits,
-			Unit:   &event,
-		})
-	}
-
-	logger(start, "Game.ComputeMusket", conn,
-		fmt.Sprintf("Game %d ID %d", data.GameID, data.ID),
-		fmt.Sprintf("%d Pts damage", pts))
-
-	if err == nil {
-		*done = true
-	}
-	return err
-}
 
 func applyMusketDamage(unit *shared.Unit, pts int) shared.UnitEvent {
 
 	inColumn := unit.InColumn()
 
 	m, c, g, s := unit.PtsToMen(pts, 3, inColumn, false)
-	println("Gun Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
+	println("Musket Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
 
 	switch unit.UType {
 	case shared.UnitDiv:
@@ -81,31 +19,40 @@ func applyMusketDamage(unit *shared.Unit, pts int) shared.UnitEvent {
 		if c > 0 {
 			unit.CommanderControl = 1
 		}
-		if unit.CommanderControl < 1 {
-			unit.CommanderControl = 1
-		}
 	case shared.UnitBde, shared.UnitSpecial:
 		unit.BayonetsLost += m
+		unit.CommanderControl--
 		if unit.BayonetsLost > unit.Bayonets {
 			unit.BayonetsLost = unit.Bayonets
 		}
 	case shared.UnitCav:
 		unit.SabresLost += m
+		unit.CommanderControl--
 		if unit.SabresLost > unit.Sabres {
 			unit.SabresLost = unit.Sabres
 		}
 	case shared.UnitGun:
 		unit.GunsLost += g
+		unit.CommanderControl--
 		if unit.GunsLost > unit.Guns {
 			unit.GunsLost = unit.Guns
 		}
+	}
+	if unit.CommanderControl < 2 {
+		unit.CommanderControl = 2
+	}
+
+	// small chance of a morale hit
+	if rand.Intn(6) == 0 {
+		unit.MState++
 	}
 
 	DB.SQL(`update unit set
 		bayonets_lost=$2,
 		sabres_lost=$3,
 		guns_lost=$4,
-		commander_control=$5
+		commander_control=$5,
+		mstate=$6
 		where id=$1`,
 		unit.ID,
 		unit.BayonetsLost, unit.SabresLost, unit.GunsLost,
@@ -118,6 +65,7 @@ func applyMusketDamage(unit *shared.Unit, pts int) shared.UnitEvent {
 		BayonetsLost:     unit.BayonetsLost,
 		SabresLost:       unit.SabresLost,
 		GunsLost:         unit.GunsLost,
+		MState:           unit.MState,
 	}
 }
 
@@ -127,8 +75,18 @@ type MusketTables struct {
 	Effect [][]int
 }
 
-func musketShot(unit *shared.Unit, bases int, r int, cover bool) int {
+func musketShot(unit *shared.Unit, r int, cover bool) int {
+	println("musketshot", unit.ID, unit.Name, r, cover)
 	mtype := 1
+
+	fireBonus := 0
+	DB.SQL(`select r.fire_bonus+c.effect 
+		from unit u
+		left join rating r on r.id=u.rating
+		left join condition c on c.id=u.condition
+		where u.id=$1`, unit.ID).QueryScalar(&fireBonus)
+	println("firebonus", fireBonus)
+
 	// TODO - adjust according to the type of unit firing
 	if mtype < 1 || mtype > 3 {
 		return 0
@@ -137,17 +95,19 @@ func musketShot(unit *shared.Unit, bases int, r int, cover bool) int {
 	if r < 1 || r > 5 {
 		return 0
 	}
+
 	mult := 1.0
 	if unit.GunsFired {
 		// local smoke effects
 		mult = .6
 	}
 	// get below 50% condition, then things go south very quickly
-	if unit.Condition < 5 {
-		mult *= float64(unit.Condition)
-		mult /= 10.0
-	}
+	// if unit.Condition < 5 {
+	// 	mult *= float64(unit.Condition)
+	// 	mult /= 10.0
+	// }
 	die := rand.Intn(6)
+	println("mult", mult, die)
 
 	table := musketOpen[mtype-1]
 	if cover {
@@ -155,8 +115,8 @@ func musketShot(unit *shared.Unit, bases int, r int, cover bool) int {
 	}
 	effects := table.Effect[r-1]
 	v1 := int(float64(effects[die]) * mult)
+	println("v1", v1)
 	// best of 2
-	fireBonus := 0
 	if fireBonus > 0 {
 		v2 := int(float64(effects[rand.Intn(6)]) * mult)
 		if v1 > v2 {

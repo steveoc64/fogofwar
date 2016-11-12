@@ -272,6 +272,23 @@ func play(context *router.Context) {
 				if consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
 					doFight(game, consoleCurrentFight)
 				}
+			case "FightWithdraw":
+				for _, v := range fights {
+					if v.ID == msg.ID {
+						for i, uu := range v.Red {
+							if uu.ID == msg.Opcode {
+								v.Red = append(v.Red[:i], v.Red[i+1:]...)
+								break
+							}
+						}
+						for i, uu := range v.Blue {
+							if uu.ID == msg.Opcode {
+								v.Blue = append(v.Blue[:i], v.Blue[i+1:]...)
+								break
+							}
+						}
+					}
+				}
 			case "UnitRole":
 				// print("A unit has changed role")
 				gotsome := false
@@ -334,6 +351,7 @@ func play(context *router.Context) {
 					theUnit.SabresLost = msg.Unit.SabresLost
 					theUnit.GunsLost = msg.Unit.GunsLost
 					theUnit.CommanderControl = msg.Unit.CommanderControl
+					theUnit.MState = msg.Unit.MState
 				}
 			case "BB":
 				print("Bombardment target ID has been aquired or dropped for unit", msg.ID)

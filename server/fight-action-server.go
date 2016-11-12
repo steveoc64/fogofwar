@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"time"
@@ -45,14 +46,61 @@ func (g *GameRPC) FightHQAction(data shared.FightAction, retval *shared.FightOut
 			pts = 1
 			outcome.Descr = "All Skirmishers Deployed Out"
 		case shared.TacticalCommitReserve:
-			pts = 2
-			outcome.Descr = "Reserve Force Committed to the 2nd Line"
+			reserveID := 0
+			reserveName := ""
+			restype := 0
+			DB.SQL(`select id,name,utype from unit where game_id=$1 and cmd_id=$2 and path <@ $3 and role=$4 and id != $5 limit 1`,
+				data.GameID, div.CmdID, div.Path, shared.RoleReserve, div.ID).
+				QueryScalar(&reserveID, &reserveName, &restype)
+			if reserveID != 0 {
+				pts = 2
+				outcome.Descr = reserveName
+				outcome.UnitID = reserveID
+				outcome.Role = shared.Role2
+				switch restype {
+				case shared.UnitBde, shared.UnitSpecial:
+					outcome.Descr2 = "Committed to the 2nd Line"
+				case shared.UnitCav:
+					if rand.Intn(1) == 0 {
+						outcome.Descr2 = "Rushes to the Left Flank"
+						outcome.Role = shared.RoleLeft
+					} else {
+						outcome.Descr2 = "Rushes to the Right Flank"
+						outcome.Role = shared.RoleRight
+					}
+				case shared.UnitGun:
+					outcome.Descr2 = "Rushes to the advance of the formation"
+					outcome.Role = shared.RoleAdvance
+				}
+				DB.SQL(`update unit set role=$2 where id=$1`, reserveID, outcome.Role).Exec()
+			} else {
+				pts = 0
+				outcome.Descr = "No Reserves Left to Commit"
+			}
 		case shared.TacticalResup:
 			pts = 1
 			outcome.Descr = "Units in 1st line and 2nd line resupplied"
 		case shared.TacticalWithdraw:
 			pts = 2
-			outcome.Descr = "Division Withdraws 1 grid"
+			outcome.Descr = "Division Moves back 1 grid"
+			outcome.Descr2 = "and withdraws from the engagement"
+			DB.SQL(`delete from fight_unit where unit_id=$1`, div.ID).Exec()
+			// Tell the playroutine that this unit is no longer in the fight
+			print("getplay", data.GameID)
+			if play, ok := Plays[data.GameID]; ok {
+				print("play")
+				play <- PlayMessage{
+					Game:   data.GameID,
+					OpCode: FightWithdraw,
+					Data: &shared.FightData{
+						ID:    data.FightID,
+						DivID: div.ID,
+					},
+				}
+			} else {
+				err = errors.New("Invalid Game ID")
+			}
+
 		case shared.TacticalSurrender:
 			outcome.Descr = "All remaining troops not in reserve Surrender"
 		}
@@ -99,7 +147,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 			switch data.Opcode {
 			case shared.TacticalAdvance:
 				if drill.Oblique {
-					outcome.Descr2 = "+/- ½Bn Base Width to the Oblique"
+					outcome.Descr2 = "+/- 1 Base Width to the Oblique"
 				}
 				switch outcome.Role {
 				case shared.RoleAdvance:
@@ -110,15 +158,29 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 					outcome.Descr = "Unit advances ½ grid ahead of the main line"
 				case shared.Role1:
 					pts = 1
-					outcome.Descr = "All units in 1st and 2nd line advance ½ grid"
-					if outcome.Descr2 == "" {
-						outcome.Descr2 = "Supporting units and flanks keep pace"
+					if unit.Formation == shared.FormationOpenOrder {
+						outcome.Descr = "Unit Advances to the head of the"
+						outcome.Descr2 = "engagement in Open Order"
+						outcome.Role = shared.RoleAdvance
+						DB.SQL(`update unit set role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
+					} else {
+						outcome.Descr = "All units in 1st and 2nd line advance ½ grid"
+						if outcome.Descr2 == "" {
+							outcome.Descr2 = "Supporting units and flanks keep pace"
+						}
 					}
 				case shared.Role2:
 					pts = 2
-					outcome.Descr = "Unit advances into 1st Line"
-					outcome.Role = shared.Role1
-					DB.SQL(`update unit set role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
+					if unit.Formation == shared.FormationOpenOrder {
+						outcome.Descr = "Unit Advances to the head of the"
+						outcome.Descr2 = "engagement in Open Order"
+						outcome.Role = shared.RoleAdvance
+						DB.SQL(`update unit set role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
+					} else {
+						outcome.Descr = "Unit advances into 1st Line"
+						outcome.Role = shared.Role1
+						DB.SQL(`update unit set role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
+					}
 				case shared.RoleLeft:
 					pts = 1
 					outcome.Descr = "Unit advances ½ grid, still covering flank"
@@ -142,15 +204,64 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 				outcome.SKOut = true
 				DB.SQL(`update unit set sk_out=true where id=$1`, unit.ID).Exec()
 			case shared.TacticalFire:
-				if outcome.Ammo > 1 {
-					pts = 1
-					outcome.Descr = "Unit Fires"
-					outcome.Ammo--
-					outcome.BayonetsFired = true
-					DB.SQL(`update unit set bayonets_fired=true,ammo=$2 where id=$1`, unit.ID, outcome.Ammo).Exec()
+				if outcome.Ammo < 2 {
+					outcome.Descr = "Unit is very low on ammo"
+					outcome.Descr2 = ".. ineffective fire"
 				} else {
 					pts = 1
-					outcome.Descr = "Low Ammo, ineffective fire"
+					outcome.Descr = fmt.Sprintf("Aimed Volley Fire within %d00 paces", data.Range)
+					if unit.BayonetsFired {
+						outcome.Descr = "Sporadic fire blindly into the smoke"
+					} else {
+						if data.Terrain != 0 {
+							outcome.Descr = "Fires Volley in the General Direction of the enemy"
+						}
+					}
+					outcome.Ammo--
+					outcome.BayonetsFired = true
+					DB.SQL(`update unit set ammo=$2,bayonets_fired=true where id=$1`, unit.ID, outcome.Ammo).Exec()
+
+					victim := &shared.Unit{}
+					err = DB.SQL(`select * from unit where id=$1`, data.Target).QueryStruct(victim)
+					if err == nil {
+						println("terrain", data.Terrain)
+						println("range", data.Range)
+						println("bases", data.Bases)
+						hitpoints := 0
+						goodEffect := data.Terrain == 0
+						// bases := (unit.Bayonets + 200) / 450
+						for ii := 0; ii < data.Bases; ii++ {
+							hitpoints += musketShot(unit, data.Range, !goodEffect)
+						}
+						outcome.Descr2 = fmt.Sprintf("%d points of damage", hitpoints)
+						println("muskets do ", hitpoints)
+						// event := applyTacticalGunShot(victim, false, pts)
+						if hitpoints > 3 {
+							eff := hitpoints / data.Bases
+							if eff > 10 {
+								if eff > 20 {
+									outcome.Descr2 = ".. Massive Devastation"
+								} else {
+									outcome.Descr2 = ".. Most Effective"
+								}
+							} else {
+								outcome.Descr2 = ".. Somewhat Effective"
+							}
+						} else {
+							outcome.Descr2 = ".. Not overly Effective"
+						}
+						// // get player who owns the target unit, and let them know the bad news
+						// TargetPlayerID := 0
+						// DB.SQL(`select c.player_id from unit u left join game_cmd c on c.id=u.cmd_id where u.id=$1`,
+						// 	data.Target).QueryScalar(&TargetPlayerID)
+
+						// Connections.BroadcastPlayer(TargetPlayerID, "Play", &shared.NetData{
+						// 	Action: "Unit",
+						// 	ID:     victim.ID,
+						// 	Opcode: shared.UnitEventHits,
+						// 	Unit:   &event,
+						// })
+					}
 				}
 			case shared.TacticalColdSteel:
 				pts = 2
@@ -262,7 +373,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 						outcome.Ammo--
 					}
 					if data.Terrain == 0 {
-						outcome.Descr = fmt.Sprintf("Fires %s To Good Effect", shotter)
+						outcome.Descr = fmt.Sprintf("Fires %s with a clear view of the enemy", shotter)
 					} else {
 						outcome.Descr = fmt.Sprintf("Fires %s blindly at the Target", shotter)
 					}
@@ -275,13 +386,31 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 					if err == nil {
 						println("terrain", data.Terrain)
 						println("range", data.Range)
-						pts := 0
+						hitpoints := 0
+						goodEffect := data.Terrain == 0
 						if data.Opcode == shared.TacticalCannister {
-							pts = cannisterShot(unit.Guns, unit.GunneryType, data.Range, data.Terrain == 0)
+							hitpoints = cannisterShot(unit.Guns, unit.GunneryType, data.Range, goodEffect)
 						} else {
-							pts = gunShot(unit.Guns, unit.GunneryType, data.Range, data.Terrain == 0)
+							hitpoints = gunShot(unit.Guns, unit.GunneryType, data.Range, goodEffect)
 						}
 						event := applyTacticalGunShot(victim, false, pts)
+
+						if goodEffect {
+							if hitpoints > 3 {
+								if hitpoints > 10 {
+									if hitpoints > 20 {
+										outcome.Descr2 = ".. Massive Devastation"
+									} else {
+										outcome.Descr2 = ".. Most Effective"
+									}
+								} else {
+									outcome.Descr2 = ".. Somewhat Effective"
+								}
+							} else {
+								outcome.Descr2 = ".. Not overly Effective"
+							}
+
+						}
 
 						// get player who owns the target unit, and let them know the bad news
 						TargetPlayerID := 0
@@ -319,7 +448,7 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 				outcome.Descr = "Unit Withdraws to Reserve"
 				outcome.GunsLimbered = true
 				outcome.Role = shared.RoleReserve
-				DB.SQL(`update unit set gun_limbered=true, role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
+				DB.SQL(`update unit set guns_limbered=true, role=$2 where id=$1`, unit.ID, outcome.Role).Exec()
 			}
 		}
 
@@ -371,7 +500,7 @@ func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.Uni
 	}
 
 	m, c, g, s := unit.PtsToMen(pts, ranks, inColumn, sk)
-	println("Gun Damage ", unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
+	println("Gun Damage ", pts, ranks, inColumn, sk, unit.Name, s, "Men=", m, "Guns=", g, "Cmd=", c)
 
 	switch unit.UType {
 	case shared.UnitDiv:
@@ -399,10 +528,17 @@ func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.Uni
 		}
 	}
 
-	if cannister {
+	if cannister && rand.Intn(2) == 0 {
 		unit.MState++
 	} else if rand.Intn(3) == 0 {
 		unit.MState++
+	}
+
+	if rand.Intn(4) == 0 {
+		unit.Condition++
+		if unit.Condition > 5 {
+			unit.Condition = 5
+		}
 	}
 
 	DB.SQL(`update unit set
@@ -410,12 +546,14 @@ func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.Uni
 		sabres_lost=$3,
 		guns_lost=$4,
 		commander_control=$5,
-		mstate=$6
+		mstate=$6,
+		condition=$7
 		where id=$1`,
 		unit.ID,
 		unit.BayonetsLost, unit.SabresLost, unit.GunsLost,
 		unit.CommanderControl,
-		unit.MState).Exec()
+		unit.MState,
+		unit.Condition).Exec()
 
 	return shared.UnitEvent{
 		ID:               unit.ID,
@@ -424,5 +562,6 @@ func applyTacticalGunShot(unit *shared.Unit, cannister bool, pts int) shared.Uni
 		BayonetsLost:     unit.BayonetsLost,
 		SabresLost:       unit.SabresLost,
 		GunsLost:         unit.GunsLost,
+		MState:           unit.MState,
 	}
 }

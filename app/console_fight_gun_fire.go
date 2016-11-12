@@ -64,8 +64,12 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 	html += svgEndG()
 
 	html += svgG(100)
-	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
+	html += fmt.Sprintf(`<rect x=30 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
 	html += svgText(xx/2, 97, "text__carryon text__middle", "Fire")
+	html += svgEndG()
+	html += svgG(102)
+	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=30 height=12 class="reorg-button" data-id=100></rect>`, xx)
+	html += svgText(15, 97, "text__carryon text__middle", "Cancel")
 	html += svgEndG()
 
 	html += fmt.Sprintf(`<text id=outcome x=%d y=40 class="text__middle text__1x hidden text__%s"></text>"`, xx/2, team)
@@ -178,17 +182,19 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 
 	g.SetInnerHTML(html)
 
-	svgCallback(1, func(evt dom.Event) {
-		svgCallback(1, func(dom.Event) {
-			el := doc.QuerySelector("#clear-shot")
-			if el != nil {
-				el.Class().Toggle("hidden")
-			}
-		})
+	svgCallback(1, func(dom.Event) {
+		el := doc.QuerySelector("#clear-shot")
+		if el != nil {
+			el.Class().Toggle("hidden")
+		}
 	})
 
 	selectedEnemy := 0
 	isDone := false
+
+	svgCallback(102, func(dom.Event) {
+		doFight(game, fight)
+	})
 
 	svgCallback(100, func(dom.Event) {
 		if isDone {
@@ -219,6 +225,7 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 				err := RPC("GameRPC.FightUnitAction", shared.FightAction{
 					Channel: Session.Channel,
 					GameID:  game.ID,
+					FightID: fight.ID,
 					Opcode:  shotType,
 					UnitID:  unit.ID,
 					Terrain: terrain,
@@ -265,7 +272,7 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 			for _, enemy := range g.QuerySelectorAll(".unit-selected") {
 				enemy.Class().Remove("unit-selected")
 			}
-			el.Class().Add("unit-selected")
+			doc.QuerySelector(fmt.Sprintf("#g-%d", id)).QuerySelector("rect").Class().Add("unit-selected")
 		})
 	}
 

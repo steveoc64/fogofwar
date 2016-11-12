@@ -36,8 +36,10 @@ type FightData struct {
 type FightAction struct {
 	Channel int
 	GameID  int
+	FightID int
 	Opcode  int
 	UnitID  int
+	Bases   int
 	Target  int
 	Range   int
 	Terrain int

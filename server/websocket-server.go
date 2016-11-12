@@ -267,7 +267,7 @@ func (c *ConnectionsList) Drop(conn *Connection) *ConnectionsList {
 						PlayerID: conn.UserID,
 						OpCode:   PlayerDisconnected,
 					}
-					println("Player", conn.Username, "has dropped out of game", i)
+					// println("Player", conn.Username, "has dropped out of game", i)
 				}
 			}
 		}

@@ -59,7 +59,7 @@ func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 	html += svgHQ(unit.ID, xx/2, 15, unit.CommanderControl, ttl)
 	html += svgEndG()
 
-	html += svgText(xx, 20, "text__end text__0x", unit.GetFightingDescription())
+	html += svgText(xx, 29, "text__end text__0x", unit.GetFightingDescription())
 
 	html += svgG(100)
 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
@@ -176,6 +176,7 @@ func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 				err := RPC("GameRPC.FightUnitAction", shared.FightAction{
 					Channel: Session.Channel,
 					GameID:  game.ID,
+					FightID: fight.ID,
 					Opcode:  shared.TacticalForm,
 					UnitID:  unit.ID,
 					Target:  id,

@@ -145,6 +145,7 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 				err := RPC("GameRPC.FightHQAction", shared.FightAction{
 					Channel: Session.Channel,
 					GameID:  game.ID,
+					FightID: fight.ID,
 					Opcode:  id,
 					UnitID:  unit.ID,
 					Target:  0,
@@ -166,6 +167,12 @@ func doFightHQ(game *shared.Game, fight *shared.Fight, unit *shared.Unit) {
 					outtext2.SetInnerHTML(outcome.Descr2)
 					outtext2.Class().Remove("hidden")
 					unit.CommanderControl = outcome.CommanderControl
+					if id == shared.TacticalCommitReserve {
+						movedUnit := game.GetUnit(team, outcome.UnitID)
+						if movedUnit != nil {
+							movedUnit.Role = outcome.Role
+						}
+					}
 				}
 			}()
 		})

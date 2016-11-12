@@ -374,6 +374,7 @@ func playRoutine(id int, playChannel <-chan PlayMessage) {
 				fightCommit(state, m)
 			case FightWithdraw:
 				fmt.Fprintf(fp, "Withdraw Division from Fight\n")
+				fightWithdraw(state, m)
 			case UnitRole:
 				fmt.Fprintf(fp, "Unit has changed Role\n")
 				unitRole(state, m)
@@ -752,6 +753,56 @@ func fightCommit(state *PlayState, m PlayMessage) {
 						}
 					}
 				}
+			}
+		}
+	} else {
+		println("couldnt convert m.Data to fightdata")
+	}
+
+}
+
+func fightWithdraw(state *PlayState, m PlayMessage) {
+	println("withdrawing unit from fight")
+
+	bb := func(theFight *shared.Fight, divID int) {
+		for _, v := range state.Game.RedPlayers {
+			Connections.BroadcastPlayer(v.PlayerID, "Play",
+				&shared.NetData{
+					Action: "FightWithdraw",
+					ID:     theFight.ID,
+					Opcode: divID})
+		}
+		for _, v := range state.Game.BluePlayers {
+			Connections.BroadcastPlayer(v.PlayerID, "Play",
+				&shared.NetData{
+					Action: "FightWithdraw",
+					ID:     theFight.ID,
+					Opcode: divID})
+		}
+	}
+
+	if f, ok := m.Data.(*shared.FightData); ok {
+		for _, v := range state.Fights {
+			if v.ID == f.ID {
+
+				for i, uu := range v.Red {
+					if uu.ID == f.DivID {
+						v.Red = append(v.Red[:i], v.Red[i+1:]...)
+						// tell everyone that the fight has changed
+						bb(v, f.DivID)
+						break
+					}
+				}
+
+				for i, uu := range v.Blue {
+					if uu.ID == f.DivID {
+						v.Blue = append(v.Blue[:i], v.Blue[i+1:]...)
+						// tell everyone that the fight has changed
+						bb(v, f.DivID)
+						break
+					}
+				}
+
 			}
 		}
 	} else {

@@ -59,7 +59,6 @@ func (g *GameRPC) NewFight(data shared.FightData, done *bool) error {
 
 func (g *GameRPC) GetFights(data shared.GameRPCData, retval *[]shared.Fight) error {
 	start := time.Now()
-	print("in get fights")
 
 	conn := Connections.Get(data.Channel)
 

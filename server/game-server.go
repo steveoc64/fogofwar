@@ -652,7 +652,7 @@ func (g *GameRPC) UpdateTeams(data shared.GameRPCData, done *bool) error {
 						Game:   data.ID,
 						OpCode: PlayersChanged,
 					}
-					println("Player", conn.Username, "has dropped out of game", data.ID)
+					// println("Player", conn.Username, "has dropped out of game", data.ID)
 				}
 			}
 

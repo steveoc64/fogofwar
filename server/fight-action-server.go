@@ -292,15 +292,45 @@ func (g *GameRPC) FightUnitAction(data shared.FightAction, retval *shared.FightO
 				DB.SQL(`select r.melee_bonus from unit u
 					left join rating r on r.id=u.rating where u.id=$1`, data.Target).QueryScalar(&trating)
 
+				bonus := urating - trating
+				advantage := true
+				odds := ""
+				doneIt := false
+
 				if data.Skirmishers > 0 {
 					if data.TargetSkirmishers > 0 {
 						println("SK vs SK")
-						bonus := urating - trating
-						advantag, odds := getOdds(data.Skirmishers, data.TargetSkirmishers, bonus)
+						advantage, odds = getOdds(data.Skirmishers, data.TargetSkirmishers, bonus)
 						println("Odds", advantage, odds)
 						outcome.Descr = "Skirmish Attack Odds"
 						outcome.Descr2 = odds
+						doneIt = true
+					} else {
+						println("Attacking Skirmishers give advantage")
+						bonus++
 					}
+				} else if data.TargetSkirmishers > 0 {
+					println("Defending Skirmishers give advantage")
+					bonus--
+				}
+
+				if !doneIt {
+					// no skirmishers at all
+					if data.Terrain > 0 {
+						println("Terrain gives advantage to defender")
+						bonus--
+					}
+					if unit.Guns > 0 && target.Guns == 0 {
+						println("Attacker guns give advantage")
+						bonus++
+					}
+					if unit.Guns == 0 && target.Guns > 0 {
+						println("Defender guns give advantage")
+						bonus--
+					}
+					advantage, odds = getOdds(unit.Bayonets-unit.BayonetsLost, target.Bayonets-target.BayonetsLost, bonus)
+					outcome.Descr = "Attack Odds"
+					outcome.Descr2 = odds
 				}
 				// TODO - must pass in complete contact info to resolve the fight
 			case shared.TacticalForm:
@@ -700,15 +730,15 @@ var dicename = []string{"1:1", "3:2", "2:1", "3:1", "4:1", "5:1"}
 
 var odds_table = []string{
 	"dtrDTR",
-	" drDTR",
+	"XdrDTR",
 	"rrTDDR",
-	"r  TDR",
-	"r RDTD",
+	"rXXTDR",
+	"rXRDTD",
 	"rDTRDT",
 }
 
 func getOdds(a, d int, bonus int) (bool, string) {
-	ratio = float64(a) / float64(d)
+	ratio := float64(a) / float64(d)
 	println("ratio", ratio, a, d, bonus)
 	dice := 1
 	if ratio >= 5.0 {
@@ -737,10 +767,11 @@ func getOdds(a, d int, bonus int) (bool, string) {
 	println("after bonus", dice)
 	if dice > 0 {
 		println("dice", dicename[dice-1], "to attackers advantage")
-		return odds_table[dice-1]
+		return true, odds_table[dice-1]
 	}
 	if dice < 0 {
 		println("dice", dicename[-1*dice-1], "to defenders advantage")
-		return odds_table[-1*dice-1]
+		return false, odds_table[-1*dice-1]
 	}
+	return true, odds_table[0]
 }

@@ -49,9 +49,7 @@ func main() {
 
 	// Setup static routes for the manual pages
 	e.File("/manual", "public/manual/manual.html")
-	e.File("/manual/scenario", "public/manual/scenario.html")
-	e.File("/manual/host-game", "public/manual/host-game.html")
-	e.File("/manual/host-game", "public/manual/host-game.html")
+	e.Static("/manual", "public/manual")
 
 	// Start up the mail server
 	if Config.MailServer == "" {

@@ -5,14 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
     <title>ActionFront Manual</title>
     <!-- Fonts -->
-    <link rel="stylesheet" href="fonts/Roboto.css">   
-    <link rel="stylesheet" href="css/font-awesome.css">   
+    <link rel="stylesheet" href="/fonts/Roboto.css">   
+    <link rel="stylesheet" href="/css/font-awesome.css">   
     <!-- Styles -->
     <!-- <link type="text/css" rel="stylesheet" href="css/treeview.css"/> -->
-    <link type="text/css" rel="stylesheet" href="css/app.css"/>
+    <link type="text/css" rel="stylesheet" href="/css/app.css"/>
   </head>
 
 <body id="app">
@@ -20,7 +20,7 @@
   <div class="wrapper">
     <nav class="navigation">
         <a class="navigation-title" href="#" id="homepage">
-          <img class="img" src="img/af-logo-nn.png" id="rxtx" alt="ActionFront" title="ActionFront">
+          <img class="img" src="/img/af-logo-nn.png" id="rxtx" alt="ActionFront" title="ActionFront">
         </a>
         <button class="button button-header float-right no-print hidden" id="hamburger">
           <i class="fa fa-bars fa-lg" style="font-size: 3rem"></i>
@@ -29,10 +29,11 @@
   </div>
 
   <div class="header-pad"></div>
-  <main>
-  <div class="container documentext">
-        <h2>User Manual</h2>
+  <main class="manual">
+  <div class="documentext">
+        <h2>ActionFront User Manual</h2>
   <ol>
+    <a href="/manual/user_interface.html">
     <li>General User Interface
     <ol>
       <li>Navigating around the App</li>
@@ -48,9 +49,13 @@
       <li>Audio Mixer</li>
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/scales_and_basing.html">
     <li>Scales and Basing</li>
+    </a>
 
+    <a href="/manual/scenario_guide.html">
     <li>Scenarios
     <ol>
       <li>Copy Existing Scenario</li>
@@ -79,7 +84,9 @@
 
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/joining_a_game.html">
     <li>Joining a Game
     <ol>
       <li>Pre-Game Registration</li>
@@ -90,7 +97,9 @@
       <li>Ending the Game</li>
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/playing_a_game.html">
     <li>Playing the Game
     <ol>
       <li>Game Phase I - Orders and Commands
@@ -146,7 +155,9 @@
 
     </ol>
     </li>
+    </a>
     
+    <a href="/manual/hosting_a_game.html">
     <li>Create and Host Your Own Game
     <ol>
       <li>Create a Game from a Scenario</li>
@@ -160,7 +171,9 @@
       <li>Pre-Game Player Registration</li>
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/account_settings.html">
     <li>Your Account Settings
     <ol>
       <li>Change Your Details</li>
@@ -173,7 +186,9 @@
       <li>Closing Your Account</li>
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/gaming_groups.html">
     <li>Gaming Groups
     <ol>
       <li>Find other Gaming Groups</li>
@@ -183,14 +198,32 @@
       <li>Publish Group Events to Public</li>
     </ol>
     </li>
+    </a>
 
+    <a href="/manual/smartphone.html">
     <li>Using a SmartPhone
     </li>
+    </a>
   </ol>
 
   </div>
   </main>
 
   <div id="slidemenu-div"></div>
+  <div id="disqus_thread" class="disqus-container"></div>
+<script>
+var disqus_config = function () {
+  // this.page.url = "http://wargaming.io/disqus";
+  this.page.url = "http://wargaming.io/manual"
+  this.page.identifier = "Manual"
+  this.page.title = "ActionFront Manual"
+};
+(function() {
+var d = document, s = d.createElement('script');
+s.src = '//actionfront.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
 </body>
 </html>

@@ -307,11 +307,14 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 	}
 
 	// Looks valid, so add the new user
-	DB.InsertInto("users").
+	err := DB.InsertInto("users").
 		Whitelist("username", "name", "passwd", "email", "rank", "notes", "country", "bloglink", "channel").
 		Record(u).
 		Returning("id").
 		QueryScalar(&u.ID)
+	if err != nil {
+		println(err.Error())
+	}
 
 	fmt.Printf("Looks ok new user =%v\n", u)
 

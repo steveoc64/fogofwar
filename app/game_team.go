@@ -87,7 +87,7 @@ func _gameEditTeam(action string, msg *shared.NetData, context *router.Context) 
 
 		if Session.Mobile() {
 			form.Row(4).
-				AddInput(3, "", fmt.Sprintf("%sTeam", team)).
+				AddFocusInput(3, "", fmt.Sprintf("%sTeam", team)).
 				AddCheck(1, "FlipMap", fmt.Sprintf("%sFlip", team))
 
 			form.Row(1).
@@ -106,7 +106,7 @@ func _gameEditTeam(action string, msg *shared.NetData, context *router.Context) 
 				AddCustom(1, "", "ViewUnits", "")
 		} else {
 			form.Row(6).
-				AddInput(4, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
+				AddFocusInput(4, fmt.Sprintf("%s Team", team), fmt.Sprintf("%sTeam", team)).
 				AddDisplay(1, "# Players", fmt.Sprintf("Num%sPlayers", team)).
 				AddCheck(1, "Flip Map", fmt.Sprintf("%sFlip", team))
 

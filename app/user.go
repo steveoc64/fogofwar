@@ -458,7 +458,7 @@ func _userSettings(action string, msg *shared.NetData, context *router.Context) 
 		if Session.SubMobile() {
 
 			form.Row(1).
-				AddInput(1, "Name", "Name")
+				AddFocusInput(1, "Name", "Name")
 
 			form.Row(1).
 				AddDisplay(1, "Username", "Username")
@@ -487,7 +487,7 @@ func _userSettings(action string, msg *shared.NetData, context *router.Context) 
 		} else {
 
 			form.Row(4).
-				AddInput(2, "Full Name", "Name").
+				AddFocusInput(2, "Full Name", "Name").
 				AddDisplay(1, "Username", "Username").
 				AddInput(1, "Country", "Country")
 
@@ -668,7 +668,7 @@ func contactForm(context *router.Context) {
 		form.New("fa-envelope", "Contact Form - Contact Site Admin")
 
 		form.Row(1).
-			AddInput(1, "Subject", "Subject")
+			AddFocusInput(1, "Subject", "Subject")
 
 		form.Row(1).
 			AddBigTextarea(1, "Message", "Message")
@@ -700,7 +700,6 @@ func contactForm(context *router.Context) {
 
 		// All done, so render the form
 		form.Render("edit-form", "main", &data)
-		form.Focus("Subject")
 
 	}()
 
@@ -723,7 +722,7 @@ func inviteFriend(context *router.Context) {
 		form.New("fa-gift", "Invite a Friend")
 
 		form.Row(1).
-			AddInput(1, "Friends Email", "EmailTo")
+			AddFocusInput(1, "Friends Email", "EmailTo")
 
 		form.Row(1).
 			AddInput(1, "Subject", "Subject")
@@ -760,8 +759,6 @@ func inviteFriend(context *router.Context) {
 		data.Subject = "Invite to a new Wargaming Site"
 		data.Message = ".. enter your message here"
 		form.Render("edit-form", "main", &data)
-		form.Focus("EmailTo")
-
 	}()
 
 }

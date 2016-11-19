@@ -35,7 +35,21 @@ func getRoutes(uid int, rank int) []shared.UserRoute {
 		// {Route: "/game/{id}/table", Func: "game-edit-table"},
 		{Route: "/game/{id}/table/{mode}", Func: "game-edit-table"},
 		{Route: "/game/{id}/players", Func: "game-edit-players"},
-		{Route: "/play/{id}", Func: "play"},
+
+		{Route: "/play/{game}", Func: "play"},
+		{Route: "/play/{game}/orders", Func: "play-orders"},
+		{Route: "/play/{game}/orders/{corps}", Func: "play-orders-corps"},
+		{Route: "/play/{game}/commander", Func: "play-commander-action"},
+
+		{Route: "/play/{game}/map", Func: "play-map"},
+		{Route: "/play/{game}/units", Func: "play-units"},
+		{Route: "/play/{game}/new_figt", Func: "play-new-fight"},
+		{Route: "/play/{game}/fight/{fight}", Func: "play-fight"},
+
+		{Route: "/play/{game}/bombard", Func: "play-bombard"},
+		{Route: "/play/{game}/bombard/unit", Func: "play-bombard-unit"},
+		{Route: "/play/{game}/bombard/target", Func: "play-bombard-target"},
+		{Route: "/play/{game}/bombard/fire", Func: "play-bombard-fire"},
 	}
 
 	more := []shared.UserRoute{}

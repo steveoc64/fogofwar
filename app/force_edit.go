@@ -66,7 +66,7 @@ func forceEdit(context *router.Context) {
 		if Session.Mobile() {
 			if Session.SubMobile() {
 				form.Row(1).
-					AddInput(1, "Unit Name", "Name")
+					AddFocusInput(1, "Unit Name", "Name")
 				form.Row(1).
 					AddInput(1, "Nation", "Nation")
 			} else {
@@ -85,7 +85,7 @@ func forceEdit(context *router.Context) {
 				AddSelect(1, "Inspiration", "Inspiration", Session.Lookup.Inspiration, "ID", "Name", 1, force.Inspiration)
 		} else {
 			form.Row(10).
-				AddInput(3, "Unit Name", "Name").
+				AddFocusInput(3, "Unit Name", "Name").
 				AddInput(3, "Nation", "Nation").
 				AddSelect(2, "Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, force.Level).
 				AddSelect(2, "Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, force.Condition)

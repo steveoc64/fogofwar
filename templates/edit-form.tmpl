@@ -45,7 +45,7 @@
                       <label>{{.Label}}</label>                  
                   {{end}}
                   {{if eq .Type "text"}}
-                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>
+                    <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}} {{if .Autofocus}}autofocus{{end}}>
                   {{end}}                               
                   {{if eq .Type "date"}}
                     <input type="{{.Type}}" name="{{$panelname}}-{{.Model}}" value="{{.Value}}" {{if .Readonly}}readonly{{end}}>
@@ -95,7 +95,7 @@
             {{end}}
           {{end}}
           {{if eq .Type "text"}}
-            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}" {{if .Focusme}}id="#focusme"{{end}} {{if .Readonly}}readonly{{end}}>
+            <input type="{{.Type}}" name="{{.Model}}" value="{{.Value}}" {{if .Focusme}}id="#focusme"{{end}} {{if .Readonly}}readonly{{end}} {{if .Autofocus}}autofocus{{end}}>
           {{end}}
           {{if eq .Type "photo"}}
             {{if .PhotoUpload}}

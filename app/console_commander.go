@@ -4,33 +4,34 @@ import (
 	"fmt"
 	"strconv"
 
-	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
-func doCommanderAction(game *shared.Game) {
+// func doCommanderAction(game *shared.Game) {
+func playCommanderAction(context *router.Context) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "Units")
+	consolePhaseBusy("Units")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
 	// teamName := game.BlueTeam
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
 		// teamName = game.RedTeam
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	// Create heading with Team Name
@@ -68,7 +69,7 @@ func doCommanderAction(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	// add callbacks for each corps
@@ -78,14 +79,16 @@ func doCommanderAction(game *shared.Game) {
 		// print("clicked on corps", id)
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
-				doCorpsOrders(game, v)
+				// doCorpsOrders(Session.Game, v)
+				Session.Cmd = v
+				Session.Nav(fmt.Sprintf("/play/%d/orders/%d", Session.Game.ID, id))
 			}
 		}
 	}
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {

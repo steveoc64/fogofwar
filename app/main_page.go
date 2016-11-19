@@ -5,7 +5,6 @@ import (
 
 	"./shared"
 	"github.com/go-humble/router"
-	"github.com/gopherjs/gopherjs/js"
 	"github.com/steveoc64/formulate"
 	"honnef.co/go/js/dom"
 )
@@ -16,14 +15,14 @@ func mainPage(context *router.Context) {
 	go _mainPage("Main", nil, context)
 }
 
-var tileClicker func(*js.Object)
-var keyGrabber func(*js.Object)
+// var tileClicker func(*js.Object)
+// var keyGrabber func(*js.Object)
 
 func _mainPage(action string, msg *shared.NetData, context *router.Context) {
 
-	if keyGrabber != nil {
-		dom.GetWindow().RemoveEventListener("keypress", false, keyGrabber)
-		keyGrabber = nil
+	if Session.KeyGrabber != nil {
+		dom.GetWindow().RemoveEventListener("keypress", false, Session.KeyGrabber)
+		Session.KeyGrabber = nil
 	}
 
 	switch action {

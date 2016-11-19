@@ -414,11 +414,17 @@ func bombardAdd(state *PlayState, m PlayMessage) {
 		DB.SQL(`update bombard set id=$2 where unit_id=$1`, bb.UnitID, newID).Exec()
 
 		// signal target player that they have incoming
-		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{Action: "Incoming", ID: newID})
+		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
+			Action: "Incoming",
+			GameID: state.Game.ID,
+			ID:     newID})
 
 		// signal the firer that we have a new target identification ID for them, all they need
 		// to do is re-get the unit info
-		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{Action: "BB", ID: bb.UnitID})
+		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{
+			Action: "BB",
+			GameID: state.Game.ID,
+			ID:     bb.UnitID})
 	}
 }
 
@@ -435,11 +441,17 @@ func bombardDone(state *PlayState, m PlayMessage) {
 		}
 
 		// signal target player that they have 1 less incoming
-		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{Action: "IncomingCancel", ID: bb.ID})
+		Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
+			Action: "IncomingCancel",
+			GameID: state.Game.ID,
+			ID:     bb.ID})
 
 		// signal the firer that we are done with the BB, which triggers a refresh of their
 		// fire mission page
-		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{Action: "BB", ID: bb.UnitID})
+		Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{
+			Action: "BB",
+			GameID: state.Game.ID,
+			ID:     bb.UnitID})
 	}
 
 }
@@ -577,18 +589,34 @@ func sendPhaseUpdates(state *PlayState, newTurn bool) {
 		state.Game.RedPlayers[i].TODO = true
 		state.Game.RedPlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn, Cmds: data})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "Turn",
+				GameID: state.Game.ID,
+				ID:     state.Game.Turn,
+				Cmds:   data})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase, Cmds: data})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "Phase",
+				GameID: state.Game.ID,
+				ID:     state.Game.Phase,
+				Cmds:   data})
 		}
 	}
 	for i, v := range state.Game.BluePlayers {
 		state.Game.BluePlayers[i].TODO = true
 		state.Game.BluePlayers[i].Done = false
 		if newTurn {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Turn", ID: state.Game.Turn, Cmds: data})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "Turn",
+				GameID: state.Game.ID,
+				ID:     state.Game.Turn,
+				Cmds:   data})
 		} else {
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "Phase", ID: state.Game.Phase, Cmds: data})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "Phase",
+				GameID: state.Game.ID,
+				ID:     state.Game.Phase,
+				Cmds:   data})
 		}
 	}
 }
@@ -696,11 +724,19 @@ func fightAdd(state *PlayState, m PlayMessage) {
 		ff := makeGameFight(f)
 		for _, v := range state.Game.RedPlayers {
 			v.Done = false
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "NewFight", ID: f.ID, Fight: ff})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "NewFight",
+				GameID: state.Game.ID,
+				ID:     f.ID,
+				Fight:  ff})
 		}
 		for _, v := range state.Game.BluePlayers {
 			v.Done = false
-			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "NewFight", ID: f.ID, Fight: ff})
+			Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+				Action: "NewFight",
+				GameID: state.Game.ID,
+				ID:     f.ID,
+				Fight:  ff})
 		}
 	}
 }
@@ -712,12 +748,20 @@ func fightCommit(state *PlayState, m PlayMessage) {
 		ff := makeGameFight(theFight)
 		for _, v := range state.Game.RedPlayers {
 			if v.PlayerID != playerID {
-				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "FightUpdate", ID: f.ID, Fight: ff})
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+					Action: "FightUpdate",
+					GameID: state.Game.ID,
+					ID:     f.ID,
+					Fight:  ff})
 			}
 		}
 		for _, v := range state.Game.BluePlayers {
 			if v.PlayerID != playerID {
-				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "FightUpdate", ID: f.ID, Fight: ff})
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+					Action: "FightUpdate",
+					GameID: state.Game.ID,
+					ID:     f.ID,
+					Fight:  ff})
 			}
 		}
 	}
@@ -815,12 +859,20 @@ func unitRole(state *PlayState, m PlayMessage) {
 	if u, ok := m.Data.(*shared.Unit); ok {
 		for _, v := range state.Game.RedPlayers {
 			if v.PlayerID != m.PlayerID {
-				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "UnitRole", ID: u.ID, Opcode: u.Role})
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+					Action: "UnitRole",
+					GameID: state.Game.ID,
+					ID:     u.ID,
+					Opcode: u.Role})
 			}
 		}
 		for _, v := range state.Game.BluePlayers {
 			if v.PlayerID != m.PlayerID {
-				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{Action: "UnitRole", ID: u.ID, Opcode: u.Role})
+				Connections.BroadcastPlayer(v.PlayerID, "Play", &shared.NetData{
+					Action: "UnitRole",
+					GameID: state.Game.ID,
+					ID:     u.ID,
+					Opcode: u.Role})
 			}
 		}
 	}

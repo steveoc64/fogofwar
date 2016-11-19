@@ -247,7 +247,7 @@ func phototestEdit(context *router.Context) {
 		// Layout the fields
 
 		form.Row(1).
-			AddInput(1, "Notes", "Notes")
+			AddFocusInput(1, "Notes", "Notes")
 
 		form.Row(2).
 			AddInput(1, "Table", "Entity").
@@ -399,7 +399,7 @@ func phototestAdd(context *router.Context) {
 		// Layout the fields
 
 		form.Row(1).
-			AddInput(1, "Name", "Notes")
+			AddFocusInput(1, "Name", "Notes")
 
 		form.Row(1).
 			AddPhoto(1, "Photo", "Photo")

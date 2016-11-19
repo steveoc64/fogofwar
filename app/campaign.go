@@ -74,7 +74,7 @@ func campaignEdit(context *router.Context) {
 			form.New("fa-map", "Edit Campaign Details - "+c.Name)
 
 			form.Row(5).
-				AddInput(3, "Name", "Name").
+				AddFocusInput(3, "Name", "Name").
 				AddNumber(1, "Year", "Year", "0").
 				AddCheck(1, "Public", "Public")
 

@@ -14,27 +14,31 @@ func doFightFormation(game *shared.Game, fight *shared.Fight, unit *shared.Unit)
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
+	Session.Game = game
+	Session.Fight = fight
+	Session.Unit = unit
+
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "FightHQ")
-	consoleCurrentFight = fight
+	consolePhaseBusy("FightHQ")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
 	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Fight -")
-	html += svgText(40, 8, "text__1x text__"+team, fight.Name)
+	html += svgText(40, 8, "text__1x text__"+team, Session.Fight.Name)
 
 	if Session.Orientation == "Landscape" {
 		html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)

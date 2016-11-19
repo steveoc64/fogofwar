@@ -5,32 +5,46 @@ import (
 	"strconv"
 
 	"./shared"
+
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func doUnits(game *shared.Game) {
+	Session.Nav(fmt.Sprintf("/play/%d/units", game.ID))
+}
+
+func playUnits(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "Units")
+	consolePhaseBusy("Units")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	teamName := game.BlueTeam
-	cmds := game.BlueCmd
-	if game.Red {
+	teamName := Session.Game.BlueTeam
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
-		teamName = game.RedTeam
-		cmds = game.RedCmd
+		teamName = Session.Game.RedTeam
+		cmds = Session.Game.RedCmd
 	}
 
 	// Create heading with Team Name
@@ -69,14 +83,16 @@ func doUnits(game *shared.Game) {
 		// print("clicked on corps", id)
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
-				doUnitsDiv(game, v)
+				Session.Cmd = v
+				Session.Nav(fmt.Sprintf("/play/%d/units/div", Session.Game.ID))
+				// doUnitsDiv(game, v)
 			}
 		}
 	}
 
 	svgCallback(100, func(dom.Event) {
 		print("all done")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	for _, v := range cmds {

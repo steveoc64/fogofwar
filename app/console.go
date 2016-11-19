@@ -15,57 +15,61 @@ type ConsolePaintData struct {
 	Hosting     bool
 }
 
-var consoleCurrentPanel = "Game"
-var consoleCurrentUnit *shared.Unit
-var consoleCurrentCmd *shared.GameCmd
-var consoleCurrentFight *shared.Fight
-var consoleGame *shared.Game
-var incoming = []int{}
-var fights = []*shared.Fight{}
-
-func consolePhaseBusy(game *shared.Game, with string) {
+func consolePhaseBusy(with string) {
+	if Session.Game == nil || Session.Game.ID == 0 {
+		print("ERROR : Game is nil, cant set busy")
+		return
+	}
 	go func() {
 		done := false
 		err := RPC("GameRPC.PhaseBusy", shared.PhaseDoneMsg{
 			Channel: Session.Channel,
-			GameID:  game.ID,
+			GameID:  Session.Game.ID,
 		}, &done)
 		if err != nil {
 			print(err.Error())
 		}
-		game.PhaseBUSY = true
-		game.PhaseDONE = false
-		consoleCurrentPanel = with
+		Session.Game.PhaseBUSY = true
+		Session.Game.PhaseDONE = false
+		Session.Panel = with
 	}()
 }
 
-func consolePhaseNotBusy(game *shared.Game) {
+func consolePhaseNotBusy() {
+	if Session.Game == nil || Session.Game.ID == 0 {
+		return
+		// No current game - nothing to do
+	}
 	go func() {
 		done := false
 		err := RPC("GameRPC.PhaseNotBusy", shared.PhaseDoneMsg{
 			Channel: Session.Channel,
-			GameID:  game.ID,
+			GameID:  Session.Game.ID,
 		}, &done)
 		if err != nil {
 			print(err.Error())
 		}
-		game.PhaseBUSY = false
-		doTurnSummary(game)
+		Session.Game.PhaseBUSY = false
+		doTurnSummary()
 	}()
 }
 
-func consolePhaseDone(game *shared.Game) {
+func consolePhaseDone() {
+	if Session.Game == nil || Session.Game.ID == 0 {
+		// no game loaded - nothing to do
+		return
+	}
 	go func() {
 		done := false
 		err := RPC("GameRPC.PhaseDone", shared.PhaseDoneMsg{
 			Channel: Session.Channel,
-			GameID:  game.ID,
+			GameID:  Session.Game.ID,
 		}, &done)
 		if err != nil {
 			print(err.Error())
 		}
-		game.PhaseDONE = true
-		doTurnSummary(game)
+		Session.Game.PhaseDONE = true
+		doTurnSummary()
 	}()
 }
 
@@ -86,8 +90,61 @@ func _play(action string, msg *shared.NetData, context *router.Context) {
 	}
 }
 
+func refreshGameData(id int) {
+	newGame := shared.Game{}
+	err := RPC("GameRPC.GetPlay", shared.GameRPCData{
+		Channel:    Session.Channel,
+		ID:         id,
+		GetUnits:   true,
+		GetBombard: true,
+	}, &newGame)
+	if err != nil {
+		dom.GetWindow().Alert("Cannot load game" + err.Error())
+		Session.Navigate("/")
+	}
+	Session.Game = &newGame
+
+	// Get the incoming
+	inc := []int{}
+	Session.Incoming = inc
+	err = RPC("GameRPC.GetIncoming", shared.GameRPCData{
+		Channel: Session.Channel,
+		ID:      id,
+	}, &inc)
+	if err == nil {
+		Session.Incoming = inc
+	}
+
+	// Get the fights
+	f := []*shared.Fight{}
+	err = RPC("GameRPC.GetFights", shared.GameRPCData{
+		Channel: Session.Channel,
+		ID:      id,
+	}, &f)
+	Session.Fights = nil
+	if err == nil {
+		Session.Fights = f
+		// print("got fight data", fights)
+		for _, ff := range f {
+			// mark committed for all units known to be in the fight
+			for _, v := range ff.Red {
+				u := Session.Game.GetUnit("red", v.ID)
+				if u != nil {
+					u.Committed = true
+				}
+			}
+			for _, v := range ff.Blue {
+				u := Session.Game.GetUnit("blue", v.ID)
+				if u != nil {
+					u.Committed = true
+				}
+			}
+		}
+	}
+}
+
 func play(context *router.Context) {
-	id, err := strconv.Atoi(context.Params["id"])
+	gameID, err := strconv.Atoi(context.Params["game"])
 	if err != nil {
 		print(err.Error())
 		return
@@ -95,116 +152,58 @@ func play(context *router.Context) {
 
 	Session.MobileSensitive = true
 	Session.OrientationSensitive = true
-	incoming = nil
 
 	w := dom.GetWindow()
 	doc := w.Document()
-	game := consoleGame
-	go func() {
-		// TheCmd := &shared.GameCmd{}
-		// TheUnit := &shared.Unit{}
 
-		// Init the game state
-		newGame := shared.Game{}
-		err := RPC("GameRPC.GetPlay", shared.GameRPCData{
-			Channel:    Session.Channel,
-			ID:         id,
-			GetUnits:   true,
-			GetBombard: true,
-		}, &newGame)
-		if err != nil {
-			dom.GetWindow().Alert("Cannot load game" + err.Error())
-			Session.Navigate("/")
+	go func() {
+		// Fetch the Game data if required
+		if Session.Game == nil || Session.Game.ID != gameID {
+			refreshGameData(gameID)
+			// All done - loaded fresh game data, incomings and fights
 		}
-		consoleGame = &newGame
-		game = consoleGame
+
 		team := "blue"
-		if game.Red {
+		if Session.Game.Red {
 			team = "red"
 		}
 
-		inc := []int{}
-		incoming = inc
-		err = RPC("GameRPC.GetIncoming", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &inc)
-		if err == nil {
-			incoming = inc
-		}
-
-		f := []*shared.Fight{}
-		fights = f
-		err = RPC("GameRPC.GetFights", shared.GameRPCData{
-			Channel: Session.Channel,
-			ID:      id,
-		}, &f)
-		if err == nil {
-			fights = f
-			// print("got fight data", fights)
-			for _, ff := range f {
-				// mark committed for all units known to be in the fight
-				for _, v := range ff.Red {
-					u := game.GetUnit("red", v.ID)
-					if u != nil {
-						u.Committed = true
-					}
-				}
-				for _, v := range ff.Blue {
-					u := game.GetUnit("blue", v.ID)
-					if u != nil {
-						u.Committed = true
-					}
-				}
-			}
-		}
-
 		loadTemplate("console", "main", ConsolePaintData{
-			Game:        game,
+			Game:        Session.Game,
 			Orientation: Session.Orientation,
-			Hosting:     game.HostedBy == Session.UserID,
+			Hosting:     Session.Game.HostedBy == Session.UserID,
 		})
 
 		playMsg := func(action string, msg *shared.NetData, context *router.Context) {
-			// print("Msg", action, msg)
+			if msg.GameID != Session.Game.ID {
+				print("We are in Game", Session.Game.ID, "and got a msg for game", msg.GameID)
+				return
+			}
+			print("Msg", action, msg)
 			switch action {
 			case "Turn":
 				// end of turn - get the data all over again
 				go func() {
-					newGame := shared.Game{}
-					err := RPC("GameRPC.GetPlay", shared.GameRPCData{
-						Channel:  Session.Channel,
-						ID:       id,
-						GetUnits: true,
-					}, &newGame)
-					if err != nil {
-						print(err.Error())
-						Session.Navigate("/")
-					}
-					consoleGame = &newGame
-					game = consoleGame
-					game.Phase = 1
-					game.Turn = msg.ID
-					game.PhaseDONE = false
-					game.PhaseTODO = true
-					incoming = nil
-					doTurnSummary(game)
+					refreshGameData(Session.Game.ID)
+					Session.Game.PhaseDONE = false
+					Session.Game.PhaseTODO = true
+					doTurnSummary()
+					// doTurnSummary(Session.Game)
 				}()
 			case "Phase":
-				game.Phase = msg.ID
-				game.PhaseDONE = false
-				game.PhaseTODO = true
-				incoming = nil
+				Session.Game.Phase = msg.ID
+				Session.Game.PhaseDONE = false
+				Session.Game.PhaseTODO = true
+				Session.Incoming = nil
 				// The Data contains a list of cmd updates to be applied
 				if msg.Cmds != nil {
 					// print("cmdupdate array", msg.Cmds)
 					for _, v := range *msg.Cmds {
-						// print("got", v)
 						c := &shared.GameCmd{}
 						if v.RedTeam {
-							c = game.GetCmd("red", v.ID)
+							c = Session.Game.GetCmd("red", v.ID)
 						} else {
-							c = game.GetCmd("blue", v.ID)
+							c = Session.Game.GetCmd("blue", v.ID)
 						}
 						if c != nil {
 							c.CX = v.CX
@@ -213,25 +212,25 @@ func play(context *router.Context) {
 						}
 					}
 				}
-				doTurnSummary(game)
+				doTurnSummary()
 			case "PhaseWait":
-				game.Phase = msg.ID
-				game.PhaseDONE = true
-				game.PhaseTODO = false
-				doTurnSummary(game)
+				Session.Game.Phase = msg.ID
+				Session.Game.PhaseDONE = true
+				Session.Game.PhaseTODO = false
+				doTurnSummary()
 			case "NewFight":
-				game.PhaseDONE = false
+				Session.Game.PhaseDONE = false
 				f := msg.Fight
 				// print("adding this one", f)
 				reds := []*shared.Unit{}
 				blues := []*shared.Unit{}
 				for _, v := range f.Red {
-					reds = append(reds, game.GetUnit("red", v))
+					reds = append(reds, Session.Game.GetUnit("red", v))
 				}
 				for _, v := range f.Blue {
-					blues = append(blues, game.GetUnit("blue", v))
+					blues = append(blues, Session.Game.GetUnit("blue", v))
 				}
-				fights = append(fights, &shared.Fight{
+				Session.Fights = append(Session.Fights, &shared.Fight{
 					ID:     f.ID,
 					GameID: f.GameID,
 					Name:   f.Name,
@@ -243,24 +242,24 @@ func play(context *router.Context) {
 					Blue:   blues,
 				})
 				// print("fights", fights)
-				if !game.PhaseBUSY {
-					doTurnSummary(game)
+				if !Session.Game.PhaseBUSY {
+					doTurnSummary()
 				}
 			case "FightUpdate":
 				f := msg.Fight
 				// print("asked to update fight", msg.ID, f)
-				for _, v := range fights {
+				for _, v := range Session.Fights {
 					if v.ID == msg.ID {
 						// print("that would be this one", v)
 						reds := []*shared.Unit{}
 						blues := []*shared.Unit{}
 						for _, v := range f.Red {
-							u := game.GetUnit("red", v)
+							u := Session.Game.GetUnit("red", v)
 							u.Committed = true
 							reds = append(reds, u)
 						}
 						for _, v := range f.Blue {
-							u := game.GetUnit("blue", v)
+							u := Session.Game.GetUnit("blue", v)
 							u.Committed = true
 							blues = append(blues, u)
 						}
@@ -269,11 +268,12 @@ func play(context *router.Context) {
 						// print("modified to", v)
 					}
 				}
-				if consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
-					doFight(game, consoleCurrentFight)
+				if Session.Panel == "Fight" && Session.Fight != nil {
+					// doFight(game, consoleCurrentFight)
+					Session.Nav(fmt.Sprintf("/play/%d/fight/%d", Session.Game.ID, Session.Fight.ID))
 				}
 			case "FightWithdraw":
-				for _, v := range fights {
+				for _, v := range Session.Fights {
 					if v.ID == msg.ID {
 						for i, uu := range v.Red {
 							if uu.ID == msg.Opcode {
@@ -292,7 +292,7 @@ func play(context *router.Context) {
 			case "UnitRole":
 				// print("A unit has changed role")
 				gotsome := false
-				for _, cmd := range game.RedCmd {
+				for _, cmd := range Session.Game.RedCmd {
 					for _, unit := range cmd.Units {
 						if unit.ID == msg.ID {
 							gotsome = true
@@ -301,7 +301,7 @@ func play(context *router.Context) {
 						}
 					}
 				}
-				for _, cmd := range game.BlueCmd {
+				for _, cmd := range Session.Game.BlueCmd {
 					for _, unit := range cmd.Units {
 						if unit.ID == msg.ID {
 							gotsome = true
@@ -310,40 +310,42 @@ func play(context *router.Context) {
 						}
 					}
 				}
-				if gotsome && consoleCurrentPanel == "Fight" && consoleCurrentFight != nil {
-					doFight(game, consoleCurrentFight)
+				if gotsome && Session.Panel == "Fight" && Session.Fight != nil {
+					// doFight(game, consoleCurrentFight)
+					Session.Nav(fmt.Sprintf("/play/%d/fight/%d", Session.Game.ID, Session.Fight.ID))
 				}
 			case "Incoming":
 				// TODO - rewrite this to use the attached data in the message
 				// print("we have incoming bombardment", msg.ID, game.PhaseBUSY, game.PhaseDONE, game.PhaseTODO)
-				incoming = append(incoming, msg.ID)
-				game.PhaseTODO = true
-				game.PhaseDONE = false
-				if !game.PhaseBUSY {
-					doTurnSummary(game)
+				Session.Incoming = append(Session.Incoming, msg.ID)
+				Session.Game.PhaseTODO = true
+				Session.Game.PhaseDONE = false
+				if !Session.Game.PhaseBUSY {
+					doTurnSummary()
 				}
 			case "IncomingCancel":
-				for i, v := range incoming {
+				for i, v := range Session.Incoming {
 					if v == msg.ID {
-						incoming = append(incoming[:i], incoming[i+1:]...)
+						Session.Incoming = append(Session.Incoming[:i], Session.Incoming[i+1:]...)
 						break
 					}
 				}
-				if !game.PhaseBUSY {
-					doTurnSummary(game)
+				if !Session.Game.PhaseBUSY {
+					doTurnSummary()
 				}
-				if consoleCurrentPanel == "BBReceive2" {
-					consolePhaseNotBusy(game)
+				if Session.Panel == "BBReceive2" {
+					consolePhaseNotBusy()
 				}
 			case "Unit":
 				// print("unit message", msg.Unit.Description)
-				theUnit := game.GetUnit(team, msg.Unit.ID)
+				theUnit := Session.Game.GetUnit(team, msg.Unit.ID)
 				switch msg.Opcode {
 				case shared.UnitEventFired:
 					theUnit.Ammo = msg.Unit.Ammo
 					theUnit.GunsFired = msg.Unit.GunsFired
-					if consoleCurrentPanel == "BB2" {
-						doBB2(game, consoleCurrentCmd)
+					if Session.Panel == "BB2" {
+						// doBB2(game, consoleCurrentCmd)
+						Session.Nav(fmt.Sprintf("/play/%d/bombard_target/%d", Session.Game.ID, Session.Cmd.ID))
 					}
 				case shared.UnitEventHits:
 					print("hit notification for", theUnit)
@@ -365,51 +367,56 @@ func play(context *router.Context) {
 						print(err.Error())
 					} else {
 						// find the unit
-						oldUnit := game.GetUnit(team, msg.ID)
+						oldUnit := Session.Game.GetUnit(team, msg.ID)
 						*oldUnit = newUnit
-						cmd := game.GetCmd(team, newUnit.CmdID)
+						Session.Cmd = Session.Game.GetCmd(team, newUnit.CmdID)
 						// print("BB data", oldUnit.Bombard)
-						doBB2(game, cmd)
+						// doBB2(Session.Game, cmd)
+						Session.Nav(fmt.Sprintf("/play/%d/bombard/unit", Session.Game.ID))
 					}
 				}()
 			}
 		}
 
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 		// doTurnSummary(game)
 
 		doDisplayPanel := func(mode string) {
-			consoleCurrentPanel = mode
-			consoleSetViewBox(game, 100, 100, false)
+			// consoleCurrentPanel = mode
+			Session.Panel = mode
+			consoleSetViewBox(100, 100, false)
 			switch mode {
 			case "Orders":
-				doOrders(game)
+				// doOrders(game)
+				Session.Nav(fmt.Sprintf("/play/%d/orders", Session.Game.ID))
 			case "Map":
-				doMap(game)
+				// doMap(game)
+				Session.Nav(fmt.Sprintf("/play/%d/map", Session.Game.ID))
 			case "Units":
-				doUnits(game)
+				// doUnits(game)
+				Session.Nav(fmt.Sprintf("/play/%d/units", Session.Game.ID))
 			case "Game":
-				consolePhaseNotBusy(game)
+				consolePhaseNotBusy()
 			}
 		}
-		doDisplayPanel(consoleCurrentPanel)
+		doDisplayPanel(Session.Panel)
 
 		gameMsg := func(action string, msg *shared.NetData, context *router.Context) {
-			if msg.ID == id {
-				// print("Game update for this game")
+			if msg.GameID == gameID {
+				print("Game update for this game")
 				newGame := &shared.Game{}
 				err := RPC("GameRPC.GetPlay", shared.GameRPCData{
 					Channel:  Session.Channel,
-					ID:       id,
+					ID:       gameID,
 					GetUnits: true,
 				}, newGame)
-				if err != nil || game.ID == 0 {
+				if err != nil || newGame.ID == 0 {
 					dom.GetWindow().Alert("Exiting this game .. Bye, and thanks for Playing")
 					// dom.GetWindow().Alert("Cannot load game" + err.Error())
 					Session.Navigate("/")
 				}
-				game = newGame
-				doDisplayPanel(consoleCurrentPanel)
+				Session.Game = newGame
+				doDisplayPanel(Session.Panel)
 			}
 		}
 
@@ -423,10 +430,10 @@ func play(context *router.Context) {
 			}
 		})
 
-		if game.HostedBy == Session.UserID {
+		if Session.Game.HostedBy == Session.UserID {
 			doc.QuerySelector("[name=hosting-users]").AddEventListener("click", false, func(evt dom.Event) {
 				// print("edit users")
-				Session.Navigate(fmt.Sprintf("/game/%d/players", id))
+				Session.Navigate(fmt.Sprintf("/game/%d/players", gameID))
 			})
 		}
 

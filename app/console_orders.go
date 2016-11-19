@@ -6,62 +6,52 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
-func doOrders(game *shared.Game) {
-	// Cant always access orders
-	switch game.Phase {
-	case shared.PhaseOrders:
-		doPreGameOrders(game)
-	default:
-		doCommanderAction(game)
-		// case shared.PhaseGT1:
-		// 	doGT1(game)
-		// 	return
-		// case shared.PhaseBB:
-		// 	doBB(game)
-		// 	return
-		// case shared.PhaseGT2:
-		// 	doGT2(game)
-		// 	return
-		// case shared.PhaseCommander:
-		// 	doCommanderAction(game)
-		// 	return
-		// case shared.PhaseEngage:
-		// 	doEngage(game)
-		// 	return
-		// case shared.PhaseTactical:
-		// 	doTactical(game)
-		// 	return
-		// case shared.PhaseObjectives:
-		// 	doObjectives(game)
-		// 	return
+// func doOrders(game *shared.Game) {
+func playOrders(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
 	}
-	doPreGameOrders(game)
+
+	// Cant always access orders
+	switch Session.Game.Phase {
+	case shared.PhaseOrders:
+		doPreGameOrders()
+	default:
+		// doCommanderAction()
+		Session.Nav(fmt.Sprintf("/play/%d/commander", Session.Game.ID))
+	}
+	doPreGameOrders()
 }
 
-func doPreGameOrders(game *shared.Game) {
+func doPreGameOrders() {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "Orders")
+	consolePhaseBusy("Orders")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	// Create heading with Team Name
@@ -96,14 +86,15 @@ func doPreGameOrders(game *shared.Game) {
 		print("clicked on corps", id, el.TagName())
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
-				doCorpsOrders(game, v)
+				Session.Cmd = v
+				Session.Nav(fmt.Sprintf("/play/%d/orders/%d", v.ID))
 			}
 		}
 	}
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	svgCallbackQuery("help", func(dom.Event) {
@@ -121,32 +112,47 @@ func doPreGameOrders(game *shared.Game) {
 	}
 }
 
-func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
+// func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
+func playOrdersCorps(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+	corpsID, _ := strconv.Atoi(context.Params["corps"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Cmd == nil || Session.Cmd.ID != corpsID {
+		print("no corps loaded")
+		Session.Nav(fmt.Sprintf("/play/%d/orders", Session.Game.ID))
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
-	consoleCurrentCmd = cmd
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
 	// Create heading with Team Name
-	cs := cmd.CommandSummary()
+	cs := Session.Cmd.CommandSummary()
 	html := svgG(100)
-	html += svgText(0, 10, "text__2x text__"+team, cmd.Name)
-	if !cmd.PrepDefence && !cmd.Moving() && !cmd.Deploying() && cmd.CState != shared.CmdCompleteMarch {
+	html += svgText(0, 10, "text__2x text__"+team, Session.Cmd.Name)
+	if !Session.Cmd.PrepDefence && !Session.Cmd.Moving() &&
+		!Session.Cmd.Deploying() && Session.Cmd.CState != shared.CmdCompleteMarch {
 		cs = cs + ", and awaiting New Orders, Sir"
 		html += svgText(xx-2, 18, "text__end text__0x text__"+team, cs)
 	} else {
@@ -157,21 +163,21 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	// print("cmd", cmd)
 	// print("deploying", cmd.Deploying())
 
-	if cmd.Deploying() {
+	if Session.Cmd.Deploying() {
 		html += svgText(xx/2-50, 30, "text__start text__hand", getSalutation(Salutations))
 		html += svgText(xx/2, 40, "text__middle text__hand", "I am currently indisposed at")
 		html += svgText(xx/2, 50, "text__middle text__hand", "present as the troops are busy")
-		html += svgText(xx/2, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", cmd.DStateName()))
+		html += svgText(xx/2, 60, "text__middle text__hand", fmt.Sprintf("deploying to %s", Session.Cmd.DStateName()))
 		html += svgText(xx-20, 70, "text__end text__hand", "Regards,")
-		html += svgText(xx-20, 80, "text__end text__bighand", cmd.CommanderName)
+		html += svgText(xx-20, 80, "text__end text__bighand", Session.Cmd.CommanderName)
 		html += svgEndG()
 	} else {
 		html += svgEndG()
 		// print("moving", cmd.Moving())
 		// print("state", cmd.CState)
-		if cmd.Moving() {
+		if Session.Cmd.Moving() {
 			// is moving and not deploying .. must be enroute to a new objective
-			switch cmd.CState {
+			switch Session.Cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandResumeMarch)
 				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Resume March")
@@ -186,7 +192,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				html += svgEndG()
 				yoffset += 11
 			case shared.CmdMarchOrder:
-				if !cmd.Wait {
+				if !Session.Cmd.Wait {
 					html += svgG(shared.CommandCarryOn)
 					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue March ...")
 					html += svgEndG()
@@ -221,7 +227,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 		} else {
 			// is not deploying and not moving .. can take any number of new orders
 			// print("not moving, cstate is", cmd.CState)
-			switch cmd.CState {
+			switch Session.Cmd.CState {
 			case shared.CmdReserve:
 				html += svgG(shared.CommandCarryOn)
 				html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue ...")
@@ -258,7 +264,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				yoffset += 11
 			case shared.CmdBattleLine:
 				html += svgG(shared.CommandCarryOn)
-				if cmd.PrepDefence {
+				if Session.Cmd.PrepDefence {
 					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Continue Defence Preparations ...")
 				} else {
 					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Await Further Orders ...")
@@ -271,7 +277,7 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 				html += svgEndG()
 				yoffset += 11
 
-				if !cmd.PrepDefence {
+				if !Session.Cmd.PrepDefence {
 					html += svgG(shared.CommandPrepare)
 					html += svgButton(0, yoffset, xx, 10, "console-button", "text__1x text__"+team, "Prepare Defensive Positions")
 					html += svgEndG()
@@ -303,11 +309,13 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		doOrders(game)
+		Session.Nav(fmt.Sprintf("/play/%d/orders", Session.Game.ID))
 	})
+
 	svgCallback(shared.CommandCarryOn, func(dom.Event) {
-		doOrders(game)
+		Session.Nav(fmt.Sprintf("/play/%d/orders", Session.Game.ID))
 	})
+
 	for i := 1; i < shared.NumCommands; i++ {
 		svgCallback(i, func(evt dom.Event) {
 			el := evt.Target()
@@ -315,22 +323,22 @@ func doCorpsOrders(game *shared.Game, cmd *shared.GameCmd) {
 			// print("exec command", id, "on game cmd", cmd.ID)
 			switch id {
 			case shared.CommandNewObjective:
-				doNewObjective(game, cmd)
+				doNewObjective(Session.Game, Session.Cmd)
 			default:
 				go func() {
-					newCmd := shared.GameCmd{}
+					newCmd := &shared.GameCmd{}
 					err := RPC("GameRPC.CmdOrder", shared.CmdOrder{
 						Channel: Session.Channel,
-						ID:      cmd.ID,
+						ID:      Session.Cmd.ID,
 						Command: id,
-					}, &newCmd)
+					}, newCmd)
 					if err != nil {
 						dom.GetWindow().Alert(err.Error())
 					} else {
 						// We are done with this Corps, so
 						// Reload console back to the Corps overview
-						*cmd = newCmd
-						doOrders(game)
+						*Session.Cmd = *newCmd
+						Session.Nav(fmt.Sprintf("/play/%d/orders", Session.Game.ID))
 					}
 				}()
 			}
@@ -347,21 +355,20 @@ func doNewObjective(game *shared.Game, cmd *shared.GameCmd) {
 	flipped := isFlipped(game)
 	html := ""
 
-	consoleCurrentCmd = cmd
-	consoleSetViewBox(game, game.GridX*game.GridSize, game.GridY*game.GridSize, true)
+	consoleSetViewBox(Session.Game.GridX*Session.Game.GridSize, Session.Game.GridY*Session.Game.GridSize, true)
 
-	if game.GridSize > 0 {
-		html += addBaseTiles(game)
+	if Session.Game.GridSize > 0 {
+		html += addBaseTiles(Session.Game)
 		html += `<path id=unit-path stroke=yellow opacity=.3 fill=yellow stroke-width=1 marker-end=url(#end-circle)></path>`
-		html += addObjectiveTiles(game)
-		html += addUnitTiles(game, cmd.ID, "red", false, false)
-		html += addUnitTiles(game, cmd.ID, "blue", false, false)
+		html += addObjectiveTiles(Session.Game)
+		html += addUnitTiles(Session.Game, Session.Cmd.ID, "red", false, false)
+		html += addUnitTiles(Session.Game, Session.Cmd.ID, "blue", false, false)
 	}
 	g.SetInnerHTML(html)
 	if flipped {
-		g.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", game.TableX*6, game.TableY*6))
+		g.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", Session.Game.TableX*6, Session.Game.TableY*6))
 	}
-	scaleImages(game)
+	scaleImages(Session.Game)
 
 	// td := dom.GetWindow().Document().QuerySelector("#tile-details")
 	// td.SetInnerHTML("Click on destination point for the March Order")
@@ -427,7 +434,7 @@ func doNewObjective(game *shared.Game, cmd *shared.GameCmd) {
 		}
 	}
 
-	tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
+	Session.TileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
 		el := evt.Target()
 		tag := el.TagName()
 

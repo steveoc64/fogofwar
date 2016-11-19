@@ -181,7 +181,7 @@ func _scenarioEdit(action string, msg *shared.NetData, context *router.Context) 
 		}
 
 		if Session.Mobile() {
-			form.Row(1).AddInput(1, "Name", "Name")
+			form.Row(1).AddFocusInput(1, "Name", "Name")
 			form.Row(1).AddNumber(1, "Year", "Year", "0")
 			if Session.Rank > 9 {
 				form.Row(2).
@@ -194,7 +194,7 @@ func _scenarioEdit(action string, msg *shared.NetData, context *router.Context) 
 			}
 		} else {
 			rowElem := form.Row(6).
-				AddInput(3, "Name", "Name").
+				AddFocusInput(3, "Name", "Name").
 				AddNumber(1, "Year", "Year", "0")
 
 			if Session.Rank > 9 {
@@ -439,7 +439,7 @@ func scenarioRed(context *router.Context) {
 		form.New("fa-flag-o", "Red Force Details - "+data.Name)
 
 		form.Row(1).
-			AddInput(1, "Commander", "RedTeam")
+			AddFocusInput(1, "Commander", "RedTeam")
 
 		form.Row(1).
 			AddTextarea(1, "Briefing", "RedBrief")
@@ -532,7 +532,7 @@ func scenarioBlue(context *router.Context) {
 		form.New("fa-flag", "Blue Force Details - "+data.Name)
 
 		form.Row(1).
-			AddInput(1, "Commander", "BlueTeam")
+			AddFocusInput(1, "Commander", "BlueTeam")
 
 		form.Row(1).
 			AddTextarea(1, "Briefing", "BlueBrief")
@@ -632,12 +632,12 @@ func scenarioForceAdd(team string, context *router.Context) {
 
 			if Session.SubMobile() {
 				form.Row(1).
-					AddInput(1, "Unit Name", "Name")
+					AddFocusInput(1, "Unit Name", "Name")
 				form.Row(1).
 					AddInput(1, "Nation", "Nation")
 			} else {
 				form.Row(2).
-					AddInput(1, "Unit Name", "Name").
+					AddFocusInput(1, "Unit Name", "Name").
 					AddInput(1, "Nation", "Nation")
 			}
 
@@ -653,7 +653,7 @@ func scenarioForceAdd(team string, context *router.Context) {
 		} else {
 
 			form.Row(5).
-				AddInput(2, "Unit Name", "Name").
+				AddFocusInput(2, "Unit Name", "Name").
 				AddInput(1, "Nation", "Nation").
 				AddSelect(1, "Force Level", "Level", Session.Lookup.CmdLevel, "ID", "Name", 1, 2).
 				AddSelect(1, "Troop Condition", "Condition", Session.Lookup.Condition, "ID", "Name", 1, 3)

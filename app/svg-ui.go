@@ -126,7 +126,7 @@ func paperButtonSet(evt dom.Event, text string) {
 	}
 }
 
-func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
+func consoleSetViewBox(x, y int, MapMode bool) {
 	w := dom.GetWindow()
 	doc := w.Document()
 
@@ -134,13 +134,17 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	g := c.QuerySelector("[name=g-main]")
 	mr := c.QuerySelector("[name=map-rect]")
 
-	if keyGrabber != nil {
-		dom.GetWindow().RemoveEventListener("keypress", false, keyGrabber)
-		keyGrabber = nil
+	if Session.KeyGrabber != nil {
+		dom.GetWindow().RemoveEventListener("keypress", false, Session.KeyGrabber)
+		Session.KeyGrabber = nil
 	}
 
-	// print("remove tileclicker")
-	g.RemoveEventListener("click", false, tileClicker)
+	if Session.Game == nil {
+		print("ERROR - Game is null")
+		Session.Game = &shared.Game{}
+	}
+
+	g.RemoveEventListener("click", false, Session.TileClicker)
 	g.RemoveAttribute("transform")
 	g.SetInnerHTML("")
 	// print("setting viewbox", x, y)
@@ -150,7 +154,7 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 	if MapMode {
 		t.Class().Add("console-map-title")
 		t.SetInnerHTML(fmt.Sprintf("%d x %d ft Table with %d\" grids (%d x %d scale m)",
-			game.TableX, game.TableY, game.GridSize, game.KmX, game.KmY))
+			Session.Game.TableX, Session.Game.TableY, Session.Game.GridSize, Session.Game.KmX, Session.Game.KmY))
 		mr.SetAttribute("width", fmt.Sprintf("%d", x))
 		mr.SetAttribute("height", fmt.Sprintf("%d", y))
 		mr.Class().Remove("hidden")
@@ -158,10 +162,10 @@ func consoleSetViewBox(game *shared.Game, x, y int, MapMode bool) {
 		t.Class().Remove("console-map-title")
 		if Session.Orientation == "Landscape" || !Session.Mobile() {
 			t.SetInnerHTML(fmt.Sprintf("%s, %d, Turn %d of %d",
-				game.Name, game.Year, game.Turn, game.TurnLimit))
+				Session.Game.Name, Session.Game.Year, Session.Game.Turn, Session.Game.TurnLimit))
 		} else {
 			t.SetInnerHTML(fmt.Sprintf("%s, %d",
-				game.Name, game.Year))
+				Session.Game.Name, Session.Game.Year))
 		}
 		mr.Class().Add("hidden")
 	}

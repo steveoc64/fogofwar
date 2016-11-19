@@ -43,6 +43,20 @@ type GlobalSessionData struct {
 	wasSubmobile         bool
 	TilesChanged         bool
 	TeamsChanged         bool
+
+	// Global JS functions
+	TileClicker func(*js.Object)
+	KeyGrabber  func(*js.Object)
+
+	// Game state data
+	Game     *shared.Game
+	Cmd      *shared.GameCmd
+	SubUnits []*shared.Unit
+	Unit     *shared.Unit
+	Fight    *shared.Fight
+	Panel    string
+	Incoming []int
+	Fights   []*shared.Fight
 }
 
 func (g *GlobalSessionData) GetRank() string {
@@ -113,6 +127,15 @@ func (s *GlobalSessionData) Navigate(url string) {
 	// 	Route:   url,
 	// }, &url)
 	hideDisqus()
+}
+
+func (s *GlobalSessionData) Nav(url string) {
+
+	// print("Navigate to", url)
+	// On navigate, clear out any subscriptions on events
+	locstor.SetItem("navigate", url)
+	s.Router.Navigate(url)
+	s.URL = url
 }
 
 func (s *GlobalSessionData) Back() {

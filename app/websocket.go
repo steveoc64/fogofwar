@@ -269,7 +269,7 @@ func (c *myClientCodec) Close() error {
 
 func processAsync(header *shared.NetResponse, msg *shared.NetData) {
 
-	// print("process async", header.ServiceMethod, msg.Action)
+	print("process async", header.ServiceMethod, msg.Action)
 
 	switch msg.Action {
 	case "Ping":
@@ -280,6 +280,7 @@ func processAsync(header *shared.NetResponse, msg *shared.NetData) {
 	default:
 		// print("General Msg", msg)
 		fn := Session.Subscriptions[header.ServiceMethod]
+		// print("subs", Session.Subscriptions)
 		if fn != nil {
 			go fn(msg.Action, msg, Session.Context)
 		}

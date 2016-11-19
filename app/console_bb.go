@@ -5,30 +5,45 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
-func doBB(game *shared.Game) {
+// Select the Corps that wishes to fire
+func playBombard(context *router.Context) {
+	gameID, err := strconv.Atoi(context.Params["game"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("Game not loaded - back to summary")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 	xx := 100
+
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "BB")
+	consolePhaseBusy("BombardCorps")
 	// print("phaseBB")
 
 	team := "blue"
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Fire!")
@@ -67,8 +82,7 @@ func doBB(game *shared.Game) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		// print("cease fire")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {
@@ -83,44 +97,62 @@ func doBB(game *shared.Game) {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			cmd := game.GetCmd(team, id)
-			// print("click on cmd", cmd)
-			doBB2(game, cmd)
+			Session.Cmd = Session.Game.GetCmd(team, id)
+			Session.Nav(fmt.Sprintf("/play/%d/bombard/unit", Session.Game.ID))
 		})
 	}
 
 }
 
-func doBB2(game *shared.Game, cmd *shared.GameCmd) {
+// Select the unit within the given corps to fire
+func playBombardUnit(context *router.Context) {
+	gameID, err := strconv.Atoi(context.Params["game"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("No game loaded - back to start")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Cmd == nil {
+		print("No corps selected - back 1 screen")
+		Session.Nav(fmt.Sprintf("/play/%d/bombard", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
-	consoleCurrentCmd = cmd
+
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "BB2")
+	consolePhaseBusy("BombardUnit")
 	// print("phaseBB2")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Fire!")
-	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), cmd.Name)
+	html += svgText(0, 15, fmt.Sprintf("text__1x text__%s", team), Session.Cmd.Name)
 	html += svgHelpBtn()
 
 	// get a prelim count
 	total := 0
-	for _, v := range cmd.Units {
-		if v.CanBombard(cmd) {
+	for _, v := range Session.Cmd.Units {
+		if v.CanBombard(Session.Cmd) {
 			total++
 		}
 	}
@@ -130,11 +162,11 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	ids := []int{}
 	divName := ""
 	count := 0
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			divName = v.Name
 		}
-		if v.CanBombard(cmd) {
+		if v.CanBombard(Session.Cmd) {
 			ids = append(ids, v.ID)
 			html += svgG(v.ID)
 			if total > 4 {
@@ -186,7 +218,7 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		doBB(game)
+		Session.Nav(fmt.Sprintf("/play/%d/bombard", Session.Game.ID))
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {
@@ -200,18 +232,18 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 	for _, v := range ids {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
-			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			unit := game.GetUnit(team, id)
+			uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
+			Session.Unit = Session.Game.GetUnit(team, uid)
 			// print("unit", team, id, unit)
-			if unit.Bombard != nil && unit.Bombard.ID != 0 {
+			if Session.Unit.Bombard != nil && Session.Unit.Bombard.ID != 0 {
 				if w.Confirm("Cancel this Fire Mission ?") {
 					go func() {
 						done := false
 						err := RPC("GameRPC.CancelShot", shared.BombardData{
 							Channel: Session.Channel,
-							GameID:  game.ID,
-							ID:      unit.Bombard.ID,
-							Bombard: unit.Bombard,
+							GameID:  Session.Game.ID,
+							ID:      Session.Unit.Bombard.ID,
+							Bombard: Session.Unit.Bombard,
 						}, &done)
 						if err != nil {
 							print(err.Error())
@@ -219,13 +251,38 @@ func doBB2(game *shared.Game, cmd *shared.GameCmd) {
 					}()
 				}
 			} else {
-				doBB3(game, cmd, unit)
+				Session.Nav(fmt.Sprintf("/play/%d/bombard/target", gameID))
 			}
 		})
 	}
 }
 
-func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
+// func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
+func playBombardTarget(context *router.Context) {
+	gameID, err := strconv.Atoi(context.Params["game"])
+	if err != nil {
+		print(err.Error())
+		return
+	}
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("No game loaded - back to start")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Cmd == nil {
+		print("No Corps selected")
+		Session.Nav(fmt.Sprintf("/play/%d/bombard", gameID))
+		return
+	}
+
+	if Session.Unit == nil {
+		print("No gun unit selected")
+		Session.Nav(fmt.Sprintf("/play/%d/bombard/unit", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -233,29 +290,27 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 	html := ""
 	bb := shared.Bombard{}
 
-	consoleCurrentCmd = cmd
-	consoleCurrentUnit = unit
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "BB3")
+	consolePhaseBusy("BombardFire")
 	// print("phaseBB3", game, cmd, unit)
 
 	team := "blue"
-	enemy := game.RedPlayers
+	enemy := Session.Game.RedPlayers
 	enemyTeam := "red"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 		enemyTeam = "blue"
-		enemy = game.BluePlayers
+		enemy = Session.Game.BluePlayers
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Fire!")
-	html += svgText(10, 20, fmt.Sprintf("text__1x text__%s", team), unit.Name+" ~ "+unit.GetGuns())
+	html += svgText(10, 20, fmt.Sprintf("text__1x text__%s", team), Session.Unit.Name+" ~ "+Session.Unit.GetGuns())
 	html += svgText(10, 26, fmt.Sprintf("text__1x text__%s", team), "Select Enemy Player:")
 	html += svgHelpBtn()
 
@@ -283,7 +338,7 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 		}
 	}
 
-	maxRange := unit.GetGunRange()
+	maxRange := Session.Unit.GetGunRange()
 	html += svgText(20, 74, "text__0x", "Range:")
 	html += `<g id=range>`
 	x = 0
@@ -305,8 +360,8 @@ func doBB3(game *shared.Game, cmd *shared.GameCmd, unit *shared.Unit) {
 		// print("Fire")
 
 		// Get the defending ID
-		bb.GameID = game.ID
-		bb.UnitID = unit.ID
+		bb.GameID = Session.Game.ID
+		bb.UnitID = Session.Unit.ID
 		bb.TargetID = 0
 		bb.TargetUID = 0
 		bb.RangeMax = 0
@@ -399,19 +454,19 @@ func doBBReceive(game *shared.Game, id int, bb string) {
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "BBReceive")
+	consolePhaseBusy("BBReceive")
 	// print("phaseBBReceive")
 
 	team := "blue"
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	html = svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), fmt.Sprintf("Incoming! (%d)", id))
@@ -460,16 +515,19 @@ func doBBReceive2(game *shared.Game, cmd *shared.GameCmd, id int, bb string) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
+
+	Session.Game = game
+	Session.Cmd = cmd
+
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consoleCurrentCmd = cmd
-	consolePhaseBusy(game, "BBReceive2")
+	consolePhaseBusy("BBReceive2")
 
 	team := "blue"
 	if game.Red {

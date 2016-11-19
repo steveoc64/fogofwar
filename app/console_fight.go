@@ -5,40 +5,60 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func doFight(game *shared.Game, fight *shared.Fight) {
+	Session.Game = game
+	Session.Fight = fight
+	Session.Nav(fmt.Sprintf("/play/%d/fight/%d", Session.Game.ID, Session.Fight.ID))
+}
+
+func playFight(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+	fightID, _ := strconv.Atoi(context.Params["fight"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+	}
+
+	if Session.Fight == nil || Session.Fight.ID != fightID {
+		print("no fight loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "Fight")
-	consoleCurrentFight = fight
+	consolePhaseBusy("Fight")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	units := fight.Blue
-	enemy := fight.Red
+	units := Session.Fight.Blue
+	enemy := Session.Fight.Red
 	enemyteam := "red"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
-		units = fight.Red
-		enemy = fight.Blue
+		units = Session.Fight.Red
+		enemy = Session.Fight.Blue
 		enemyteam = "blue"
 	}
 
 	html = svgText(4, 10, fmt.Sprintf("text__2x text__%s", team), "Fight -")
-	html += svgText(40, 8, "text__1x text__"+team, fight.Name)
+	html += svgText(40, 8, "text__1x text__"+team, Session.Fight.Name)
 
 	if Session.Orientation == "Landscape" {
 		html += fmt.Sprintf(`<image xlink:href=/img/fight.png x=%d y=0 height=15 width=50></image>`, xx-60)
@@ -56,22 +76,22 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 	html += svgEndG()
 
 	terrain := ""
-	if fight.Rough {
+	if Session.Fight.Rough {
 		terrain += "Rough Ground"
 	}
-	if fight.Woods {
+	if Session.Fight.Woods {
 		if terrain != "" {
 			terrain += ", "
 		}
 		terrain += "Woods"
 	}
-	if fight.Built {
+	if Session.Fight.Built {
 		if terrain != "" {
 			terrain += ", "
 		}
 		terrain += "Buildings"
 	}
-	if fight.Fort {
+	if Session.Fight.Fort {
 		if terrain != "" {
 			terrain += ", "
 		}
@@ -92,7 +112,7 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 	advance := 0
 	baseline := 60
 	for _, v := range units {
-		subs := v.GetSubunits(game.GetCmd(team, v.CmdID))
+		subs := v.GetSubunits(Session.Game.GetCmd(team, v.CmdID))
 		for _, u := range subs {
 			x := 0
 			y := 0
@@ -149,7 +169,7 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		advance = 0
 		baseline = 25
 		for _, v := range enemy {
-			subs := v.GetSubunits(game.GetCmd(enemyteam, v.CmdID))
+			subs := v.GetSubunits(Session.Game.GetCmd(enemyteam, v.CmdID))
 			for _, u := range subs {
 				x := 0
 				y := 0
@@ -190,10 +210,10 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 	g.SetInnerHTML(html)
 
 	svgCallback(100, func(dom.Event) {
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 	svgCallback(101, func(dom.Event) {
-		doCommitFight(game, fight)
+		doCommitFight(Session.Game, Session.Fight)
 	})
 
 	// add callbacks for our units
@@ -202,12 +222,12 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
 			// print("clicked on friendly unit", id)
-			unit := game.GetUnit(team, id)
+			unit := Session.Game.GetUnit(team, id)
 			switch unit.UType {
 			case shared.UnitDiv:
-				doFightHQ(game, fight, unit)
+				doFightHQ(Session.Game, Session.Fight, unit)
 			default:
-				doFightUnit(game, fight, unit)
+				doFightUnit(Session.Game, Session.Fight, unit)
 			}
 		})
 	}
@@ -217,8 +237,8 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 		svgCallback(v, func(evt dom.Event) {
 			el := evt.Target()
 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-			unit := game.GetUnit(enemyteam, id)
-			doFightEnemy(game, fight, unit)
+			unit := Session.Game.GetUnit(enemyteam, id)
+			doFightEnemy(Session.Game, Session.Fight, unit)
 		})
 	}
 
@@ -233,24 +253,37 @@ func doFight(game *shared.Game, fight *shared.Fight) {
 }
 
 func doNewFight(game *shared.Game) {
+	Session.Nav(fmt.Sprintf("/play/%d", game.ID))
+}
+
+func playNewFight(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "NewFight")
+	consolePhaseBusy("NewFight")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
@@ -304,8 +337,8 @@ func doNewFight(game *shared.Game) {
 	entryField.SetInnerHTML("")
 
 	allDone := func() {
-		w.RemoveEventListener("keydown", false, keyGrabber)
-		keyGrabber = nil
+		w.RemoveEventListener("keydown", false, Session.KeyGrabber)
+		Session.KeyGrabber = nil
 		rough := !doc.QuerySelector("#rough").Class().Contains("hidden")
 		woods := !doc.QuerySelector("#woods").Class().Contains("hidden")
 		built := !doc.QuerySelector("#built").Class().Contains("hidden")
@@ -316,7 +349,7 @@ func doNewFight(game *shared.Game) {
 			err := RPC("GameRPC.NewFight", shared.FightData{
 				Channel: Session.Channel,
 				Fight: &shared.Fight{
-					GameID: game.ID,
+					GameID: Session.Game.ID,
 					Name:   t,
 					Rough:  rough,
 					Woods:  woods,
@@ -327,7 +360,7 @@ func doNewFight(game *shared.Game) {
 			if err != nil {
 				print(err.Error())
 			} else {
-				consolePhaseNotBusy(game)
+				consolePhaseNotBusy()
 			}
 		}()
 	}
@@ -336,7 +369,7 @@ func doNewFight(game *shared.Game) {
 		allDone()
 	})
 
-	keyGrabber = w.AddEventListener("keydown", false, func(evt dom.Event) {
+	Session.KeyGrabber = w.AddEventListener("keydown", false, func(evt dom.Event) {
 		k := evt.(*dom.KeyboardEvent)
 		// print("global keypress", k.CharCode, k.Key, k.KeyCode)
 		t := entryField.InnerHTML()

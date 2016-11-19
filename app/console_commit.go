@@ -12,24 +12,26 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+	Session.Game = game
+	Session.Fight = fight
+
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consoleCurrentFight = fight
-	consolePhaseBusy(game, "CommitFight")
+	consolePhaseBusy("CommitFight")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	// Create heading with Team Name
@@ -105,24 +107,26 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
-	consoleCurrentCmd = cmd
-	consoleCurrentFight = fight
+	Session.Game = game
+	Session.Cmd = cmd
+	Session.Fight = fight
+
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "CommitDiv")
+	consolePhaseBusy("CommitDiv")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
-	html = svgText(0, 9, "text__1x text__"+team, "Select Divisions from "+cmd.Name)
-	html += svgText(0, 18, "text__1x text__"+team, "To commit to "+fight.Name)
+	html = svgText(0, 9, "text__1x text__"+team, "Select Divisions from "+Session.Cmd.Name)
+	html += svgText(0, 18, "text__1x text__"+team, "To commit to "+Session.Fight.Name)
 	html += svgHelpBtn()
 
 	if Session.Orientation == "Landscape" {

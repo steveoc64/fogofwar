@@ -12,16 +12,20 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
+
+	Session.Game = game
+	Session.Fight = fight
+	Session.Unit = unit
+
 	html := ""
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "FightHQ")
-	consoleCurrentFight = fight
+	consolePhaseBusy("FightHQ")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -29,11 +33,11 @@ func doFightGunFire(game *shared.Game, fight *shared.Fight, unit *shared.Unit, s
 	print("shot type", shotType)
 
 	team := "blue"
-	enemy := fight.Red
+	enemy := Session.Fight.Red
 	enemyteam := "red"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
-		enemy = fight.Blue
+		enemy = Session.Fight.Blue
 		enemyteam = "blue"
 	}
 

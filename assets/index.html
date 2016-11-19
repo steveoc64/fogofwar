@@ -95,7 +95,8 @@
 <blockquote class="embedly-card hidden" data-card-key="d38d2f4460e44ad6a30761e916240ebe" data-card-type="article-full"><h4><a href="https://wargaming.io">ActionFront</a></h4><p>Computer Moderated TableTop Wargaming</p></blockquote>
 <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
 
- --><div id="disqus_thread" class="disqus-container hidden">Here is the disqus thread</div>
+ -->
+<div id="disqus_thread" class="disqus-container hidden">Here is the disqus thread</div>
 <script>
 var disqus_config = function () {
   // this.page.url = "http://wargaming.io/disqus";
@@ -110,50 +111,133 @@ s.setAttribute('data-timestamp', +new Date());
 (d.head || d.body).appendChild(s);
 })();
 </script>
-</body>
 
-<!-- Our Apps, cached in localstorage 
 <script type="text/javascript">
-var codeVersion = "20161102"
+var codeVersion = "20161119"
 var script = document.createElement('script');
     script.type = 'text/javascript';
+    script.id = "ActionFrontApp"
 var head = document.getElementsByTagName('head')[0];
 
-function loadScript(url, callback)
-{
-  script.src = url;
-  script.onreadystatechange = callback;
-  script.onload = callback;
-  console.log("loading code from remote")
-  head.appendChild(script);
+const dbName = "AFCode";
+var db;
+
+var client = new XMLHttpRequest();
+client.open('GET', '/foo.txt');
+client.onreadystatechange = function() {
+  alert(client.responseText);
 }
-var throwTheFrankenSwitch = function() {
-  console.log("the code appears to be", script.text.substr(1,44))
-  if (typeof(Storage) !== "undefined") {
-    localStorage.appCode = script.text
-    console.log("the code is now cached")
+
+var storeTheCode = function(code) {
+  console.log("got the code from the backend", script)
+  console.log("which comes from", script.src)
+  console.log("and it is", script.text)
+
+  console.log("lets try storing it")
+  var dreq = db.transaction("code", "readwrite")
+    .objectStore("code")
+    .delete(codeVersion) 
+
+  dreq.onsuccess = function(event) {
+    console.log("deleted old code")
+  }
+
+  var req = db.transaction("code", "readwrite")
+    .objectStore("code")
+    .add({ versionName: codeVersion, code: script.text })
+
+  req.onsuccess = function(event) {
+    console.log("stored ok, so now exec", script.text)
     eval(script.text)
+  };
+};
+
+var fetchTheCode = function() {
+  console.log("loading code from remote")
+  var client = new XMLHttpRequest();
+  client.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var code = client.responseText
+      console.log("got code", code.substr(1,66))
+
+      console.log("lets try storing it")
+      var dreq = db.transaction("code", "readwrite")
+        .objectStore("code")
+        .delete(codeVersion) 
+
+      dreq.onsuccess = function(event) {
+        console.log("deleted old code")
+      }
+
+      var req = db.transaction("code", "readwrite")
+        .objectStore("code")
+        .add({ versionName: codeVersion, code: code })
+
+      req.onsuccess = function(event) {
+        console.log("stored ok, so now exec", code.substr(1,66))
+        eval(code)
+      };
+    } else {
+      console.log("readystate", this.readystate, this.status)
+    }
+  }
+  console.log("client", client)
+  client.open('GET', 'app.js', true)
+  client.send()
+
+  // script.onload = function(){
+  //   storeTheCode()
+  // }
+  // script.src = "app.js"
+  // head.appendChild(script)
+};
+
+var loadTheCode = function() {
+  var req = db.transaction("code", "readonly")
+    .objectStore("code")
+    .get(codeVersion) 
+
+  req.onsuccess = function(event) {
+    code = event.target.result.code
+    console.log("fetched code", codeVersion)
+    eval(code)
   }
 }
-var gotIt = false
-if (typeof(Storage) !== "undefined") {
-  console.log("we have localstorage")
-  if (!localStorage.appCode) {
-    console.log("no code locally - fetch from remote")
-  } else {
-    console.log("fetching code from localstorage")
-    eval(localStorage.appCode)
-    gotIt = true
-  }
-} else {
-  console.log("no localstorage")
-}
-if (!gotIt) {
-  loadScript("app.js", throwTheFrankenSwitch)
-}
-</script> -->
-<script src="app.js"></script>
-<script type="text/javascript">
-  codeVersion="02040"
+
+
+var request = indexedDB.open(dbName, 1);
+
+request.onerror = function(event) {
+  // Handle errors.
+  console.log("An error opening the DB")
+};
+
+request.onsuccess = function(event) {
+  console.log("onsuccess open db")
+  db = event.target.result;
+  loadTheCode()
+};
+
+
+request.onupgradeneeded = function(event) {
+  console.log("onupgradeneeded")
+  db = event.target.result;
+
+  // Create an objectStore to hold information about our customers. We're
+  // going to use "ssn" as our key path because it's guaranteed to be
+  // unique - or at least that's what I was told during the kickoff meeting.
+  var objectStore = db.createObjectStore("code", { keyPath: "versionName" });
+
+    // Use transaction oncomplete to make sure the objectStore creation is 
+  // finished before adding data into it.
+  objectStore.transaction.oncomplete = function(event) {
+    console.log("objectstore created")
+    loadTheCode()
+  };
+};
+
 </script>
+</body>
+
+<!-- <script src="app.js"></script> -->
 </html>

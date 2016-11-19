@@ -163,6 +163,7 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			DB.SQL(`update unit set ammo=$2,guns_fired=true where id=$1`, firer.ID, firer.Ammo).Exec()
 			Connections.BroadcastPlayer(bb.FirerID, "Play", &shared.NetData{
 				Action: "Unit",
+				GameID: data.GameID,
 				ID:     firer.ID,
 				Opcode: shared.UnitEventFired,
 				Unit: &shared.UnitEvent{
@@ -211,6 +212,7 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			event := applyGunDamage(victim, targetCorps, pts)
 			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
 				Action: "Unit",
+				GameID: data.GameID,
 				ID:     victim.ID,
 				Opcode: shared.UnitEventHits,
 				Unit:   &event,
@@ -221,6 +223,7 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			event = applyGunDamage(victim, targetCorps, pts)
 			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
 				Action: "Unit",
+				GameID: data.GameID,
 				ID:     victim.ID,
 				Opcode: shared.UnitEventHits,
 				Unit:   &event,
@@ -231,6 +234,7 @@ func (g *GameRPC) ComputeBombard(data shared.BombardData, done *bool) error {
 			event = applyGunDamage(victim, targetCorps, pts)
 			Connections.BroadcastPlayer(bb.TargetID, "Play", &shared.NetData{
 				Action: "Unit",
+				GameID: data.GameID,
 				ID:     victim.ID,
 				Opcode: shared.UnitEventHits,
 				Unit:   &event,

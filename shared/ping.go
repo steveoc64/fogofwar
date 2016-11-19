@@ -12,6 +12,7 @@ type NetData struct {
 	Action string
 	ID     int
 	Opcode int
+	GameID int
 	Unit   *UnitEvent
 	Fight  *GameFight
 	Cmds   *[]CmdUpdate

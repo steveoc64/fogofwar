@@ -307,6 +307,7 @@ func (l *LoginRPC) NewUserRego(u shared.UserSignup, newUser *shared.UserSignup) 
 	}
 
 	// Looks valid, so add the new user
+	u.Rank = 1
 	err := DB.InsertInto("users").
 		Whitelist("username", "name", "passwd", "email", "rank", "notes", "country", "bloglink", "channel").
 		Record(u).

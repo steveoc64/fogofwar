@@ -16,12 +16,12 @@ func doGT1(game *shared.Game) {
 
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "GT1")
+	consolePhaseBusy("GT1")
 	// print("phaseGT1 with", game)
 
 	team := "blue"
@@ -78,7 +78,7 @@ func doGT1(game *shared.Game) {
 
 	svgCallback(100, func(dom.Event) {
 		print("all done")
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	svgCallbackQuery("#help", func(dom.Event) {
@@ -114,33 +114,35 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 
-	consoleCurrentCmd = cmd
+	Session.Game = game
+	Session.Cmd = cmd
+
 	xx := 100
 
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "GTCmd")
+	consolePhaseBusy("GTCmd")
 	// print("phaseGT1 with", game)
 
 	team := "blue"
-	teamName := game.BlueTeam
-	if game.Red {
+	teamName := Session.Game.BlueTeam
+	if Session.Game.Red {
 		team = "red"
-		teamName = game.RedTeam
+		teamName = Session.Game.RedTeam
 	}
 	html := ""
-	max, _, _ := cmd.GTMove()
+	max, _, _ := Session.Cmd.GTMove()
 
 	// Create heading with Team Name
 	sz := 2
 	if len(teamName) > 18 {
 		sz = 1
 	}
-	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), cmd.Name)
+	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), Session.Cmd.Name)
 	html += svgText(15, 16, fmt.Sprintf("text__1x text__%s", team), fmt.Sprintf("Move head of March Column %d grids", max))
 	html += svgHelpBtn()
 
@@ -178,19 +180,19 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 				contact := !doc.QuerySelector("#contact").Class().Contains("hidden")
 				err := RPC("GameRPC.GTMove", shared.GTMoveData{
 					Channel:     Session.Channel,
-					ID:          cmd.ID,
+					ID:          Session.Cmd.ID,
 					Destination: destination,
 					Contact:     contact,
 				}, &newCmd)
 				if err == nil {
 					print("got back new cmd", newCmd)
-					cmd.CX = newCmd.CX
-					cmd.CY = newCmd.CY
-					cmd.DState = newCmd.DState
+					Session.Cmd.CX = newCmd.CX
+					Session.Cmd.CY = newCmd.CY
+					Session.Cmd.DState = newCmd.DState
 				}
 			}()
 		}
-		consolePhaseNotBusy(game)
+		consolePhaseNotBusy()
 	})
 
 	if max > 1 {
@@ -219,97 +221,3 @@ func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
 		})
 	})
 }
-
-// func doGT2(game *shared.Game) {
-// 	w := dom.GetWindow()
-// 	doc := w.Document()
-// 	c := doc.QuerySelector("[name=svg-console]")
-// 	g := c.QuerySelector("[name=g-main]")
-// 	xx := 100
-
-// 	if Session.Orientation == "Landscape" {
-// 		consoleSetViewBox(game, 150, 100, false)
-// 		xx = 150
-// 	} else {
-// 		consoleSetViewBox(game, 100, 100, false)
-// 	}
-// 	consolePhaseBusy(game, "GT2")
-// 	// print("phaseGT1 with", game)
-
-// 	team := "blue"
-// 	// teamName := game.BlueTeam
-// 	cmds := game.BlueCmd
-// 	if game.Red {
-// 		team = "red"
-// 		// teamName = game.RedTeam
-// 		cmds = game.RedCmd
-// 	}
-
-// 	// Create heading with Team Name
-// 	// sz := 2
-// 	// if len(teamName) > 18 {
-// 	// 	sz = 1
-// 	// }
-// 	// html := svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), teamName)
-// 	html := svgText(0, 10, fmt.Sprintf("text__2x text__%s", team), "Extra Movement")
-// 	html += svgHelpBtn()
-
-// 	yoffset := 0
-// 	count := 0
-// 	ids := []int{}
-// 	for _, v := range cmds {
-// 		// max, min, gt := v.GTMove()
-// 		max, _, _ := v.GTMove()
-
-// 		// print("unit", v.ID, "can move", max, min, gt)
-// 		if v.PlayerID == Session.UserID {
-// 			html += svgG(v.ID)
-// 			if max == 0 || !v.Moving() {
-// 				html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-disabled", "text__"+team+" text__1x", v.Name)
-// 				html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())
-// 			} else {
-// 				count++
-// 				html += svgButton(0, 18+(yoffset), xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-// 				html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.CommandSummary())
-// 			}
-// 			html += svgEndG()
-// 			yoffset += 11
-// 			ids = append(ids, v.ID)
-// 		}
-// 	}
-// 	if count > 0 {
-// 		html += svgText(0, 16, "text__1x text__"+team, "Any Cav in listed units can move 2 grids")
-// 		html += svgText(0, 85, "text__0x", ".. any Cav not listed 1 grid, any skirmishers ½ grid")
-// 	} else {
-// 		html += svgText(0, 16, "text__0x", ".. any Cavalry unit 1 grid, any skirmishers ½ grid")
-// 	}
-
-// 	html += svgG(100)
-// 	html += fmt.Sprintf(`<rect x=0 y=88 rx=2 ry=2 width=%d height=12 class="carryon-button" data-id=100></rect>`, xx)
-// 	html += "\n"
-// 	html += svgText(xx/2, 97, "text__carryon text__middle", "Movement Complete")
-// 	html += svgEndG()
-// 	g.SetInnerHTML(html)
-
-// 	svgCallback(100, func(dom.Event) {
-// 		// print("all done")
-// 		consolePhaseNotBusy(game)
-// 	})
-
-// 	for _, v := range ids {
-// 		svgCallback(v, func(evt dom.Event) {
-// 			el := evt.Target()
-// 			id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-// 			cmd := game.GetCmd(team, id)
-// 			doUnitsDiv(game, cmd)
-// 		})
-// 	}
-
-// 	svgCallbackQuery("#help", func(dom.Event) {
-// 		loadTemplate("gt-move", "#unit-details", nil)
-// 		doc.QuerySelector("#unit-details").Class().Add("md-show")
-// 		doc.QuerySelector("[name=gt-move]").AddEventListener("click", false, func(evt dom.Event) {
-// 			doc.QuerySelector("#unit-details").Class().Remove("md-show")
-// 		})
-// 	})
-// }

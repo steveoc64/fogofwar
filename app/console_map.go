@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
@@ -22,25 +23,37 @@ func isFlipped(game *shared.Game) bool {
 }
 
 func doMap(game *shared.Game) {
+	Session.Nav(fmt.Sprintf("/play/%d/units", game.ID))
+}
+
+func playMap(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID == gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
-	flipped := isFlipped(game)
+	flipped := isFlipped(Session.Game)
 	html := ""
 	adjustCmd := &shared.GameCmd{}
 	adjusting := false
 
-	consolePhaseBusy(game, "Map")
+	consolePhaseBusy("Map")
 
-	consoleSetViewBox(game, game.GridX*game.GridSize, game.GridY*game.GridSize, true)
+	consoleSetViewBox(Session.Game.GridX*Session.Game.GridSize, Session.Game.GridY*Session.Game.GridSize, true)
 
-	if game.GridSize > 0 {
-		html += addBaseTiles(game)
-		html += addObjectiveTiles(game)
-		html += addUnitTiles(game, 0, "red", true, false)
-		html += addUnitTiles(game, 0, "blue", true, false)
+	if Session.Game.GridSize > 0 {
+		html += addBaseTiles(Session.Game)
+		html += addObjectiveTiles(Session.Game)
+		html += addUnitTiles(Session.Game, 0, "red", true, false)
+		html += addUnitTiles(Session.Game, 0, "blue", true, false)
 
 		g.SetInnerHTML(html)
 
@@ -50,9 +63,9 @@ func doMap(game *shared.Game) {
 		}
 
 		if flipped {
-			g.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", game.TableX*6, game.TableY*6))
+			g.SetAttribute("transform", fmt.Sprintf("rotate(180 %d %d)", Session.Game.TableX*6, Session.Game.TableY*6))
 		}
-		scaleImages(game)
+		scaleImages(Session.Game)
 
 		tileDetails := doc.QuerySelector("#tile-details")
 		tileDetails.AddEventListener("click", false, func(evt dom.Event) {
@@ -66,13 +79,13 @@ func doMap(game *shared.Game) {
 			gy, _ := strconv.Atoi(el.GetAttribute("gy"))
 			if cl.Contains("tile-objective") || cl.Contains("objective-name") {
 				obj, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				TheObjective := consoleGame.Objectives[obj]
+				TheObjective := Session.Game.Objectives[obj]
 				html = fmt.Sprintf("<b>Objective</b><br><i>%s</i><br>Victory Points ", TheObjective.Name)
-				if consoleGame.Red {
+				if Session.Game.Red {
 					html += fmt.Sprintf("Red: %d + %d per turn<br>",
 						TheObjective.RedVP, TheObjective.VPPerTurn)
 				}
-				if consoleGame.Blue {
+				if Session.Game.Blue {
 					html += fmt.Sprintf("Blue: %d + %d per turn",
 						TheObjective.BlueVP, TheObjective.VPPerTurn)
 				}
@@ -87,10 +100,10 @@ func doMap(game *shared.Game) {
 			} else if cl.Contains("tile-blue") || cl.Contains("unitname-blue") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				// print("getting blue cmd", uid)
-				cmd := consoleGame.GetCmd("Blue", uid)
+				cmd := Session.Game.GetCmd("Blue", uid)
 				// print("cmd", cmd)
 				// print("game", consoleGame)
-				if cmd.IsEnemy(game) {
+				if cmd.IsEnemy(Session.Game) {
 					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
 				} else {
@@ -107,8 +120,8 @@ func doMap(game *shared.Game) {
 			} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
 				// print("getting red cmd", uid)
-				cmd := consoleGame.GetCmd("Red", uid)
-				if cmd.IsEnemy(game) {
+				cmd := Session.Game.GetCmd("Red", uid)
+				if cmd.IsEnemy(Session.Game) {
 					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
 				} else {
@@ -131,7 +144,7 @@ func doMap(game *shared.Game) {
 						newCmd := &shared.GameCmd{}
 						err := RPC("GameRPC.MoveCmd", shared.MoveCmdData{
 							Channel: Session.Channel,
-							GameID:  game.ID,
+							GameID:  Session.Game.ID,
 							ID:      adjustCmd.ID,
 							X:       gx,
 							Y:       gy,
@@ -143,7 +156,7 @@ func doMap(game *shared.Game) {
 							adjustCmd.CY = newCmd.CY
 							adjustCmd.DX = newCmd.DX
 							adjustCmd.DY = newCmd.DY
-							doMap(game)
+							doMap(Session.Game)
 						}
 					}()
 					// }
@@ -195,7 +208,7 @@ func doMap(game *shared.Game) {
 			}
 		}
 
-		tileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
+		Session.TileClicker = g.AddEventListener("click", false, func(evt dom.Event) {
 			el := evt.Target()
 			tag := el.TagName()
 			if !el.Class().Contains("map-tile") {

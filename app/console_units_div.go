@@ -13,15 +13,14 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 
-	consoleCurrentCmd = cmd
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "UnitsDiv")
+	consolePhaseBusy("UnitsDiv")
 
 	// Add a turn summary object
 	g := c.QuerySelector("[name=g-main]")
@@ -99,18 +98,17 @@ func doUnitDivReorg(game *shared.Game, cmd *shared.GameCmd) {
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
-	consoleCurrentCmd = cmd
 	xx := 100
 	if Session.Orientation == "Landscape" {
-		consoleSetViewBox(game, 150, 100, false)
+		consoleSetViewBox(150, 100, false)
 		xx = 150
 	} else {
-		consoleSetViewBox(game, 100, 100, false)
+		consoleSetViewBox(100, 100, false)
 	}
-	consolePhaseBusy(game, "UnitReorg")
+	consolePhaseBusy("UnitReorg")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 

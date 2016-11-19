@@ -158,30 +158,26 @@ var fetchTheCode = function() {
   client.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var code = client.responseText
-      console.log("got code", code.substr(1,66))
-
-      console.log("lets try storing it")
       var dreq = db.transaction("code", "readwrite")
         .objectStore("code")
         .delete(codeVersion) 
 
-      dreq.onsuccess = function(event) {
-        console.log("deleted old code")
-      }
+      // dreq.onsuccess = function(event) {
+      //   console.log("deleted old code")
+      // }
 
       var req = db.transaction("code", "readwrite")
         .objectStore("code")
         .add({ versionName: codeVersion, code: code })
 
       req.onsuccess = function(event) {
-        console.log("stored ok, so now exec", code.substr(1,66))
+        console.log("stored code")
         eval(code)
       };
     } else {
       console.log("readystate", this.readystate, this.status)
     }
   }
-  console.log("client", client)
   client.open('GET', 'app.js', true)
   client.send()
 
@@ -198,9 +194,16 @@ var loadTheCode = function() {
     .get(codeVersion) 
 
   req.onsuccess = function(event) {
-    code = event.target.result.code
-    console.log("fetched code", codeVersion)
-    eval(code)
+    // console.log(event.target.result)
+    if (event.target.result == undefined) {
+      fetchTheCode()
+    } else {
+      code = event.target.result.code
+      console.log("fetched code", codeVersion)
+      console.log("but ... will get it from the sever anyway for now, after all that")
+      fetchTheCode()
+      // eval(code)
+    }
   }
 }
 

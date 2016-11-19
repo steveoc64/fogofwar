@@ -78,6 +78,7 @@ func enableRoutes(Rank int) {
 		"play-orders-corps":     playOrdersCorps,
 		"play-commander-action": playCommanderAction,
 		"play-units":            playUnits,
+		"play-units-div":        playUnitsDiv,
 		"play-map":              playMap,
 		"play-new-fight":        playNewFight,
 		"play-fight":            playFight,
@@ -128,7 +129,7 @@ func enableRoutes(Rank int) {
 }
 
 func initRouter() {
-	// print("initRouter")
+	print("initRouter")
 	Session.Subscriptions = make(map[string]MessageFunction)
 	Session.Context = nil
 	Session.ID = make(map[string]int)

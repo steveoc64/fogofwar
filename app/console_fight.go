@@ -253,7 +253,7 @@ func playFight(context *router.Context) {
 }
 
 func doNewFight(game *shared.Game) {
-	Session.Nav(fmt.Sprintf("/play/%d", game.ID))
+	Session.Nav(fmt.Sprintf("/play/%d/fight/new", game.ID))
 }
 
 func playNewFight(context *router.Context) {

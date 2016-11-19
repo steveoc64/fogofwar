@@ -5,10 +5,31 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
+	Session.Game = game
+	Session.Cmd = cmd
+	Session.Nav(fmt.Sprintf("/play/%d/units/div", game.ID))
+}
+
+func playUnitsDiv(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Cmd == nil {
+		print("No Corps defined")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -26,12 +47,12 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	g := c.QuerySelector("[name=g-main]")
 
 	team := "blue"
-	if game.Red {
+	if Session.Game.Red {
 		team = "red"
 	}
 
 	// Create heading with Team Name
-	fullName := cmd.Name + ": " + cmd.CommanderName
+	fullName := Session.Cmd.Name + ": " + Session.Cmd.CommanderName
 	sz := 2
 	if len(fullName) > 18 {
 		sz = 1
@@ -39,11 +60,11 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	// title
 	html := svgG(0)
 	html += svgText(0, 10, fmt.Sprintf("text__%dx text__%s", sz, team), fullName)
-	html += svgText(xx-2, 15, "text__end text__0x", cmd.CommandSummary())
+	html += svgText(xx-2, 15, "text__end text__0x", Session.Cmd.CommandSummary())
 	html += svgEndG()
 
 	numDivs := 0
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			numDivs++
 		}
@@ -51,11 +72,11 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 
 	// yspacing := 80 / (numDivs + 1) // width to use for each cmd
 	yoffset := 0
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			html += svgG(v.ID)
 			html += svgButton(0, 18+yoffset, xx, 10, "console-corps-button", "text__"+team+" text__1x", v.Name)
-			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(cmd))
+			html += svgText(xx-2, 25+yoffset, "text__0x text__end text__"+team, v.GetShortSummary(Session.Cmd))
 			html += svgEndG()
 			yoffset += 11
 		}
@@ -68,21 +89,21 @@ func doUnitsDiv(game *shared.Game, cmd *shared.GameCmd) {
 	g.SetInnerHTML(html)
 
 	svgCallback(0, func(dom.Event) {
-		doUnits(game)
+		doUnits(Session.Game)
 	})
 
 	svgCallback(100, func(evt dom.Event) {
-		doUnitDivReorg(game, cmd)
+		doUnitDivReorg(Session.Game, Session.Cmd)
 	})
 
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			svgCallback(v.ID, func(evt dom.Event) {
 				el := evt.Target()
 				id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				for _, v := range cmd.Units {
+				for _, v := range Session.Cmd.Units {
 					if v.ID == id {
-						doUnitsBde(game, cmd, v)
+						doUnitsBde(Session.Game, Session.Cmd, v)
 					}
 				}
 			})

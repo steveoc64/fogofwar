@@ -5,15 +5,27 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func doCommitFight(game *shared.Game, fight *shared.Fight) {
+	Session.Game = game
+	Session.Fight = fight
+	Session.Nav(fmt.Sprintf("/play/%d/fight/commit", Session.Game.ID))
+}
+
+func playFightCommit(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
-	Session.Game = game
-	Session.Fight = fight
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
 
 	xx := 100
 	if Session.Orientation == "Landscape" {
@@ -75,14 +87,14 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 		// print("clicked on corps", id, el.TagName())
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
-				doCommitDiv(game, v, fight)
+				doCommitDiv(Session.Game, v, Session.Fight)
 			}
 		}
 	}
 
 	svgCallback(100, func(dom.Event) {
 		// print("all done")
-		doFight(game, fight)
+		doFight(Session.Game, Session.Fight)
 	})
 
 	svgCallbackQuery("help", func(dom.Event) {
@@ -101,15 +113,38 @@ func doCommitFight(game *shared.Game, fight *shared.Fight) {
 }
 
 func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
+	Session.Game = game
+	Session.Cmd = cmd
+	Session.Fight = fight
+	Session.Nav(fmt.Sprintf("/play/%d/fight/commit/div", Session.Game.ID))
+}
+
+func playFightCommitDiv(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
 	html := ""
 
-	Session.Game = game
-	Session.Cmd = cmd
-	Session.Fight = fight
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Cmd == nil {
+		print("no cmd loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
+	if Session.Fight == nil {
+		print("no fight")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
 
 	xx := 100
 	if Session.Orientation == "Landscape" {
@@ -168,7 +203,7 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	totalres := 0
 
 	// calc the number of things in each role
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			switch v.Role {
 			case shared.RoleReserve:
@@ -198,7 +233,7 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 	y := 0
 
 	// render all the things
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			print("rendering", v.Name, v.Committed)
 			addclass := ""
@@ -310,27 +345,27 @@ func doCommitDiv(game *shared.Game, cmd *shared.GameCmd, fight *shared.Fight) {
 				done := false
 				err := RPC("GameRPC.CommitToFight", shared.FightData{
 					Channel: Session.Channel,
-					GameID:  game.ID,
-					ID:      fight.ID,
+					GameID:  Session.Game.ID,
+					ID:      Session.Fight.ID,
 					DivID:   id,
 				}, &done)
 				if err != nil {
 					print(err.Error())
 				} else {
-					u := game.GetUnit(team, id)
+					u := Session.Game.GetUnit(team, id)
 					u.Committed = true
 					if team == "blue" {
-						fight.Blue = append(fight.Blue, u)
+						Session.Fight.Blue = append(Session.Fight.Blue, u)
 					} else {
-						fight.Red = append(fight.Red, u)
+						Session.Fight.Red = append(Session.Fight.Red, u)
 					}
 				}
 			}
-			doFight(game, fight)
+			doFight(Session.Game, Session.Fight)
 		}()
 	})
 
-	for _, v := range cmd.Units {
+	for _, v := range Session.Cmd.Units {
 		if v.UType == shared.UnitDiv {
 			svgCallback(v.ID, func(evt dom.Event) {
 				el := evt.Target()

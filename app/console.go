@@ -18,6 +18,7 @@ type ConsolePaintData struct {
 func consolePhaseBusy(with string) {
 	if Session.Game == nil || Session.Game.ID == 0 {
 		print("ERROR : Game is nil, cant set busy")
+		Session.Navigate("/games")
 		return
 	}
 	go func() {
@@ -50,6 +51,7 @@ func consolePhaseNotBusy() {
 			print(err.Error())
 		}
 		Session.Game.PhaseBUSY = false
+		// Session.Nav(fmt.Sprintf("/play/%d", Session.Game.ID))
 		doTurnSummary()
 	}()
 }

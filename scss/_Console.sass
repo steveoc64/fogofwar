@@ -15,6 +15,10 @@
   @media (max-width: 800px)
     width: calc(100% - 14rem)
 
+  @media (orientation: portrait)
+    height: calc(100% - 12rem)
+    width: calc(100% - 2rem)
+
   .map-tile 
     stroke-width: .1px
     stroke-opacity: .6
@@ -22,7 +26,7 @@
   .tile-content-0-0
     opacity: .6
 
-.svg-console-portrait
+.svg-console-portrait-not
   height: calc(100% - 12rem)
   width: calc(100% - 2rem)
   margin-left: 1rem
@@ -164,6 +168,13 @@
   @media (max-width: 800px)
     width: 13rem
 
+  @media (orientation: portrait)
+    width: calc(100% - 2rem)
+    height: 5rem
+    top: calc(100% - 6.5rem)
+    left: 1rem
+
+
 .console-button-bar .button
   width: 19rem
   height: 9rem
@@ -186,6 +197,17 @@
     width: 12rem
     font-size: 2rem
     height: 4rem
+
+  @media (orientation: portrait)
+    width: 24%
+    height: 6rem
+    margin-left: 0
+    padding: 0
+    font-size: 2.2rem
+    color: #2a2e2e
+
+  @media (max-width: 500px) and (orientation: portrait)
+    font-size: 1.5rem
 
   &:hover
     color: black
@@ -245,6 +267,9 @@
   margin-left: auto
   margin-right: auto
   height: calc(100% - 42rem)
+
+  @media (orientation: portrait)
+    display: hidden
 
 .map-satellite-fill
   fill: url(#satellite-img)

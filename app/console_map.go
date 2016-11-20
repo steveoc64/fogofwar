@@ -23,13 +23,15 @@ func isFlipped(game *shared.Game) bool {
 }
 
 func doMap(game *shared.Game) {
-	Session.Nav(fmt.Sprintf("/play/%d/units", game.ID))
+	print("doMap", game)
+	Session.Game = game
+	Session.Nav(fmt.Sprintf("/play/%d/map", game.ID))
 }
 
 func playMap(context *router.Context) {
 	gameID, _ := strconv.Atoi(context.Params["game"])
 
-	if Session.Game == nil || Session.Game.ID == gameID {
+	if Session.Game == nil || Session.Game.ID != gameID {
 		print("no game loaded")
 		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
 		return
@@ -334,7 +336,7 @@ func addUnitTiles(game *shared.Game, id int, team string, showAllUnits, showAllL
 
 			}
 		}
-		print("here")
+		// print("here")
 		if v.CX != -1 && !v.Cull {
 			if showAllUnits || v.ID == id {
 				html += fmt.Sprintf(`<rect x="%d" y="%d" width="%d" height="%d" class="map-tile %s" gx="%d" gy="%d" name="%s-%d" data-id="%d"/>`,

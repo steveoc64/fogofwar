@@ -87,7 +87,7 @@ func doPreGameOrders() {
 		for _, v := range cmds {
 			if v.ID == id && v.PlayerID == Session.UserID {
 				Session.Cmd = v
-				Session.Nav(fmt.Sprintf("/play/%d/orders/%d", v.ID))
+				Session.Nav(fmt.Sprintf("/play/%d/orders/%d", Session.Game.ID, v.ID))
 			}
 		}
 	}

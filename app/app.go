@@ -156,11 +156,14 @@ func (s *GlobalSessionData) Subscribe(msg string, fn MessageFunction, context *r
 }
 
 func (s *GlobalSessionData) Reload(context *router.Context) {
+	s.Router.Navigate(s.URL)
+	return
+
 	if context == nil {
 		// print("reload to ", s.URL)
-		s.Router.Navigate(s.URL)
 	} else {
-		s.Router.Navigate(context.Path)
+		// print("reload from last url", s.URL)
+		s.Router.Navigate(s.URL)
 	}
 }
 
@@ -176,6 +179,7 @@ func (s *GlobalSessionData) Resize() {
 	// print("resize event", dom.GetWindow().InnerWidth(), dom.GetWindow().InnerHeight(), Session.Mobile())
 	if s.OrientationSensitive {
 		w := dom.GetWindow()
+
 		o := s.Orientation
 		s.Orientation = "Landscape"
 		if w.InnerHeight() > w.InnerWidth() {
@@ -186,6 +190,7 @@ func (s *GlobalSessionData) Resize() {
 			// dom.GetWindow().Alert("orientation change")
 			formulate.Templates(GetTemplate)
 			s.Reload(s.Context)
+			return
 		}
 	}
 

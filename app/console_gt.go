@@ -5,10 +5,24 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
 func doGT1(game *shared.Game) {
+	Session.Game = game
+	Session.Nav(fmt.Sprintf("/play/%d/move", Session.Game.ID))
+}
+
+func playMove(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
@@ -26,11 +40,11 @@ func doGT1(game *shared.Game) {
 
 	team := "blue"
 	// teamName := game.BlueTeam
-	cmds := game.BlueCmd
-	if game.Red {
+	cmds := Session.Game.BlueCmd
+	if Session.Game.Red {
 		team = "red"
 		// teamName = game.RedTeam
-		cmds = game.RedCmd
+		cmds = Session.Game.RedCmd
 	}
 
 	// Create heading with Team Name
@@ -96,11 +110,11 @@ func doGT1(game *shared.Game) {
 				svgCallback(v.ID, func(evt dom.Event) {
 					el := evt.Target()
 					id, _ := strconv.Atoi(el.GetAttribute("data-id"))
-					cmd := game.GetCmd(team, id)
+					cmd := Session.Game.GetCmd(team, id)
 					if max > 1 {
-						doGTCmd(game, cmd)
+						doGTCmd(Session.Game, cmd)
 					} else {
-						doMap(game)
+						doMap(Session.Game)
 					}
 				})
 			}
@@ -109,13 +123,24 @@ func doGT1(game *shared.Game) {
 }
 
 func doGTCmd(game *shared.Game, cmd *shared.GameCmd) {
+	Session.Game = game
+	Session.Cmd = cmd
+	Session.Nav(fmt.Sprintf("/play/%d/move/corps", Session.Game.ID))
+}
+
+func playMoveCorps(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")
 	g := c.QuerySelector("[name=g-main]")
-
-	Session.Game = game
-	Session.Cmd = cmd
 
 	xx := 100
 

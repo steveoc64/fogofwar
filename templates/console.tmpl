@@ -5,16 +5,14 @@
 {{end}}
 <span class="console-title">{{.Game.Name}} {{.Game.Year}}</span>
 </div>
-<div class="console-button-bar {{if eq "Portrait" .Orientation}}console-button-bar-portrait{{end}}">
+<div id="console-button-bar" class="console-button-bar">
 	<input type="button" class="button button-console" value="Orders">
 	<input type="button" class="button button-console" value="Map">
 	<input type="button" class="button button-console" value="Units">
 	<input type="button" class="button button-console" value="Game">
-	{{if eq "Landscape" .Orientation}}
-		<img src="/img/general2.png" class="console-general">
-	{{end}}
+	<img src="/img/general2.png" class="console-general">
 </div>
-<svg name="svg-console" class="svg-console{{if eq "Portrait" .Orientation}}-portrait{{end}}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg name="svg-console" class="svg-console" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1">
 
 <!-- Create definitions -->
 <defs>

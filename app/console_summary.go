@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"./shared"
+	"github.com/go-humble/router"
 	"honnef.co/go/js/dom"
 )
 
@@ -44,6 +45,18 @@ func getPhaseDescription(phase int) (string, string) {
 }
 
 func doTurnSummary() {
+	Session.Nav(fmt.Sprintf("/play/%d/summary", Session.Game.ID))
+}
+
+func playSummary(context *router.Context) {
+	gameID, _ := strconv.Atoi(context.Params["game"])
+
+	if Session.Game == nil || Session.Game.ID != gameID {
+		print("no game loaded")
+		Session.Navigate(fmt.Sprintf("/play/%d", gameID))
+		return
+	}
+
 	w := dom.GetWindow()
 	doc := w.Document()
 	c := doc.QuerySelector("[name=svg-console]")

@@ -121,8 +121,8 @@ func playMap(context *router.Context) {
 				}
 			} else if cl.Contains("tile-red") || cl.Contains("unitname-red") {
 				uid, _ := strconv.Atoi(el.GetAttribute("data-id"))
-				// print("getting red cmd", uid)
 				cmd := Session.Game.GetCmd("Red", uid)
+				print("getting red cmd", uid, cmd)
 				if cmd.IsEnemy(Session.Game) {
 					html = fmt.Sprintf("<b>Enemy Player: %s</b><br><b>%s</b><br>Nation: %s<br>Commander: %s<br>%s<br>\n",
 						cmd.PlayerName, cmd.Name, cmd.Nation, cmd.CommanderName, cmd.CommandSummary())
@@ -136,6 +136,7 @@ func playMap(context *router.Context) {
 						html += "<h4>Click on the map to adjust the location of the Unit by 1 grid</h4>"
 						adjustCmd = cmd
 					}
+
 				}
 			} else {
 				if adjustCmd.ID != 0 {
